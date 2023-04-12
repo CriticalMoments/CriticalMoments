@@ -1,0 +1,6 @@
+framework module Pods_CriticalMoments_Tests {
+  umbrella header "Pods-CriticalMoments_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

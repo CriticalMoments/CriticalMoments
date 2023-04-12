@@ -1,0 +1,6 @@
+framework module CriticalMoments {
+  umbrella header "CriticalMoments-umbrella.h"
+
+  export *
+  module * { export * }
+}
