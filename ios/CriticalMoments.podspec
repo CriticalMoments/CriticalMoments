@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   Work in progress, not ready for use.
                        DESC
 
-  s.homepage         = 'https://github.com/criticalmoments/criticalmoments'
+  s.homepage         = 'https://criticalmoments.io'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'CUSTOM', :text => 'Copyright 2023. All rights reserved.' }
   s.author           = { 'scosman' => 'scosman@users.noreply.github.com' }
