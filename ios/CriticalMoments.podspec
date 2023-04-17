@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '10.0'
 
-  s.source_files = 'CriticalMoments/Classes/**/*'
+  s.source_files = 'ios/CriticalMoments/Classes/**/*'
   
   # s.resource_bundles = {
   #   'CriticalMoments' => ['CriticalMoments/Assets/*.png']
