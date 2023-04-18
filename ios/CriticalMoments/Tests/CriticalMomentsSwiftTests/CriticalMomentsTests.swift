@@ -1,5 +1,5 @@
 import XCTest
-@testable import CriticalMoments
+@testable import CriticalMomentsSwift
 
 final class CriticalMomentsTests: XCTestCase {
     func testExample() throws {
