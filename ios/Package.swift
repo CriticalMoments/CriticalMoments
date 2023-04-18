@@ -18,6 +18,7 @@ let package = Package(
             name: "CriticalMoments"),
         .testTarget(
             name: "CriticalMomentsTests",
-            dependencies: ["CriticalMoments"]),
+            dependencies: ["CriticalMoments"],
+            path: "Example/Tests"),
     ]
 )
