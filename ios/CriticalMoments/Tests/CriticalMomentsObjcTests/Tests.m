@@ -7,7 +7,9 @@
 //
 
 @import XCTest;
-#import "CriticalMoments/CriticalMoments.h"
+
+@import CriticalMomentsObjc;
+#import "CriticalMoments.h"
 
 @interface Tests : XCTestCase
 
@@ -30,7 +32,7 @@
 - (void)testPing
 {
     NSString *response = [CriticalMoments objcPing];
-    XCTAssert([@"pong" isEqualToString:response], @"Expected ping to pong");
+    XCTAssert([@"objcPong" isEqualToString:response], @"Expected ping to pong -- objective C tests not working end to end");
 }
 
 @end
