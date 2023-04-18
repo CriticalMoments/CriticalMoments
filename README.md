@@ -33,6 +33,18 @@ Instructions coming soon.
 
 CriticalMoments is available through [Carthage](https://github.com/Carthage/Carthage)
 
+To install, follow the usual Carthage steps:
+
+ - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`
+ - Run `carthage update --use-xcframeworks`
+ - Drag the built .xcframework bundles from Carthage/Build into the "Frameworks and Libraries" section of your application’s Xcode project.
+ - Build the project
+ - Import CriticalMoments where needed:
+   - Objective C: `@import CriticalMoments;`
+   - Swift: `import CriticalMoments`
+
+For details see [Carthage Docs](https://github.com/Carthage/Carthage#adding-frameworks-to-an-application).
+
 ## CocoaPods Installation
 
 CriticalMoments is available through [CocoaPods](https://cocoapods.org). 
