@@ -7,14 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E0CF5B5F29EF3B6C0005C9FE /* CriticalMoments.h in Headers */ = {isa = PBXBuildFile; fileRef = E0CF5B5E29EF3B6C0005C9FE /* CriticalMoments.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E008609C29EF454D005A4898 /* CriticalMoments.swift in Sources */ = {isa = PBXBuildFile; fileRef = E008609B29EF454D005A4898 /* CriticalMoments.swift */; };
+		E0CF5BB229EF40120005C9FE /* CriticalMoments.m in Sources */ = {isa = PBXBuildFile; fileRef = E0CF5BAF29EF40120005C9FE /* CriticalMoments.m */; };
+		E0CF5BB329EF40120005C9FE /* CriticalMoments.h in Headers */ = {isa = PBXBuildFile; fileRef = E0CF5BB029EF40120005C9FE /* CriticalMoments.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E008609B29EF454D005A4898 /* CriticalMoments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CriticalMoments.swift; sourceTree = "<group>"; };
 		E00AF7E429EF1F3F00167DD0 /* CriticalMoments.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CriticalMoments.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E04A2DC129EF345700D8DB82 /* CriticalMoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CriticalMoments; sourceTree = "<group>"; };
 		E04A2DC429EF358800D8DB82 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		E0CF5B5E29EF3B6C0005C9FE /* CriticalMoments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CriticalMoments.h; path = Sources/CriticalMomentsObjc/include/CriticalMoments.h; sourceTree = "<group>"; };
+		E0CF5BAF29EF40120005C9FE /* CriticalMoments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CriticalMoments.m; sourceTree = "<group>"; };
+		E0CF5BB029EF40120005C9FE /* CriticalMoments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CriticalMoments.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,10 +31,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E008609A29EF454D005A4898 /* CriticalMomentsSwift */ = {
+			isa = PBXGroup;
+			children = (
+				E008609B29EF454D005A4898 /* CriticalMoments.swift */,
+			);
+			path = CriticalMomentsSwift;
+			sourceTree = "<group>";
+		};
 		E00AF7DA29EF1F3F00167DD0 = {
 			isa = PBXGroup;
 			children = (
-				E0CF5B5E29EF3B6C0005C9FE /* CriticalMoments.h */,
+				E0CF5BAA29EF40120005C9FE /* Sources */,
 				E00AF7EE29EF1F8400167DD0 /* Packages */,
 				E00AF7E529EF1F3F00167DD0 /* Products */,
 				E04A2DB729EF328400D8DB82 /* Frameworks */,
@@ -49,7 +60,6 @@
 		E00AF7EE29EF1F8400167DD0 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				E04A2DC129EF345700D8DB82 /* CriticalMoments */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -62,6 +72,32 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E0CF5BAA29EF40120005C9FE /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				E008609A29EF454D005A4898 /* CriticalMomentsSwift */,
+				E0CF5BAD29EF40120005C9FE /* CriticalMomentsObjc */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		E0CF5BAD29EF40120005C9FE /* CriticalMomentsObjc */ = {
+			isa = PBXGroup;
+			children = (
+				E0CF5BAE29EF40120005C9FE /* include */,
+			);
+			path = CriticalMomentsObjc;
+			sourceTree = "<group>";
+		};
+		E0CF5BAE29EF40120005C9FE /* include */ = {
+			isa = PBXGroup;
+			children = (
+				E0CF5BAF29EF40120005C9FE /* CriticalMoments.m */,
+				E0CF5BB029EF40120005C9FE /* CriticalMoments.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -69,7 +105,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0CF5B5F29EF3B6C0005C9FE /* CriticalMoments.h in Headers */,
+				E0CF5BB329EF40120005C9FE /* CriticalMoments.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +179,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E008609C29EF454D005A4898 /* CriticalMoments.swift in Sources */,
+				E0CF5BB229EF40120005C9FE /* CriticalMoments.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +333,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -329,6 +368,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
