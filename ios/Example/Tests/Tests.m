@@ -7,6 +7,7 @@
 //
 
 @import XCTest;
+#import "CriticalMoments/CriticalMoments.h"
 
 @interface Tests : XCTestCase
 
@@ -26,9 +27,10 @@
     [super tearDown];
 }
 
-- (void)testExample
+- (void)testPing
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    NSString *response = [CriticalMoments ping];
+    XCTAssert([@"pong" isEqualToString:response], @"Expected ping to pong");
 }
 
 @end

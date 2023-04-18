@@ -15,8 +15,13 @@
 		9D85A816DBEB127E317B4539D50A2130 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
 		A41ECF8FAA05C826A9EB77BBB0E1E222 /* CriticalMoments-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FCBA0F72A57F1B17C90A78E6E66C37A /* CriticalMoments-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB0933A9036B82D70F703A78A3ACA008 /* Pods-CriticalMoments_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BD4569D4E3DC0F48C9A2CF7F4878843 /* Pods-CriticalMoments_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DCF0D793E3FCB9C017BB8BB56A357FCA /* ReplaceMe.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F343AA64D94E00EE3C6BDBD5463B798 /* ReplaceMe.m */; };
 		DF526843F2B3C4C82F019B27A4443156 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
+		E049B02429EE1E7E0025A3BC /* CriticalMoments.m in Sources */ = {isa = PBXBuildFile; fileRef = E049B02229EE1E7E0025A3BC /* CriticalMoments.m */; };
+		E049B02529EE1E7E0025A3BC /* CriticalMoments.m in Sources */ = {isa = PBXBuildFile; fileRef = E049B02229EE1E7E0025A3BC /* CriticalMoments.m */; };
+		E049B02629EE1E7E0025A3BC /* CriticalMoments.m in Sources */ = {isa = PBXBuildFile; fileRef = E049B02229EE1E7E0025A3BC /* CriticalMoments.m */; };
+		E049B02729EE1E7E0025A3BC /* CriticalMoments.h in Headers */ = {isa = PBXBuildFile; fileRef = E049B02329EE1E7E0025A3BC /* CriticalMoments.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E049B02829EE1E7E0025A3BC /* CriticalMoments.h in Headers */ = {isa = PBXBuildFile; fileRef = E049B02329EE1E7E0025A3BC /* CriticalMoments.h */; };
+		E049B02929EE1E7E0025A3BC /* CriticalMoments.h in Headers */ = {isa = PBXBuildFile; fileRef = E049B02329EE1E7E0025A3BC /* CriticalMoments.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,22 +54,23 @@
 		3FCBA0F72A57F1B17C90A78E6E66C37A /* CriticalMoments-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CriticalMoments-umbrella.h"; sourceTree = "<group>"; };
 		45C1BE69AC8BF857E9061FBF774C9A61 /* Pods-CriticalMoments_Example-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-CriticalMoments_Example-dummy.m"; sourceTree = "<group>"; };
 		4C06CEBD15E65605F78B1BB28B0FE478 /* CriticalMoments.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CriticalMoments.debug.xcconfig; sourceTree = "<group>"; };
-		4F343AA64D94E00EE3C6BDBD5463B798 /* ReplaceMe.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ReplaceMe.m; path = CriticalMoments/Classes/ReplaceMe.m; sourceTree = "<group>"; };
 		5E23BDFEAFA25F0490FD8800D218CE8C /* Pods-CriticalMoments_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CriticalMoments_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		5F628E88212395A148E363957C453B49 /* Pods-CriticalMoments_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CriticalMoments_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		6C7E1EAABEA2189FCAEE07428B8802A4 /* Pods-CriticalMoments_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-CriticalMoments_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		6EF82FF195AB7425C944B95CEE93B497 /* CriticalMoments.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = CriticalMoments.modulemap; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = CriticalMoments; path = CriticalMoments.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F496EFA02B8150B6317B6435C99B1C9 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
-		9676EA96978FD8454817BAC27E779E67 /* CriticalMoments.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = CriticalMoments.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CriticalMoments.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F496EFA02B8150B6317B6435C99B1C9 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9676EA96978FD8454817BAC27E779E67 /* CriticalMoments.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = CriticalMoments.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		99DF8EC68EA4AA210B8750F17C05EC6B /* Pods-CriticalMoments_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-CriticalMoments_Example.modulemap"; sourceTree = "<group>"; };
 		9B1F42EC1D3B9FDE7247E2066881C394 /* Pods-CriticalMoments_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-CriticalMoments_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		9BD4569D4E3DC0F48C9A2CF7F4878843 /* Pods-CriticalMoments_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CriticalMoments_Example-umbrella.h"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		B0AFAE882980FC6BD37B8E4B559EA800 /* Pods-CriticalMoments_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-CriticalMoments_Example-frameworks.sh"; sourceTree = "<group>"; };
 		B0F00FCC30E24B85F523336F177C56D9 /* Pods-CriticalMoments_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-CriticalMoments_Tests-umbrella.h"; sourceTree = "<group>"; };
 		C6E4D1D0B4CD66F579FF95BE2F37D39C /* CriticalMoments.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CriticalMoments.release.xcconfig; sourceTree = "<group>"; };
+		E049B02229EE1E7E0025A3BC /* CriticalMoments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CriticalMoments.m; path = Sources/CriticalMoments/Classes/CriticalMoments.m; sourceTree = "<group>"; };
+		E049B02329EE1E7E0025A3BC /* CriticalMoments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CriticalMoments.h; path = Sources/CriticalMoments/Classes/CriticalMoments.h; sourceTree = "<group>"; };
 		E8604581FFE78AF7413EC62813BA9D94 /* Pods-CriticalMoments_Example */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CriticalMoments_Example"; path = Pods_CriticalMoments_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6C6F2ECDF16413B460D6D9BA047C884 /* Pods-CriticalMoments_Tests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-CriticalMoments_Tests"; path = Pods_CriticalMoments_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1D5807B8D91D4F291069B910CE176B /* Pods-CriticalMoments_Tests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-CriticalMoments_Tests-acknowledgements.plist"; sourceTree = "<group>"; };
@@ -110,7 +116,8 @@
 		3757FBD3CC9DF8B12B50C1826328C51F /* CriticalMoments */ = {
 			isa = PBXGroup;
 			children = (
-				4F343AA64D94E00EE3C6BDBD5463B798 /* ReplaceMe.m */,
+				E049B02329EE1E7E0025A3BC /* CriticalMoments.h */,
+				E049B02229EE1E7E0025A3BC /* CriticalMoments.m */,
 				C609C05618D43E63328F2846DBC0F530 /* Pod */,
 				ACD3FBF6108060C0BC8EF0BF3C030532 /* Support Files */,
 			);
@@ -170,7 +177,7 @@
 		BFF45D747B626394ABDDFCBC088774D6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments */,
+				7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments.framework */,
 				E8604581FFE78AF7413EC62813BA9D94 /* Pods-CriticalMoments_Example */,
 				F6C6F2ECDF16413B460D6D9BA047C884 /* Pods-CriticalMoments_Tests */,
 			);
@@ -229,6 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C528936F190ADDFB06C139B5AFD231A /* Pods-CriticalMoments_Tests-umbrella.h in Headers */,
+				E049B02929EE1E7E0025A3BC /* CriticalMoments.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB0933A9036B82D70F703A78A3ACA008 /* Pods-CriticalMoments_Example-umbrella.h in Headers */,
+				E049B02829EE1E7E0025A3BC /* CriticalMoments.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A41ECF8FAA05C826A9EB77BBB0E1E222 /* CriticalMoments-umbrella.h in Headers */,
+				E049B02729EE1E7E0025A3BC /* CriticalMoments.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +276,7 @@
 			);
 			name = CriticalMoments;
 			productName = CriticalMoments;
-			productReference = 7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments */;
+			productReference = 7D18E7CE1DFBEED377A62D2F4D4CD4F7 /* CriticalMoments.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		BFBB782ED65F90502254DE682F333AD4 /* Pods-CriticalMoments_Example */ = {
@@ -365,6 +375,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E049B02529EE1E7E0025A3BC /* CriticalMoments.m in Sources */,
 				33A5EB04CC651DE4DEA7E09EC84ABE94 /* Pods-CriticalMoments_Example-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -373,6 +384,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E049B02629EE1E7E0025A3BC /* CriticalMoments.m in Sources */,
 				57A2169E855BAE3AAF477CCB243BDB95 /* Pods-CriticalMoments_Tests-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -381,8 +393,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E049B02429EE1E7E0025A3BC /* CriticalMoments.m in Sources */,
 				4C71F63E40D1A58ED299117A8A7441CF /* CriticalMoments-dummy.m in Sources */,
-				DCF0D793E3FCB9C017BB8BB56A357FCA /* ReplaceMe.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -589,8 +601,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				SYMROOT = "${SRCROOT}/../build";
 			};
