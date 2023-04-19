@@ -35,7 +35,7 @@ CriticalMoments is available through [Carthage](https://github.com/Carthage/Cart
 
 To install, follow the usual Carthage steps:
 
- - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`
+ - Add CriticalMoments to you `Cartfile` with a line like `github "CriticalMoments/CriticalMoments" >= 0.1.1-beta`
  - Run `carthage update --use-xcframeworks`
  - Drag the built .xcframework bundles from Carthage/Build into the "Frameworks and Libraries" section of your application’s Xcode project.
  - Build the project
