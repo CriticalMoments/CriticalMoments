@@ -16,11 +16,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: xavierLowmiller/xcodegen-action@1.1.2
 
       - name: Select xcode
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
       - name: Build xcode project
-        uses: xavierLowmiller/xcodegen-action@1.1.2
         run: xcodegen generate --spec ./ios/project.yml 
 
