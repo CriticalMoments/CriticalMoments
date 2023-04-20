@@ -1,5 +1,6 @@
 # CriticalMoments iOS
 
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CI Status](https://img.shields.io/travis/scosman/CriticalMoments.svg?style=flat)](https://travis-ci.org/scosman/CriticalMoments)
 [![Version](https://img.shields.io/cocoapods/v/CriticalMoments.svg?style=flat)](https://cocoapods.org/pods/CriticalMoments)
 [![License](https://img.shields.io/cocoapods/l/CriticalMoments.svg?style=flat)](https://cocoapods.org/pods/CriticalMoments)
@@ -50,7 +51,27 @@ To install it, follow the usual Cocoapods steps:
 
 ## Direct Framework Download Installation
 
-Instructions coming soon.
+ - Download `CriticalMoments.xcframework` (link coming soon)
+ - Add the framework to your project by dragging into the "Frameworks, Libraries, and Embedded Content" section of your project in xcode
+ - Import and use the framework where needed
+   - Objective C: `@import CriticalMoments;`
+   - Swift: `import CriticalMoments`
+
+## Carthage Installation
+
+CriticalMoments is available through [Carthage](https://github.com/Carthage/Carthage)
+
+There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs.
+
+  - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`, optionally including a version requirement
+  - Run `carthage update --use-xcframeworks`. This will fail because of the missing xcodeproj, but is needed to populate your /Carthage/Checkouts cache
+  - Run `xcodegen generate --spec ./Carthage/Checkouts/criticalmoments/ios/project.yml` (if you don't have xcodegen installed already, install with `brew install xcodegen`)
+  - Run `carthage build --no-skip-current --use-xcframeworks` again, this time it should succeed 
+  - Drag the built .xcframework bundles from Carthage/Build into the "Frameworks and Libraries" section of your application’s Xcode project.
+  - Build the project
+  - Import CriticalMoments where needed:
+    - Objective C: `@import CriticalMoments;`
+    - Swift: `import CriticalMoments`
 
 # Author
 
