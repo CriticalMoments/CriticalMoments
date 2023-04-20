@@ -26,3 +26,7 @@ jobs:
 
       - name: Build xcframework using carthage
         run: carthage build --no-skip-current --use-xcframeworks
+
+      - name: zip xcframework
+        run: cp -r Carthage/Build/CriticalMoments.xcframework . && zip -r xcframework.zip CriticalMoments.xcframework
+
