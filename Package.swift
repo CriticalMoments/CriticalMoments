@@ -17,16 +17,20 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "CriticalMomentsSwift",
-            dependencies: ["CriticalMomentsObjc"]),
+            dependencies: ["CriticalMomentsObjc"],
+            path: "ios/Sources/CriticalMomentsSwift"),
         .target(
             name: "CriticalMomentsObjc",
+            path: "ios/Sources/CriticalMomentsObjc",
             publicHeadersPath:"include"),
         .testTarget(
             name: "CriticalMomentsSwiftTests",
-            dependencies: ["CriticalMomentsSwift"]),
+            dependencies: ["CriticalMomentsSwift"],
+            path: "ios/Tests/CriticalMomentsSwiftTests"),
         .testTarget(
             name: "CriticalMomentsObjcTests",
-            dependencies: ["CriticalMomentsObjc"]),
+            dependencies: ["CriticalMomentsObjc"],
+            path: "ios/Tests/CriticalMomentsObjcTests"),
     ],
     swiftLanguageVersions: [.v5]
 )
