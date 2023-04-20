@@ -1,9 +1,8 @@
 name: Build xcframework Release
 
-on: [push]
-#on:
-#  release:
-#    types: [created]
+on:
+  release:
+    types: [created]
 
 permissions:
     contents: write
