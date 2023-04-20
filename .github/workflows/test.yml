@@ -5,13 +5,13 @@ on: [push]
 jobs:
   build_and_test:
     name: Build and analyse default scheme using xcodebuild command
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Select xcode
-        run: sudo xcode-select -switch /Applications/Xcode_14.3.app && /usr/bin/xcodebuild -version
+        run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test 
         run: xcodebuild -scheme CriticalMoments -destination 'platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro' test 
