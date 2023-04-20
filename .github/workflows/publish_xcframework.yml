@@ -30,9 +30,10 @@ jobs:
       - name: zip xcframework
         run: cp -r Carthage/Build/CriticalMoments.xcframework . && zip -r xcframework.zip CriticalMoments.xcframework
 
-      - name: Attach xcframework to release
-        uses: actions/upload-artifact@v3
+      - name: Upload xcframework to release
+        uses: softprops/action-gh-release@v1
         with:
-          name: xcframework.zip
-          path: xcframework.zip
+          files: xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
