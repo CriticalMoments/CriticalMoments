@@ -2,10 +2,7 @@ name: Release Tests
 
 on:
   release:
-    types: [created]
-    isLatest: true
-    isPrerelease: false
-    isDraft: false
+    types: [released]
 
 jobs:
   build_and_test:
