@@ -12,14 +12,14 @@ Pod::Spec.new do |s|
 
   s.homepage         = 'https://criticalmoments.io'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'CUSTOM', :text => 'Copyright 2023. All rights reserved.' }
+  s.license          = { :type => 'All Rights Reserved', :text => 'Copyright (c) 2023 Stephen Cosman. All rights reserved.' }
   s.author           = { 'Steve Cosman' => 'scosman@users.noreply.github.com' }
   s.source           = { :git => 'https://github.com/criticalmoments/CriticalMoments.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'
 
-  s.source_files = 'ios/CriticalMoments/Sources/**/*.{h,m,swift}'
+  s.source_files = 'ios/Sources/**/*.{h,m,swift}'
   s.swift_version = '5.0'
   
   # s.resource_bundles = {

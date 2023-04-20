@@ -1,6 +1,5 @@
 # CriticalMoments iOS
 
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CI Status](https://img.shields.io/travis/scosman/CriticalMoments.svg?style=flat)](https://travis-ci.org/scosman/CriticalMoments)
 [![Version](https://img.shields.io/cocoapods/v/CriticalMoments.svg?style=flat)](https://cocoapods.org/pods/CriticalMoments)
 [![License](https://img.shields.io/cocoapods/l/CriticalMoments.svg?style=flat)](https://cocoapods.org/pods/CriticalMoments)
@@ -21,29 +20,18 @@ The API supports both Objective-C and Swift.
 CriticalMoments can be installed several ways:
 
  - Swift Package Manager
- - Carthage
  - CocoaPods
  - Direct framework download
 
+Carthage is not supported, but direct xcframework download is similar, and suggested for those using Carthage.
+
 ## Swift Package Manager Installation
 
-Instructions coming soon.
+Follow Apple's instructions for [Adding package dependencies to your app using swift package manager](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
-## Carthage Installation
+The git URL to enter is simply: `https://github.com/CriticalMoments/CriticalMoments`
 
-CriticalMoments is available through [Carthage](https://github.com/Carthage/Carthage)
-
-To install, follow the usual Carthage steps:
-
- - Add CriticalMoments to you `Cartfile` with a line like `github "CriticalMoments/CriticalMoments" >= 0.1.1-beta`
- - Run `carthage update --use-xcframeworks`
- - Drag the built .xcframework bundles from Carthage/Build into the "Frameworks and Libraries" section of your application’s Xcode project.
- - Build the project
- - Import CriticalMoments where needed:
-   - Objective C: `@import CriticalMoments;`
-   - Swift: `import CriticalMoments`
-
-For details see [Carthage Docs](https://github.com/Carthage/Carthage#adding-frameworks-to-an-application).
+We suggest specifing "Up to next major version" as your dependancy rule. We don't recommend the dependancy rule `branch=main`, as main may contain pre-release code.
 
 ## CocoaPods Installation
 
