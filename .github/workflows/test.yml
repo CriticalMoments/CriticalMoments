@@ -14,5 +14,5 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test 
-        run: xcodebuild -scheme CriticalMoments -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test 
+        run: xcodebuild -scheme CriticalMoments -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' clean test 
 
