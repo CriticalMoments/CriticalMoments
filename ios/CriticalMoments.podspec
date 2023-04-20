@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CriticalMoments'
-  s.version          = '0.1.1-beta'
+  s.version          = '0.1.2-beta'
   s.summary          = 'Deliver the right message, at the right moment.'
 
   s.description      = <<-DESC
