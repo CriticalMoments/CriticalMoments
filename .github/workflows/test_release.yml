@@ -3,6 +3,9 @@ name: Release Tests
 on:
   release:
     types: [created]
+    isLatest: true
+    isPrerelease: false
+    isDraft: false
 
 jobs:
   build_and_test:
