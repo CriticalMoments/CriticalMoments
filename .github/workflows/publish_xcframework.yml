@@ -21,6 +21,8 @@ jobs:
       - name: Select xcode
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
-      - name: Build xcode project
+      - name: Build xcode project files
         run: xcodegen generate --spec ./ios/project.yml 
 
+      - name: Build xcframework using carthage
+        run: carthage build --no-skip-current —use-xcframeworks
