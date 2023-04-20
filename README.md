@@ -61,7 +61,7 @@ To install it, follow the usual Cocoapods steps:
 
 CriticalMoments is available through [Carthage](https://github.com/Carthage/Carthage)
 
-There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs.
+There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs. If you prefer to not install other tools, the direct framework download approach is very similar to Carthage.
 
   - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`, optionally including a version requirement
   - Run `carthage update --use-xcframeworks`. This will fail because of the missing xcodeproj, but is needed to populate your /Carthage/Checkouts cache
