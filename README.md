@@ -31,7 +31,7 @@ Follow Apple's instructions for [Adding package dependencies to your app using s
 
 The git URL to enter is simply: `https://github.com/CriticalMoments/CriticalMoments`
 
-We suggest specifing "Up to next major version" as your dependancy rule. We don't recommend installing branch=main, as main may contain pre-release code.
+We suggest specifing "Up to next major version" as your dependancy rule. We don't recommend the dependancy rule `branch=main`, as main may contain pre-release code.
 
 ## CocoaPods Installation
 
