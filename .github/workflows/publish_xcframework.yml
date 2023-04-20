@@ -1,4 +1,4 @@
-name: Build xcframework Release
+name: Release Build
 
 on:
   release:
