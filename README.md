@@ -1,5 +1,6 @@
 # CriticalMoments iOS
 
+[![Release Tests](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CI Status](https://img.shields.io/travis/scosman/CriticalMoments.svg?style=flat)](https://travis-ci.org/scosman/CriticalMoments)
 [![Version](https://img.shields.io/cocoapods/v/CriticalMoments.svg?style=flat)](https://cocoapods.org/pods/CriticalMoments)
