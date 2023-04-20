@@ -25,4 +25,4 @@ jobs:
         run: xcodegen generate --spec ./ios/project.yml 
 
       - name: Build xcframework using carthage
-        run: carthage build --no-skip-current —-use-xcframeworks
+        run: carthage build --no-skip-current --use-xcframeworks
