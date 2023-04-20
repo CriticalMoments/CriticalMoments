@@ -1,0 +1,13 @@
+# Project file for use with https://github.com/yonaskolb/XcodeGen
+
+name: CriticalMoments
+options:
+  bundleIdPrefix: io.criticalmoments
+targets:
+  CriticalMoments:
+    type: framework
+    platform: iOS
+    sources: [Sources]
+    scheme: {}
+    info:
+        path: "Sources/Info.plist"
