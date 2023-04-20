@@ -24,6 +24,7 @@ CriticalMoments can be installed several ways:
  - Swift Package Manager
  - CocoaPods
  - Direct framework download
+ - Carthage
 
 Carthage is not supported, but direct xcframework download is similar, and suggested for those using Carthage.
 
@@ -52,7 +53,9 @@ To install it, follow the usual Cocoapods steps:
 
 ## Direct Framework Download Installation
 
- - Download `CriticalMoments.xcframework` (link coming soon)
+Note: if you choose this route, you should manually update for bug fixes and enhancements.
+
+ - Download `xcframework.zip` from the latest [Github Release](https://github.com/CriticalMoments/CriticalMoments/releases/latest)
  - Add the framework to your project by dragging into the "Frameworks, Libraries, and Embedded Content" section of your project in xcode
  - Import and use the framework where needed
    - Objective C: `@import CriticalMoments;`
