@@ -67,7 +67,7 @@ There are a few extra steps to install via Carthage so please follow steps below
   - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`, optionally including a version requirement
   - Run `carthage update --use-xcframeworks`. This will fail because of the missing xcodeproj, but is needed to populate your /Carthage/Checkouts cache
   - Run `xcodegen generate --spec ./Carthage/Checkouts/criticalmoments/ios/project.yml` (if you don't have xcodegen installed already, install with `brew install xcodegen`)
-  - Run `carthage build --no-skip-current --use-xcframeworks`, this time the build should succeed as the step above created needed project files 
+  - Run `carthage build --use-xcframeworks`, this time the build should succeed as the step above created needed project files 
   - Drag the built .xcframework bundles from Carthage/Build into the "Frameworks and Libraries" section of your application’s Xcode project.
   - Build the project
   - Import CriticalMoments where needed:
