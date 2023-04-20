@@ -1,0 +1,25 @@
+name: Build xcframework Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+    contents: write
+    packages: write
+
+jobs:
+  build_xcframework:
+    name: Build an xcframework for this release 
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Select xcode
+        run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
+
+      - name: Build xcode project
+        uses: xavierLowmiller/xcodegen-action@1.1.2
+        run: xcodegen generate --spec ./ios/project.yml 
+
