@@ -4,7 +4,19 @@
 
 **/.DS_Store
 
-## .gitignore from swift project setup
+## START .gitignore from swift project setup
+
+.DS_Store
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/config/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+
+## END .gitignore from swift project setup
 
  ## User settings
  xcuserdata/
