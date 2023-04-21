@@ -52,9 +52,13 @@ To install it, follow the usual Cocoapods steps:
    - Objective C: `#import "CriticalMoments.h"` 
    - Swift: `import CriticalMoments` 
 
-## Direct Framework Download Installation
+## Direct Framework Download (Objective C)
+
+You can download an XCFramework for use in your Objective C apps from our [Github Releases](https://github.com/CriticalMoments/CriticalMoments/releases/latest). This approach is not recommended for Swift, as the framework must be built with the exact same toolchain as you app, which is unlikely to match. For Swift, use [Swift Package Manager](#swift-package-manager-installation).
 
 Note: if you choose this route, you should manually update for bug fixes and enhancements.
+
+Process: 
 
  - Download `xcframework.zip` from the latest [Github Release](https://github.com/CriticalMoments/CriticalMoments/releases/latest)
  - Add the framework to your project by dragging into the "Frameworks, Libraries, and Embedded Content" section of your project in xcode
