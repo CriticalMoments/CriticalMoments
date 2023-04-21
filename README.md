@@ -33,6 +33,10 @@ The git URL to enter is simply: `https://github.com/CriticalMoments/CriticalMome
 
 We suggest specifing "Up to next major version" as your dependancy rule. We don't recommend the dependancy rule `branch=main`, as main may contain pre-release code.
 
+Then import and use where needed:
+ - `@import CriticalMomentsObjc;`
+ - `import CriticalMomentsSwift`
+
 ## CocoaPods Installation
 
 CriticalMoments is available through [CocoaPods](https://cocoapods.org). 
