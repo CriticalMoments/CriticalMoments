@@ -68,7 +68,7 @@ CriticalMoments is available through [Carthage](https://github.com/Carthage/Cart
 
 There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs. If you prefer to not install other tools, the direct framework download approach is very similar to Carthage.
 
-  - Add CriticalMoments to you `Cartfile` with a line like `github https://github.com/CriticalMoments/CriticalMoments`, optionally including a version requirement
+  - Add CriticalMoments to you `Cartfile` with a line like `github "https://github.com/CriticalMoments/CriticalMoments"`, optionally including a version requirement
   - Run `carthage update --no-build`
   - Run `xcodegen generate --spec ./Carthage/Checkouts/criticalmoments/ios/project.yml`. If you don't already have xcodegen installed already, you'll need to install with `brew install xcodegen`.
   - Run `carthage build --use-xcframeworks`, this time the build should succeed as the step above created needed project files 
