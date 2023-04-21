@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CriticalMoments'
-  s.version          = '0.1.3-beta'
+  s.version          = '0.1.4-beta'
   s.summary          = 'Deliver the right message, at the right moment.'
 
   s.description      = <<-DESC
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '11.0'
 
-  s.source_files = 'ios/Sources/**/*.{h,m,swift}'
+  s.source_files = 'Sources/**/*.{h,m,swift}'
   s.swift_version = '5.0'
   
   # s.resource_bundles = {
