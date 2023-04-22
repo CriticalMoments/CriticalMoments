@@ -18,12 +18,10 @@ The API supports both Objective-C and Swift.
 
 CriticalMoments can be installed several ways:
 
- - Swift Package Manager
- - CocoaPods
- - Direct framework download
- - Carthage
-
-Carthage is not supported, but direct xcframework download is similar, and suggested for those using Carthage.
+ - [Swift Package Manager (recommended)](#swift-package-manager-installation)
+ - [CocoaPods](#cocoapods-installation)
+ - [Direct framework download](#direct-framework-download-objective-c)
+ - [Carthage](#carthage-installation)
 
 ## Swift Package Manager Installation
 
@@ -43,7 +41,7 @@ CriticalMoments is available through [CocoaPods](https://cocoapods.org).
 
 To install it, follow the usual Cocoapods steps: 
 
- - Add the pod to your Podfile. A line like `pod 'CriticalMoments'`, optionally locking to a version or major release
+ - Add the pod to your Podfile. A line like `pod 'CriticalMoments', '>= 0.1.4-beta'`, optionally modifing the version requirement
  - Run `pod install` and confirm the output indicates the CM installation was successful
  - Clean and build your project
  - Restart Xcode (yes, this is usually needed...)
@@ -68,11 +66,9 @@ Process:
 
 ## Carthage Installation
 
-CriticalMoments is available through [Carthage](https://github.com/Carthage/Carthage)
+There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs. If you prefer to not install other tools, we suggest using Swift Package Manager.
 
-There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses `Package.swift`, and Carthage doesn't yet support it. You must run the [XcodeGen](https://github.com/yonaskolb/XcodeGen) tool to build the project files Carthage needs. If you prefer to not install other tools, the direct framework download approach is very similar to Carthage.
-
-  - Add CriticalMoments to you `Cartfile` with a line like `github "https://github.com/CriticalMoments/CriticalMoments"`, optionally including a version requirement
+  - Add CriticalMoments to you `Cartfile` with a line like `github "https://github.com/CriticalMoments/CriticalMoments" >= 0.1.4-beta`, optionally modifing the version requirement
   - Run `carthage update --no-build`
   - Run `xcodegen generate --spec ./Carthage/Checkouts/criticalmoments/ios/project.yml`. If you don't already have xcodegen installed already, you'll need to install with `brew install xcodegen`.
   - Run `carthage build --use-xcframeworks`, this time the build should succeed as the step above created needed project files 
