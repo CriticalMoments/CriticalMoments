@@ -7,6 +7,9 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../messaging/CMBannerMessage.h"
+#import "../messaging/CMBannerManager.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CriticalMoments : NSObject
