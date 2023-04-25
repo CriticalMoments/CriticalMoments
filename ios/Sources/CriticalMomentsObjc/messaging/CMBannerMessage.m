@@ -34,10 +34,16 @@
 
 -(UIView*) buildViewForMessage {
     UIView* view = [[UIView alloc] init];
-    view.backgroundColor = [UIColor greenColor];
+    
+    // TODO: load from theme
+    UIColor* forgroundBannerColor = [UIColor blackColor];
+    UIColor* backgroundBannerColor = [UIColor greenColor];
+    
+    view.backgroundColor = backgroundBannerColor;
     
     self.bodyLabel = [[UILabel alloc] init];
     self.bodyLabel.text = self.body;
+    self.bodyLabel.textColor = forgroundBannerColor;
     self.bodyLabel.backgroundColor = [UIColor clearColor];
     self.bodyLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.bodyLabel.numberOfLines = 2;
@@ -46,9 +52,17 @@
     // TODO height passed up
     [view addSubview:self.bodyLabel];
     
-    // TODO Warning
     // TODO style/color
-    self.dismissButton = [UIButton buttonWithType:UIButtonTypeClose];
+    self.dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    if (@available(iOS 13.0, *)) {
+        UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"] imageWithTintColor:forgroundBannerColor renderingMode:UIImageRenderingModeAlwaysOriginal];
+        [self.dismissButton setImage:dismissImage forState:UIControlStateNormal];
+    } else {
+        // Fallback on earlier versions
+        [self.dismissButton setTitle:@"X" forState:UIControlStateNormal];
+        [self.dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
+    }
+    
     self.dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
     [view addSubview:self.dismissButton];
     
