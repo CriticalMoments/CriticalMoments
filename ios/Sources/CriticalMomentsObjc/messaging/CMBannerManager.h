@@ -12,8 +12,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
-    CMAppWideBannerPositionTop,
-    CMAppWideBannerPositionBottom
+    CMAppWideBannerPositionBottom,
+    CMAppWideBannerPositionTop
 };
 
 @interface CMBannerManager : NSObject

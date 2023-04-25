@@ -72,7 +72,7 @@
 }
 
 - (void)dismissTapped:(UIButton*)sender {
-    [self.delegate dismissed];
+    [self.dismissDelegate dismissedMessage:self];
 }
 
 @end

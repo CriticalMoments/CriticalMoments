@@ -26,18 +26,21 @@ NS_ASSUME_NONNULL_BEGIN
  Delegate: tap/dismiss
  */
 
-@protocol CMBannerDelegate
-@optional
--(void) messageTapped;
--(void) dismissed;
+@class CMBannerMessage;
+
+@protocol CMBannerActionDelegate
+-(void) messageAction:(CMBannerMessage*)message;
 @end
 
+@protocol CMBannerDismissDelegate
+-(void) dismissedMessage:(CMBannerMessage*)message;
+@end
 
+// TODO: P0 -- not a UI View, but a UIView builder
 @interface CMBannerMessage : UIView
 
-//@property (nonatomic, readonly) NSString* title;
-//@property (nonatomic, readonly) NSString* body;
-@property (nonatomic, readwrite) id<CMBannerDelegate> delegate;
+@property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
+@property (nonatomic, readwrite) id<CMBannerDismissDelegate> dismissDelegate;
 
 -(instancetype)init NS_UNAVAILABLE;
 
@@ -45,10 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // TODO: preferred size for height method
 // TODO: 
-
-/*-(instancetype)initWithBody:(NSString*)body;
--(instancetype)initWithTitle:(NSString*)title andBody:(NSString*)body;
--(instancetype)initWithDelegate:(id<CMBannerDelegate>)delegate;*/
 
 @end
 
