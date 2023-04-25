@@ -7,10 +7,7 @@
 
 #import "CMBannerManager.h"
 
-// TODO Dynamic height.
-// https://stackoverflow.com/questions/19628568/uilabel-sizethatfits-not-working
-// best just fully dnamic, with max height and max-lines? I think so
-#define BANNER_HEIGHT 60.0
+#define MAX_BANNER_HEIGHT_PERCENTAGE 0.20
 
 @interface CMBannerManager () <CMBannerDismissDelegate>
 
@@ -23,7 +20,6 @@
 
 // access syncronized by main queue
 @property (nonatomic, strong) UIView* appWideContainerView;
-@property (nonatomic) UIEdgeInsets addedInsetsForContainerView;
 
 @end
 
@@ -48,7 +44,6 @@ static CMBannerManager *sharedInstance = nil;
         _appWideMessages = [[NSMutableArray alloc] init];
         // Default to bottom -- less likely to conflict with hard-coded app frame content
         self.appWideBannerPosition = CMAppWideBannerPositionBottom;
-        self.addedInsetsForContainerView = UIEdgeInsetsZero;
     }
     return self;
 }
@@ -163,37 +158,65 @@ static CMBannerManager *sharedInstance = nil;
     _appWideContainerView.translatesAutoresizingMaskIntoConstraints = NO;
     [keyWindow addSubview:_appWideContainerView];
     
+    // TODO
+    // Max height still set, don't want it taking over screen
+    // Max lines still set, but configurable
+    // Invert sizing
+    // look at rootview.bottomLayoutGuide
+    
+    appRootViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
+    
     // Bottom || Top
     if (self.appWideBannerPosition == CMAppWideBannerPositionBottom) {
         // Container at bottom of app
-        UIEdgeInsets rootVcInsets = appRootViewController.additionalSafeAreaInsets;
-        rootVcInsets.bottom = rootVcInsets.bottom + BANNER_HEIGHT;
-        _addedInsetsForContainerView.bottom = _addedInsetsForContainerView.bottom  + BANNER_HEIGHT;
-        appRootViewController.additionalSafeAreaInsets = rootVcInsets;
         
-        // TODO dynamic height here for many rows possible?
+        // This low priority constraint takes over and aligns to window if the higher priority contraint for the banner alignment disappears (banner dismissed)
+        NSLayoutConstraint* appAlignBottomWindowLowPriorityConstraint = [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor];
+        appAlignBottomWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
+        
         NSArray<NSLayoutConstraint*>* constraints = @[
-            // position below the window and to the edges
-            [_appWideContainerView.topAnchor constraintEqualToAnchor:appRootViewController.view.layoutMarginsGuide.bottomAnchor],
+            // position banner at the bottom the window and to the edges
             [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
             [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
             [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
+            
+            // Make the banner at most 20% window height. Backstop for way too much text.
+            [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
+            
+            // TODO Min height x2
+            
+            // root VC positions to window, or top of banner, which ever is higher
+            appAlignBottomWindowLowPriorityConstraint,
+            [appRootViewController.view.bottomAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
+            [appRootViewController.view.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
+            [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
+            [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
         ];
+        //appRootViewController.view.layoutMarginsGuide.bottomAnchor
         
         [NSLayoutConstraint activateConstraints:constraints];
     } else {
         // Container at top of app
-        UIEdgeInsets rootVcInsets = appRootViewController.additionalSafeAreaInsets;
-        rootVcInsets.top = rootVcInsets.top + BANNER_HEIGHT;
-        _addedInsetsForContainerView.top = _addedInsetsForContainerView.top  + BANNER_HEIGHT;
-        appRootViewController.additionalSafeAreaInsets = rootVcInsets;
+        
+        // This low priority constraint takes over and aligns to window if the higher priority contraint for the banner alignment disappears (banner dismissed)
+        NSLayoutConstraint* appAlignTopWindowLowPriorityConstraint = [appRootViewController.view.topAnchor constraintEqualToAnchor:keyWindow.topAnchor];
+        appAlignTopWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
         
         NSArray<NSLayoutConstraint*>* constraints = @[
-            // position above the window and to the edges
-            [_appWideContainerView.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
+            // position banner at the top of the window and to the edges
             [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
             [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
-            [_appWideContainerView.bottomAnchor constraintEqualToAnchor:appRootViewController.view.layoutMarginsGuide.topAnchor],
+            [_appWideContainerView.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
+            
+            // Make the banner at most 20% window height. Backstop for way too much text.
+            [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
+
+            // root VC positions to window, or bottom of banner, which ever is higher
+            [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
+            [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
+            [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
+            [appRootViewController.view.topAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
+            appAlignTopWindowLowPriorityConstraint,
         ];
         
         [NSLayoutConstraint activateConstraints:constraints];
@@ -213,14 +236,6 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
     
-    UIWindow* keyWindow = _appWideContainerView.window;
-    UIViewController* appRootViewController = keyWindow.rootViewController;
-    UIEdgeInsets rootVcInsets = appRootViewController.additionalSafeAreaInsets;
-    rootVcInsets.bottom = rootVcInsets.bottom - _addedInsetsForContainerView.bottom;
-    _addedInsetsForContainerView.bottom = 0.0;
-    rootVcInsets.top = rootVcInsets.top - _addedInsetsForContainerView.top;
-    _addedInsetsForContainerView.top = 0.0;
-    appRootViewController.additionalSafeAreaInsets = rootVcInsets;
     [_appWideContainerView removeFromSuperview];
     _appWideContainerView = nil;
 }
