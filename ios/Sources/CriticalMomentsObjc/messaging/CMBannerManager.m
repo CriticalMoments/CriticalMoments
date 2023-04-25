@@ -166,61 +166,47 @@ static CMBannerManager *sharedInstance = nil;
     
     appRootViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
     
-    // Bottom || Top
+    // Layout
+    
+    // These two low priority constraints aligns rootVC to window top/bottom,  but are overridden by high pri banner constraints if present
+    NSLayoutConstraint* appAlignBottomWindowLowPriorityConstraint = [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor];
+    appAlignBottomWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
+    NSLayoutConstraint* appAlignTopWindowLowPriorityConstraint = [appRootViewController.view.topAnchor constraintEqualToAnchor:keyWindow.topAnchor];
+    appAlignTopWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
+    
+    NSArray<NSLayoutConstraint*>* constraints = @[
+        // position banner at the bottom the window and to the edges
+        [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
+        [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
+        
+        // TODO [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
+        
+        // Make the banner at most 20% window height. Backstop for way too much text.
+        [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
+        
+        // Align root VC to window
+        appAlignBottomWindowLowPriorityConstraint,
+        appAlignTopWindowLowPriorityConstraint,
+        // TODO [appRootViewController.view.bottomAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
+        [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
+        [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
+    ];
+    
     if (self.appWideBannerPosition == CMAppWideBannerPositionBottom) {
         // Container at bottom of app
-        
-        // This low priority constraint takes over and aligns to window if the higher priority contraint for the banner alignment disappears (banner dismissed)
-        NSLayoutConstraint* appAlignBottomWindowLowPriorityConstraint = [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor];
-        appAlignBottomWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
-        
-        NSArray<NSLayoutConstraint*>* constraints = @[
-            // position banner at the bottom the window and to the edges
-            [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
-            [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
+        constraints = [constraints arrayByAddingObjectsFromArray:@[
             [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
-            
-            // Make the banner at most 20% window height. Backstop for way too much text.
-            [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
-            
-            // TODO Min height x2
-            
-            // root VC positions to window, or top of banner, which ever is higher
-            appAlignBottomWindowLowPriorityConstraint,
             [appRootViewController.view.bottomAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
-            [appRootViewController.view.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
-            [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
-            [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
-        ];
-        //appRootViewController.view.layoutMarginsGuide.bottomAnchor
-        
-        [NSLayoutConstraint activateConstraints:constraints];
+        ]];
     } else {
         // Container at top of app
-        
-        // This low priority constraint takes over and aligns to window if the higher priority contraint for the banner alignment disappears (banner dismissed)
-        NSLayoutConstraint* appAlignTopWindowLowPriorityConstraint = [appRootViewController.view.topAnchor constraintEqualToAnchor:keyWindow.topAnchor];
-        appAlignTopWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
-        
-        NSArray<NSLayoutConstraint*>* constraints = @[
-            // position banner at the top of the window and to the edges
-            [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
-            [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
+        constraints = [constraints arrayByAddingObjectsFromArray:@[
             [_appWideContainerView.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
-            
-            // Make the banner at most 20% window height. Backstop for way too much text.
-            [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
-
-            // root VC positions to window, or bottom of banner, which ever is higher
-            [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
-            [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
-            [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
             [appRootViewController.view.topAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
-            appAlignTopWindowLowPriorityConstraint,
-        ];
-        
-        [NSLayoutConstraint activateConstraints:constraints];
+        ]];
     }
+    
+    [NSLayoutConstraint activateConstraints:constraints];
 }
 
 // TODO main method dispatch
