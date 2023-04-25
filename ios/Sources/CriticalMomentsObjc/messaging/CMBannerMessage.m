@@ -21,6 +21,7 @@
     self = [super init];
     if (self) {
         self.body = body;
+        self.showDismissButton = YES;
     }
     return self;
 }
@@ -46,30 +47,40 @@
     // TODO height passed up
     [view addSubview:bodyLabel];
     
-    // TODO style/color
-    UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    if (@available(iOS 13.0, *)) {
-        UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"] imageWithTintColor:forgroundBannerColor renderingMode:UIImageRenderingModeAlwaysOriginal];
-        [dismissButton setImage:dismissImage forState:UIControlStateNormal];
-    } else {
-        [dismissButton setTitle:@"X" forState:UIControlStateNormal];
-        [dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
-    }
-    [dismissButton addTarget:self action:@selector(dismissTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
-    dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:dismissButton];
-    
     // Layout
     NSArray<NSLayoutConstraint*>* constraints = @[
-        [dismissButton.heightAnchor constraintEqualToConstant:40],
-        [dismissButton.widthAnchor constraintEqualToConstant:40],
-        [dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
-        [dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
         [bodyLabel.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
         [bodyLabel.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
-        [bodyLabel.rightAnchor constraintEqualToAnchor:dismissButton.leftAnchor constant:-12],
         [bodyLabel.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
     ];
+    [NSLayoutConstraint activateConstraints:constraints];
+    
+    if (!self.showDismissButton) {
+        // Layout body without dismiss button
+        constraints = [constraints arrayByAddingObject:[bodyLabel.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor]];
+    } else {
+        UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        if (@available(iOS 13.0, *)) {
+            UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"] imageWithTintColor:forgroundBannerColor renderingMode:UIImageRenderingModeAlwaysOriginal];
+            [dismissButton setImage:dismissImage forState:UIControlStateNormal];
+        } else {
+            [dismissButton setTitle:@"X" forState:UIControlStateNormal];
+            [dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
+        }
+        [dismissButton addTarget:self action:@selector(dismissTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
+        dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [view addSubview:dismissButton];
+
+        // Layout for dismiss button, making room for body. 44=HIG accessibility recommendation.
+        constraints = [constraints arrayByAddingObjectsFromArray:@[
+            [dismissButton.heightAnchor constraintEqualToConstant:44],
+            [dismissButton.widthAnchor constraintEqualToConstant:44],
+            [dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
+            [dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
+            [bodyLabel.rightAnchor constraintEqualToAnchor:dismissButton.leftAnchor constant:-12],
+        ]];
+    }
+    
     [NSLayoutConstraint activateConstraints:constraints];
     
     return view;

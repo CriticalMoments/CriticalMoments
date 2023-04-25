@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMBannerMessage : NSObject
 
 @property (nonatomic, readonly) NSString* body;
+@property (nonatomic, readwrite) bool showDismissButton;
 @property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
 @property (nonatomic, readwrite) id<CMBannerDismissDelegate> dismissDelegate;
 
