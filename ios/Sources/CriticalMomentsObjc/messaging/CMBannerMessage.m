@@ -12,8 +12,6 @@
 @interface CMBannerMessage ()
 
 @property (nonatomic, strong, readwrite) NSString* body;
-@property (nonatomic, strong) UILabel* bodyLabel;
-@property (nonatomic, strong) UIButton* dismissButton;
 
 @end
 
@@ -27,10 +25,6 @@
     return self;
 }
 
--(void)setDismissButton:(UIButton *)dismissButton {
-    [dismissButton addTarget:self action:@selector(dismissTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
-    _dismissButton = dismissButton;
-}
 
 -(UIView*) buildViewForMessage {
     UIView* view = [[UIView alloc] init];
@@ -41,49 +35,44 @@
     
     view.backgroundColor = backgroundBannerColor;
     
-    self.bodyLabel = [[UILabel alloc] init];
-    self.bodyLabel.text = self.body;
-    self.bodyLabel.textColor = forgroundBannerColor;
-    self.bodyLabel.backgroundColor = [UIColor clearColor];
-    self.bodyLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.bodyLabel.numberOfLines = 2;
+    UILabel* bodyLabel = [[UILabel alloc] init];
+    bodyLabel.text = self.body;
+    bodyLabel.textColor = forgroundBannerColor;
+    bodyLabel.backgroundColor = [UIColor clearColor];
+    bodyLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    bodyLabel.numberOfLines = 2;
     // TODO style
     // TODO elipisis
     // TODO height passed up
-    [view addSubview:self.bodyLabel];
+    [view addSubview:bodyLabel];
     
     // TODO style/color
-    self.dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
     if (@available(iOS 13.0, *)) {
         UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"] imageWithTintColor:forgroundBannerColor renderingMode:UIImageRenderingModeAlwaysOriginal];
-        [self.dismissButton setImage:dismissImage forState:UIControlStateNormal];
+        [dismissButton setImage:dismissImage forState:UIControlStateNormal];
     } else {
-        // Fallback on earlier versions
-        [self.dismissButton setTitle:@"X" forState:UIControlStateNormal];
-        [self.dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
+        [dismissButton setTitle:@"X" forState:UIControlStateNormal];
+        [dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
     }
+    [dismissButton addTarget:self action:@selector(dismissTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
+    dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [view addSubview:dismissButton];
     
-    self.dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [view addSubview:self.dismissButton];
-    
-    [self setupLayoutForRootView:(UIView*)view];
-    
-    return view;
-}
-
--(void) setupLayoutForRootView:(UIView*)view {
     // Layout
     NSArray<NSLayoutConstraint*>* constraints = @[
-        [self.dismissButton.heightAnchor constraintEqualToConstant:40],
-        [self.dismissButton.widthAnchor constraintEqualToConstant:40],
-        [self.dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
-        [self.dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-        [self.bodyLabel.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
-        [self.bodyLabel.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
-        [self.bodyLabel.rightAnchor constraintEqualToAnchor:self.dismissButton.leftAnchor constant:-12],
-        [self.bodyLabel.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
+        [dismissButton.heightAnchor constraintEqualToConstant:40],
+        [dismissButton.widthAnchor constraintEqualToConstant:40],
+        [dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
+        [dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
+        [bodyLabel.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
+        [bodyLabel.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
+        [bodyLabel.rightAnchor constraintEqualToAnchor:dismissButton.leftAnchor constant:-12],
+        [bodyLabel.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
+    
+    return view;
 }
 
 - (void)dismissTapped:(UIButton*)sender {
