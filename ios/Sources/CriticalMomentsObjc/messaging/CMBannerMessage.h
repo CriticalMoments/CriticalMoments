@@ -36,8 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) dismissedMessage:(CMBannerMessage*)message;
 @end
 
-// TODO: P0 -- not a UI View, but a UIView builder
-@interface CMBannerMessage : UIView
+@interface CMBannerMessage : NSObject
 
 @property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
 @property (nonatomic, readwrite) id<CMBannerDismissDelegate> dismissDelegate;
@@ -46,8 +45,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(instancetype)initWithBody:(NSString*)body;
 
+-(UIView*) buildViewForMessage;
+
 // TODO: preferred size for height method
-// TODO: 
+// TODO: next/prev delegate
 
 @end
 

@@ -19,6 +19,7 @@
 
 // currentMessage managed by renderForCurrentState -- don't modify directly
 @property (nonatomic, strong) CMBannerMessage* currentMessage;
+@property (nonatomic, strong) UIView* currentMessageView;
 
 // access syncronized by main queue
 @property (nonatomic, strong) UIView* appWideContainerView;
@@ -108,19 +109,21 @@ static CMBannerManager *sharedInstance = nil;
     }
     
     // remove prior message from container
-    [priorCurrentMessage removeFromSuperview];
+    [_currentMessageView removeFromSuperview];
     
     if (!_appWideContainerView) {
         [self createAppWideBannerContainer];
     }
     
-    _currentMessage.translatesAutoresizingMaskIntoConstraints = NO;
-    [_appWideContainerView addSubview:_currentMessage];
+    UIView* messageView = [_currentMessage buildViewForMessage];
+    _currentMessageView = messageView;
+    messageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_appWideContainerView addSubview:messageView];
     NSArray<NSLayoutConstraint*>* constraints = @[
-        [_currentMessage.topAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
-        [_currentMessage.leftAnchor constraintEqualToAnchor:_appWideContainerView.leftAnchor],
-        [_currentMessage.rightAnchor constraintEqualToAnchor:_appWideContainerView.rightAnchor],
-        [_currentMessage.bottomAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
+        [messageView.topAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
+        [messageView.leftAnchor constraintEqualToAnchor:_appWideContainerView.leftAnchor],
+        [messageView.rightAnchor constraintEqualToAnchor:_appWideContainerView.rightAnchor],
+        [messageView.bottomAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
     ];
     
     [NSLayoutConstraint activateConstraints:constraints];

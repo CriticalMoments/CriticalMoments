@@ -23,7 +23,6 @@
     self = [super init];
     if (self) {
         self.body = body;
-        [self buildSubviews];
     }
     return self;
 }
@@ -33,9 +32,9 @@
     _dismissButton = dismissButton;
 }
 
--(void) buildSubviews {
-    // TODO
-    self.backgroundColor = [UIColor greenColor];
+-(UIView*) buildViewForMessage {
+    UIView* view = [[UIView alloc] init];
+    view.backgroundColor = [UIColor greenColor];
     
     self.bodyLabel = [[UILabel alloc] init];
     self.bodyLabel.text = self.body;
@@ -45,28 +44,30 @@
     // TODO style
     // TODO elipisis
     // TODO height passed up
-    [self addSubview:self.bodyLabel];
+    [view addSubview:self.bodyLabel];
     
     // TODO Warning
     // TODO style/color
     self.dismissButton = [UIButton buttonWithType:UIButtonTypeClose];
     self.dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.dismissButton];
+    [view addSubview:self.dismissButton];
     
-    [self setupLayout];
+    [self setupLayoutForRootView:(UIView*)view];
+    
+    return view;
 }
 
--(void) setupLayout {
+-(void) setupLayoutForRootView:(UIView*)view {
     // Layout
     NSArray<NSLayoutConstraint*>* constraints = @[
         [self.dismissButton.heightAnchor constraintEqualToConstant:40],
         [self.dismissButton.widthAnchor constraintEqualToConstant:40],
-        [self.dismissButton.rightAnchor constraintEqualToAnchor:self.layoutMarginsGuide.rightAnchor],
-        [self.dismissButton.centerYAnchor constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
-        [self.bodyLabel.topAnchor constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
-        [self.bodyLabel.leftAnchor constraintEqualToAnchor:self.layoutMarginsGuide.leftAnchor],
+        [self.dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
+        [self.dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
+        [self.bodyLabel.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
+        [self.bodyLabel.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
         [self.bodyLabel.rightAnchor constraintEqualToAnchor:self.dismissButton.leftAnchor constant:-12],
-        [self.bodyLabel.bottomAnchor constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
+        [self.bodyLabel.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
 }
