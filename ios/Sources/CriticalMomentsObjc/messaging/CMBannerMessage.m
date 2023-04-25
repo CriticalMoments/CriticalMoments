@@ -31,7 +31,7 @@
     
     // TODO: load from theme
     UIColor* forgroundBannerColor = [UIColor blackColor];
-    UIColor* backgroundBannerColor = [UIColor greenColor];
+    UIColor* backgroundBannerColor = [UIColor systemYellowColor];
     
     view.backgroundColor = backgroundBannerColor;
     
