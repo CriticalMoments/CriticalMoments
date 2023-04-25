@@ -158,15 +158,11 @@ static CMBannerManager *sharedInstance = nil;
     _appWideContainerView.translatesAutoresizingMaskIntoConstraints = NO;
     [keyWindow addSubview:_appWideContainerView];
     
-    // TODO
-    // Max height still set, don't want it taking over screen
-    // Max lines still set, but configurable
-    // Invert sizing
-    // look at rootview.bottomLayoutGuide
+    //
+    // Layout
+    //
     
     appRootViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    // Layout
     
     // These two low priority constraints aligns rootVC to window top/bottom,  but are overridden by high pri banner constraints if present
     NSLayoutConstraint* appAlignBottomWindowLowPriorityConstraint = [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor];
@@ -175,31 +171,28 @@ static CMBannerManager *sharedInstance = nil;
     appAlignTopWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
     
     NSArray<NSLayoutConstraint*>* constraints = @[
-        // position banner at the bottom the window and to the edges
+        // position banner to the edges
         [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
         [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
-        
-        // TODO [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
         
         // Make the banner at most 20% window height. Backstop for way too much text.
         [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
         
-        // Align root VC to window
+        // Align root VC to the window
         appAlignBottomWindowLowPriorityConstraint,
         appAlignTopWindowLowPriorityConstraint,
-        // TODO [appRootViewController.view.bottomAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
         [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
         [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
     ];
     
     if (self.appWideBannerPosition == CMAppWideBannerPositionBottom) {
-        // Container at bottom of app
+        // Banner container at bottom of app
         constraints = [constraints arrayByAddingObjectsFromArray:@[
             [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
             [appRootViewController.view.bottomAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
         ]];
     } else {
-        // Container at top of app
+        // Banner container at top of app
         constraints = [constraints arrayByAddingObjectsFromArray:@[
             [_appWideContainerView.topAnchor constraintEqualToAnchor:keyWindow.topAnchor],
             [appRootViewController.view.topAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
