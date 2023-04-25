@@ -143,9 +143,20 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
     
-    // TODO better primary -- UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.addSubview(myView)
-    // TODO Warning
+    // Find key window, falling back to first window
     UIWindow* keyWindow = [[[UIApplication sharedApplication] windows] firstObject];
+    for (UIWindow* w in [[UIApplication sharedApplication] windows]) {
+        if (w.isKeyWindow) {
+            keyWindow = w;
+            break;
+        }
+    }
+    if (!keyWindow) {
+        // no window to render in
+        NSLog(@"CMBannerManager could not find a key window");
+        return;
+    }
+    
     UIViewController* appRootViewController = keyWindow.rootViewController;
     
     _appWideContainerView = [[UIView alloc] init];
