@@ -16,7 +16,7 @@
 
 // currentMessage managed by renderForCurrentState -- don't modify directly
 @property (nonatomic, strong) CMBannerMessage* currentMessage;
-@property (nonatomic, strong) UIView* currentMessageView;
+@property (nonatomic, weak) UIView* currentMessageView;
 
 // access syncronized by main queue
 @property (nonatomic, strong) UIView* appWideContainerView;
@@ -69,6 +69,15 @@ static CMBannerManager *sharedInstance = nil;
     }
 }
 
+-(void)setAppWideBannerPosition:(CMAppWideBannerPosition)appWideBannerPosition {
+    if (appWideBannerPosition == _appWideBannerPosition) {
+        return;
+    }
+    _appWideBannerPosition = appWideBannerPosition;
+    [self removeAppWideBannerContainer];
+    [self renderForCurrentState];
+}
+
 -(void) removeAllAppWideMessages {
     @synchronized (self) {
         [_appWideMessages removeAllObjects];
@@ -98,7 +107,7 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
     
-    if (priorCurrentMessage == _currentMessage) {
+    if (priorCurrentMessage == _currentMessage && _currentMessageView) {
         // we are already rendering this message, no-op
         return;
     }
@@ -202,7 +211,6 @@ static CMBannerManager *sharedInstance = nil;
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
-// TODO main method dispatch
 -(void) removeAppWideBannerContainer {
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -216,6 +224,7 @@ static CMBannerManager *sharedInstance = nil;
     }
     
     [_appWideContainerView removeFromSuperview];
+    _currentMessageView = nil;
     _appWideContainerView = nil;
 }
 
