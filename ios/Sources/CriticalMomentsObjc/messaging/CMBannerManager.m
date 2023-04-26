@@ -6,16 +6,17 @@
 //
 
 #import "CMBannerManager.h"
+#import "CMBannerMessage_private.h"
 
 #define MAX_BANNER_HEIGHT_PERCENTAGE 0.20
 
-@interface CMBannerManager () <CMBannerDismissDelegate>
+@interface CMBannerManager () <CMBannerDismissDelegate, CMBannerNextMessageDelegate>
 
 // Access should be @synchronized(self)
 @property (nonatomic, strong) NSMutableArray<CMBannerMessage*>* appWideMessages;
-
-// currentMessage managed by renderForCurrentState -- don't modify directly
 @property (nonatomic, strong) CMBannerMessage* currentMessage;
+
+// currentMessageView managed by renderForCurrentState
 @property (nonatomic, weak) UIView* currentMessageView;
 
 // access syncronized by main queue
@@ -50,13 +51,12 @@ static CMBannerManager *sharedInstance = nil;
 
 -(void) showAppWideMessage:(CMBannerMessage*)message {
     @synchronized (self) {
-        if ([_appWideMessages containsObject:message]) {
-            return;
+        if (![_appWideMessages containsObject:message]) {
+            message.dismissDelegate = self;
+            [_appWideMessages addObject:message];
         }
         
-        message.dismissDelegate = self;
-        [_appWideMessages addObject:message];
-
+        _currentMessage = message;
         [self renderForCurrentState];
     }
 }
@@ -65,6 +65,18 @@ static CMBannerManager *sharedInstance = nil;
     @synchronized (self) {
         [_appWideMessages removeObject:message];
         
+        if (_currentMessage == message) {
+            _currentMessage = _appWideMessages.lastObject;
+        }
+        
+        [self renderForCurrentState];
+    }
+}
+
+-(void) removeAllAppWideMessages {
+    @synchronized (self) {
+        [_appWideMessages removeAllObjects];
+        _currentMessage = nil;
         [self renderForCurrentState];
     }
 }
@@ -78,14 +90,6 @@ static CMBannerManager *sharedInstance = nil;
     [self renderForCurrentState];
 }
 
--(void) removeAllAppWideMessages {
-    @synchronized (self) {
-        [_appWideMessages removeAllObjects];
-        
-        [self renderForCurrentState];
-    }
-}
-
 -(void) renderForCurrentState {
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -94,21 +98,18 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
 
-    // Pick a valid new current message, preferring current, then the last added still active message
-    CMBannerMessage* priorCurrentMessage = _currentMessage;
+    // Ensure current message is valid
+    // Prefer current, then the last added still active message
     if (![_appWideMessages containsObject:_currentMessage]) {
         _currentMessage = nil;
     }
-    _currentMessage = _appWideMessages.lastObject;
+    if (!_currentMessage) {
+        _currentMessage = _appWideMessages.lastObject;
+    }
     
     // if no messages left to render clear container view
     if (!_currentMessage) {
         [self removeAppWideBannerContainer];
-        return;
-    }
-    
-    if (priorCurrentMessage == _currentMessage && _currentMessageView) {
-        // we are already rendering this message, no-op
         return;
     }
     
@@ -119,6 +120,11 @@ static CMBannerManager *sharedInstance = nil;
         [self createAppWideBannerContainer];
     }
     
+    if (_appWideMessages.count > 1) {
+        _currentMessage.nextMessageDelegate = self;
+    } else {
+        _currentMessage.nextMessageDelegate = nil;
+    }
     UIView* messageView = [_currentMessage buildViewForMessage];
     _currentMessageView = messageView;
     messageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -228,10 +234,19 @@ static CMBannerManager *sharedInstance = nil;
     _appWideContainerView = nil;
 }
 
-#pragma mark
+#pragma mark CMBannerDismissDelegate
 
 -(void) dismissedMessage:(CMBannerMessage*)message{
     [self removeAppWideMessage:message];
+}
+
+#pragma mark CMBannerNextMessageDelegate
+
+-(void)nextMessage {
+    NSUInteger nextIndex = [_appWideMessages indexOfObject:_currentMessage] + 1;
+    nextIndex = nextIndex % _appWideMessages.count;
+    _currentMessage = [_appWideMessages objectAtIndex:nextIndex];
+    [self renderForCurrentState];
 }
 
 @end

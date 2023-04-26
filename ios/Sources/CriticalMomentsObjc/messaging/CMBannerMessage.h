@@ -36,21 +36,25 @@ NS_ASSUME_NONNULL_BEGIN
 -(void) dismissedMessage:(CMBannerMessage*)message;
 @end
 
+@protocol CMBannerNextMessageDelegate
+-(void) nextMessage;
+@end
+
 @interface CMBannerMessage : NSObject
 
 @property (nonatomic, readonly) NSString* body;
 @property (nonatomic, readwrite) bool showDismissButton;
+@property (nonatomic) NSNumber* maxLineCount;
 @property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
-@property (nonatomic, readwrite) id<CMBannerDismissDelegate> dismissDelegate;
+
 
 -(instancetype)init NS_UNAVAILABLE;
 
 -(instancetype)initWithBody:(NSString*)body;
 
 -(UIView*) buildViewForMessage;
-
-// TODO: preferred size for height method
-// TODO: next/prev delegate
+- (void)dismissTapped:(UIButton*)sender;
+- (void)nextTapped:(UIButton*)sender;
 
 @end
 
