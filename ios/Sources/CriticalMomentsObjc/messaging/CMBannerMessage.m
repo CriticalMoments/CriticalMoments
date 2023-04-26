@@ -48,9 +48,6 @@
     } else {
         bodyLabel.numberOfLines = 4;
     }
-    // TODO style
-    // TODO elipisis
-    // TODO height passed up
     [view addSubview:bodyLabel];
     
     // Gesture for action
