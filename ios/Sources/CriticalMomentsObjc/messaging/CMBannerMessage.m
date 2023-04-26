@@ -53,6 +53,13 @@
     // TODO height passed up
     [view addSubview:bodyLabel];
     
+    // Gesture for action
+    if (self.actionDelegate) {
+        UITapGestureRecognizer* tapReco = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(bannerTapped)];
+        [view setUserInteractionEnabled:YES];
+        [view addGestureRecognizer:tapReco];
+    }
+    
     // Layout
     
     // Low Pri constraint that can be overridden if there's a <> button
@@ -122,6 +129,10 @@
 
 - (void)nextTapped:(UIButton*)sender {
     [self.nextMessageDelegate nextMessage];
+}
+
+- (void)bannerTapped {
+    [self.actionDelegate messageAction:self];
 }
 
 @end
