@@ -59,16 +59,14 @@
     
     // Layout
     
-    // Low Pri constraint that can be overridden if there's a <> button
-    NSLayoutConstraint* bodyLeftLC = [bodyLabel.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor];
-    bodyLeftLC.priority = UILayoutPriorityDefaultLow;
-    
     NSArray<NSLayoutConstraint*>* constraints = @[
         [bodyLabel.topAnchor constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
         [bodyLabel.bottomAnchor constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
-        bodyLeftLC,
         [bodyLabel.leftAnchor constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
         [bodyLabel.rightAnchor constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
+        [bodyLabel.centerXAnchor constraintEqualToAnchor:view.centerXAnchor],
+        // Max width for iPad, based on readableContentGuide from Apple
+        [bodyLabel.widthAnchor constraintLessThanOrEqualToConstant:672],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
     
@@ -91,7 +89,7 @@
             [dismissButton.widthAnchor constraintEqualToConstant:44],
             [dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
             [dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-            [bodyLabel.rightAnchor constraintEqualToAnchor:dismissButton.leftAnchor constant:-12],
+            [bodyLabel.rightAnchor constraintLessThanOrEqualToAnchor:dismissButton.leftAnchor constant:-4],
         ]];
     }
     
@@ -111,7 +109,7 @@
             [nextMessageButton.widthAnchor constraintGreaterThanOrEqualToConstant:44],
             [nextMessageButton.leftAnchor constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
             [nextMessageButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-            [bodyLabel.leftAnchor constraintEqualToAnchor:nextMessageButton.rightAnchor ],
+            [bodyLabel.leftAnchor constraintGreaterThanOrEqualToAnchor:nextMessageButton.rightAnchor ],
         ]];
     }
     
