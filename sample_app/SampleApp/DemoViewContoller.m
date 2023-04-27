@@ -7,6 +7,8 @@
 
 #import "DemoViewContoller.h"
 
+#define DEMO_CELL_REUSE_ID @"io.criticalmoments.sample_app.demo_cell"
+
 @interface DemoViewContoller () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic) CMDemoScreen* screen;
@@ -31,7 +33,7 @@
 }
 
 -(CMDemoAction*) actionForIndexPath:(NSIndexPath *)indexPath {
-    return [self.screen.sections objectAtIndex:indexPath.section].actions[indexPath.row];
+    return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
 }
 
 #pragma mark UITableViewDelegate
@@ -55,10 +57,12 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CMDemoAction* action = [self actionForIndexPath:indexPath];
     
-    // TOOD
-    //var cell = tableView.dequeueReusableCell(withIdentifier: "myCellType", for: indexPath
-    
-    UITableViewCell* cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"demoCell"];
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:DEMO_CELL_REUSE_ID];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:DEMO_CELL_REUSE_ID];
+    } else {
+        NSLog(@"reuse!");
+    }
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
     cell.detailTextLabel.numberOfLines = 4;
