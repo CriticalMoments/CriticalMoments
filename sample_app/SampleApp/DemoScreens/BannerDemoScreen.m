@@ -22,6 +22,7 @@
 -(instancetype)init {
     self = [super init];
     if (self) {
+        self.title = @"Banners";
         [self buildSections];
     }
     return self;
@@ -32,17 +33,17 @@
     // Basics
     
     CMDemoAction* shortBannerAction = [[CMDemoAction alloc] init];
-    shortBannerAction.title = @"Short banner message";
+    shortBannerAction.title = @"Show Short Banner";
     shortBannerAction.subtitle = @"Display a short single line banner, across entire app";
     [shortBannerAction addTarget:self action:@selector(showShortMessage)];
     
     CMDemoAction* longBannerAction = [[CMDemoAction alloc] init];
-    longBannerAction.title = @"Long banner message";
+    longBannerAction.title = @"Show Long Banner";
     longBannerAction.subtitle = @"Display a long banner message, across entire app";
     [longBannerAction addTarget:self action:@selector(showLongMessage)];
     
     CMDemoAction* veryLongBannerAction = [[CMDemoAction alloc] init];
-    veryLongBannerAction.title = @"Very Long banner message";
+    veryLongBannerAction.title = @"Show Very Long Banner";
     veryLongBannerAction.subtitle = @"Display a very long banner message, across entire app";
     [veryLongBannerAction addTarget:self action:@selector(showVeryLongMessage)];
     
@@ -85,7 +86,7 @@
     
     CMDemoAction* singleLineAction = [[CMDemoAction alloc] init];
     singleLineAction.title = @"Show single line banner";
-    singleLineAction.subtitle = @"Show a banner that truncates after the first line of text";
+    singleLineAction.subtitle = @"Show a banner that truncates using `maxLineCount`";
     [singleLineAction addTarget:self action:@selector(showSingleLineMessage)];
     
     [self addSection:@"Banners Display Options" withActions:@[

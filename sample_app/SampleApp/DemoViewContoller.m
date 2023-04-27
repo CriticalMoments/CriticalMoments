@@ -26,23 +26,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.title = @"Critical Moments";
-    
+    self.navigationItem.title = self.screen.title;
     self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
-    
-    //self.tableView.dataSource = self;
-    
-    /*UITableView* tableView = [[UITableView alloc] init];
-    [self.view addSubview:tableView];
-    
-    NSArray<NSLayoutConstraint*>* constraints = @[
-        [tableView.leftAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.leftAnchor],
-        [tableView.rightAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.rightAnchor],
-        [tableView.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor],
-        [tableView.topAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.topAnchor],
-    ];
-    
-    [NSLayoutConstraint activateConstraints:constraints];*/
 }
 
 -(CMDemoAction*) actionForIndexPath:(NSIndexPath *)indexPath {
@@ -76,6 +61,7 @@
     UITableViewCell* cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"demoCell"];
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
+    cell.detailTextLabel.numberOfLines = 4;
     return cell;
 }
 

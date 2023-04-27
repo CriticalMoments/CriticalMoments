@@ -8,7 +8,7 @@
 #import "ViewController.h"
 
 #import "DemoViewContoller.h"
-#import "BannerDemoScreen.h"
+#import "MainDemoScreen.h"
 
 #define BANNER_HEIGHT 60.0
 
@@ -23,8 +23,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    CMDemoScreen* bannerScreen = [[BannerDemoScreen alloc] init];
-    DemoViewContoller* mainTabRoot = [[DemoViewContoller alloc] initWithDemoScreen:bannerScreen];
+    CMDemoScreen* mainDemoScreen = [[MainDemoScreen alloc] init];
+    DemoViewContoller* mainTabRoot = [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
     UINavigationController* mainTabNav = [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
     mainTabNav.navigationBar.prefersLargeTitles = YES;
     

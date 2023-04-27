@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Only should use one of these
 @property (nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;
-@property (nonatomic, readwrite) CMDemoScreen* screenForLaunchAction;
+@property (nonatomic, readwrite) CMDemoScreen* actionNextScreen;
 @property (nonatomic, copy) void (^actionBlock)(void);
 - (void)addTarget:(nullable id)target action:(SEL)action;
 
@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMDemoScreen : NSObject
 
+@property (nonatomic) NSString* title;
 @property (nonatomic, readwrite) NSMutableArray<CMDemoSection*>* sections;
 
 -(void) addSection:(NSString*)section withActions:(NSArray<CMDemoAction*>*)actions;

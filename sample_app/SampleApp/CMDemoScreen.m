@@ -28,10 +28,8 @@
 -(void)performAction {
     if (self.actionDelegate) {
         [self.actionDelegate performAction];
-    } else if (self.screenForLaunchAction) {
-        DemoViewContoller* demoVc = [[DemoViewContoller alloc] initWithDemoScreen:self.screenForLaunchAction];
-        UIViewController *rootVC  = Utils.keyWindow.rootViewController;
-        [rootVC.navigationController pushViewController:demoVc animated:YES];
+    } else if (self.actionNextScreen) {
+        [self pushNextScreen];
     } else if (self.actionBlock) {
         self.actionBlock();
     } else if (self.actionTarget && self.actionSelector) {
@@ -40,6 +38,22 @@
         [self.actionTarget performSelector:self.actionSelector];
 #pragma clang diagnostic pop
     }
+}
+
+-(void) pushNextScreen {
+    DemoViewContoller* demoVc = [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
+    UINavigationController* navController;
+    UIViewController *rootVC  = Utils.keyWindow.rootViewController;
+    if ([rootVC isKindOfClass:[UITabBarController class]]) {
+        UITabBarController* tab = (UITabBarController*)rootVC;
+        rootVC = tab.selectedViewController;
+    }
+    if ([rootVC isKindOfClass:[UINavigationController class]]) {
+        navController = (UINavigationController*)rootVC;
+    } else {
+        navController = rootVC.navigationController;
+    }
+    [navController pushViewController:demoVc animated:YES];
 }
 
 @end
