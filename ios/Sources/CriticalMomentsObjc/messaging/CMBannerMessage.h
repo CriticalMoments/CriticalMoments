@@ -37,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)initWithBody:(NSString*)body;
 
 -(UIView*) buildViewForMessage;
-- (void)dismissTapped:(UIButton*)sender;
-- (void)nextTapped:(UIButton*)sender;
 
 @end
 
