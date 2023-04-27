@@ -2,7 +2,7 @@ import XCTest
 @testable import CriticalMomentsSwift
 
 final class CriticalMomentsTests: XCTestCase {
-    func testExample() throws {
+    func testSwiftPing() throws {
         // XCTest Documenation
         // https://developer.apple.com/documentation/xctest
 

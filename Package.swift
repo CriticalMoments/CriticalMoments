@@ -10,27 +10,27 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "CriticalMoments",
-            targets: ["CriticalMomentsSwift", "CriticalMomentsObjc"]),
+            targets: ["CriticalMomentsSwift", "CriticalMoments"]),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "CriticalMomentsSwift",
-            dependencies: ["CriticalMomentsObjc"],
+            dependencies: ["CriticalMoments"],
             path: "ios/Sources/CriticalMomentsSwift"),
         .target(
-            name: "CriticalMomentsObjc",
-            path: "ios/Sources/CriticalMomentsObjc",
+            name: "CriticalMoments",
+            path: "ios/Sources/CriticalMoments",
             publicHeadersPath:"include"),
         .testTarget(
             name: "CriticalMomentsSwiftTests",
             dependencies: ["CriticalMomentsSwift"],
             path: "ios/Tests/CriticalMomentsSwiftTests"),
         .testTarget(
-            name: "CriticalMomentsObjcTests",
-            dependencies: ["CriticalMomentsObjc"],
-            path: "ios/Tests/CriticalMomentsObjcTests"),
+            name: "CriticalMomentsTests",
+            dependencies: ["CriticalMoments"],
+            path: "ios/Tests/CriticalMomentsTests"),
     ],
     swiftLanguageVersions: [.v5]
 )
