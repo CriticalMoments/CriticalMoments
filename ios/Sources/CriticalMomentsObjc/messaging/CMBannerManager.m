@@ -30,6 +30,11 @@ static CMBannerManager *sharedInstance = nil;
 
 + (CMBannerManager*)sharedInstance
 {
+    // avoid lock if we can
+    if (sharedInstance) {
+        return sharedInstance;
+    }
+    
     @synchronized(CMBannerManager.class) {
         if (!sharedInstance) {
             sharedInstance = [[self alloc] init];
