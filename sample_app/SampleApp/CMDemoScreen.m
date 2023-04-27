@@ -58,15 +58,33 @@
 
 @end
 
+@interface CMDemoSection ()
+
+@property (nonatomic, readwrite) NSString* title;
+@property (nonatomic, readwrite) NSMutableArray<CMDemoAction*>* actionsList;
+
+@end
+
 @implementation CMDemoSection
 
 -(instancetype)init {
     self = [super init];
     if (self) {
-        self.actions = [[NSMutableArray alloc] init];
+        self.actionsList = [[NSMutableArray alloc] init];
     }
     return self;
 }
+
+-(NSArray<CMDemoAction *> *)actions{
+    return self.actionsList;
+}
+
+@end
+
+@interface CMDemoScreen ()
+
+@property (nonatomic, readwrite) NSMutableArray<CMDemoSection*>* sections;
+@property (nonatomic, readwrite) NSMutableArray<CMDemoAction*>* actions;
 
 @end
 
@@ -86,7 +104,7 @@
         [_sections addObject:rootSection];
     }
     CMDemoSection* rootSection = _sections.firstObject;
-    [rootSection.actions addObject:action];
+    [rootSection.actionsList addObject:action];
 }
 
 -(void)addSection:(NSString *)title withActions:(NSArray<CMDemoAction *> *)actions {
@@ -99,7 +117,7 @@
         mutableActions = [actions mutableCopy];
     }
     
-    section.actions = mutableActions;
+    section.actionsList = mutableActions;
     [_sections addObject:section];
 }
 

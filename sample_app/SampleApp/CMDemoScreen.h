@@ -34,18 +34,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMDemoSection : NSObject
 
-@property (nonatomic) NSString* title;
-@property (nonatomic) NSMutableArray<CMDemoAction*>* actions;
+@property (nonatomic, readonly) NSString* title;
+
+-(NSArray<CMDemoAction*>*) actions;
 
 @end
 
 @interface CMDemoScreen : NSObject
 
-@property (nonatomic) NSString* title;
-@property (nonatomic, readwrite) NSMutableArray<CMDemoSection*>* sections;
+@property (nonatomic, readwrite) NSString* title;
+
+-(NSArray<CMDemoSection*>*) sections;
 
 -(void) addSection:(NSString*)section withActions:(NSArray<CMDemoAction*>*)actions;
 -(void) addActionToRootSection:(CMDemoAction*)action;
+
 
 @end
 
