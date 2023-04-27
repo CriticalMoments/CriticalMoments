@@ -96,6 +96,13 @@ static CMBannerManager *sharedInstance = nil;
 }
 
 -(void) renderForCurrentState {
+    // Always dispatch async. The caller might call us before the window/rootVC relations are setup.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self renderForCurrentStateSyncMain];
+    });
+}
+
+-(void) renderForCurrentStateSyncMain {
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self renderForCurrentState];
@@ -121,8 +128,9 @@ static CMBannerManager *sharedInstance = nil;
     // remove prior message from container
     [_currentMessageView removeFromSuperview];
     
+    [self createAppWideBannerContainerIfMissing];
     if (!_appWideContainerView) {
-        [self createAppWideBannerContainer];
+        return;
     }
     
     if (_appWideMessages.count > 1) {
@@ -144,10 +152,10 @@ static CMBannerManager *sharedInstance = nil;
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
--(void) createAppWideBannerContainer {
+-(void) createAppWideBannerContainerIfMissing {
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [self createAppWideBannerContainer];
+            [self createAppWideBannerContainerIfMissing];
         });
         return;
     }
@@ -166,13 +174,17 @@ static CMBannerManager *sharedInstance = nil;
     }
     if (!keyWindow) {
         // no window to render in
-        NSLog(@"CMBannerManager could not find a key window");
+        NSLog(@"CriticalMoments: CMBannerManager could not find a key window, aborting.");
         return;
     }
     
     // Add the container view to the key window root VC
-    _appWideContainerView = [[UIView alloc] init];
     UIViewController* appRootViewController = keyWindow.rootViewController;
+    if (appRootViewController.view.window != keyWindow) {
+        NSLog(@"CriticalMoments: tried to show a banner before root VC was setup, aborting.");
+        return;
+    }
+    _appWideContainerView = [[UIView alloc] init];
     [keyWindow addSubview:_appWideContainerView];
     
     //
