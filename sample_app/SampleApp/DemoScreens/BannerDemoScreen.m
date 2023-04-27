@@ -9,7 +9,7 @@
 
 #import "Utils.h"
 
-@import CriticalMomentsObjc;
+@import CriticalMoments;
 
 @interface BannerDemoScreen () <CMBannerActionDelegate>
 
