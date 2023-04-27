@@ -28,13 +28,12 @@
 }
 
 -(UIView*) buildViewForMessage {
-    UIView* view = [[UIView alloc] init];
-    
     // TODO: load from theme
     UIColor* forgroundBannerColor = [UIColor blackColor];
     UIColor* backgroundBannerColor = [UIColor systemYellowColor];
     UIFont* bannerFont = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
     
+    UIView* view = [[UIView alloc] init];
     view.backgroundColor = backgroundBannerColor;
     
     UILabel* bodyLabel = [[UILabel alloc] init];
@@ -76,6 +75,7 @@
             UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"] imageWithTintColor:forgroundBannerColor renderingMode:UIImageRenderingModeAlwaysOriginal];
             [dismissButton setImage:dismissImage forState:UIControlStateNormal];
         } else {
+            // TODO: check this unicode on earliest deployment target: ios 11
             [dismissButton setTitle:@"✕" forState:UIControlStateNormal];
             [dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
         }
@@ -83,13 +83,15 @@
         dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
         [view addSubview:dismissButton];
         
-        // Layout for dismiss button, making room for body. 44=HIG accessibility recommendation.
+        // Layout for dismiss button, making room for body
         constraints = [constraints arrayByAddingObjectsFromArray:@[
+            // 44=HIG accessibility recommendation
             [dismissButton.heightAnchor constraintEqualToConstant:44],
             [dismissButton.widthAnchor constraintEqualToConstant:44],
             [dismissButton.rightAnchor constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
             [dismissButton.centerYAnchor constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-            [bodyLabel.rightAnchor constraintLessThanOrEqualToAnchor:dismissButton.leftAnchor constant:-4],
+            // -6 is just visual padding on left of X button
+            [bodyLabel.rightAnchor constraintLessThanOrEqualToAnchor:dismissButton.leftAnchor constant:-6],
         ]];
     }
     
@@ -97,9 +99,10 @@
     if (self.nextMessageDelegate) {
         // Create "ᐊᐅ" button
         UIButton* nextMessageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        // TODO: check this unicode on earliest deployment target: ios 11
         [nextMessageButton setTitle:@"ᐊᐅ" forState:UIControlStateNormal];
         [nextMessageButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
-        [nextMessageButton addTarget:self action:@selector(nextTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
+        [nextMessageButton addTarget:self action:@selector(nextMessageButtonTapped:) forControlEvents:UIControlEventPrimaryActionTriggered];
         nextMessageButton.translatesAutoresizingMaskIntoConstraints = NO;
         [view addSubview:nextMessageButton];
         
@@ -122,7 +125,7 @@
     [self.dismissDelegate dismissedMessage:self];
 }
 
-- (void)nextTapped:(UIButton*)sender {
+- (void)nextMessageButtonTapped:(UIButton*)sender {
     [self.nextMessageDelegate nextMessage];
 }
 

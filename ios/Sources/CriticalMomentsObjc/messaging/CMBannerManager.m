@@ -145,8 +145,6 @@ static CMBannerManager *sharedInstance = nil;
 }
 
 -(void) createAppWideBannerContainer {
-    //if (dispatch_queue_get_label(dispatch_get_main_queue()) != dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)) {
-    // Dispatch UI work to main
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self createAppWideBannerContainer];
@@ -172,10 +170,9 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
     
-    UIViewController* appRootViewController = keyWindow.rootViewController;
-    
+    // Add the container view to the key window root VC
     _appWideContainerView = [[UIView alloc] init];
-    _appWideContainerView.translatesAutoresizingMaskIntoConstraints = NO;
+    UIViewController* appRootViewController = keyWindow.rootViewController;
     [keyWindow addSubview:_appWideContainerView];
     
     //
@@ -183,6 +180,7 @@ static CMBannerManager *sharedInstance = nil;
     //
     
     appRootViewController.view.translatesAutoresizingMaskIntoConstraints = NO;
+    _appWideContainerView.translatesAutoresizingMaskIntoConstraints = NO;
     
     // These two low priority constraints aligns rootVC to window top/bottom,  but are overridden by high pri banner constraints if present
     NSLayoutConstraint* appAlignBottomWindowLowPriorityConstraint = [appRootViewController.view.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor];
@@ -191,20 +189,21 @@ static CMBannerManager *sharedInstance = nil;
     appAlignTopWindowLowPriorityConstraint.priority = UILayoutPriorityDefaultLow;
     
     NSArray<NSLayoutConstraint*>* constraints = @[
-        // position banner to the edges
+        // position banner to the side edges
         [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
         [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
         
         // Make the banner at most 20% window height. Backstop for way too much text.
         [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
         
-        // Align root VC to the window
+        // Align root VC to the edges of the window
         appAlignBottomWindowLowPriorityConstraint,
         appAlignTopWindowLowPriorityConstraint,
         [appRootViewController.view.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
         [appRootViewController.view.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
     ];
     
+    // Top vs Bottom layout for banner
     if (self.appWideBannerPosition == CMAppWideBannerPositionBottom) {
         // Banner container at bottom of app
         constraints = [constraints arrayByAddingObjectsFromArray:@[
@@ -248,10 +247,12 @@ static CMBannerManager *sharedInstance = nil;
 #pragma mark CMBannerNextMessageDelegate
 
 -(void)nextMessage {
-    NSUInteger nextIndex = [_appWideMessages indexOfObject:_currentMessage] + 1;
-    nextIndex = nextIndex % _appWideMessages.count;
-    _currentMessage = [_appWideMessages objectAtIndex:nextIndex];
-    [self renderForCurrentState];
+    @synchronized (self) {
+        NSUInteger nextIndex = [_appWideMessages indexOfObject:_currentMessage] + 1;
+        nextIndex = nextIndex % _appWideMessages.count;
+        _currentMessage = [_appWideMessages objectAtIndex:nextIndex];
+        [self renderForCurrentState];
+    }
 }
 
 @end
