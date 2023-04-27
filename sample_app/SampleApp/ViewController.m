@@ -34,26 +34,12 @@
     mainTabNav.tabBarItem = mainTabBarItem;
     self.viewControllers = @[mainTabNav];
     
-    UITabBarAppearance* tabAppearance = [[UITabBarAppearance alloc] init];
-    [tabAppearance configureWithOpaqueBackground];
-    self.tabBar.scrollEdgeAppearance = tabAppearance;
-    
-    /*dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.25 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        CMBannerMessage* message = [[CMBannerMessage alloc] initWithBody:@"Helllooo world Helllooo world Helllooo world Helllooo world Helllooo world Helllooo world Helllooo world "];
-        message = [[CMBannerMessage alloc] initWithBody:@"short msg"];
-        message.actionDelegate = self;
-        [[CMBannerManager sharedInstance] showAppWideMessage:message];
-    });
-    
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.25 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        CMBannerMessage* message = [[CMBannerMessage alloc] initWithBody:@"message two, ya ba do. message two, ya ba do message two, sdf sdf  sdf sdfsf sdf sdya ba do message two, ya ba do. message two, ya ba do message two, ya ba do"];
-        //message.maxLines = @4;
-        //message.showDismissButton = NO;
-        message.actionDelegate = self;
-        [[CMBannerManager sharedInstance] showAppWideMessage:message];
-        [CMBannerManager sharedInstance].appWideBannerPosition = CMAppWideBannerPositionTop;
-    });*/
+    if (@available(iOS 15.0, *)) {
+        UITabBarAppearance* tabAppearance = [[UITabBarAppearance alloc] init];
+        [tabAppearance configureWithOpaqueBackground];
+        self.tabBar.scrollEdgeAppearance = tabAppearance;
+    }
+
 }
 
 @end
