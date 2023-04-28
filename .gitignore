@@ -29,6 +29,7 @@ Carthage/
 # My xcframework build action
 CriticalMoments.xcframework/
 xcframework.zip
+docs/
 
 ## End build tools ignore
 
