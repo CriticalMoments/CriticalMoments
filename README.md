@@ -82,6 +82,10 @@ There are a few extra steps to install via Carthage so please follow steps below
 
 Steve Cosman: https://scosman.net
 
+# Trademark
+
+"Critical Moments" and our logos are trademarks. All rights reserved.
+
 # License
 
 Copyright (c) 2023 Stephen Cosman.
