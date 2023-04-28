@@ -12,7 +12,7 @@
 
 #define BANNER_HEIGHT 60.0
 
-@import CriticalMomentsObjc;
+@import CriticalMoments;
 
 @interface ViewController ()
 
