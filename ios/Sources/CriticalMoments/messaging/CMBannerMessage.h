@@ -14,11 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 @class CMBannerMessage;
 
 /**
- A protocol for the action to call when a banner message is tapped.
- @param message the CMBannerMessage which was tapped
+ A protocol for the action which occurs when a banner message is tapped.
  @see CMBannerMessage.actionDelegate
  */
 @protocol CMBannerActionDelegate
+/**
+ The delegate method which will be called when a banner is tapped
+ @param message The CMBannerMessage which was tapped
+ */
 -(void) messageAction:(CMBannerMessage*)message;
 @end
 
@@ -57,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
 
+/// :nodoc:
 -(instancetype)init NS_UNAVAILABLE;
 
 /**

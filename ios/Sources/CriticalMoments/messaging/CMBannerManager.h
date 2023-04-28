@@ -25,9 +25,15 @@ typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
 /**
  Manages the presentation of banner messages across your app.
  
- Example usage:
+ Example usage Swift:
+ ```swift
+ let message = CMBannerMessage.init(body: "Important msg")
+ CMBannerManager.sharedInstance().showAppWideMessage(message)
  ```
- CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"Important info..."];
+ 
+ Example usage Objective-C:
+ ```objc
+ CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"Important msg"];
  [CMBannerManager.sharedInstance showAppWideMessage:bannerMessage];
  ```
  */
