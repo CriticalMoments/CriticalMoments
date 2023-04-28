@@ -11,8 +11,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Enumeration of CMBannerMannager positions
+ @see CMBannerManager.appWideBannerPosition
+ */
 typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
+    /// Position banners at the bottom of the key window
     CMAppWideBannerPositionBottom,
+    /// Position banners at the top of the key window
     CMAppWideBannerPositionTop
 };
 
