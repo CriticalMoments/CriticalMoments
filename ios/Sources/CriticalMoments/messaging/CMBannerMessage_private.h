@@ -7,6 +7,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol CMBannerDismissDelegate
+-(void) dismissedMessage:(CMBannerMessage*)message;
+@end
+
+@protocol CMBannerNextMessageDelegate
+-(void) nextMessage;
+@end
+
 @interface CMBannerMessage ()
 
 // _private header prevents exposing these to public SDK.

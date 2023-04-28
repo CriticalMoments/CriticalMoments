@@ -12,8 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// :nodoc:
 @interface CriticalMoments : NSObject
 
+/// :nodoc:
 +(NSString*) objcPing;
 
 @end
