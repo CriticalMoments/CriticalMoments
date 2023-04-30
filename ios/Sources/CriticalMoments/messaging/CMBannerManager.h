@@ -28,13 +28,13 @@ typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
  Example usage Swift:
  ```swift
  let message = CMBannerMessage.init(body: "Important msg")
- CMBannerManager.sharedInstance().showAppWideMessage(message)
+ CMBannerManager.shared().showAppWideMessage(message)
  ```
  
  Example usage Objective-C:
  ```objc
  CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"Important msg"];
- [CMBannerManager.sharedInstance showAppWideMessage:bannerMessage];
+ [CMBannerManager.shared showAppWideMessage:bannerMessage];
  ```
  */
 @interface CMBannerManager : NSObject
@@ -47,10 +47,10 @@ typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
 @property (nonatomic) CMAppWideBannerPosition appWideBannerPosition;
 
 /**
- A shared instance reference. You should only use a single instance of CMBannerManager per app. This sharedInstance is suggested for convenience, but you can also create and maintain your own instance if you prefer.
+ A shared instance reference. You should only use a single instance of CMBannerManager per app. This `shared` instance is available for convenience, but you can also create and maintain your own instance if you prefer.
  @return a shared instance of CMBannerManager
  */
-+(CMBannerManager*) sharedInstance;
++(CMBannerManager*) shared;
 
 /**
  Shows a banner across your entire application, shifting the root viewcontroller of your key window. If called multiple times, will include UI to iterate though multiple banners.

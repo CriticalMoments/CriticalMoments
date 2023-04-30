@@ -70,7 +70,7 @@
     clearAllBanners.title = @"Clear all banners";
     clearAllBanners.subtitle = @"Remove all banners from this app";
     clearAllBanners.actionBlock = ^{
-        [CMBannerManager.sharedInstance removeAllAppWideMessages];
+        [CMBannerManager.shared removeAllAppWideMessages];
     };
     
     [self addSection:@"Banners Management" withActions:@[
@@ -108,12 +108,12 @@
 }
 
 -(void) swapBannerPosition {
-    CMAppWideBannerPosition old = [CMBannerManager sharedInstance].appWideBannerPosition;
+    CMAppWideBannerPosition old = [CMBannerManager shared].appWideBannerPosition;
     
     if (old == CMAppWideBannerPositionTop) {
-        [CMBannerManager sharedInstance].appWideBannerPosition = CMAppWideBannerPositionBottom;
+        [CMBannerManager shared].appWideBannerPosition = CMAppWideBannerPositionBottom;
     } else {
-        [CMBannerManager sharedInstance].appWideBannerPosition = CMAppWideBannerPositionTop;
+        [CMBannerManager shared].appWideBannerPosition = CMAppWideBannerPositionTop;
     }
 }
 
@@ -121,14 +121,14 @@
     CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"You are stuck with me."];
     bannerMessage.actionDelegate = self;
     bannerMessage.showDismissButton = NO;
-    [[CMBannerManager sharedInstance] showAppWideMessage:bannerMessage];
+    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
 }
 
 -(void) showSingleLineMessage {
     CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"This message will truncate after the first line, unlike the default."];
     bannerMessage.actionDelegate = self;
     bannerMessage.maxLineCount = @1;
-    [[CMBannerManager sharedInstance] showAppWideMessage:bannerMessage];
+    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
 }
 
 -(void) showAppWideBanner:(NSString*)messageString {
@@ -136,7 +136,7 @@
     NSString* messageStingWithCount = [NSString stringWithFormat:@"(%ld) %@", (long)self.counter, messageString];
     CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:messageStingWithCount];
     bannerMessage.actionDelegate = self;
-    [[CMBannerManager sharedInstance] showAppWideMessage:bannerMessage];
+    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
 }
 
 #pragma mark CMBannerActionDelegate

@@ -28,7 +28,7 @@
 
 static CMBannerManager *sharedInstance = nil;
 
-+ (CMBannerManager*)sharedInstance
++ (CMBannerManager*)shared
 {
     // avoid lock if we can
     if (sharedInstance) {
