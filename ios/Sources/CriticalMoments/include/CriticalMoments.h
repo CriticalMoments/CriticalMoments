@@ -7,8 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../messaging/CMBannerMessage.h"
 #import "../messaging/CMBannerManager.h"
+#import "../messaging/CMBannerMessage.h"
 #import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
-+(NSString*) objcPing;
++ (NSString *)objcPing;
 
 @end
 

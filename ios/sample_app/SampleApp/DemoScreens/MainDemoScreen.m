@@ -12,7 +12,7 @@
 
 @implementation MainDemoScreen
 
--(instancetype)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.title = @"Critical Moments";
@@ -21,24 +21,21 @@
     return self;
 }
 
--(void) buildSections {
-    CMDemoAction* bannersAction = [[CMDemoAction alloc] init];
+- (void)buildSections {
+    CMDemoAction *bannersAction = [[CMDemoAction alloc] init];
     bannersAction.title = @"Banners";
-    bannersAction.subtitle = @"UI to display announcement banners across the top or bottom of your app.";
+    bannersAction.subtitle = @"UI to display announcement banners across the "
+                             @"top or bottom of your app.";
     bannersAction.actionNextScreen = [[BannerDemoScreen alloc] init];
-    
-    [self addSection:@"UI Actions" withActions:@[
-        bannersAction
-    ]];
-    
-    CMDemoAction* themeAction = [[CMDemoAction alloc] init];
+
+    [self addSection:@"UI Actions" withActions:@[ bannersAction ]];
+
+    CMDemoAction *themeAction = [[CMDemoAction alloc] init];
     themeAction.title = @"Edit Theme";
     themeAction.subtitle = @"Modify the colors, font and style of UI elements.";
     themeAction.actionNextScreen = [[ThemeDemoScreen alloc] init];
-    
-    [self addSection:@"Themes / Style" withActions:@[
-        themeAction
-    ]];
+
+    [self addSection:@"Themes / Style" withActions:@[ themeAction ]];
 }
 
 @end
