@@ -10,6 +10,6 @@ jobs:
       uses: jidicula/clang-format-action@v4.10.1
       with:
         clang-format-version: '13'
-        check-path: 'ios/voicebox'
+        check-path: 'ios'
         fallback-style: 'WebKit'
         include-regex: '^.*\.((((c|C)(c|pp|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))|(ino|pde|proto|cu|m))$'
