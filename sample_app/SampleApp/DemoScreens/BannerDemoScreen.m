@@ -108,12 +108,10 @@
 }
 
 -(void) swapBannerPosition {
-    CMAppWideBannerPosition old = [CMBannerManager shared].appWideBannerPosition;
-    
-    if (old == CMAppWideBannerPositionTop) {
-        [CMBannerManager shared].appWideBannerPosition = CMAppWideBannerPositionBottom;
+    if (CMBannerManager.shared.appWideBannerPosition == CMBannerPositionTop) {
+        CMBannerManager.shared.appWideBannerPosition = CMBannerPositionBottom;
     } else {
-        [CMBannerManager shared].appWideBannerPosition = CMAppWideBannerPositionTop;
+        CMBannerManager.shared.appWideBannerPosition = CMBannerPositionTop;
     }
 }
 

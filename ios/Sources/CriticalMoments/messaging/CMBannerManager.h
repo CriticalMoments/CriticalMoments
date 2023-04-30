@@ -15,11 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
  Enumeration of CMBannerMannager positions
  @see CMBannerManager.appWideBannerPosition
  */
-typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
+typedef NS_ENUM(NSUInteger, CMBannerPosition) {
     /// Position banners at the bottom of the key window
-    CMAppWideBannerPositionBottom,
+    CMBannerPositionBottom,
     /// Position banners at the top of the key window
-    CMAppWideBannerPositionTop
+    CMBannerPositionTop
 };
 
 /**
@@ -42,9 +42,9 @@ typedef NS_ENUM(NSUInteger, CMAppWideBannerPosition) {
 /**
  Set this to configure if the banner messages are presented at the top or bottom of your app.
  @warning Be sure to test your app renders well with the chosen position. The banner manager will resize your root view controller to make room for the banner; if you've hard coded offsets, for example the notch or dyamic island, then your app layout may be a bit strange. If you encounter issues, you should adapt use apple layout guides for any offsets, which will solve most of these issues and help on future hardware.
- @see CMAppWideBannerPosition enum
+ @see CMBannerPosition enumeration
  */
-@property (nonatomic) CMAppWideBannerPosition appWideBannerPosition;
+@property (nonatomic) CMBannerPosition appWideBannerPosition;
 
 /**
  A shared instance reference. You should only use a single instance of CMBannerManager per app. This `shared` instance is available for convenience, but you can also create and maintain your own instance if you prefer.

@@ -49,7 +49,7 @@ static CMBannerManager *sharedInstance = nil;
     if (self) {
         _appWideMessages = [[NSMutableArray alloc] init];
         // Default to bottom -- less likely to conflict with hard-coded app frame content
-        self.appWideBannerPosition = CMAppWideBannerPositionBottom;
+        self.appWideBannerPosition = CMBannerPositionBottom;
     }
     return self;
 }
@@ -86,7 +86,7 @@ static CMBannerManager *sharedInstance = nil;
     }
 }
 
--(void)setAppWideBannerPosition:(CMAppWideBannerPosition)appWideBannerPosition {
+-(void)setAppWideBannerPosition:(CMBannerPosition)appWideBannerPosition {
     if (appWideBannerPosition == _appWideBannerPosition) {
         return;
     }
@@ -216,7 +216,7 @@ static CMBannerManager *sharedInstance = nil;
     ];
     
     // Top vs Bottom layout for banner
-    if (self.appWideBannerPosition == CMAppWideBannerPositionBottom) {
+    if (self.appWideBannerPosition == CMBannerPositionBottom) {
         // Banner container at bottom of app
         constraints = [constraints arrayByAddingObjectsFromArray:@[
             [_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor],
