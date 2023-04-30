@@ -7,6 +7,7 @@
 
 #import "CMBannerMessage.h"
 #import "CMBannerMessage_private.h"
+#import "../themes/CMTheme.h"
 
 @import UIKit;
 
@@ -28,10 +29,9 @@
 }
 
 -(UIView*) buildViewForMessage {
-    // TODO: load from theme
-    UIColor* forgroundBannerColor = [UIColor blackColor];
-    UIColor* backgroundBannerColor = [UIColor systemYellowColor];
-    UIFont* bannerFont = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+    UIColor* forgroundBannerColor = CMTheme.current.bannerForegroundColor;
+    UIColor* backgroundBannerColor = CMTheme.current.bannerBackgroundColor;
+    UIFont* bannerFont = [CMTheme.current boldFontOfSize:UIFont.systemFontSize];
     
     UIView* view = [[UIView alloc] init];
     view.backgroundColor = backgroundBannerColor;
