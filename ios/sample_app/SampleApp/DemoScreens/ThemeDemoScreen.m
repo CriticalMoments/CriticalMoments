@@ -22,7 +22,7 @@
 static CMTheme *staticCustomTheme = nil;
 + (CMTheme *)customTheme {
     // avoid lock if we can
-    if (staticCustomTheme) {
+     if (staticCustomTheme) {
         return staticCustomTheme;
     }
 
