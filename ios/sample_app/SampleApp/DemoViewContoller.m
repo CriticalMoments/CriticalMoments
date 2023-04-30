@@ -11,13 +11,13 @@
 
 @interface DemoViewContoller () <UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic) CMDemoScreen* screen;
+@property(nonatomic) CMDemoScreen *screen;
 
 @end
 
 @implementation DemoViewContoller
 
--(instancetype)initWithDemoScreen:(CMDemoScreen*)screen {
+- (instancetype)initWithDemoScreen:(CMDemoScreen *)screen {
     self = [super init];
     if (self) {
         self.screen = screen;
@@ -27,39 +27,46 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     self.navigationItem.title = self.screen.title;
     self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
 }
 
--(CMDemoAction*) actionForIndexPath:(NSIndexPath *)indexPath {
-    return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
+- (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
+    return [[self.screen.sections objectAtIndex:indexPath.section].actions
+        objectAtIndex:indexPath.row];
 }
 
 #pragma mark UITableViewDelegate
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView
+    didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    CMDemoAction* action = [self actionForIndexPath:indexPath];
+    CMDemoAction *action = [self actionForIndexPath:indexPath];
     [action performAction];
 }
 
 #pragma mark UITableViewDataSource
 
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView
+    numberOfRowsInSection:(NSInteger)section {
     return [self.screen.sections objectAtIndex:section].actions.count;
 }
 
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return self.screen.sections.count;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CMDemoAction* action = [self actionForIndexPath:indexPath];
-    
-    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:DEMO_CELL_REUSE_ID];
+- (UITableViewCell *)tableView:(UITableView *)tableView
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CMDemoAction *action = [self actionForIndexPath:indexPath];
+
+    UITableViewCell *cell =
+        [tableView dequeueReusableCellWithIdentifier:DEMO_CELL_REUSE_ID];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:DEMO_CELL_REUSE_ID];
+        cell =
+            [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                   reuseIdentifier:DEMO_CELL_REUSE_ID];
     } else {
         NSLog(@"reuse!");
     }
@@ -69,7 +76,8 @@
     return cell;
 }
 
--(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView
+    titleForHeaderInSection:(NSInteger)section {
     return [self.screen.sections objectAtIndex:section].title;
 }
 

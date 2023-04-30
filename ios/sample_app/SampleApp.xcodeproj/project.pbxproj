@@ -46,6 +46,7 @@
 /* Begin PBXFileReference section */
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
+		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
 		E07B774929F9B202001521F4 /* CMDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMDemoScreen.h; sourceTree = "<group>"; };
 		E07B774A29F9B202001521F4 /* CMDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CMDemoScreen.m; sourceTree = "<group>"; };
 		E07B774C29F9B69D001521F4 /* BannerDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BannerDemoScreen.h; sourceTree = "<group>"; };
@@ -71,7 +72,6 @@
 		E0B5460E29F407C3002A25A8 /* SampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B5461229F407C3002A25A8 /* SampleAppUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleAppUITests.m; sourceTree = "<group>"; };
 		E0B5461429F407C3002A25A8 /* SampleAppUITestsLaunchTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleAppUITestsLaunchTests.m; sourceTree = "<group>"; };
-		E0B5462229F4082C002A25A8 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ..; sourceTree = "<group>"; };
 		E0DA23F029F560A800DB0AC7 /* DemoViewContoller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoViewContoller.h; sourceTree = "<group>"; };
 		E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoViewContoller.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -182,7 +182,7 @@
 		E0B5462129F4082C002A25A8 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				E0B5462229F4082C002A25A8 /* criticalmoments */,
+				E0409D3329FF24490027E0D2 /* criticalmoments */,
 			);
 			name = Packages;
 			sourceTree = "<group>";

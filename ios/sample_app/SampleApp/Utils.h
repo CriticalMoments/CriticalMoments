@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Utils : NSObject
 
-+(UIWindow*) keyWindow;
++ (UIWindow *)keyWindow;
 
 @end
 

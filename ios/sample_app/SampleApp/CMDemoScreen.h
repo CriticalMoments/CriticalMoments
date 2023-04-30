@@ -13,44 +13,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol DemoActionDelegate
 
--(void) performAction;
+- (void)performAction;
 
 @end
 
 @interface CMDemoAction : NSObject
 
-@property (nonatomic, readwrite) NSString* title;
-@property (nonatomic, readwrite) NSString* subtitle;
+@property(nonatomic, readwrite) NSString *title;
+@property(nonatomic, readwrite) NSString *subtitle;
 
 // Only should use one of these
-@property (nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;
-@property (nonatomic, readwrite) CMDemoScreen* actionNextScreen;
-@property (nonatomic, copy) void (^actionBlock)(void);
+@property(nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;
+@property(nonatomic, readwrite) CMDemoScreen *actionNextScreen;
+@property(nonatomic, copy) void (^actionBlock)(void);
 - (void)addTarget:(nullable id)target action:(SEL)action;
 
--(void) performAction;
+- (void)performAction;
 
 @end
 
 @interface CMDemoSection : NSObject
 
-@property (nonatomic, readonly) NSString* title;
+@property(nonatomic, readonly) NSString *title;
 
--(NSArray<CMDemoAction*>*) actions;
+- (NSArray<CMDemoAction *> *)actions;
 
 @end
 
 @interface CMDemoScreen : NSObject
 
-@property (nonatomic, readwrite) NSString* title;
+@property(nonatomic, readwrite) NSString *title;
 
--(NSArray<CMDemoSection*>*) sections;
+- (NSArray<CMDemoSection *> *)sections;
 
--(void) addSection:(NSString*)section withActions:(NSArray<CMDemoAction*>*)actions;
--(void) addActionToRootSection:(CMDemoAction*)action;
-
+- (void)addSection:(NSString *)section
+       withActions:(NSArray<CMDemoAction *> *)actions;
+- (void)addActionToRootSection:(CMDemoAction *)action;
 
 @end
-
 
 NS_ASSUME_NONNULL_END

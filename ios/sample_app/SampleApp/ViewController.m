@@ -22,24 +22,30 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    CMDemoScreen* mainDemoScreen = [[MainDemoScreen alloc] init];
-    DemoViewContoller* mainTabRoot = [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
-    UINavigationController* mainTabNav = [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
+
+    CMDemoScreen *mainDemoScreen = [[MainDemoScreen alloc] init];
+    DemoViewContoller *mainTabRoot =
+        [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
+    UINavigationController *mainTabNav =
+        [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
     mainTabNav.navigationBar.prefersLargeTitles = YES;
-    
-    UIImageConfiguration *largeImageConfig = [UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge];
-    UIImage* mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays" withConfiguration:largeImageConfig];
-    UITabBarItem* mainTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Demo" image:mainTabIconImage tag:0];
+
+    UIImageConfiguration *largeImageConfig = [UIImageSymbolConfiguration
+        configurationWithScale:UIImageSymbolScaleLarge];
+    UIImage *mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays"
+                                        withConfiguration:largeImageConfig];
+    UITabBarItem *mainTabBarItem =
+        [[UITabBarItem alloc] initWithTitle:@"Demo"
+                                      image:mainTabIconImage
+                                        tag:0];
     mainTabNav.tabBarItem = mainTabBarItem;
-    self.viewControllers = @[mainTabNav];
-    
+    self.viewControllers = @[ mainTabNav ];
+
     if (@available(iOS 15.0, *)) {
-        UITabBarAppearance* tabAppearance = [[UITabBarAppearance alloc] init];
+        UITabBarAppearance *tabAppearance = [[UITabBarAppearance alloc] init];
         [tabAppearance configureWithOpaqueBackground];
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
-
 }
 
 @end

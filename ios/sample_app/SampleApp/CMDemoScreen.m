@@ -13,8 +13,8 @@
 
 @interface CMDemoAction ()
 
-@property (nonatomic) id actionTarget;
-@property (nonatomic) SEL actionSelector;
+@property(nonatomic) id actionTarget;
+@property(nonatomic) SEL actionSelector;
 
 @end
 
@@ -25,7 +25,7 @@
     self.actionSelector = action;
 }
 
--(void)performAction {
+- (void)performAction {
     if (self.actionDelegate) {
         [self.actionDelegate performAction];
     } else if (self.actionNextScreen) {
@@ -40,16 +40,17 @@
     }
 }
 
--(void) pushNextScreen {
-    DemoViewContoller* demoVc = [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
-    UINavigationController* navController;
-    UIViewController *rootVC  = Utils.keyWindow.rootViewController;
+- (void)pushNextScreen {
+    DemoViewContoller *demoVc =
+        [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
+    UINavigationController *navController;
+    UIViewController *rootVC = Utils.keyWindow.rootViewController;
     if ([rootVC isKindOfClass:[UITabBarController class]]) {
-        UITabBarController* tab = (UITabBarController*)rootVC;
+        UITabBarController *tab = (UITabBarController *)rootVC;
         rootVC = tab.selectedViewController;
     }
     if ([rootVC isKindOfClass:[UINavigationController class]]) {
-        navController = (UINavigationController*)rootVC;
+        navController = (UINavigationController *)rootVC;
     } else {
         navController = rootVC.navigationController;
     }
@@ -60,14 +61,14 @@
 
 @interface CMDemoSection ()
 
-@property (nonatomic, readwrite) NSString* title;
-@property (nonatomic, readwrite) NSMutableArray<CMDemoAction*>* actionsList;
+@property(nonatomic, readwrite) NSString *title;
+@property(nonatomic, readwrite) NSMutableArray<CMDemoAction *> *actionsList;
 
 @end
 
 @implementation CMDemoSection
 
--(instancetype)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.actionsList = [[NSMutableArray alloc] init];
@@ -75,7 +76,7 @@
     return self;
 }
 
--(NSArray<CMDemoAction *> *)actions{
+- (NSArray<CMDemoAction *> *)actions {
     return self.actionsList;
 }
 
@@ -83,14 +84,14 @@
 
 @interface CMDemoScreen ()
 
-@property (nonatomic, readwrite) NSMutableArray<CMDemoSection*>* sections;
-@property (nonatomic, readwrite) NSMutableArray<CMDemoAction*>* actions;
+@property(nonatomic, readwrite) NSMutableArray<CMDemoSection *> *sections;
+@property(nonatomic, readwrite) NSMutableArray<CMDemoAction *> *actions;
 
 @end
 
 @implementation CMDemoScreen
 
--(instancetype)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.sections = [[NSMutableArray alloc] init];
@@ -98,25 +99,26 @@
     return self;
 }
 
--(void)addActionToRootSection:(CMDemoAction *)action {
+- (void)addActionToRootSection:(CMDemoAction *)action {
     if (_sections.count == 0) {
-        CMDemoSection* rootSection = [[CMDemoSection alloc] init];
+        CMDemoSection *rootSection = [[CMDemoSection alloc] init];
         [_sections addObject:rootSection];
     }
-    CMDemoSection* rootSection = _sections.firstObject;
+    CMDemoSection *rootSection = _sections.firstObject;
     [rootSection.actionsList addObject:action];
 }
 
--(void)addSection:(NSString *)title withActions:(NSArray<CMDemoAction *> *)actions {
-    CMDemoSection* section = [[CMDemoSection alloc] init];
+- (void)addSection:(NSString *)title
+       withActions:(NSArray<CMDemoAction *> *)actions {
+    CMDemoSection *section = [[CMDemoSection alloc] init];
     section.title = title;
-    NSMutableArray* mutableActions;
+    NSMutableArray *mutableActions;
     if ([actions isKindOfClass:[NSMutableArray class]]) {
-        mutableActions = (NSMutableArray*)actions;
+        mutableActions = (NSMutableArray *)actions;
     } else {
         mutableActions = [actions mutableCopy];
     }
-    
+
     section.actionsList = mutableActions;
     [_sections addObject:section];
 }
