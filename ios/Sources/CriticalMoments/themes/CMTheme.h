@@ -27,9 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Current Theme
 
-/// Retrieves the current default theme
+/// Retrieves the current/default theme
 +(CMTheme*)current;
-/// Set a new theme as current/default
+/// Sets a theme as current/default
 +(void) setCurrentTheme:(CMTheme*)theme;
 
 #pragma mark Banners
