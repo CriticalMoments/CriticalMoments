@@ -14,7 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A class to control the theme/style of our UI controls.
  
- To create a custom theme, create a new instance, modify the properties which control style, and make if your current theme with `setCurrentsTheme`.
+ To create a custom theme, create a new instance, modify the properties which control style, and make if your current theme with `setCurrentsTheme`. Swift example of custom theme:
+
+ ```swift
+ let customTheme = CMTheme.init()
+ customTheme.bannerBackgroundColor = UIColor.red;
+ customTheme.bannerForegroundColor = UIColor.white;
+ CMTheme.setCurrent(customTheme)
+ ```
  */
 @interface CMTheme : NSObject
 
