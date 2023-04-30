@@ -9,12 +9,14 @@
 
 #import "../messaging/CMBannerMessage.h"
 #import "../messaging/CMBannerManager.h"
+#import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 @interface CriticalMoments : NSObject
 
+// Simple "ping" method for testing end to end integrations
 /// :nodoc:
 +(NSString*) objcPing;
 
