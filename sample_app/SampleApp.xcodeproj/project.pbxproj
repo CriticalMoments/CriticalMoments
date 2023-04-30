@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774A29F9B202001521F4 /* CMDemoScreen.m */; };
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
 		E07B775129FA0144001521F4 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
@@ -43,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
+		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E07B774929F9B202001521F4 /* CMDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMDemoScreen.h; sourceTree = "<group>"; };
 		E07B774A29F9B202001521F4 /* CMDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CMDemoScreen.m; sourceTree = "<group>"; };
 		E07B774C29F9B69D001521F4 /* BannerDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BannerDemoScreen.h; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 				E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */,
 				E07B775229FA04FF001521F4 /* MainDemoScreen.h */,
 				E07B775329FA04FF001521F4 /* MainDemoScreen.m */,
+				E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */,
+				E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */,
 			);
 			path = DemoScreens;
 			sourceTree = "<group>";
@@ -324,6 +329,7 @@
 			files = (
 				E0B545F429F407C2002A25A8 /* ViewController.m in Sources */,
 				E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */,
+				E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */,
 				E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */,
 				E07B775129FA0144001521F4 /* Utils.m in Sources */,
 				E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */,

@@ -22,7 +22,7 @@
 -(instancetype)init {
     self = [super init];
     if (self) {
-        self.title = @"Banners";
+        self.title = @"Banner Demos";
         [self buildSections];
     }
     return self;

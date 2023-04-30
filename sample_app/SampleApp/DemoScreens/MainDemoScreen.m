@@ -8,6 +8,7 @@
 #import "MainDemoScreen.h"
 
 #import "BannerDemoScreen.h"
+#import "ThemeDemoScreen.h"
 
 @implementation MainDemoScreen
 
@@ -28,6 +29,15 @@
     
     [self addSection:@"UI Actions" withActions:@[
         bannersAction
+    ]];
+    
+    CMDemoAction* themeAction = [[CMDemoAction alloc] init];
+    themeAction.title = @"Edit Theme";
+    themeAction.subtitle = @"Modify the colors, font and style of UI elements.";
+    themeAction.actionNextScreen = [[ThemeDemoScreen alloc] init];
+    
+    [self addSection:@"Themes / Style" withActions:@[
+        themeAction
     ]];
 }
 
