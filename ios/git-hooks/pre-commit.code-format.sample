@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+ # Check code formatting was run
+ HOOK_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+ source $HOOK_PATH/../../ios/check-code-format.sh
+ FMTSTATUS=$?
+ echo "Code format check returned status: $FMTSTATUS"
+
+ exit FMTSTATUS
