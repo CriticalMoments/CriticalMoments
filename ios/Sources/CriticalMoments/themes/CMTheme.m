@@ -54,7 +54,7 @@ static CMTheme* currentTheme = nil;
 }
 
 -(UIColor *)bannerForegroundColor {
-    if (_bannerBackgroundColor) {
+    if (_bannerForegroundColor) {
         return _bannerForegroundColor;
     }
     return [UIColor blackColor];
