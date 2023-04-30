@@ -39,6 +39,16 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  */
 @interface CMBannerManager : NSObject
 
+#pragma mark Shared Instance
+
+/**
+ A shared instance reference. You should only use a single instance of CMBannerManager per app. This `shared` instance is available for convenience, but you can also create and maintain your own instance if you prefer.
+ @return a shared instance of CMBannerManager
+ */
++(CMBannerManager*) shared;
+
+#pragma mark Banner Position
+
 /**
  Set this to configure if the banner messages are presented at the top or bottom of your app.
  @warning Be sure to test your app renders well with the chosen position. The banner manager will resize your root view controller to make room for the banner; if you've hard coded offsets, for example the notch or dyamic island, then your app layout may be a bit strange. If you encounter issues, you should adapt use apple layout guides for any offsets, which will solve most of these issues and help on future hardware.
@@ -46,11 +56,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  */
 @property (nonatomic) CMBannerPosition appWideBannerPosition;
 
-/**
- A shared instance reference. You should only use a single instance of CMBannerManager per app. This `shared` instance is available for convenience, but you can also create and maintain your own instance if you prefer.
- @return a shared instance of CMBannerManager
- */
-+(CMBannerManager*) shared;
+#pragma mark Displaying and removing banners
 
 /**
  Shows a banner across your entire application, shifting the root viewcontroller of your key window. If called multiple times, will include UI to iterate though multiple banners.

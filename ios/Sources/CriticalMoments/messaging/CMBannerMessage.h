@@ -40,10 +40,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CMBannerMessage : NSObject
 
+#pragma mark Initializers
+
+/// :nodoc:
+-(instancetype)init NS_UNAVAILABLE;
+
+/**
+ @param body The body text to be rendered in the banner
+ */
+-(instancetype)initWithBody:(NSString*)body;
+
+#pragma mark Content/Text
+
 /**
  The body text to be rendered in the banner
  */
 @property (nonatomic, readonly) NSString* body;
+
+#pragma mark Configuration Options
 
 /**
  Controls if a dismiss button ("X") is rendered, allowing user to close the banner. Defaults to YES.
@@ -55,18 +69,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readwrite) NSNumber* maxLineCount;
 
+#pragma mark Action delegate
+
 /**
  This action delegate will be called when the banner message is tapped. If not set, tapping will not perform any action.
  */
 @property (nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
 
-/// :nodoc:
--(instancetype)init NS_UNAVAILABLE;
-
-/**
- @param body The body text to be rendered in the banner
- */
--(instancetype)initWithBody:(NSString*)body;
+#pragma mark Subclassing
 
 /**
  This method is only exposed for subclassing and should not be called in normal usage. See CMBannerMessage class documentation for notes on how to subclass properly.
