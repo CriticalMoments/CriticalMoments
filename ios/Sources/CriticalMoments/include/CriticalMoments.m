@@ -7,10 +7,16 @@
 
 #import "CriticalMoments.h"
 
+@import Appcore;
+
 @implementation CriticalMoments
 
 + (NSString *)objcPing {
     return @"objcPong";
+}
+
++ (NSString *)goPing {
+    return AppcoreGoPing();
 }
 
 @end
