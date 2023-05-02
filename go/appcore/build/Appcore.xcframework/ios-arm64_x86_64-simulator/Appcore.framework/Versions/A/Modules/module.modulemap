@@ -1,3 +1,8 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:f991872b3ff9dfa2018ce0da0d17629f433a6cfa98243037c9dd6e05f106a41f
-size 140
+framework module "Appcore" {
+	header "ref.h"
+    header "Appcore.objc.h"
+    header "Universe.objc.h"
+    header "Appcore.h"
+
+    export *
+}
