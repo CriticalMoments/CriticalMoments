@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Setup gomobile
+        run: go install golang.org/x/mobile/cmd/gomobile@latest 
+
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
 
