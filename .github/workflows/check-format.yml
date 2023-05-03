@@ -12,7 +12,7 @@ jobs:
         cache-dependency-path: go/go.sum
 
     - name: Golang vet
-      run: cd go && go vet -v ./... && cd ..
+      run: cd go && go vet ./... && cd ..
 
     - name: Go fmt
       run: cd go && if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") | wc -l)" -gt 0 ]; then exit 1; fi && cd ..
