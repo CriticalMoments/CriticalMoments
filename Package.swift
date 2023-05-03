@@ -10,19 +10,22 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "CriticalMoments",
-            targets: ["CriticalMomentsSwift", "CriticalMoments"]),
+            targets: ["CriticalMoments", "CriticalMomentsSwift", "Appcore"]),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "CriticalMomentsSwift",
-            dependencies: ["CriticalMoments"],
             path: "ios/Sources/CriticalMomentsSwift"),
         .target(
             name: "CriticalMoments",
+            dependencies: ["Appcore"],
             path: "ios/Sources/CriticalMoments",
             publicHeadersPath:"include"),
+        .binaryTarget(
+            name: "Appcore",
+            path: "go/appcore/build/Appcore.xcframework"),
         .testTarget(
             name: "CriticalMomentsSwiftTests",
             dependencies: ["CriticalMomentsSwift"],

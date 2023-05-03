@@ -11,6 +11,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: go/go.sum
+
+      - name: Setup gomobile
+        run: go install golang.org/x/mobile/cmd/gomobile@latest && gomobile init
+
+      - name: Golang tests
+        run: cd go && go test -v ./... && cd ..
+
+      - name: Go verify module integrity
+        run: cd go && go mod verify && cd ..
+
+      - name: Build go appcore xcframework
+        run: ./go/build_appcore.sh
 
       - name: Select xcode
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version

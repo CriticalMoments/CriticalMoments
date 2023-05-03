@@ -7,6 +7,8 @@
 
 #import <XCTest/XCTest.h>
 
+@import CriticalMoments;
+
 @interface SampleAppTests : XCTestCase
 
 @end
@@ -23,10 +25,13 @@
     // each test method in the class.
 }
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the
-    // correct results.
+- (void)testIntegration {
+    NSString *pongResponse = [CriticalMoments objcPing];
+    XCTAssert([@"objcPong" isEqual:pongResponse], @"CM integration broken");
+
+    NSString *goPongResponse = [CriticalMoments goPing];
+    XCTAssert([@"AppcorePong->PongCmCore" isEqual:goPongResponse],
+              @"CM Go integration broken");
 }
 
 - (void)testPerformanceExample {

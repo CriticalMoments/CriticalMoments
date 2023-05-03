@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// :nodoc:
 + (NSString *)objcPing;
 
+// Golang "ping" method for testing end to end integrations
+/// :nodoc:
++ (NSString *)goPing;
+
 @end
 
 NS_ASSUME_NONNULL_END

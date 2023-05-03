@@ -12,6 +12,7 @@
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
 		E07B775129FA0144001521F4 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775329FA04FF001521F4 /* MainDemoScreen.m */; };
+		E0A582CB2A019F5400178076 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0A582CA2A019F5400178076 /* CriticalMoments */; };
 		E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
 		E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545F029F407C2002A25A8 /* SceneDelegate.m */; };
 		E0B545F429F407C2002A25A8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545F329F407C2002A25A8 /* ViewController.m */; };
@@ -89,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0A582CB2A019F5400178076 /* CriticalMoments in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +233,9 @@
 				E0B5460629F407C3002A25A8 /* PBXTargetDependency */,
 			);
 			name = SampleAppTests;
+			packageProductDependencies = (
+				E0A582CA2A019F5400178076 /* CriticalMoments */,
+			);
 			productName = SampleAppTests;
 			productReference = E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -668,6 +673,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E0A582CA2A019F5400178076 /* CriticalMoments */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CriticalMoments;
+		};
 		E0DA23EE29F4095900DB0AC7 /* CriticalMoments */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CriticalMoments;

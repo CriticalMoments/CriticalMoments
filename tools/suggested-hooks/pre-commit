@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Check code formatting was run
+HOOK_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+$HOOK_PATH/../../ios/check-code-format.sh
+clangFmtExit=$?
+echo "Code format check returned status: $clangFmtExit"
+
+if [ $clangFmtExit -ne 0 ]; then
+  echo "clang-format detected an issue, aborting\n"
+  exit 1
+fi
+
+
+# exit when any command fails from here on out
+set -e
+
+# Set working dir for Go checks
+dir="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
+cd $dir/../../go
+
+echo "Running Go Vet"
+go vet ./...
+
+echo "running go fmt"
+if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") | wc -l)" -gt 0 ]; then exit 1; fi
+
+echo "running go tests"
+go test ./... > /dev/null
+
+exit 0

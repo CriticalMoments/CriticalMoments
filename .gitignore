@@ -29,7 +29,11 @@ Carthage/
 # My xcframework build action
 CriticalMoments.xcframework/
 xcframework.zip
+# go build system artifact, but the other hashlist should be checked in
+go/.go_folder_hashlist
+# docs folder
 docs/
+
 
 ## End build tools ignore
 
