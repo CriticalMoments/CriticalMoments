@@ -19,7 +19,7 @@ fi
 echo "Building golang appcore framework..."
 # remove prior build and build hashlist
 rm -r ./appcore/build/Appcore.xcframework > /dev/null 2>&1
-rm ../.go_folder_last_build_hashlist > /dev/null 2>&1
+rm ./.go_folder_last_build_hashlist > /dev/null 2>&1
 
 gomobile bind -target ios,iossimulator -iosversion=11 -ldflags '-w -s' -o appcore/build/Appcore.xcframework ./appcore
 buildSuccess=$?
