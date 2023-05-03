@@ -42,6 +42,12 @@
     XCTAssert([@"AppcorePong->PongCmCore" isEqualToString:response],
               @"Expected ping to pong -- Appcore framework integration not "
               @"working end to end");
+
+    NSString *fullyIntegratedRespons = [CriticalMoments goPing];
+    XCTAssert(
+        [@"AppcorePong->PongCmCore" isEqualToString:fullyIntegratedRespons],
+        @"Expected ping to pong -- Appcore e2e framework integration not "
+        @"working end to end");
 }
 
 @end
