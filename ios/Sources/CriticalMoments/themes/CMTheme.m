@@ -7,6 +7,10 @@
 
 #import "CMTheme.h"
 
+#import "../utils/CMUtils.h"
+
+@import Appcore;
+
 @implementation CMTheme
 
 - (instancetype)init {
@@ -41,6 +45,38 @@ static CMTheme *currentTheme = nil;
     @synchronized(CMTheme.class) {
         currentTheme = theme;
     }
+}
+
+#pragma mark Built in themes
+
++ (CMTheme *)elegantTheme {
+    DatamodelTheme *appcoreTheme = DatamodelElegantTheme();
+    return [CMTheme themeFromAppcoreTheme:appcoreTheme];
+}
+
++ (CMTheme *)testTheme {
+    DatamodelTheme *appcoreTheme = DatamodelTestTheme();
+    return [CMTheme themeFromAppcoreTheme:appcoreTheme];
+}
+
+#pragma mark Appcore interop
+
++ (CMTheme *)themeFromAppcoreTheme:(DatamodelTheme *)acTheme {
+    CMTheme *theme = [[CMTheme alloc] init];
+
+    // banners
+    theme.bannerBackgroundColor =
+        [CMUtils colorFromHexString:acTheme.bannerBackgroundColor];
+    theme.bannerForegroundColor =
+        [CMUtils colorFromHexString:acTheme.bannerForegroundColor];
+
+    // fonts
+    theme.fontName = acTheme.fontName.length > 0 ? acTheme.fontName : nil;
+    theme.boldFontName =
+        acTheme.fontName.length > 0 ? acTheme.boldFontName : nil;
+    theme.scaleFontForDynamicType = acTheme.scaleFontForUserPreference;
+    theme.fontScale = acTheme.fontScale;
+    return theme;
 }
 
 #pragma mark Banners

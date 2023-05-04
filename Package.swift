@@ -33,7 +33,11 @@ let package = Package(
         .testTarget(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
-            path: "ios/Tests/CriticalMomentsTests"),
+            path: "ios/Tests/CriticalMomentsTests",
+            cSettings: [
+                .headerSearchPath("../../Sources/CriticalMoments"),
+            ]
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )

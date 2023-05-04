@@ -34,6 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// Sets a theme as current/default
 + (void)setCurrentTheme:(CMTheme *)theme;
 
+#pragma mark Built in themes
+
+/// Built in elegant theme. Simple black and white.
++ (CMTheme *)elegantTheme;
+/// :nodoc: Test Theme for e2e testing
++ (CMTheme *)testTheme;
+
 #pragma mark Banners
 
 /// The background color of banner messages
