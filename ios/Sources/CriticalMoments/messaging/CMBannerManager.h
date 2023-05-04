@@ -22,6 +22,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
     CMBannerPositionTop
 };
 
+// clang-format off
 /**
  Manages the presentation of banner messages across your app.
 
@@ -33,11 +34,11 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 
  Example usage Objective-C:
  ```objc
- CMBannerMessage* bannerMessage = [[CMBannerMessage alloc]
- initWithBody:@"Important msg"]; [CMBannerManager.shared
- showAppWideMessage:bannerMessage];
+ CMBannerMessage* bannerMessage = [[CMBannerMessage alloc] initWithBody:@"Important msg"];
+ [CMBannerManager.shared showAppWideMessage:bannerMessage];
  ```
  */
+// clang-format on
 @interface CMBannerManager : NSObject
 
 #pragma mark Shared Instance

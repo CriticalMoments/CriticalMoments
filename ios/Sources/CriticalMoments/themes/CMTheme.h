@@ -11,6 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// clang-format off
 /**
  A class to control the theme/style of our UI controls.
 
@@ -25,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  CMTheme.setCurrent(customTheme)
  ```
  */
+// clang-format on
 @interface CMTheme : NSObject
 
 #pragma mark Current Theme
