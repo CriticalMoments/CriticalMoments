@@ -30,9 +30,9 @@
 
     // banners
     XCTAssert([UIColor.greenColor isEqual:testTheme.bannerForegroundColor],
-              @"banner foreground should be green on elegant theme");
+              @"banner foreground should be green on test theme");
     XCTAssert([UIColor.redColor isEqual:testTheme.bannerBackgroundColor],
-              @"banner background should be red on elegant theme");
+              @"banner background should be red on test theme");
 
     // fonts
     XCTAssert(fabs(testTheme.fontScale - 1.1) < FLT_EPSILON,
