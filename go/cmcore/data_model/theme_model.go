@@ -53,11 +53,11 @@ func TestTheme() *Theme {
 	return &testTheme
 }
 
-func NewThemeFromJson(data []byte) *Theme {
+func NewThemeFromJson(data []byte) (*Theme, error) {
 	var jt jsonTheme
 	err := json.Unmarshal(data, &jt)
 	if err != nil {
-		return nil
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	// Default Values for nullable options
@@ -79,11 +79,11 @@ func NewThemeFromJson(data []byte) *Theme {
 		FontScale:                  fontScale,
 	}
 
-	if !t.Validate() {
-		return nil
+	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
+		return nil, NewUserPresentableError(validationIssue)
 	}
 
-	return &t
+	return &t, nil
 }
 
 func (t Theme) Validate() bool {

@@ -130,22 +130,39 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 		if err != nil {
 			t.Fatal()
 		}
-		theme := datamodel.NewThemeFromJson(testFileData)
-		if (theme == nil && expectSuccess) || (theme != nil && !expectSuccess) {
-			t.Fatalf("Theme json parsing failure: %v (expected %v)", file.Name(), expectSuccess)
-		}
-		if expectSuccess && !theme.Validate() {
-			t.Fatalf("Theme json file failed validating: %v (expected %v)", file.Name(), expectSuccess)
+		theme, err := datamodel.NewThemeFromJson(testFileData)
+		if expectSuccess {
+			if err != nil || theme == nil {
+				t.Fatalf("Theme failed to parse: %v", file.Name())
+			}
+			if !theme.Validate() {
+				t.Fatalf("Theme failed to validate: %v", file.Name())
+			}
+		} else {
+			if err == nil {
+				t.Fatalf("Parsed theme when invalid: %v", file.Name())
+			}
+			// All errors should be user readable! We want to be able to tell user what was wrong
+			_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+			if !ok {
+				t.Fatalf("Theme parsing issue didn't return user presentable error: %v", file.Name())
+			}
+			if theme != nil {
+				t.Fatalf("Parsed theme when invalid without error: %v", file.Name())
+			}
 		}
 	}
 }
 
-func TestJsonParsingDefaults(t *testing.T) {
+func TestJsonParsingDefaultsTheme(t *testing.T) {
 	testFileData, err := os.ReadFile("./testdata/themes/valid/minimalValidTheme.json")
 	if err != nil {
 		t.Fatal()
 	}
-	theme := datamodel.NewThemeFromJson(testFileData)
+	theme, err := datamodel.NewThemeFromJson(testFileData)
+	if err != nil {
+		t.Fatal()
+	}
 
 	// Check defaults for values not included in json
 	if theme.FontScale != 1.0 {
@@ -155,12 +172,15 @@ func TestJsonParsingDefaults(t *testing.T) {
 		t.Fatal()
 	}
 }
-func TestJsonParsingAllFields(t *testing.T) {
+func TestJsonParsingAllFieldsTheme(t *testing.T) {
 	testFileData, err := os.ReadFile("./testdata/themes/valid/maximalValidTheme.json")
 	if err != nil {
 		t.Fatal()
 	}
-	theme := datamodel.NewThemeFromJson(testFileData)
+	theme, err := datamodel.NewThemeFromJson(testFileData)
+	if err != nil {
+		t.Fatal()
+	}
 
 	if theme.FontScale != 1.1 {
 		t.Fatal()

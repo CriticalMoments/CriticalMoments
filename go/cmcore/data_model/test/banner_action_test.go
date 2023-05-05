@@ -1,0 +1,119 @@
+package testing
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"testing"
+
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+)
+
+func TestInvalidBannerMissingField(t *testing.T) {
+	b := datamodel.BannerAction{}
+
+	if b.Validate() {
+		t.Fatal("Banners should require body")
+	}
+	b.Body = "Banner body"
+	if !b.Validate() {
+		t.Fatal("Minimal banner failed validation")
+	}
+	b.MaxLineCount = -2
+	if b.Validate() {
+		t.Fatal("Banner allowed negative max line count")
+	}
+}
+
+func TestJsonParsingInvalidBanners(t *testing.T) {
+	basePath := "./testdata/actions/banner/invalid"
+	files, err := ioutil.ReadDir(basePath)
+	if err != nil {
+		t.Fatal()
+	}
+	for _, file := range files {
+		testFileData, err := os.ReadFile(basePath + "/" + file.Name())
+		if err != nil {
+			t.Fatal()
+		}
+		var ac datamodel.ActionContainer
+		err = json.Unmarshal(testFileData, &ac)
+		if err == nil {
+			t.Fatalf("Parsed action when invalid: %v", file.Name())
+		}
+		// All errors should be user readable! We want to be able to tell user what was wrong
+		_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+		if !ok {
+			t.Fatalf("Banner parsing issue didn't return user presentable error: %v", file.Name())
+		}
+		if ac.ActionType != "" {
+			t.Fatalf("Set type on invalid json. Invalid should not set type. %v", file.Name())
+		}
+		if ac.BannerAction != nil {
+			t.Fatalf("Set BannerAction on invalid json: %v", file.Name())
+		}
+	}
+}
+func TestJsonParsingMinimalFieldsBanner(t *testing.T) {
+	testFileData, err := os.ReadFile("./testdata/actions/banner/valid/minimalValid.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac datamodel.ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+
+	if ac.ActionType != datamodel.ActionTypeEnumBanner {
+		t.Fatal()
+	}
+	banner := ac.BannerAction
+	if banner == nil || !banner.Validate() {
+		t.Fatal()
+	}
+	if banner.Body != "Hello world, but on a banner!" {
+		t.Fatal()
+	}
+	if banner.MaxLineCount != -1 {
+		t.Fatal()
+	}
+	if banner.TapActionName != "" {
+		t.Fatal()
+	}
+	if banner.Theme != "" {
+		t.Fatal()
+	}
+	if banner.ShowDismissButton != true {
+		t.Fatal()
+	}
+}
+
+func TestJsonParsingAllFieldsBanner(t *testing.T) {
+	testFileData, err := os.ReadFile("./testdata/actions/banner/valid/maximalValid.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac datamodel.ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+
+	if ac.ActionType != datamodel.ActionTypeEnumBanner {
+		t.Fatal()
+	}
+	banner := ac.BannerAction
+	if banner == nil || !banner.Validate() {
+		t.Fatal()
+	}
+	if banner.Body != "Hello world, but on a banner!" {
+		t.Fatal()
+	}
+	if banner.MaxLineCount != 1 {
+		t.Fatal()
+	}
+	if banner.TapActionName != "customAction" {
+		t.Fatal()
+	}
+	if banner.Theme != "navy" {
+		t.Fatal()
+	}
+	if banner.ShowDismissButton == true {
+		t.Fatal()
+	}
+}

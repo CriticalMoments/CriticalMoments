@@ -1,0 +1,7 @@
+{
+    "actionType": "banner",
+    "actionData": {
+        "body": "Hello world, but on a banner!",
+        "maxLineCount": -2
+    }
+}
