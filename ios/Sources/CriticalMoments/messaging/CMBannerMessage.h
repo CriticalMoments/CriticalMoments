@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+@import Appcore;
 @import UIKit;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -56,6 +57,12 @@ NS_ASSUME_NONNULL_BEGIN
  @param body The body text to be rendered in the banner
  */
 - (instancetype)initWithBody:(NSString *)body;
+
+/**
+ :nodoc:
+ @param bannerData The appcore datamodel for this banner
+ */
+- (instancetype)initWithAppcoreDataModel:(DatamodelBannerAction *)bannerData;
 
 #pragma mark Content/Text
 

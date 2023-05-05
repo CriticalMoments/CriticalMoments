@@ -11,6 +11,8 @@
 
 @import CriticalMoments;
 
+@import Appcore;
+
 @interface BannerDemoScreen () <CMBannerActionDelegate>
 
 @property(nonatomic) NSInteger counter;
@@ -50,9 +52,16 @@
         @"Display a very long banner message, across entire app";
     [veryLongBannerAction addTarget:self action:@selector(showVeryLongMessage)];
 
+    // TODO: remove this -- just for internal testing pre v1
+    CMDemoAction *appcoreBannerAction = [[CMDemoAction alloc] init];
+    appcoreBannerAction.title = @"Show Banner from Config";
+    appcoreBannerAction.subtitle = @"Display a banner built from config";
+    [appcoreBannerAction addTarget:self action:@selector(showAppcoreBanner)];
+
     [self addSection:@"App Wide Banners"
          withActions:@[
-             shortBannerAction, longBannerAction, veryLongBannerAction
+             shortBannerAction, longBannerAction, veryLongBannerAction,
+             appcoreBannerAction
          ]];
 
     // Position
@@ -120,6 +129,10 @@
               @"belief, it was the epoch of incredulity, it was the season of "
               @"light, it was the season of darkness, it was the spring of "
               @"hope, it was the winter of despair"];
+}
+
+- (void)showAppcoreBanner {
+    AppcoreInternalDipatchBannerFromGo();
 }
 
 - (void)swapBannerPosition {

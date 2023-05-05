@@ -46,6 +46,8 @@
         [tabAppearance configureWithOpaqueBackground];
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
+
+    [CriticalMoments start];
 }
 
 @end

@@ -28,6 +28,21 @@
     return self;
 }
 
+- (instancetype)initWithAppcoreDataModel:(DatamodelBannerAction *)bannerData {
+    self = [super init];
+    if (self) {
+        self.body = bannerData.body;
+        self.showDismissButton = bannerData.showDismissButton;
+        if (bannerData.maxLineCount !=
+            DatamodelBannerMaxLineCountSystemDefault) {
+            self.maxLineCount = @(bannerData.maxLineCount);
+        }
+        // TODO: tap action name
+        // TODO: named theme integration
+    }
+    return self;
+}
+
 - (UIView *)buildViewForMessage {
     UIColor *forgroundBannerColor = CMTheme.current.bannerForegroundColor;
     UIColor *backgroundBannerColor = CMTheme.current.bannerBackgroundColor;

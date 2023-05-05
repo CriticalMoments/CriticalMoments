@@ -7,6 +7,8 @@
 
 #import "CriticalMoments.h"
 
+#import "../appcore_integration/CMActionDispatcher.h"
+
 @import Appcore;
 
 @implementation CriticalMoments
@@ -17,6 +19,13 @@
 
 + (NSString *)goPing {
     return AppcoreGoPing();
+}
+
++ (void)start {
+    // Register the action dispatcher
+    [CMActionDispatcher registerWithAppcore];
+
+    // TODO: actually start :)
 }
 
 @end
