@@ -1,0 +1,55 @@
+{
+    "configVersion": "v1",
+    "themes": {
+        "defaultTheme": {
+            "bannerBackgroundColor": "#ffffff",
+            "bannerForegroundColor": "#000000",
+            "fontScale": 1.1,
+            "fontName": "AvenirNext-Regular",
+            "boldFontName": "AvenirNext-Bold",
+            "scaleFontForUserPreference": false
+        },
+        "namedThemes": {
+            "blueTheme": {
+                "bannerBackgroundColor": "#ffffff",
+                "bannerForegroundColor": "#000000",
+                "fontScale": 1.1,
+                "fontName": "AvenirNext-Regular",
+                "boldFontName": "AvenirNext-Bold",
+                "scaleFontForUserPreference": false
+            },
+            "greenTheme": {
+                "bannerBackgroundColor": "#ffffff",
+                "bannerForegroundColor": "#000000",
+                "fontScale": 1.1,
+                "fontName": "AvenirNext-Regular",
+                "boldFontName": "AvenirNext-Bold",
+                "scaleFontForUserPreference": false
+            }
+        }
+    },
+    "actions": {
+        "namedActions": {
+            "bannerAction1": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Hello world, but on a banner!",
+                    "maxLineCount": 1,
+                    "tapActionName": "customAction",
+                    "theme": "navy",
+                    "showDismissButton": false
+                }
+            },
+            "banerAction2": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Hello world 2, but on a banner!",
+                    "maxLineCount": 1,
+                    "tapActionName": "customAction",
+                    "theme": "navy",
+                    "showDismissButton": false
+                }
+            }
+        }
+    }
+}

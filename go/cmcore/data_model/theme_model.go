@@ -60,6 +60,10 @@ func NewThemeFromJson(data []byte) (*Theme, error) {
 		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
+	return NewThemeFromJsonTheme(&jt)
+}
+
+func NewThemeFromJsonTheme(jt *jsonTheme) (*Theme, error) {
 	// Default Values for nullable options
 	scaleFontForPref := true
 	if jt.ScaleFontForUserPreference != nil {

@@ -42,6 +42,7 @@ type jsonBannerAction struct {
 	Theme             string `json:"theme,omitempty"`
 }
 
+// TODO: this is right system. Data model should support UnmarshalJSON for other types too...
 func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	// docs suggest no-op for empty data
 	if data == nil {
