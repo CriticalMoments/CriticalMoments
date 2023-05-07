@@ -16,16 +16,14 @@ System here for each new type
  - All errors should be user readable since this deals with user input
 */
 
-type ActionTypeEnum string
-
 const (
-	ActionTypeEnumBanner ActionTypeEnum = "banner"
+	ActionTypeEnumBanner string = "banner"
 )
 
 // This section is the json data model we use for parsing/masrshaling
 
 type ActionContainer struct {
-	ActionType ActionTypeEnum
+	ActionType string
 
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
@@ -56,7 +54,7 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	switch ActionTypeEnum(jac.ActionType) {
+	switch jac.ActionType {
 	case ActionTypeEnumBanner:
 		ac.BannerAction, err = NewBannerActionFromJson(jac.RawActionData)
 		if err != nil {
