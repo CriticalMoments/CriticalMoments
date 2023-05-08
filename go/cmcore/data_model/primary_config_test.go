@@ -7,7 +7,11 @@ import (
 )
 
 func testHelperBuildMaxPrimaryConfig(t *testing.T) *PrimaryConfig {
-	testFileData, err := os.ReadFile("./test/testdata/primary_config/valid/maximalValid.json")
+	return testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/maximalValid.json")
+}
+
+func testHelperBuilPrimaryConfigFromFile(t *testing.T, filePath string) *PrimaryConfig {
+	testFileData, err := os.ReadFile(filePath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,6 +141,100 @@ func TestEmptyKey(t *testing.T) {
 	}
 }
 
-// TODO Min valid file
-// TODO extra fields
-// TODO breaking a sub-element's validation after parsing, and that "Validate" is recursive (not implmented)
+func TestBreakNestedValidationActions(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.namedActions["invalidAction"] = ActionContainer{}
+	if pc.Validate() {
+		t.Fatal("actions not re-validated")
+	}
+}
+
+func TestBreakNestedValidationTriggers(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.namedTriggers["invalidTrigger"] = Trigger{}
+	if pc.Validate() {
+		t.Fatal("trigger not re-validated")
+	}
+}
+
+func TestBreakNestedTheme(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.DefaultTheme = &Theme{} // invalid
+	if pc.Validate() {
+		t.Fatal("default theme not re-validated")
+	}
+	pc.DefaultTheme = nil // valid
+	if !pc.Validate() {
+		t.Fatal()
+	}
+	pc.namedThemes["newInvalidTheme"] = Theme{}
+	if pc.Validate() {
+		t.Fatal("named themes not re-validated")
+	}
+}
+
+func TestMinValidConfig(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+}
+
+func TestOddballValidConfig(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if len(pc.namedActions) != 0 || len(pc.namedThemes) != 0 || len(pc.namedTriggers) != 0 {
+		t.Fatal("Expected oddball with empty maps")
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+}
+
+func TestMinWithUnknownFieldConfig(t *testing.T) {
+	// https://github.com/golang/go/issues/41144
+	t.Skip("This test fails -- we would need to implement strict decoding separately, which is non trivial")
+	filePath := "./test/testdata/primary_config/invalid/minimalWithUnknownField.json"
+	reader, err := os.Open(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Without strict it should work
+	decoder := json.NewDecoder(reader)
+	var pc PrimaryConfig
+	err = decoder.Decode(&pc)
+	if err != nil || !pc.Validate() {
+		t.Fatal("Non strict parsing failed")
+	}
+
+	// with strict it should fail
+	reader, err = os.Open(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	strictDecoder := json.NewDecoder(reader)
+	strictDecoder.DisallowUnknownFields()
+	var strictPc PrimaryConfig
+	err = strictDecoder.Decode(&strictPc)
+	if err == nil {
+		t.Fatal("Strict parsing ignored extra field")
+	}
+}

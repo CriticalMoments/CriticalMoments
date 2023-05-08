@@ -81,3 +81,19 @@ func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
 		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
 	}
 }
+
+func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
+	if ac.ActionType == "" {
+		return "Empty actionType"
+	}
+
+	switch ac.ActionType {
+	case ActionTypeEnumBanner:
+		if ac.BannerAction == nil {
+			return "Missing valid banner action data when actionType=banner"
+		}
+		return ac.BannerAction.ValidateReturningUserReadableIssue()
+	default:
+		return fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType)
+	}
+}

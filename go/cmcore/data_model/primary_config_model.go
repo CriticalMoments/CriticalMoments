@@ -67,9 +67,10 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
-		} else {
-			pc.namedThemes = make(map[string]Theme)
 		}
+	}
+	if pc.namedThemes == nil {
+		pc.namedThemes = make(map[string]Theme)
 	}
 
 	// Actions
@@ -114,6 +115,28 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	}
 	if emptyKeyIssue := pc.validateMapsDontContainEmptyStringReturningUserReadable(); emptyKeyIssue != "" {
 		return emptyKeyIssue
+	}
+
+	// Run nested validations
+	if pc.DefaultTheme != nil {
+		if defaultThemeIssue := pc.DefaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
+			return defaultThemeIssue
+		}
+	}
+	for themeName, theme := range pc.namedThemes {
+		if themeIssue := theme.ValidateReturningUserReadableIssue(); themeIssue != "" {
+			return fmt.Sprintf("Theme \"%v\" had issue: %v", themeName, themeIssue)
+		}
+	}
+	for actionName, action := range pc.namedActions {
+		if actionValidationIssue := action.ValidateReturningUserReadableIssue(); actionValidationIssue != "" {
+			return fmt.Sprintf("Action \"%v\" had issue: %v", actionName, actionValidationIssue)
+		}
+	}
+	for triggerName, trigger := range pc.namedTriggers {
+		if triggerIssue := trigger.ValidateReturningUserReadableIssue(); triggerIssue != "" {
+			return fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue)
+		}
 	}
 
 	return ""

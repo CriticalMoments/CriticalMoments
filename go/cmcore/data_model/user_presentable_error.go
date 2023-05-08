@@ -38,5 +38,8 @@ func (err *UserPresentableError) UserErrorString() string {
 }
 
 func (err *UserPresentableError) Error() string {
+	if err.SourceError == nil {
+		return err.userReadableErrorString
+	}
 	return fmt.Sprintf("%v (Source Error: %v)", err.userReadableErrorString, err.SourceError)
 }
