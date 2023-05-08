@@ -68,6 +68,8 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
+		} else {
+			pc.namedThemes = make(map[string]Theme)
 		}
 	}
 
@@ -76,11 +78,15 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	// TODO invalid/empty names/keys?
 	if jpc.ActionsConfig != nil && jpc.ActionsConfig.NamedActions != nil {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
+	} else {
+		pc.namedActions = map[string]ActionContainer{}
 	}
 
 	// Triggers
 	if jpc.TriggerConfig != nil && jpc.TriggerConfig.NamedTriggers != nil {
 		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
+	} else {
+		pc.namedTriggers = make(map[string]Trigger)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
@@ -99,31 +105,39 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 		return "Config must have a config version of v1"
 	}
 
+	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
+		return "Internal issue initializing config: missing map for actions, themes or triggers"
+	}
+
 	if actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable(); actionIssue != "" {
 		return actionIssue
 	}
 	if themeIssue := pc.validateThemeNamesExistReturningUserReadable(); themeIssue != "" {
 		return themeIssue
 	}
-
-	// Missing: empty or nil expected for each type/set? Add checks and/or tests
+	if emptyKeyIssue := pc.validateMapsDontContainEmptyStringReturningUserReadable(); emptyKeyIssue != "" {
+		return emptyKeyIssue
+	}
 
 	return ""
 }
 
-func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
-	// TODO test no named themes properly uses empty map
-	namedThemes := pc.namedThemes
-	if namedThemes == nil {
-		namedThemes = make(map[string]Theme)
+func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
+	_, themeFound := pc.namedThemes[""]
+	_, actionFound := pc.namedActions[""]
+	_, triggerFound := pc.namedTriggers[""]
+	if triggerFound || actionFound || themeFound {
+		return "The empty string \"\" is not a valid name for actions/themes/triggers"
 	}
-	if pc.namedActions != nil {
-		for sourceActionName, action := range pc.namedActions {
-			if action.ThemeName != "" {
-				_, ok := namedThemes[action.ThemeName]
-				if !ok {
-					return fmt.Sprintf("Action \"%v\" included named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
-				}
+	return ""
+}
+
+func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+	for sourceActionName, action := range pc.namedActions {
+		if action.ThemeName != "" {
+			_, ok := pc.namedThemes[action.ThemeName]
+			if !ok {
+				return fmt.Sprintf("Action \"%v\" included named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
 			}
 		}
 	}
@@ -132,41 +146,24 @@ func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 }
 
 func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
-	// TODO test no named actions properly uses empty map
-	namedActions := pc.namedActions
-	if namedActions == nil {
-		namedActions = make(map[string]ActionContainer)
-	}
-
 	// Validate the actions in the trigger actually exist
-	if pc.namedTriggers != nil {
-		for tName, t := range pc.namedTriggers {
-			_, ok := namedActions[t.ActionName]
-			// TODO: test all 3 cases
-			if !ok {
-				return fmt.Sprintf("Trigger included named action \"%v\", which doesn't exist", t.ActionName)
-			}
-			if tName == "" {
-				return "Empty trigger name"
-			}
-			if t.EventName == "" {
-				return "Empty/nil event name in trigger"
-			}
+	for tName, t := range pc.namedTriggers {
+		_, ok := pc.namedActions[t.ActionName]
+		if !ok {
+			return fmt.Sprintf("Trigger \"%v\" included named action \"%v\", which doesn't exist", tName, t.ActionName)
 		}
 	}
 
 	// validate any named actions embedded in other actions actually exist
-	if pc.namedActions != nil {
-		for sourceActionName, action := range pc.namedActions {
-			actionList, err := action.AllEmbeddedActionNames()
-			if err != nil || actionList == nil {
-				return fmt.Sprintf("Unknown issue confirming all named actions in action \"%v\"exist in config", sourceActionName)
-			}
-			for _, actionName := range actionList {
-				_, ok := namedActions[actionName]
-				if !ok {
-					return fmt.Sprintf("Action \"%v\" included named action \"%v\", which doesn't exist", sourceActionName, actionName)
-				}
+	for sourceActionName, action := range pc.namedActions {
+		actionList, err := action.AllEmbeddedActionNames()
+		if err != nil || actionList == nil {
+			return fmt.Sprintf("Unknown issue confirming all named actions in action \"%v\"exist in config", sourceActionName)
+		}
+		for _, actionName := range actionList {
+			_, ok := pc.namedActions[actionName]
+			if !ok {
+				return fmt.Sprintf("Action \"%v\" included named action \"%v\", which doesn't exist", sourceActionName, actionName)
 			}
 		}
 	}
