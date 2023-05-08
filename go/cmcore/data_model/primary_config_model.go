@@ -2,7 +2,6 @@ package datamodel
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type PrimaryConfig struct {
@@ -11,7 +10,7 @@ type PrimaryConfig struct {
 
 	// Themes
 	DefaultTheme *Theme
-	namedThemes  map[string]*Theme
+	namedThemes  map[string]Theme
 
 	// Actions
 	namedActions map[string]ActionContainer
@@ -20,7 +19,7 @@ type PrimaryConfig struct {
 	namedTriggers map[string]*Trigger
 }
 
-func (pc PrimaryConfig) ThemeWithName(name string) *Theme {
+func (pc PrimaryConfig) ThemeWithName(name string) Theme {
 	return pc.namedThemes[name]
 }
 
@@ -39,8 +38,8 @@ type jsonPrimaryConfig struct {
 }
 
 type jsonThemesSection struct {
-	DefaultTheme *jsonTheme           `json:"defaultTheme"`
-	NamedThemes  map[string]jsonTheme `json:"namedThemes"`
+	DefaultTheme *Theme           `json:"defaultTheme"`
+	NamedThemes  map[string]Theme `json:"namedThemes"`
 }
 
 type jsonActionsSection struct {
@@ -60,13 +59,21 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 
 	pc := PrimaryConfig{
 		ConfigVersion: jpc.ConfigVersion,
-		namedThemes:   make(map[string]*Theme),
 		namedTriggers: make(map[string]*Trigger),
 	}
 
 	// Themes
-	// TODO test no default theme field at all
-	if jpc.ThemesConfig.DefaultTheme != nil {
+	// TODO test no default/named/root theme field at all
+	if jpc.ThemesConfig != nil {
+		if jpc.ThemesConfig.DefaultTheme != nil {
+			pc.DefaultTheme = jpc.ThemesConfig.DefaultTheme
+		}
+		if jpc.ThemesConfig.NamedThemes != nil {
+			pc.namedThemes = jpc.ThemesConfig.NamedThemes
+		}
+	}
+
+	/*if jpc.ThemesConfig.DefaultTheme != nil {
 		defaultTheme, err := NewThemeFromJsonTheme(jpc.ThemesConfig.DefaultTheme)
 		if err != nil {
 			return nil, NewUserPresentableErrorWSource("Default theme not a valid theme", err)
@@ -84,7 +91,7 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 			return nil, NewUserPresentableErrorWSource(errString, err)
 		}
 		pc.namedThemes[themeName] = theme
-	}
+	}*/
 
 	// Actions
 	/*for actionName, actionJsonConfig := range jpc.ActionsConfig.NamedActions {

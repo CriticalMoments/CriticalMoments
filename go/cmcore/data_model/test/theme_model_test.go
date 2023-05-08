@@ -130,9 +130,10 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 		if err != nil {
 			t.Fatal()
 		}
-		theme, err := datamodel.NewThemeFromJson(testFileData)
+		var theme datamodel.Theme
+		err = theme.UnmarshalJSON(testFileData)
 		if expectSuccess {
-			if err != nil || theme == nil {
+			if err != nil {
 				t.Fatalf("Theme failed to parse: %v", file.Name())
 			}
 			if !theme.Validate() {
@@ -147,9 +148,6 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 			if !ok {
 				t.Fatalf("Theme parsing issue didn't return user presentable error: %v", file.Name())
 			}
-			if theme != nil {
-				t.Fatalf("Parsed theme when invalid without error: %v", file.Name())
-			}
 		}
 	}
 }
@@ -159,7 +157,8 @@ func TestJsonParsingDefaultsTheme(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
-	theme, err := datamodel.NewThemeFromJson(testFileData)
+	var theme datamodel.Theme
+	err = theme.UnmarshalJSON(testFileData)
 	if err != nil {
 		t.Fatal()
 	}
@@ -177,7 +176,8 @@ func TestJsonParsingAllFieldsTheme(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
-	theme, err := datamodel.NewThemeFromJson(testFileData)
+	var theme datamodel.Theme
+	err = theme.UnmarshalJSON(testFileData)
 	if err != nil {
 		t.Fatal()
 	}

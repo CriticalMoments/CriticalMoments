@@ -1,6 +1,8 @@
 package datamodel
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Theme struct {
 	// Banners
@@ -53,41 +55,43 @@ func TestTheme() *Theme {
 	return &testTheme
 }
 
-func NewThemeFromJson(data []byte) (*Theme, error) {
+func (t *Theme) UnmarshalJSON(data []byte) error {
 	var jt jsonTheme
 	err := json.Unmarshal(data, &jt)
 	if err != nil {
-		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
-	return NewThemeFromJsonTheme(&jt)
+	uperr := parseThemeFromJsonTheme(t, &jt)
+	if uperr != nil {
+		return uperr
+	}
+
+	return nil
 }
 
-func NewThemeFromJsonTheme(jt *jsonTheme) (*Theme, error) {
+func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	// Default Values for nullable options
-	scaleFontForPref := true
+	t.ScaleFontForUserPreference = true
 	if jt.ScaleFontForUserPreference != nil {
-		scaleFontForPref = *jt.ScaleFontForUserPreference
+		t.ScaleFontForUserPreference = *jt.ScaleFontForUserPreference
 	}
-	fontScale := 1.0
+	t.FontScale = 1.0
 	if jt.FontScale != nil {
-		fontScale = *jt.FontScale
+		t.FontScale = *jt.FontScale
 	}
 
-	t := Theme{
-		BannerBackgroundColor:      jt.BannerBackgroundColor,
-		BannerForegroundColor:      jt.BannerForegroundColor,
-		FontName:                   jt.FontName,
-		BoldFontName:               jt.BoldFontName,
-		ScaleFontForUserPreference: scaleFontForPref,
-		FontScale:                  fontScale,
-	}
+	// Passthough values
+	t.BannerBackgroundColor = jt.BannerBackgroundColor
+	t.BannerForegroundColor = jt.BannerForegroundColor
+	t.FontName = jt.FontName
+	t.BoldFontName = jt.BoldFontName
 
 	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return nil, NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
-	return &t, nil
+	return nil
 }
 
 func (t Theme) Validate() bool {
