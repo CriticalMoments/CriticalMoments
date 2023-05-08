@@ -48,19 +48,17 @@ type jsonActionsSection struct {
 }
 
 type jsonTriggersSection struct {
-	NamedTriggers map[string]jsonTrigger `json:"namedTriggers"`
+	NamedTriggers map[string]Trigger `json:"namedTriggers"`
 }
 
-func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
+func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	var jpc jsonPrimaryConfig
 	err := json.Unmarshal(data, &jpc)
 	if err != nil {
-		return nil, NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
+		return NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
 	}
 
-	pc := PrimaryConfig{
-		ConfigVersion: jpc.ConfigVersion,
-	}
+	pc.ConfigVersion = jpc.ConfigVersion
 
 	// Themes
 	// TODO test no default/named/root theme field at all
@@ -80,45 +78,15 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
 	}
 
-	pc.buildTriggersFromJsonTriggers(jpc.TriggerConfig.NamedTriggers)
+	// Triggers
+	if jpc.TriggerConfig != nil && jpc.TriggerConfig.NamedTriggers != nil {
+		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
+	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return nil, NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
-	// TODO map action.primaryAction to a real action, and validate name exists
-
-	return &pc, nil
-}
-
-func (pc PrimaryConfig) buildTriggersFromJsonTriggers(jsonTriggers map[string]jsonTrigger) *UserPresentableError {
-	// TODO test missing and {} triggers
-	// TODO decide if empty map or nil map is right for missing
-	if jsonTriggers == nil {
-		return nil
-	}
-
-	namedTriggers := make(map[string]Trigger)
-	for tName, jt := range jsonTriggers {
-		action, ok := pc.namedActions[jt.ActionName]
-		// TODO: test all 3 cases
-		if !ok {
-			return NewUserPresentableError(fmt.Sprintf("Trigger included named action \"%v\", which doesn't exist", jt.ActionName))
-		}
-		if tName == "" {
-			return NewUserPresentableError("Empty trigger name")
-		}
-		if jt.EventName == "" {
-			return NewUserPresentableError("Empty event name in trigger")
-		}
-		trigger := Trigger{
-			Action:    action,
-			EventName: jt.EventName,
-		}
-		namedTriggers[tName] = trigger
-	}
-
-	pc.namedTriggers = namedTriggers
 	return nil
 }
 
@@ -130,6 +98,27 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if pc.ConfigVersion != "v1" {
 		return "Config must have a config version of v1"
 	}
+
+	// Validate the actions in the trigger actually exist
+	if pc.namedTriggers != nil {
+		for tName, t := range pc.namedTriggers {
+			_, ok := pc.namedActions[t.ActionName]
+			// TODO: test all 3 cases
+			if !ok {
+				return fmt.Sprintf("Trigger included named action \"%v\", which doesn't exist", t.ActionName)
+			}
+			if tName == "" {
+				return "Empty trigger name"
+			}
+			if t.EventName == "" {
+				return "Empty/nil event name in trigger"
+			}
+		}
+	}
+
+	// TODO validate action.primaryAction that a real action by that name exists
+
+	// Missing: empty or nil expected for each type/set? Add checks and/or tests
 
 	return ""
 }
