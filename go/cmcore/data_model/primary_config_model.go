@@ -2,6 +2,7 @@ package datamodel
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type PrimaryConfig struct {
@@ -16,7 +17,7 @@ type PrimaryConfig struct {
 	namedActions map[string]ActionContainer
 
 	// Triggers
-	namedTriggers map[string]*Trigger
+	namedTriggers map[string]Trigger
 }
 
 func (pc PrimaryConfig) ThemeWithName(name string) Theme {
@@ -34,7 +35,7 @@ type jsonPrimaryConfig struct {
 	ActionsConfig *jsonActionsSection `json:"actions"`
 
 	// Triggers
-	TriggerConfig *jsonThemesSection `json:"triggers"`
+	TriggerConfig *jsonTriggersSection `json:"triggers"`
 }
 
 type jsonThemesSection struct {
@@ -59,7 +60,6 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 
 	pc := PrimaryConfig{
 		ConfigVersion: jpc.ConfigVersion,
-		namedTriggers: make(map[string]*Trigger),
 	}
 
 	// Themes
@@ -73,44 +73,14 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 		}
 	}
 
-	/*if jpc.ThemesConfig.DefaultTheme != nil {
-		defaultTheme, err := NewThemeFromJsonTheme(jpc.ThemesConfig.DefaultTheme)
-		if err != nil {
-			return nil, NewUserPresentableErrorWSource("Default theme not a valid theme", err)
-		}
-		pc.DefaultTheme = defaultTheme
-	}
-	// TODO test no namedThemes field at all
-	for themeName, themeJsonConfig := range jpc.ThemesConfig.NamedThemes {
-		if themeName == "" {
-			return nil, NewUserPresentableError("Named themes with empty name")
-		}
-		theme, err := NewThemeFromJsonTheme(&themeJsonConfig)
-		if err != nil || theme == nil {
-			errString := fmt.Sprintf("Named theme \"%v\" not a valid theme", themeName)
-			return nil, NewUserPresentableErrorWSource(errString, err)
-		}
-		pc.namedThemes[themeName] = theme
-	}*/
-
 	// Actions
-	/*for actionName, actionJsonConfig := range jpc.ActionsConfig.NamedActions {
-		if actionName == "" {
-			return nil, NewUserPresentableError("Named action with empty name")
-		}
-		action, err := NewAc
-		theme, err := NewThemeFromJsonTheme(&themeJsonConfig)
-		if err != nil || theme == nil {
-			errString := fmt.Sprintf("Named theme \"%v\" not a valid theme", themeName)
-			return nil, NewUserPresentableErrorWSource(errString, err)
-		}
-		pc.namedThemes[themeName] = theme
-	}*/
 	// TODO test No named Actions
 	// TODO invalid/empty names/keys?
 	if jpc.ActionsConfig != nil && jpc.ActionsConfig.NamedActions != nil {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
 	}
+
+	pc.buildTriggersFromJsonTriggers(jpc.TriggerConfig.NamedTriggers)
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return nil, NewUserPresentableError(validationIssue)
@@ -119,6 +89,37 @@ func NewPrimaryConfigFromJson(data []byte) (*PrimaryConfig, error) {
 	// TODO map action.primaryAction to a real action, and validate name exists
 
 	return &pc, nil
+}
+
+func (pc PrimaryConfig) buildTriggersFromJsonTriggers(jsonTriggers map[string]jsonTrigger) *UserPresentableError {
+	// TODO test missing and {} triggers
+	// TODO decide if empty map or nil map is right for missing
+	if jsonTriggers == nil {
+		return nil
+	}
+
+	namedTriggers := make(map[string]Trigger)
+	for tName, jt := range jsonTriggers {
+		action, ok := pc.namedActions[jt.ActionName]
+		// TODO: test all 3 cases
+		if !ok {
+			return NewUserPresentableError(fmt.Sprintf("Trigger included named action \"%v\", which doesn't exist", jt.ActionName))
+		}
+		if tName == "" {
+			return NewUserPresentableError("Empty trigger name")
+		}
+		if jt.EventName == "" {
+			return NewUserPresentableError("Empty event name in trigger")
+		}
+		trigger := Trigger{
+			Action:    action,
+			EventName: jt.EventName,
+		}
+		namedTriggers[tName] = trigger
+	}
+
+	pc.namedTriggers = namedTriggers
+	return nil
 }
 
 func (pc PrimaryConfig) Validate() bool {

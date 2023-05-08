@@ -1,8 +1,8 @@
 package datamodel
 
 type Trigger struct {
-	Event  Event
-	Action ActionContainer
+	Action    ActionContainer
+	EventName string
 }
 
 type jsonTrigger struct {
