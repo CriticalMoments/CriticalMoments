@@ -29,9 +29,17 @@ func NewUserPresentableErrorWSource(s string, sourceErr error) *UserPresentableE
 }
 
 func (err *UserPresentableError) UserErrorString() string {
-	return err.userReadableErrorString
+	sourcePresentableError, ok := interface{}(err.SourceError).(UserPresentableErrorI)
+	if ok {
+		return fmt.Sprintf("%v (from error: \"%v\")", err.userReadableErrorString, sourcePresentableError.UserErrorString())
+	} else {
+		return err.userReadableErrorString
+	}
 }
 
 func (err *UserPresentableError) Error() string {
+	if err.SourceError == nil {
+		return err.userReadableErrorString
+	}
 	return fmt.Sprintf("%v (Source Error: %v)", err.userReadableErrorString, err.SourceError)
 }

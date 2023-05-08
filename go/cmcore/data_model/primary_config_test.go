@@ -1,0 +1,240 @@
+package datamodel
+
+import (
+	"encoding/json"
+	"os"
+	"testing"
+)
+
+func testHelperBuildMaxPrimaryConfig(t *testing.T) *PrimaryConfig {
+	return testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/maximalValid.json")
+}
+
+func testHelperBuilPrimaryConfigFromFile(t *testing.T, filePath string) *PrimaryConfig {
+	testFileData, err := os.ReadFile(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pc PrimaryConfig
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &pc
+}
+
+func TestPrimaryConfigJson(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+
+	// Check parsing of top level structure, but individual parsers (Themes, Actions) have
+	// their own dedicated test files
+	if pc.DefaultTheme == nil {
+		t.Fatal()
+	}
+
+	// TODO check all the fields -- full parse checker
+
+	// Check defaults for values not included in json
+}
+
+func TestInvalidConfigVersionTheme(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.ConfigVersion = "v2"
+	if pc.Validate() {
+		t.Fatal("invalid config (v2) passed validation")
+	}
+	pc.ConfigVersion = ""
+	if pc.Validate() {
+		t.Fatal("invalid config ('') passed validation")
+	}
+}
+
+func TestNoDefaultTheme(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.DefaultTheme = nil
+	if !pc.Validate() {
+		t.Fatal("Not allowing nil default theme, which should be allowed")
+	}
+}
+
+func TestNoNamedThemes(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.namedThemes = nil
+	if pc.Validate() {
+		t.Fatal("Named themes map is nil, and validated")
+	}
+	pc.namedThemes = make(map[string]Theme)
+	if pc.Validate() {
+		t.Fatal("Named themes map is empty, and an action uses a missing named theme")
+	}
+
+	// fix the broken name mapping above
+	banner := pc.namedActions["bannerAction1"]
+	banner.ThemeName = ""
+	pc.namedActions["bannerAction1"] = banner
+	if !pc.Validate() {
+		t.Fatal("empty named themes should be allowed")
+	}
+}
+
+func TestNoNamedTriggers(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.namedTriggers = nil
+	if pc.Validate() {
+		t.Fatal("Named triggers map is nil, and validated")
+	}
+	pc.namedTriggers = make(map[string]Trigger)
+	if !pc.Validate() {
+		t.Fatal("empty triggers map should be allowed")
+	}
+}
+
+func TestNoNamedActions(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.namedActions = nil
+	if pc.Validate() {
+		t.Fatal("Named actions map is nil, and validated")
+	}
+	pc.namedActions = map[string]ActionContainer{}
+	if pc.Validate() {
+		t.Fatal("empty map should fail since still triggers referencing them")
+	}
+
+	delete(pc.namedTriggers, "trigger1")
+	if !pc.Validate() {
+		t.Fatal("empty actions should be allowed")
+	}
+}
+
+func TestEmptyKey(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+
+	pc.namedActions[""] = ActionContainer{}
+	if pc.Validate() {
+		t.Fatal("Allowed empty key")
+	}
+	delete(pc.namedActions, "")
+
+	pc.namedThemes[""] = Theme{}
+	if pc.Validate() {
+		t.Fatal("Allowed empty key")
+	}
+	delete(pc.namedThemes, "")
+
+	pc.namedTriggers[""] = Trigger{}
+	if pc.Validate() {
+		t.Fatal("Allowed empty key")
+	}
+	delete(pc.namedTriggers, "")
+
+	if !pc.Validate() {
+		t.Fatal("Should be valid")
+	}
+}
+
+func TestBreakNestedValidationActions(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.namedActions["invalidAction"] = ActionContainer{}
+	if pc.Validate() {
+		t.Fatal("actions not re-validated")
+	}
+}
+
+func TestBreakNestedValidationTriggers(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.namedTriggers["invalidTrigger"] = Trigger{}
+	if pc.Validate() {
+		t.Fatal("trigger not re-validated")
+	}
+}
+
+func TestBreakNestedTheme(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	pc.DefaultTheme = &Theme{} // invalid
+	if pc.Validate() {
+		t.Fatal("default theme not re-validated")
+	}
+	pc.DefaultTheme = nil // valid
+	if !pc.Validate() {
+		t.Fatal()
+	}
+	pc.namedThemes["newInvalidTheme"] = Theme{}
+	if pc.Validate() {
+		t.Fatal("named themes not re-validated")
+	}
+}
+
+func TestMinValidConfig(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+}
+
+func TestOddballValidConfig(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if len(pc.namedActions) != 0 || len(pc.namedThemes) != 0 || len(pc.namedTriggers) != 0 {
+		t.Fatal("Expected oddball with empty maps")
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+}
+
+func TestMinWithUnknownFieldConfig(t *testing.T) {
+	// https://github.com/golang/go/issues/41144
+	t.Skip("This test fails -- we would need to implement strict decoding separately, which is non trivial")
+	filePath := "./test/testdata/primary_config/invalid/minimalWithUnknownField.json"
+	reader, err := os.Open(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Without strict it should work
+	decoder := json.NewDecoder(reader)
+	var pc PrimaryConfig
+	err = decoder.Decode(&pc)
+	if err != nil || !pc.Validate() {
+		t.Fatal("Non strict parsing failed")
+	}
+
+	// with strict it should fail
+	reader, err = os.Open(filePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	strictDecoder := json.NewDecoder(reader)
+	strictDecoder.DisallowUnknownFields()
+	var strictPc PrimaryConfig
+	err = strictDecoder.Decode(&strictPc)
+	if err == nil {
+		t.Fatal("Strict parsing ignored extra field")
+	}
+}

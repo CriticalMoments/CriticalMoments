@@ -78,7 +78,7 @@ func TestJsonParsingMinimalFieldsBanner(t *testing.T) {
 	if banner.TapActionName != "" {
 		t.Fatal()
 	}
-	if banner.Theme != "" {
+	if ac.ThemeName != "" {
 		t.Fatal()
 	}
 	if banner.ShowDismissButton != true {
@@ -110,7 +110,7 @@ func TestJsonParsingAllFieldsBanner(t *testing.T) {
 	if banner.TapActionName != "customAction" {
 		t.Fatal()
 	}
-	if banner.Theme != "navy" {
+	if ac.ThemeName != "navy" {
 		t.Fatal()
 	}
 	if banner.ShowDismissButton == true {

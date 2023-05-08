@@ -24,6 +24,7 @@ const (
 
 type ActionContainer struct {
 	ActionType string
+	ThemeName  string
 
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
@@ -31,15 +32,8 @@ type ActionContainer struct {
 
 type jsonActionContainer struct {
 	ActionType    string          `json:"actionType"`
+	ThemeName     string          `json:"themeName"`
 	RawActionData json.RawMessage `json:"actionData"`
-}
-
-type jsonBannerAction struct {
-	Body              string `json:"body"`
-	ShowDismissButton *bool  `json:"showDismissButton,omitempty"`
-	MaxLineCount      *int   `json:"maxLineCount,omitempty"`
-	TapActionName     string `json:"tapActionName,omitempty"`
-	Theme             string `json:"theme,omitempty"`
 }
 
 func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
@@ -56,49 +50,50 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 
 	switch jac.ActionType {
 	case ActionTypeEnumBanner:
-		ac.BannerAction, err = NewBannerActionFromJson(jac.RawActionData)
+		var banner BannerAction
+		err = json.Unmarshal(jac.RawActionData, &banner)
 		if err != nil {
 			return err
 		}
-		if ac.BannerAction == nil {
-			return errors.New("Unknown banner parse issue")
-		}
+		ac.BannerAction = &banner
 		ac.ActionType = ActionTypeEnumBanner
 	default:
 		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
 	}
 
+	// Set theme only if we were successful in parsing the rest
+	ac.ThemeName = jac.ThemeName
 	return nil
 }
 
-func NewBannerActionFromJson(data []byte) (*BannerAction, error) {
-	var ja jsonBannerAction
-	err := json.Unmarshal(data, &ja)
-	if err != nil {
-		return nil, NewUserPresentableErrorWSource("Unable to parse the json of an action with type=banner. Check the format, variable names, and types (eg float vs int).", err)
+func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
+	if ac.ActionType == "" {
+		return nil, errors.New("AllEmbeddedActionNames called on an uninitialized action continer")
 	}
 
-	// Default Values for nullable options
-	showDismissButton := true
-	if ja.ShowDismissButton != nil {
-		showDismissButton = *ja.ShowDismissButton
+	switch ac.ActionType {
+	case ActionTypeEnumBanner:
+		if ac.BannerAction.TapActionName == "" {
+			return []string{}, nil
+		}
+		return []string{ac.BannerAction.TapActionName}, nil
+	default:
+		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
 	}
-	maxLineCount := BannerMaxLineCountSystemDefault // go requires a value
-	if ja.MaxLineCount != nil {
-		maxLineCount = *ja.MaxLineCount
+}
+
+func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
+	if ac.ActionType == "" {
+		return "Empty actionType"
 	}
 
-	banner := BannerAction{
-		Body:              ja.Body,
-		ShowDismissButton: showDismissButton,
-		MaxLineCount:      maxLineCount,
-		TapActionName:     ja.TapActionName,
-		Theme:             ja.Theme,
+	switch ac.ActionType {
+	case ActionTypeEnumBanner:
+		if ac.BannerAction == nil {
+			return "Missing valid banner action data when actionType=banner"
+		}
+		return ac.BannerAction.ValidateReturningUserReadableIssue()
+	default:
+		return fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType)
 	}
-
-	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return nil, NewUserPresentableError(validationIssue)
-	}
-
-	return &banner, nil
 }
