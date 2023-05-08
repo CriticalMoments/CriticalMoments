@@ -99,12 +99,34 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 		return "Config must have a config version of v1"
 	}
 
-	actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable()
-	if actionIssue != "" {
+	if actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable(); actionIssue != "" {
 		return actionIssue
+	}
+	if themeIssue := pc.validateThemeNamesExistReturningUserReadable(); themeIssue != "" {
+		return themeIssue
 	}
 
 	// Missing: empty or nil expected for each type/set? Add checks and/or tests
+
+	return ""
+}
+
+func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+	// TODO test no named themes properly uses empty map
+	namedThemes := pc.namedThemes
+	if namedThemes == nil {
+		namedThemes = make(map[string]Theme)
+	}
+	if pc.namedActions != nil {
+		for sourceActionName, action := range pc.namedActions {
+			if action.ThemeName != "" {
+				_, ok := namedThemes[action.ThemeName]
+				if !ok {
+					return fmt.Sprintf("Action \"%v\" included named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
+				}
+			}
+		}
+	}
 
 	return ""
 }

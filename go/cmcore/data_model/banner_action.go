@@ -10,7 +10,6 @@ type BannerAction struct {
 	ShowDismissButton bool
 	MaxLineCount      int
 	TapActionName     string
-	Theme             string
 }
 
 type jsonBannerAction struct {
@@ -18,7 +17,6 @@ type jsonBannerAction struct {
 	ShowDismissButton *bool  `json:"showDismissButton,omitempty"`
 	MaxLineCount      *int   `json:"maxLineCount,omitempty"`
 	TapActionName     string `json:"tapActionName,omitempty"`
-	Theme             string `json:"theme,omitempty"`
 }
 
 func (ba BannerAction) Validate() bool {
@@ -59,7 +57,6 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.ShowDismissButton = showDismissButton
 	banner.MaxLineCount = maxLineCount
 	banner.TapActionName = ja.TapActionName
-	banner.Theme = ja.Theme
 
 	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)

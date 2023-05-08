@@ -24,6 +24,7 @@ const (
 
 type ActionContainer struct {
 	ActionType string
+	ThemeName  string
 
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
@@ -31,6 +32,7 @@ type ActionContainer struct {
 
 type jsonActionContainer struct {
 	ActionType    string          `json:"actionType"`
+	ThemeName     string          `json:"themeName"`
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
@@ -60,6 +62,8 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
 	}
 
+	// Set theme only if we were successful in parsing the rest
+	ac.ThemeName = jac.ThemeName
 	return nil
 }
 

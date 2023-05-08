@@ -32,11 +32,11 @@
         "namedActions": {
             "bannerAction1": {
                 "actionType": "banner",
+                "themeName": "blueTheme",
                 "actionData": {
                     "body": "Hello world, but on a banner!",
                     "maxLineCount": 1,
                     "tapActionName": "bannerAction2",
-                    "theme": "navy",
                     "showDismissButton": false
                 }
             },
@@ -45,7 +45,6 @@
                 "actionData": {
                     "body": "Hello world 2, but on a banner!",
                     "maxLineCount": 1,
-                    "theme": "navy",
                     "showDismissButton": false
                 }
             }
