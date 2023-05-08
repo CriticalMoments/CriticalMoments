@@ -2,7 +2,6 @@ package datamodel
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -57,13 +56,12 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 
 	switch jac.ActionType {
 	case ActionTypeEnumBanner:
-		ac.BannerAction, err = NewBannerActionFromJson(jac.RawActionData)
+		var banner BannerAction
+		err = json.Unmarshal(jac.RawActionData, &banner)
 		if err != nil {
 			return err
 		}
-		if ac.BannerAction == nil {
-			return errors.New("Unknown banner parse issue")
-		}
+		ac.BannerAction = &banner
 		ac.ActionType = ActionTypeEnumBanner
 	default:
 		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
@@ -72,11 +70,11 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func NewBannerActionFromJson(data []byte) (*BannerAction, error) {
+func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	var ja jsonBannerAction
 	err := json.Unmarshal(data, &ja)
 	if err != nil {
-		return nil, NewUserPresentableErrorWSource("Unable to parse the json of an action with type=banner. Check the format, variable names, and types (eg float vs int).", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=banner. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	// Default Values for nullable options
@@ -89,17 +87,15 @@ func NewBannerActionFromJson(data []byte) (*BannerAction, error) {
 		maxLineCount = *ja.MaxLineCount
 	}
 
-	banner := BannerAction{
-		Body:              ja.Body,
-		ShowDismissButton: showDismissButton,
-		MaxLineCount:      maxLineCount,
-		TapActionName:     ja.TapActionName,
-		Theme:             ja.Theme,
-	}
+	banner.Body = ja.Body
+	banner.ShowDismissButton = showDismissButton
+	banner.MaxLineCount = maxLineCount
+	banner.TapActionName = ja.TapActionName
+	banner.Theme = ja.Theme
 
 	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return nil, NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
-	return &banner, nil
+	return nil
 }
