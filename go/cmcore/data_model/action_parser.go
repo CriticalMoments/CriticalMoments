@@ -2,6 +2,7 @@ package datamodel
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -68,6 +69,23 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
+	if ac.ActionType == "" {
+		return nil, errors.New("AllEmbeddedActionNames called on an uninitialized action continer")
+	}
+
+	switch ac.ActionType {
+	case ActionTypeEnumBanner:
+		// TODO Test case
+		if ac.BannerAction.TapActionName == "" {
+			return []string{}, nil
+		}
+		return []string{ac.BannerAction.TapActionName}, nil
+	default:
+		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
+	}
 }
 
 func (banner *BannerAction) UnmarshalJSON(data []byte) error {

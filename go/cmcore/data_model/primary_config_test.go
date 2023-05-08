@@ -14,7 +14,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	var pc PrimaryConfig
 	uperr := json.Unmarshal(testFileData, &pc)
 	if uperr != nil {
-		t.Fatal()
+		t.Fatal(uperr)
 	}
 	if pc.DefaultTheme == nil {
 		t.Fatal()

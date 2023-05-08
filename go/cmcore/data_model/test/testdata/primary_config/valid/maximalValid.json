@@ -35,17 +35,16 @@
                 "actionData": {
                     "body": "Hello world, but on a banner!",
                     "maxLineCount": 1,
-                    "tapActionName": "customAction",
+                    "tapActionName": "bannerAction2",
                     "theme": "navy",
                     "showDismissButton": false
                 }
             },
-            "banerAction2": {
+            "bannerAction2": {
                 "actionType": "banner",
                 "actionData": {
                     "body": "Hello world 2, but on a banner!",
                     "maxLineCount": 1,
-                    "tapActionName": "customAction",
                     "theme": "navy",
                     "showDismissButton": false
                 }

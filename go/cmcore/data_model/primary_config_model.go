@@ -99,10 +99,27 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 		return "Config must have a config version of v1"
 	}
 
+	actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable()
+	if actionIssue != "" {
+		return actionIssue
+	}
+
+	// Missing: empty or nil expected for each type/set? Add checks and/or tests
+
+	return ""
+}
+
+func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
+	// TODO test no named actions properly uses empty map
+	namedActions := pc.namedActions
+	if namedActions == nil {
+		namedActions = make(map[string]ActionContainer)
+	}
+
 	// Validate the actions in the trigger actually exist
 	if pc.namedTriggers != nil {
 		for tName, t := range pc.namedTriggers {
-			_, ok := pc.namedActions[t.ActionName]
+			_, ok := namedActions[t.ActionName]
 			// TODO: test all 3 cases
 			if !ok {
 				return fmt.Sprintf("Trigger included named action \"%v\", which doesn't exist", t.ActionName)
@@ -116,9 +133,21 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 		}
 	}
 
-	// TODO validate action.primaryAction that a real action by that name exists
-
-	// Missing: empty or nil expected for each type/set? Add checks and/or tests
+	// validate any named actions embedded in other actions actually exist
+	if pc.namedActions != nil {
+		for sourceActionName, action := range pc.namedActions {
+			actionList, err := action.AllEmbeddedActionNames()
+			if err != nil || actionList == nil {
+				return fmt.Sprintf("Unknown issue confirming all named actions in action \"%v\"exist in config", sourceActionName)
+			}
+			for _, actionName := range actionList {
+				_, ok := namedActions[actionName]
+				if !ok {
+					return fmt.Sprintf("Action \"%v\" included named action \"%v\", which doesn't exist", sourceActionName, actionName)
+				}
+			}
+		}
+	}
 
 	return ""
 }
