@@ -36,7 +36,6 @@ type jsonActionContainer struct {
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
-// TODO: this is right system. Data model should support UnmarshalJSON for other types too...
 func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	// docs suggest no-op for empty data
 	if data == nil {
@@ -74,7 +73,6 @@ func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
 
 	switch ac.ActionType {
 	case ActionTypeEnumBanner:
-		// TODO Test case
 		if ac.BannerAction.TapActionName == "" {
 			return []string{}, nil
 		}

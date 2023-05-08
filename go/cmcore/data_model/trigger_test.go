@@ -48,16 +48,14 @@ func TestTriggerParsingValidTrigger(t *testing.T) {
 func TestTriggerParsingInvalidTrigger(t *testing.T) {
 	testFileData, _ := os.ReadFile("./test/testdata/triggers/invalid/empty.json")
 	var trigger Trigger
-	json.Unmarshal(testFileData, &trigger)
-
-	// Check defaults for values not included in json
-	if trigger.ActionName != "" {
-		t.Fatal()
+	err := json.Unmarshal(testFileData, &trigger)
+	if err == nil {
+		t.Fatal("allowed invalid empty trigger")
 	}
-	if trigger.EventName != "" {
-		t.Fatal()
+	if trigger.ActionName != "" || trigger.EventName != "" {
+		t.Fatal("trigger parse issue")
 	}
 	if trigger.Validate() {
-		t.Fatal()
+		t.Fatal("validated empty trigger")
 	}
 }

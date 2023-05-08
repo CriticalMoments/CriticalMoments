@@ -61,7 +61,6 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	pc.ConfigVersion = jpc.ConfigVersion
 
 	// Themes
-	// TODO test no default/named/root theme field at all
 	if jpc.ThemesConfig != nil {
 		if jpc.ThemesConfig.DefaultTheme != nil {
 			pc.DefaultTheme = jpc.ThemesConfig.DefaultTheme
@@ -74,8 +73,6 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	// Actions
-	// TODO test No named Actions
-	// TODO invalid/empty names/keys?
 	if jpc.ActionsConfig != nil && jpc.ActionsConfig.NamedActions != nil {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
 	} else {
@@ -106,7 +103,7 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	}
 
 	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
-		return "Internal issue initializing config: missing map for actions, themes or triggers"
+		return "Internal issue: code 7842371152"
 	}
 
 	if actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable(); actionIssue != "" {
@@ -137,7 +134,7 @@ func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 		if action.ThemeName != "" {
 			_, ok := pc.namedThemes[action.ThemeName]
 			if !ok {
-				return fmt.Sprintf("Action \"%v\" included named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
+				return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
 			}
 		}
 	}
@@ -158,12 +155,12 @@ func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() stri
 	for sourceActionName, action := range pc.namedActions {
 		actionList, err := action.AllEmbeddedActionNames()
 		if err != nil || actionList == nil {
-			return fmt.Sprintf("Unknown issue confirming all named actions in action \"%v\"exist in config", sourceActionName)
+			return fmt.Sprintf("Internal issue for action \"%v\". Code: 798853616", sourceActionName)
 		}
 		for _, actionName := range actionList {
 			_, ok := pc.namedActions[actionName]
 			if !ok {
-				return fmt.Sprintf("Action \"%v\" included named action \"%v\", which doesn't exist", sourceActionName, actionName)
+				return fmt.Sprintf("Action \"%v\" specified named action \"%v\", which doesn't exist", sourceActionName, actionName)
 			}
 		}
 	}

@@ -12,8 +12,6 @@ type jsonTrigger struct {
 	ActionName string `json:"actionName"`
 }
 
-// TODO - not using validate yet
-
 func (t *Trigger) UnmarshalJSON(data []byte) error {
 	var jt jsonTrigger
 	err := json.Unmarshal(data, &jt)

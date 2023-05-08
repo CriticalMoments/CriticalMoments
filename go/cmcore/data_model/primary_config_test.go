@@ -136,3 +136,7 @@ func TestEmptyKey(t *testing.T) {
 		t.Fatal("Should be valid")
 	}
 }
+
+// TODO Min valid file
+// TODO extra fields
+// TODO breaking a sub-element's validation after parsing, and that "Validate" is recursive (not implmented)
