@@ -47,6 +47,17 @@ static CMTheme *currentTheme = nil;
     }
 }
 
+#pragma mark Named Themes From Appcore
+
++ (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
+    DatamodelTheme *appcoreTheme =
+        [AppcoreSharedAppcore() themeForName:themeName];
+    if (appcoreTheme) {
+        return [CMTheme themeFromAppcoreTheme:appcoreTheme];
+    }
+    return nil;
+}
+
 #pragma mark Built in themes
 
 + (CMTheme *)elegantTheme {

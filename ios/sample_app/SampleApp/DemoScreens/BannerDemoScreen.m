@@ -11,8 +11,6 @@
 
 @import CriticalMoments;
 
-@import Appcore;
-
 @interface BannerDemoScreen () <CMBannerActionDelegate>
 
 @property(nonatomic) NSInteger counter;
@@ -52,10 +50,10 @@
         @"Display a very long banner message, across entire app";
     [veryLongBannerAction addTarget:self action:@selector(showVeryLongMessage)];
 
-    // TODO: remove this -- just for internal testing pre v1
     CMDemoAction *appcoreBannerAction = [[CMDemoAction alloc] init];
     appcoreBannerAction.title = @"Show Banner from Config";
-    appcoreBannerAction.subtitle = @"Display a banner built from config";
+    appcoreBannerAction.subtitle =
+        @"Display a banner built from config with custom theme and action";
     [appcoreBannerAction addTarget:self action:@selector(showAppcoreBanner)];
 
     [self addSection:@"App Wide Banners"
@@ -132,7 +130,7 @@
 }
 
 - (void)showAppcoreBanner {
-    AppcoreInternalDipatchBannerFromGo();
+    [CriticalMoments sendEvent:@"show_banner"];
 }
 
 - (void)swapBannerPosition {

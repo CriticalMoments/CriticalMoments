@@ -1,12 +1,21 @@
-//
-//  Header.h
-//  
-//
-//  Created by Steve Cosman on 2023-05-09.
-//
+NS_ASSUME_NONNULL_BEGIN
 
-#ifndef Header_h
-#define Header_h
+@import Appcore;
 
+@interface CMTheme ()
 
-#endif /* Header_h */
+// _private header prevents exposing these to public SDK.
+
+/**
+ :nodoc:
+ @param acTheme The appcore theme to convert to CMTheme
+ */
++ (CMTheme *)themeFromAppcoreTheme:(DatamodelTheme *)acTheme;
+
+// Theme from config, based on name
+/// :nodoc:
++ (CMTheme *)namedThemeFromAppcore:(NSString *)themeName;
+
+@end
+
+NS_ASSUME_NONNULL_END

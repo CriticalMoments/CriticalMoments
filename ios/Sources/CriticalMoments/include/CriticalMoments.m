@@ -7,7 +7,7 @@
 
 #import "CriticalMoments.h"
 
-#import "../appcore_integration/CMActionDispatcher.h"
+#import "../appcore_integration/CMLibBindings.h"
 
 @import Appcore;
 
@@ -22,10 +22,36 @@
 }
 
 + (void)start {
-    // Register the action dispatcher
-    [CMActionDispatcher registerWithAppcore];
+    // TODO: move to bg thread?
 
-    // TODO: actually start :)
+    // Register the action dispatcher
+    [CMLibBindings registerWithAppcore];
+
+    NSError *error;
+    [AppcoreSharedAppcore() start:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: Critical Moments was unable to start! %@",
+              error);
+#if DEBUG
+        @throw NSInternalInconsistencyException;
+#endif
+    }
+}
+
++ (void)setRemoteConfigUrl:(NSString *)urlString {
+    NSError *error;
+    [AppcoreSharedAppcore() setConfigUrl:urlString error:&error];
+    if (error != nil) {
+        NSLog(@"ERROR: CriticalMoments -- invalid remote config url: %@",
+              error);
+#if DEBUG
+        @throw NSInternalInconsistencyException;
+#endif
+    }
+}
+
++ (void)sendEvent:(NSString *)eventName {
+    [AppcoreSharedAppcore() sendEvent:eventName];
 }
 
 @end

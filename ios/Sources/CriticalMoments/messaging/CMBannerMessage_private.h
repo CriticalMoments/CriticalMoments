@@ -7,6 +7,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@import Appcore;
+
 @protocol CMBannerDismissDelegate
 - (void)dismissedMessage:(CMBannerMessage *)message;
 @end
@@ -18,6 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMBannerMessage ()
 
 // _private header prevents exposing these to public SDK.
+
+/**
+ :nodoc:
+ @param bannerData The appcore datamodel for this banner
+ */
+- (instancetype)initWithAppcoreDataModel:(DatamodelBannerAction *)bannerData;
 
 // We want people to overrider CMBannerMessage buildViewForMessage without
 // breaking/overriding our delegation system for dismiss/next

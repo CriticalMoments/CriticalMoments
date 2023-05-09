@@ -7,8 +7,9 @@
 
 #import <Foundation/Foundation.h>
 
-@import Appcore;
 @import UIKit;
+
+#import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,8 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  This class represents individual banner message which can be presented across
  the top or bottom of your app.
-
- It will take the default theme, which controls the font and colors.
 
  This class can be subclassed to implement completely custom views. Before
  subclassing, try using themes to achieve desired look. If you choose to
@@ -58,11 +57,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithBody:(NSString *)body;
 
-/**
- :nodoc:
- @param bannerData The appcore datamodel for this banner
- */
-- (instancetype)initWithAppcoreDataModel:(DatamodelBannerAction *)bannerData;
+#pragma mark Theme
+
+/// A custom theme, which will be used instead of the default theme if set
+@property(nonatomic, readwrite) CMTheme *customTheme;
 
 #pragma mark Content/Text
 

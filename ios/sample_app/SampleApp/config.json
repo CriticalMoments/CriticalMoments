@@ -1,0 +1,43 @@
+{
+    "configVersion": "v1",
+    "themes": {
+        "namedThemes": {
+            "blackAndWhiteTheme": {
+                "bannerBackgroundColor": "#000000",
+                "bannerForegroundColor": "#ffffff",
+                "fontScale": 1.1,
+                "fontName": "AvenirNext-Regular",
+                "boldFontName": "AvenirNext-Bold",
+                "scaleFontForUserPreference": false
+            }
+        }
+    },
+    "actions": {
+        "namedActions": {
+            "testBannerAction": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "A banner from config with a custom theme/action. Tap me!",
+                    "showDismissButton": true,
+                    "customThemeName": "blackAndWhiteTheme",
+                    "tapActionName": "nestedBannerAction"
+                }
+            },
+            "nestedBannerAction": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Banner from a banner tap?! Wow.",
+                    "showDismissButton": true
+                }
+            }
+        }
+    },
+    "triggers": {
+        "namedTriggers": {
+            "bannerTestTrigger": {
+                "eventName": "show_banner",
+                "actionName": "testBannerAction"
+            }
+        }
+    }
+}
