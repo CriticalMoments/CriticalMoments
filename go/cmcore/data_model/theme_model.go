@@ -32,8 +32,8 @@ type jsonTheme struct {
 
 var (
 	elegantTheme = Theme{
-		BannerBackgroundColor: "#ffffff", // White
-		BannerForegroundColor: "#000000", // Black
+		BannerBackgroundColor: "#000000", // Black
+		BannerForegroundColor: "#ffffff", // White
 		FontScale:             1.0,
 	}
 	// Not pretty, but for e2e integration tests through to clients
