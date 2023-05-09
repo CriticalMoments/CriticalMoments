@@ -1,10 +1,10 @@
 {
     "actionType": "banner",
-    "themeName": "navy",
     "actionData": {
         "body": "Hello world, but on a banner!",
         "maxLineCount": 1,
         "tapActionName": "customAction",
+        "customThemeName": "navy",
         "showDismissButton": false
     }
 }

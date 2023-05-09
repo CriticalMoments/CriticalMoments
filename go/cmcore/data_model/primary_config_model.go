@@ -20,8 +20,34 @@ type PrimaryConfig struct {
 	namedTriggers map[string]Trigger
 }
 
-func (pc PrimaryConfig) ThemeWithName(name string) Theme {
-	return pc.namedThemes[name]
+func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
+	theme, ok := pc.namedThemes[name]
+	if ok {
+		return &theme
+	}
+	return nil
+}
+
+func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
+	action, ok := pc.namedActions[name]
+	if ok {
+		return &action
+	}
+	return nil
+}
+
+func (pc *PrimaryConfig) ActionsForEvent(eventName string) []ActionContainer {
+	// TODO P2: don't iterate, use a map
+	actions := make([]ActionContainer, 0)
+	for _, trigger := range pc.namedTriggers {
+		if trigger.EventName == eventName {
+			action, ok := pc.namedActions[trigger.ActionName]
+			if ok {
+				actions = append(actions, action)
+			}
+		}
+	}
+	return actions
 }
 
 type jsonPrimaryConfig struct {
@@ -154,10 +180,14 @@ func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable(
 
 func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	for sourceActionName, action := range pc.namedActions {
-		if action.ThemeName != "" {
-			_, ok := pc.namedThemes[action.ThemeName]
+		themeList, err := action.AllEmbeddedThemeNames()
+		if err != nil || themeList == nil {
+			return fmt.Sprintf("Internal issue for action \"%v\". Code: 88456198", sourceActionName)
+		}
+		for _, themeName := range themeList {
+			_, ok := pc.namedThemes[themeName]
 			if !ok {
-				return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, action.ThemeName)
+				return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, themeName)
 			}
 		}
 	}

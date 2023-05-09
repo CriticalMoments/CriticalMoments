@@ -24,7 +24,6 @@ const (
 
 type ActionContainer struct {
 	ActionType string
-	ThemeName  string
 
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
@@ -32,7 +31,6 @@ type ActionContainer struct {
 
 type jsonActionContainer struct {
 	ActionType    string          `json:"actionType"`
-	ThemeName     string          `json:"themeName"`
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
@@ -61,9 +59,23 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
 	}
 
-	// Set theme only if we were successful in parsing the rest
-	ac.ThemeName = jac.ThemeName
 	return nil
+}
+
+func (ac *ActionContainer) AllEmbeddedThemeNames() ([]string, error) {
+	if ac.ActionType == "" {
+		return nil, errors.New("AllEmbeddedThemeNames called on an uninitialized action continer")
+	}
+
+	switch ac.ActionType {
+	case ActionTypeEnumBanner:
+		if ac.BannerAction.CustomThemeName == "" {
+			return []string{}, nil
+		}
+		return []string{ac.BannerAction.CustomThemeName}, nil
+	default:
+		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
+	}
 }
 
 func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
