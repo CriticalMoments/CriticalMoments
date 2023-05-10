@@ -32,12 +32,49 @@ func TestPrimaryConfigJson(t *testing.T) {
 
 	// Check parsing of top level structure, but individual parsers (Themes, Actions) have
 	// their own dedicated test files
-	if pc.DefaultTheme == nil {
-		t.Fatal()
+
+	// Version
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("invalid config version parse")
 	}
 
-	// TODO check all the fields -- full parse checker
-	// TODO Check defaults for values not included in json
+	// Themes
+	if pc.DefaultTheme == nil || pc.DefaultTheme.BannerBackgroundColor != "#ffffff" {
+		t.Fatal("Default theme not parsed")
+	}
+	if len(pc.namedThemes) != 2 {
+		t.Fatal("Wrong number of named themes")
+	}
+	blueTheme := pc.ThemeWithName("blueTheme")
+	if blueTheme == nil || blueTheme.BannerBackgroundColor != "#00ff00" {
+		t.Fatal("Named theme not parsed")
+	}
+	greenTheme := pc.ThemeWithName("greenTheme")
+	if greenTheme == nil || greenTheme.BannerBackgroundColor != "#0000ff" {
+		t.Fatal("Named theme not parsed")
+	}
+
+	// Actions
+	if len(pc.namedActions) != 2 {
+		t.Fatal("Wrong number of named actions")
+	}
+	bannerAction1 := pc.ActionWithName("bannerAction1")
+	if bannerAction1 == nil || bannerAction1.BannerAction.Body != "Hello world, but on a banner!" {
+		t.Fatal("Didn't parse banner action 1")
+	}
+	bannerAction2 := pc.ActionWithName("bannerAction2")
+	if bannerAction2 == nil || bannerAction2.BannerAction.Body != "Hello world 2, but on a banner!" {
+		t.Fatal("Didn't parse banner action 2")
+	}
+
+	// Triggers
+	if len(pc.namedTriggers) != 1 {
+		t.Fatal("Wrong trigger count")
+	}
+	trigger1 := pc.namedTriggers["trigger1"]
+	if trigger1.ActionName != "bannerAction1" || trigger1.EventName != "custom_event" {
+		t.Fatal("Trigger 1 parsing failed")
+	}
 }
 
 func TestInvalidConfigVersionTheme(t *testing.T) {

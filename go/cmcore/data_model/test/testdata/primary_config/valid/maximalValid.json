@@ -11,7 +11,7 @@
         },
         "namedThemes": {
             "blueTheme": {
-                "bannerBackgroundColor": "#ffffff",
+                "bannerBackgroundColor": "#00ff00",
                 "bannerForegroundColor": "#000000",
                 "fontScale": 1.1,
                 "fontName": "AvenirNext-Regular",
@@ -19,7 +19,7 @@
                 "scaleFontForUserPreference": false
             },
             "greenTheme": {
-                "bannerBackgroundColor": "#ffffff",
+                "bannerBackgroundColor": "#0000ff",
                 "bannerForegroundColor": "#000000",
                 "fontScale": 1.1,
                 "fontName": "AvenirNext-Regular",
