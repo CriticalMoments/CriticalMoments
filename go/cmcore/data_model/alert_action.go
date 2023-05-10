@@ -75,6 +75,16 @@ type jsonAlertCustomButton struct {
 	Style      *string `json:"style"`
 }
 
+func unpackAlertFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
+	var alert AlertAction
+	err := json.Unmarshal(rawJson, &alert)
+	if err != nil {
+		return nil, err
+	}
+	ac.AlertAction = &alert
+	return &alert, nil
+}
+
 func (a *AlertAction) Validate() bool {
 	return a.ValidateReturningUserReadableIssue() == ""
 }
@@ -171,4 +181,22 @@ func customButtonFromJson(jb *jsonAlertCustomButton) *AlertActionCustomButton {
 		ActionName: jb.ActionName,
 		Style:      buttonStyle,
 	}
+}
+
+func (a *AlertAction) AllEmbeddedThemeNames() ([]string, error) {
+	return []string{}, nil
+}
+
+// TODO Test this
+func (a *AlertAction) AllEmbeddedActionNames() ([]string, error) {
+	alertActions := []string{}
+	if a.OkButtonActionName != "" {
+		alertActions = append(alertActions, a.OkButtonActionName)
+	}
+	for _, customButton := range a.CustomButtons {
+		if customButton.ActionName != "" {
+			alertActions = append(alertActions, customButton.ActionName)
+		}
+	}
+	return alertActions, nil
 }
