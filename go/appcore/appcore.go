@@ -33,6 +33,7 @@ func newAppcore() Appcore {
 	return Appcore{}
 }
 
+// Hopefully no one wants http (no TLS) in 2023... but given the importance of the config file we can't open this up to injection attacks
 const filePrefix = "file://"
 const httpsPrefix = "https://"
 
@@ -49,7 +50,7 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	ac.libBindings = lb
 }
 
-// Might not be "error"
+// TODO: guard against double start call
 func (ac *Appcore) Start() error {
 	if ac.configUrlString == "" {
 		return errors.New("A config URL must be provided before starting critical moments")
@@ -87,6 +88,7 @@ func (ac *Appcore) postConfigSetup() error {
 	if ac.config.DefaultTheme != nil {
 		err := ac.libBindings.SetDefaultTheme(ac.config.DefaultTheme)
 		if err != nil {
+			fmt.Println("CriticalMoments: there was an issue setting up the default theme from config")
 			return err
 		}
 	}
@@ -95,23 +97,23 @@ func (ac *Appcore) postConfigSetup() error {
 }
 
 // TODO: method considered WIP, not tested, expect a full re-write for conditions so saving for later
+// TODO: events should be queued during setup, and run after postConfigSetup
 func (ac *Appcore) SendEvent(e string) {
 	actions := ac.config.ActionsForEvent(e)
 	for _, action := range actions {
 		err := dispatchActionToLib(&action, ac.libBindings)
 		if err != nil {
-			fmt.Printf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", e, err)
+			fmt.Printf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err)
 		}
 	}
 }
 
-// TODO: test
 func (ac *Appcore) PerformNamedAction(actionName string) error {
 	action := ac.config.ActionWithName(actionName)
 	if action != nil {
 		err := dispatchActionToLib(action, ac.libBindings)
 		if err != nil {
-			fmt.Printf("CriticalMoments: there was an issue performing action named \"%v\". Error: %v", actionName, err)
+			fmt.Printf("CriticalMoments: there was an issue performing action named \"%v\". Error: %v\n", actionName, err)
 			return err
 		}
 		return nil
