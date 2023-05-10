@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 2 {
+	if len(pc.namedActions) != 3 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -64,6 +64,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 	bannerAction2 := pc.ActionWithName("bannerAction2")
 	if bannerAction2 == nil || bannerAction2.BannerAction.Body != "Hello world 2, but on a banner!" {
+		t.Fatal("Didn't parse banner action 2")
+	}
+	alertAction := pc.ActionWithName("alertAction")
+	if alertAction == nil || alertAction.AlertAction.Title != "Alert title" {
 		t.Fatal("Didn't parse banner action 2")
 	}
 

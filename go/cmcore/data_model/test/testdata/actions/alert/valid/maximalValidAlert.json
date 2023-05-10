@@ -1,0 +1,28 @@
+{
+    "actionType": "alert",
+    "actionData": {
+        "title": "For real?",
+        "message": "Are you sure you want to?",
+        "showCancelButton": true,
+        "showOkButton": true,
+        "okButtonActionName": "custom_event",
+        "style": "large",
+        "customButtons": [
+            {
+                "label": "Custom 1",
+                "actionName": "event1",
+                "style": "primary"
+            },
+            {
+                "label": "Custom 2",
+                "actionName": "event2",
+                "style": "destructive"
+            },
+            {
+                "label": "Custom 3",
+                "actionName": "event3",
+                "style": "normal"
+            }
+        ]
+    }
+}

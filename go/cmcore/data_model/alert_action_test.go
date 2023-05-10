@@ -1,0 +1,216 @@
+package datamodel
+
+import (
+	"encoding/json"
+	"os"
+	"testing"
+)
+
+func TestActionValidators(t *testing.T) {
+	// valid
+	a := AlertAction{
+		Title:        "Title",
+		Message:      "Message",
+		ShowOkButton: true,
+		Style:        AlertActionStyleEnumDialog,
+	}
+	if !a.Validate() {
+		t.Fatal(a.ValidateReturningUserReadableIssue())
+	}
+	a.Style = ""
+	if a.Validate() {
+		t.Fatal("Allowed empty style")
+	}
+	a.Style = "asdf"
+	if a.Validate() {
+		t.Fatal("Allowed invalid style")
+	}
+	a.Style = AlertActionStyleEnumLarge
+	if !a.Validate() {
+		t.Fatal(a.ValidateReturningUserReadableIssue())
+	}
+	a.Title = ""
+	if !a.Validate() {
+		t.Fatal("Should allow empty title if message still provided")
+	}
+	a.Message = ""
+	if a.Validate() {
+		t.Fatal("Should not allow empty title and message")
+	}
+	a.Title = "New title"
+	if !a.Validate() {
+		t.Fatal("Should allow title and not message")
+	}
+	a.ShowOkButton = false
+	a.OkButtonActionName = "action"
+	if a.Validate() {
+		t.Fatal("Should not allow an okay actio when ok button hidden")
+	}
+	a.ShowOkButton = true
+	a.OkButtonActionName = ""
+	if !a.Validate() {
+		t.Fatal("Should allow okay without an action")
+	}
+	cb := AlertActionCustomButton{}
+	a.CustomButtons = []*AlertActionCustomButton{&cb}
+	if a.Validate() {
+		t.Fatal("Should vaidate buttons as well")
+	}
+	a.CustomButtons = []*AlertActionCustomButton{}
+	if !a.Validate() {
+		t.Fatal()
+	}
+	a.ShowOkButton = false
+	if a.Validate() {
+		t.Fatal("Alert requires ok or custom buttons, but allowed neither")
+	}
+}
+
+func TestCustomButtonValidation(t *testing.T) {
+	b := AlertActionCustomButton{
+		Label: "Label",
+		Style: AlertActionButtonStyleEnumPrimary,
+	}
+	if !b.Validate() {
+		t.Fatal("Valid button fails validation")
+	}
+	b.Style = ""
+	if b.Validate() {
+		t.Fatal("Emtpy button style should not validate")
+	}
+	b.Style = "adsf"
+	if b.Validate() {
+		t.Fatal("INvalid style should not validate")
+	}
+	b.Style = AlertActionButtonStyleEnumNormal
+	if !b.Validate() {
+		t.Fatal("Valid button style fails validation")
+	}
+	b.Style = AlertActionButtonStyleEnumDestructive
+	if !b.Validate() {
+		t.Fatal("Valid button style fails validation")
+	}
+	b.Label = ""
+	if b.Validate() {
+		t.Fatal("Buttons require a label")
+	}
+}
+
+func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/valid/maximalValidAlert.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ac.ActionType != ActionTypeEnumAlert {
+		t.Fatal()
+	}
+	a := ac.AlertAction
+	if a == nil || !a.Validate() {
+		t.Fatal()
+	}
+	if a.Title != "For real?" {
+		t.Fatal()
+	}
+	if a.Message != "Are you sure you want to?" {
+		t.Fatal()
+	}
+	if !a.ShowCancelButton || !a.ShowOkButton {
+		t.Fatal()
+	}
+	if a.OkButtonActionName != "custom_event" {
+		t.Fatal()
+	}
+	if a.Style != AlertActionStyleEnumLarge {
+		t.Fatal()
+	}
+	cb1 := a.CustomButtons[0]
+	if cb1.Label != "Custom 1" || cb1.ActionName != "event1" || cb1.Style != AlertActionButtonStyleEnumPrimary {
+		t.Fatal()
+	}
+	cb2 := a.CustomButtons[1]
+	if cb2.Label != "Custom 2" || cb2.ActionName != "event2" || cb2.Style != AlertActionButtonStyleEnumDestructive {
+		t.Fatal()
+	}
+	cb3 := a.CustomButtons[2]
+	if cb3.Label != "Custom 3" || cb3.ActionName != "event3" || cb3.Style != AlertActionButtonStyleEnumNormal {
+		t.Fatal()
+	}
+}
+func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/valid/minimalValidAlert.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ac.ActionType != ActionTypeEnumAlert {
+		t.Fatal()
+	}
+	a := ac.AlertAction
+	if a == nil || !a.Validate() {
+		t.Fatal()
+	}
+	if a.Title != "For real?" {
+		t.Fatal()
+	}
+	if a.Message != "" {
+		t.Fatal()
+	}
+	if a.ShowCancelButton || !a.ShowOkButton {
+		t.Fatal()
+	}
+	if a.OkButtonActionName != "" {
+		t.Fatal()
+	}
+	if a.Style != AlertActionStyleEnumDialog {
+		t.Fatal()
+	}
+	if len(a.CustomButtons) != 0 {
+		t.Fatal()
+	}
+}
+
+func TestJsonParsingOkayDisabledAlert(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/valid/okDisabled.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ac.ActionType != ActionTypeEnumAlert {
+		t.Fatal()
+	}
+	a := ac.AlertAction
+	if a == nil || !a.Validate() {
+		t.Fatal()
+	}
+	if a.ShowOkButton {
+		t.Fatal("failed to parse showOkayButton")
+	}
+}
+
+func TestJsonParsingInvalidAlert(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/invalid/invalid.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil {
+		t.Fatal("invalid json should error")
+	}
+}
