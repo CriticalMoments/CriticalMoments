@@ -40,6 +40,34 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)start;
 
+/**
+ Set the config URL for critical moments.
+
+ We highly recommend https/web URLs, as Critical Moments is particularly useful
+ for unexpected/unplanned customer messaging. With a remote URL you can update
+ the config to handle these situations. Loading from a file in the bundle is
+ supported, but mostly for testing.
+
+ @param urlString the URL string of the json config file. Can be a local
+ `file://` URL or a `https://` URL.
+ @warning Be sure to secure who can upload files to this URL path. This config
+ file can present messages directly to your users, and you should treat security
+ seriously, as you would your app update release process or webpage.
+ */
++ (void)setRemoteConfigUrl:(NSString *)urlString;
+
+// TODO: improve docs
+// TODO: enforce naming limits (ascii, no spaces)?
+/**
+ Use SendEvent to sent named events to Critical Moments (example:
+ `user_updated_profile_photo`). These events may trigger actions, or may be used
+ in conditions.
+
+ @param eventName a string describing the event. Example:
+ `user_updated_profile_photo`
+ */
++ (void)sendEvent:(NSString *)eventName;
+
 @end
 
 NS_ASSUME_NONNULL_END

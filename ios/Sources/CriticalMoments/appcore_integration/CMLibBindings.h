@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMActionDispatcher : NSObject
+@interface CMLibBindings : NSObject
 
 #pragma mark Shared Instance
 
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  A shared instance reference.
  @return a shared instance of CMActionDispatcher
  */
-+ (CMActionDispatcher *)shared;
++ (CMLibBindings *)shared;
 
 /**
  :nodoc:

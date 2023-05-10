@@ -37,8 +37,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// TODO check all the fields -- full parse checker
-
-	// Check defaults for values not included in json
+	// TODO Check defaults for values not included in json
 }
 
 func TestInvalidConfigVersionTheme(t *testing.T) {
@@ -72,15 +71,15 @@ func TestNoNamedThemes(t *testing.T) {
 	}
 	pc.namedThemes = make(map[string]Theme)
 	if pc.Validate() {
-		t.Fatal("Named themes map is empty, and an action uses a missing named theme")
+		t.Fatal("Named themes map is empty, and an action uses a missing named theme, but it improperly validated")
 	}
 
 	// fix the broken name mapping above
 	banner := pc.namedActions["bannerAction1"]
-	banner.ThemeName = ""
+	banner.BannerAction.CustomThemeName = ""
 	pc.namedActions["bannerAction1"] = banner
 	if !pc.Validate() {
-		t.Fatal("empty named themes should be allowed")
+		t.Fatal("empty named themes should be allowed if no one references them")
 	}
 }
 
@@ -182,6 +181,43 @@ func TestBreakNestedTheme(t *testing.T) {
 	pc.namedThemes["newInvalidTheme"] = Theme{}
 	if pc.Validate() {
 		t.Fatal("named themes not re-validated")
+	}
+}
+
+func TestPcAccessors(t *testing.T) {
+	pc := testHelperBuildMaxPrimaryConfig(t)
+	if !pc.Validate() {
+		t.Fatal()
+	}
+
+	theme := pc.ThemeWithName("doesntExist")
+	if theme != nil {
+		t.Fatal("Found a theme that doesn't exist")
+	}
+
+	theme = pc.ThemeWithName("greenTheme")
+	if theme == nil {
+		t.Fatal("Couldn't find theme by name")
+	}
+
+	action := pc.ActionWithName("nada")
+	if action != nil {
+		t.Fatal("Found a action that doesn't exist")
+	}
+
+	action = pc.ActionWithName("bannerAction1")
+	if action == nil {
+		t.Fatal("Couldn't find action by name")
+	}
+
+	actions := pc.ActionsForEvent("nada")
+	if len(actions) > 0 {
+		t.Fatal("Found a action that doesn't exist")
+	}
+
+	actions = pc.ActionsForEvent("custom_event")
+	if len(actions) != 1 || actions[0].ActionType != ActionTypeEnumBanner {
+		t.Fatal("Didn't find action from event")
 	}
 }
 

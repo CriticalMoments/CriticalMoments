@@ -47,6 +47,10 @@
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
 
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"config"
+                                         withExtension:@"json"];
+
+    [CriticalMoments setRemoteConfigUrl:url.absoluteString];
     [CriticalMoments start];
 }
 

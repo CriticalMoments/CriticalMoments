@@ -7,13 +7,16 @@
 
 #import "CMBannerMessage.h"
 #import "../themes/CMTheme.h"
+#import "../themes/CMTheme_private.h"
 #import "CMBannerMessage_private.h"
 
 @import UIKit;
 
-@interface CMBannerMessage ()
+@interface CMBannerMessage () <CMBannerActionDelegate>
 
 @property(nonatomic, strong, readwrite) NSString *body;
+@property(nonatomic, strong, readwrite) NSString *appcoreTapActionName;
+@property(nonatomic, strong, readwrite) NSString *appcoreThemeName;
 
 @end
 
@@ -37,16 +40,27 @@
             DatamodelBannerMaxLineCountSystemDefault) {
             self.maxLineCount = @(bannerData.maxLineCount);
         }
-        // TODO: tap action name
-        // TODO: named theme integration
+        if (bannerData.tapActionName.length > 0) {
+            self.appcoreTapActionName = bannerData.tapActionName;
+            self.actionDelegate = self;
+        }
+        if (bannerData.customThemeName.length > 0) {
+            CMTheme *customTheme =
+                [CMTheme namedThemeFromAppcore:bannerData.customThemeName];
+            self.customTheme = customTheme;
+        }
     }
     return self;
 }
 
 - (UIView *)buildViewForMessage {
-    UIColor *forgroundBannerColor = CMTheme.current.bannerForegroundColor;
-    UIColor *backgroundBannerColor = CMTheme.current.bannerBackgroundColor;
-    UIFont *bannerFont = [CMTheme.current boldFontOfSize:UIFont.systemFontSize];
+    CMTheme *theme = self.customTheme;
+    if (!theme) {
+        theme = CMTheme.current;
+    }
+    UIColor *forgroundBannerColor = theme.bannerForegroundColor;
+    UIColor *backgroundBannerColor = theme.bannerBackgroundColor;
+    UIFont *bannerFont = [theme boldFontOfSize:UIFont.systemFontSize];
 
     UIView *view = [[UIView alloc] init];
     view.backgroundColor = backgroundBannerColor;
@@ -173,6 +187,22 @@
 
 - (void)bannerTapped {
     [self.actionDelegate messageAction:self];
+}
+
+#pragma mark CMBannerActionDelegate
+
+// Messages should only be their own delegate for DatamodelBannerAction messages
+- (void)messageAction:(nonnull CMBannerMessage *)message {
+    if (!self.appcoreTapActionName) {
+        return;
+    }
+
+    NSError *error;
+    [AppcoreSharedAppcore() performNamedAction:self.appcoreTapActionName
+                                         error:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: Banner tap unknown issue: %@", error);
+    }
 }
 
 @end
