@@ -15,16 +15,16 @@ Default is an alert with a title, body, and okay button which dismisses but take
  - You can add a standard cancel button with 1 property: showCancelButton:true. It never performs an action other than dismiss. It is not shown by default
  - Buttons are ordered by platform convention. If you desire a separate order use all custom buttons.
     - ios order: Custom Buttons, Cancel, Ok.
-	- other platforms:
+    - other platforms: TBD
  - While it's supported, you probably shouldn't have "Ok" and custom buttons. Logically "Ok" works alone for an informational message, or paired with cancel for a confimation message. Ok paired with several custom options is usually confusing to the user.
  - Button styles are automatic for Ok/Cancel, and manual for custom buttons
    - The Ok button will get a treatment following the platform guidelines. On iOS that means "preferred" if paired with cancel, and plain if solo.
    - Cancel button will get the plain visual treatment.
-   - Custom buttons specify their visual treatment: normal, desructive (red), primary.
+   - Custom buttons specify their visual treatment: normal, destructive (red), primary.
  - Alert style is based on the platform
-   - the default is dialog, which is UIAlertControllerStyleAlert on iOS and a Material dialog style: https://m3.material.io/components/dialogs/specs#23e479cf-c5a6-4a8b-87b3-1202d51855ac
-   - large is UIAlertControllerStyleActionSheet on iOS and the material fullscreen style: https://m3.material.io/components/dialogs/specs#bbf1acde-f8d2-4ae1-9d51-343e96c4ac20
- - You must have at least 1 button: Ok, Cancel, or a valid custom button
+   - the default is "dialog", which is UIAlertControllerStyleAlert on iOS and a Material dialog style: https://m3.material.io/components/dialogs/specs#23e479cf-c5a6-4a8b-87b3-1202d51855ac
+   - "large" is UIAlertControllerStyleActionSheet on iOS and the material fullscreen style: https://m3.material.io/components/dialogs/specs#bbf1acde-f8d2-4ae1-9d51-343e96c4ac20
+ - You must have at least 1 button: Ok, or a valid custom button. No buttons or cancel alone aren't valid
  - There is no theme support for alerts, they use the system native alert look
 
 https://developer.apple.com/design/human-interface-guidelines/alerts
@@ -65,14 +65,14 @@ type jsonAlertAction struct {
 	ShowOkButton       *bool                    `json:"showOkButton,omitempty"`
 	OkButtonActionName string                   `json:"okButtonActionName,omitempty"`
 	ShowCancelButton   *bool                    `json:"showCancelButton,omitempty"`
-	Style              string                   `json:"style,omitempty"`
+	Style              *string                  `json:"style,omitempty"`
 	CustomButtons      *[]jsonAlertCustomButton `json:"customButtons,omitempty"`
 }
 
 type jsonAlertCustomButton struct {
-	Label      string `json:"label"`
-	ActionName string `json:"actionName"`
-	Style      string `json:"style"`
+	Label      string  `json:"label"`
+	ActionName string  `json:"actionName"`
+	Style      *string `json:"style"`
 }
 
 func (a *AlertAction) Validate() bool {
@@ -133,8 +133,8 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		showCancelButton = *ja.ShowCancelButton
 	}
 	alertStyle := AlertActionStyleEnumDialog
-	if ja.Style != "" {
-		alertStyle = ja.Style
+	if ja.Style != nil {
+		alertStyle = *ja.Style
 	}
 
 	a.Title = ja.Title
@@ -162,8 +162,8 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 
 func customButtonFromJson(jb *jsonAlertCustomButton) *AlertActionCustomButton {
 	buttonStyle := AlertActionButtonStyleEnumNormal
-	if jb.Style != "" {
-		buttonStyle = jb.Style
+	if jb.Style != nil {
+		buttonStyle = *jb.Style
 	}
 
 	return &AlertActionCustomButton{
