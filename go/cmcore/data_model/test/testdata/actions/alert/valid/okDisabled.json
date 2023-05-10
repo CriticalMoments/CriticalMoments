@@ -1,0 +1,14 @@
+{
+    "actionType": "alert",
+    "actionData": {
+        "title": "For real?",
+        "showOkButton": false,
+        "customButtons": [
+            {
+                "label": "Custom 1",
+                "actionName": "event1",
+                "style": "primary"
+            }
+        ]
+    }
+}

@@ -47,6 +47,12 @@
                     "maxLineCount": 1,
                     "showDismissButton": false
                 }
+            },
+            "alertAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Alert title"
+                }
             }
         }
     },
