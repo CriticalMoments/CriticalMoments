@@ -193,7 +193,7 @@
 
 // Messages should only be their own delegate for DatamodelBannerAction messages
 - (void)messageAction:(nonnull CMBannerMessage *)message {
-    if (self.appcoreTapActionName.length <= 0) {
+    if (!self.appcoreTapActionName) {
         return;
     }
 

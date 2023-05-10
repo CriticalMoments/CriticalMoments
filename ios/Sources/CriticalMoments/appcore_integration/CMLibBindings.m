@@ -38,7 +38,6 @@ static CMLibBindings *sharedInstance = nil;
 }
 
 + (void)registerWithAppcore {
-    AppcoreAppcore *appcore = AppcoreSharedAppcore();
     [AppcoreSharedAppcore() registerLibraryBindings:[CMLibBindings shared]];
 }
 
