@@ -44,12 +44,14 @@
         @"Open an app deeplink into the iOS Settings app";
     openSettingsLink.actionCMActionName = @"settings_link_action";
 
-    // TODO another deep link into same app
+    CMDemoAction *openMainScreenLink = [[CMDemoAction alloc] init];
+    openMainScreenLink.title = @"Open deeplink";
+    openMainScreenLink.subtitle =
+        @"Open an app deeplink into this sample app's main screen";
+    openMainScreenLink.actionCMActionName = @"main_screen_deeplink_action";
 
     [self addSection:@"App deep links"
-         withActions:@[
-             openSettingsLink,
-         ]];
+         withActions:@[ openSettingsLink, openMainScreenLink ]];
 }
 
 @end

@@ -153,6 +153,12 @@
                     "url": "app-settings:"
                 }
             },
+            "main_screen_deeplink_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "critical-moments-sampleapp:main"
+                }
+            },
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
