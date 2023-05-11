@@ -120,7 +120,7 @@ func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
 	if b.Style != AlertActionButtonStyleEnumDefault &&
 		b.Style != AlertActionButtonStyleEnumPrimary &&
 		b.Style != AlertActionButtonStyleEnumDestructive {
-		return "Custom alert buttons must have a valid style: default or destuctive"
+		return fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style)
 	}
 
 	return ""

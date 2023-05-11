@@ -31,7 +31,7 @@
 
     CMDemoAction *alertAction = [[CMDemoAction alloc] init];
     alertAction.title = @"Alerts";
-    alertAction.subtitle = @"UI to display system alerts/dialogs.";
+    alertAction.subtitle = @"UI to display system alerts and action sheets.";
     alertAction.actionNextScreen = [[AlertDemoScreen alloc] init];
 
     [self addSection:@"UI Actions" withActions:@[ bannersAction, alertAction ]];

@@ -14,7 +14,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.title = @"Alerts Demos";
+        self.title = @"Alert Demos";
         [self buildSections];
     }
     return self;

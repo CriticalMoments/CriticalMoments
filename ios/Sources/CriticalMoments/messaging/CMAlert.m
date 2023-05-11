@@ -43,12 +43,11 @@
     DatamodelAlertAction *dataModel = self.dataModel;
     NSString *title = dataModel.title.length > 0 ? dataModel.title : nil;
     NSString *message = dataModel.message.length > 0 ? dataModel.message : nil;
+
     UIAlertControllerStyle style = UIAlertControllerStyleAlert;
     if ([DatamodelAlertActionStyleEnumLarge isEqualToString:dataModel.style]) {
         style = UIAlertControllerStyleActionSheet;
     }
-
-    // TODO: setPreferredAction maybe disable?
 
     UIAlertController *alert =
         [UIAlertController alertControllerWithTitle:title
@@ -86,8 +85,8 @@
                     }];
         [alert addAction:okAction];
 
-        // Only highlight ok as primary if there's other buttons (system UI
-        // standard)
+        // Only highlight ok as primary if there's other buttons.
+        // This is an iOS UI standard.
         if (dataModel.showCancelButton || customButtonActions.count > 0) {
             [alert setPreferredAction:okAction];
         }
@@ -105,9 +104,11 @@
 }
 
 - (NSArray<CMCustomAlertButton *> *)customButtonActions {
+
     NSMutableArray<CMCustomAlertButton *> *customActions =
         [[NSMutableArray alloc]
             initWithCapacity:self.dataModel.customButtonsCount];
+
     for (int i = 0; i < self.dataModel.customButtonsCount; i++) {
         DatamodelAlertActionCustomButton *buttonModel =
             [self.dataModel customButtonAtIndex:i];

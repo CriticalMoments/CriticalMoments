@@ -20,14 +20,7 @@
                     "body": "A banner from config with a custom theme/action. Tap me!",
                     "showDismissButton": true,
                     "customThemeName": "blackAndWhiteTheme",
-                    "tapActionName": "bannerAlertAction"
-                }
-            },
-            "bannerAlertAction": {
-                "actionType": "alert",
-                "actionData": {
-                    "title": "You clicked a banner!",
-                    "message": "Did you know the tap action is also controled by remote config? Because it is!"
+                    "tapActionName": "nested_alert"
                 }
             },
             "show_notice_alert": {
@@ -108,7 +101,7 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Nested Action",
-                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including nothing, showing a infomation sheet, deeplinking into part of your app, or launching Safari with a link!"
+                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
                 }
             }
         }
