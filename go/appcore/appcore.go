@@ -110,15 +110,10 @@ func (ac *Appcore) SendEvent(e string) {
 
 func (ac *Appcore) PerformNamedAction(actionName string) error {
 	action := ac.config.ActionWithName(actionName)
-	if action != nil {
-		err := dispatchActionToLib(action, ac.libBindings)
-		if err != nil {
-			fmt.Printf("CriticalMoments: there was an issue performing action named \"%v\". Error: %v\n", actionName, err)
-			return err
-		}
-		return nil
+	if action == nil {
+		return errors.New(fmt.Sprintf("No action found named %v", actionName))
 	}
-	return errors.New(fmt.Sprintf("No action found named %v", actionName))
+	return action.PerformAction(ac.libBindings)
 }
 
 func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {

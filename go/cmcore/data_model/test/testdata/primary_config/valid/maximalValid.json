@@ -61,6 +61,10 @@
             "trigger1": {
                 "eventName": "custom_event",
                 "actionName": "bannerAction1"
+            },
+            "trigger_alert": {
+                "eventName": "custom_event_alert",
+                "actionName": "alertAction"
             }
         }
     }

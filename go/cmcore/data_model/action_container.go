@@ -2,6 +2,7 @@ package datamodel
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -40,16 +41,18 @@ type jsonActionContainer struct {
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
-// Option one: unpacker interface. Classes. Map of instances
-// Option two: the main class implements the methods
-// - weird part: what's in map? AlertAction{}? Can we have map to class? Can the unpack method
-// be added to interface if there isn't an
-// Also want to get rid of the list of pointers... generic
+// To be implemented by client libaray (eg: iOS SDK)
+type ActionBindings interface {
+	// Actions
+	ShowBanner(banner *BannerAction) error
+	ShowAlert(alert *AlertAction) error
+}
 
 type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
 	ValidateReturningUserReadableIssue() string
+	PerformAction(ActionBindings) error
 }
 
 var (
@@ -58,8 +61,6 @@ var (
 		ActionTypeEnumAlert:  unpackAlertFromJson,
 	}
 )
-
-//ActionTypeEnumAlert: AlertAction,
 
 func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	// docs suggest no-op for empty data
@@ -108,4 +109,11 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	// TODO: losing the validation that one of the strong pointers is populated. Tests enough?
 
 	return ac.actionData.ValidateReturningUserReadableIssue()
+}
+
+func (ac *ActionContainer) PerformAction(ab ActionBindings) error {
+	if ac.actionData == nil {
+		return errors.New("Attempted to perform action without AD interface")
+	}
+	return ac.actionData.PerformAction(ab)
 }

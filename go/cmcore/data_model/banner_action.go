@@ -92,3 +92,7 @@ func (b *BannerAction) AllEmbeddedActionNames() ([]string, error) {
 	return []string{b.TapActionName}, nil
 
 }
+
+func (b *BannerAction) PerformAction(ab ActionBindings) error {
+	return ab.ShowBanner(b)
+}

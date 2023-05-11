@@ -200,3 +200,7 @@ func (a *AlertAction) AllEmbeddedActionNames() ([]string, error) {
 	}
 	return alertActions, nil
 }
+
+func (a *AlertAction) PerformAction(ab ActionBindings) error {
+	return ab.ShowAlert(a)
+}

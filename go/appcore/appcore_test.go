@@ -37,11 +37,16 @@ func TestUrlValidation(t *testing.T) {
 
 type testLibBindings struct {
 	lastBannerAction *datamodel.BannerAction
+	lastAlertAction  *datamodel.AlertAction
 	defaultTheme     *datamodel.Theme
 }
 
 func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction) error {
 	lb.lastBannerAction = b
+	return nil
+}
+func (lb *testLibBindings) ShowAlert(a *datamodel.AlertAction) error {
+	lb.lastAlertAction = a
 	return nil
 }
 func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
