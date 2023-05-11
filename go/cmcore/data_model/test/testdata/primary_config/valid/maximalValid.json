@@ -53,6 +53,12 @@
                 "actionData": {
                     "title": "Alert title"
                 }
+            },
+            "linkAction": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io"
+                }
             }
         }
     },
