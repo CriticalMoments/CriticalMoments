@@ -31,8 +31,8 @@ type ActionContainer struct {
 	BannerAction *BannerAction
 	AlertAction  *AlertAction
 
-	// generalized interface all of above, for functions we need for all actions types
-	// Typically a pointer to the one value above that is populated
+	// generalized interface for functions we need for any actions type.
+	// Typically a pointer to the one value above that is populated.
 	actionData ActionTypeInterface
 }
 
@@ -98,15 +98,11 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 		return "Internal error. Code 776232923."
 	}
 
-	// TODO check it's registered in system
-
 	if ac.actionData == nil {
 		// the action type data interface should be set after unmarshaling.
 		// This is a code issue if it occurs, not a data issue
 		return fmt.Sprintf("Action type %v has internal issues", ac.ActionType)
 	}
-
-	// TODO: losing the validation that one of the strong pointers is populated. Tests enough?
 
 	return ac.actionData.ValidateReturningUserReadableIssue()
 }

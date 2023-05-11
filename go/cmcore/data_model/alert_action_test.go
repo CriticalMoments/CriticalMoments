@@ -2,8 +2,11 @@ package datamodel
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
+
+	"golang.org/x/exp/slices"
 )
 
 func TestActionValidators(t *testing.T) {
@@ -141,7 +144,28 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 	if cb3.Label != "Custom 3" || cb3.ActionName != "event3" || cb3.Style != AlertActionButtonStyleEnumNormal {
 		t.Fatal()
 	}
+
+	// Theme names
+	themes, err := a.AllEmbeddedThemeNames()
+	if err != nil || len(themes) > 0 {
+		t.Fatal("alerts don't have themes!")
+	}
+	// Embedded action names
+	actions, err := a.AllEmbeddedActionNames()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedActions := []string{"custom_event", "event1", "event2", "event3"}
+	for _, expected := range expectedActions {
+		if !slices.Contains(actions, expected) {
+			t.Fatal(fmt.Sprintf("Expected %v but missing", expected))
+		}
+	}
+	if len(actions) != len(expectedActions) {
+		t.Fatal()
+	}
 }
+
 func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/alert/valid/minimalValidAlert.json")
 	if err != nil {

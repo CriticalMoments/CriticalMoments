@@ -187,7 +187,6 @@ func (a *AlertAction) AllEmbeddedThemeNames() ([]string, error) {
 	return []string{}, nil
 }
 
-// TODO Test this
 func (a *AlertAction) AllEmbeddedActionNames() ([]string, error) {
 	alertActions := []string{}
 	if a.OkButtonActionName != "" {
