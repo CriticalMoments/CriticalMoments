@@ -34,8 +34,8 @@ func (l *LinkAction) ValidateReturningUserReadableIssue() string {
 	}
 	url, err := url.Parse(l.UrlString)
 	// We don't want to accept schemeless URLs ("/local/path")
-	// We don't want to accept opaque URLs ("scheme:path") https://pkg.go.dev/net/url#URL
-	if err != nil || url == nil || url.Scheme == "" || url.Opaque != "" {
+	// We do accept "Opaque" URLs as iOS uses this ("app-settings:root=Sounds") https://pkg.go.dev/net/url#URL
+	if err != nil || url == nil || url.Scheme == "" {
 		return fmt.Sprintf("Link action url string is not a valid URL: \"%v\"", l.UrlString)
 	}
 

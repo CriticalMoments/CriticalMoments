@@ -98,6 +98,7 @@ static CMLibBindings *sharedInstance = nil;
         return NO;
     }
 
+    // TODO in app browser option
     [UIApplication.sharedApplication openURL:url
                                      options:@{}
                            completionHandler:nil];

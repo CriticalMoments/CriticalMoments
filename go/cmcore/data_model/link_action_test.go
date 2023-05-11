@@ -15,9 +15,9 @@ func TestLinkActionValidators(t *testing.T) {
 	if l.Validate() {
 		t.Fatal("Links require a valid url and should not validate")
 	}
-	l.UrlString = "custom:asdf"
-	if l.Validate() {
-		t.Fatal("Links require a valid :// and should not validate")
+	l.UrlString = "app-settings:root=Photos"
+	if !l.Validate() {
+		t.Fatal("Link vaidation failed for valid opaque url")
 	}
 	l.UrlString = "/Local/Urls/Dont/Count"
 	if l.Validate() {

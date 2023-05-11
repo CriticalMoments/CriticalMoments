@@ -147,6 +147,12 @@
                     "url": "https://criticalmoments.io"
                 }
             },
+            "settings_link_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "app-settings:"
+                }
+            },
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
