@@ -7,7 +7,7 @@
             {
                 "label": "Custom 1",
                 "actionName": "event1",
-                "style": "primary"
+                "style": "default"
             }
         ]
     }

@@ -20,14 +20,86 @@
                     "body": "A banner from config with a custom theme/action. Tap me!",
                     "showDismissButton": true,
                     "customThemeName": "blackAndWhiteTheme",
-                    "tapActionName": "nestedBannerAction"
+                    "tapActionName": "bannerAlertAction"
                 }
             },
-            "nestedBannerAction": {
-                "actionType": "banner",
+            "bannerAlertAction": {
+                "actionType": "alert",
                 "actionData": {
-                    "body": "Banner from a banner tap?! Wow.",
-                    "showDismissButton": true
+                    "title": "You clicked a banner!",
+                    "message": "Did you know the tap action is also controled by remote config? Because it is!"
+                }
+            },
+            "show_notice_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "A simple notice alert",
+                    "message": "Title, message, okay button. You get the idea!"
+                }
+            },
+            "show_cancelable_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "A cancelable alert",
+                    "message": "An alert with a cancel button... not exactly rocket science.\n\nTry both buttons to see what they do.",
+                    "showCancelButton": true,
+                    "okButtonActionName": "nested_alert"
+                }
+            },
+            "custom_button_alert_large": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Action sheet deep dive",
+                    "message": "This is an action sheet with several options.\n\nEach can launch a custom action!",
+                    "showOkButton": false,
+                    "showCancelButton": true,
+                    "style": "large",
+                    "customButtons": [
+                        {
+                            "label": "Button 1",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Button 2",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Scary button",
+                            "actionName": "nested_alert",
+                            "style": "destructive"
+                        }
+                    ]
+                }
+            },
+            "custom_button_alert_dialog": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Lots of options",
+                    "message": "This is an alert with several options. Consider style='large' for multiple options as it may be cleaner UI!",
+                    "showOkButton": false,
+                    "showCancelButton": true,
+                    "customButtons": [
+                        {
+                            "label": "Button 1",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Button 2",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Big red button",
+                            "actionName": "nested_alert",
+                            "style": "destructive"
+                        }
+                    ]
+                }
+            },
+            "nested_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Nested action alert",
+                    "message": "Whoa... you got a follow up action from tapping something... entirely from config.\n\n\nRadical man."
                 }
             }
         }

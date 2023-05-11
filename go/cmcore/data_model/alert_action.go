@@ -47,10 +47,8 @@ type AlertAction struct {
 }
 
 const (
-	// IOS =, Android = Neutral
-	AlertActionButtonStyleEnumNormal      string = "normal"
+	AlertActionButtonStyleEnumNormal      string = "default"
 	AlertActionButtonStyleEnumDestructive string = "destructive"
-	AlertActionButtonStyleEnumPrimary     string = "primary"
 )
 
 type AlertActionCustomButton struct {
@@ -119,8 +117,8 @@ func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
 	if b.Label == "" {
 		return "Custom alert buttons must have a label"
 	}
-	if b.Style != AlertActionButtonStyleEnumNormal && b.Style != AlertActionButtonStyleEnumPrimary && b.Style != AlertActionButtonStyleEnumDestructive {
-		return "Custom alert buttons must have a valid style: normal, destuctive, primary"
+	if b.Style != AlertActionButtonStyleEnumNormal && b.Style != AlertActionButtonStyleEnumDestructive {
+		return "Custom alert buttons must have a valid style: default or destuctive"
 	}
 
 	return ""
@@ -202,4 +200,12 @@ func (a *AlertAction) AllEmbeddedActionNames() ([]string, error) {
 
 func (a *AlertAction) PerformAction(ab ActionBindings) error {
 	return ab.ShowAlert(a)
+}
+
+func (a *AlertAction) CustomButtonsCount() int {
+	return len(a.CustomButtons)
+}
+
+func (a *AlertAction) CustomButtonAtIndex(i int) *AlertActionCustomButton {
+	return a.CustomButtons[i]
 }

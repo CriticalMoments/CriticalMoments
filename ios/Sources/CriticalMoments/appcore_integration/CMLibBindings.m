@@ -7,6 +7,8 @@
 
 #import "CMLibBindings.h"
 
+#import "../messaging/CMAlert.h"
+#import "../messaging/CMAlert_private.h"
 #import "../messaging/CMBannerManager.h"
 #import "../messaging/CMBannerMessage.h"
 #import "../messaging/CMBannerMessage_private.h"
@@ -74,6 +76,16 @@ static CMLibBindings *sharedInstance = nil;
 
     // TODO: main thread?
     [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+}
+
+- (BOOL)showAlert:(DatamodelAlertAction *_Nullable)alertDataModel
+            error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    if (!alertDataModel) {
+        *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
+        return;
+    }
+    CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
+    [alert showAlert];
 }
 
 @end

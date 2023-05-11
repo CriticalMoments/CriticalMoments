@@ -10,6 +10,9 @@
 #import "Utils.h"
 
 @import UIKit;
+@import CriticalMoments;
+// TODO -- shouldn't be able to import Appcore
+@import Appcore;
 
 @interface CMDemoAction ()
 
@@ -30,6 +33,15 @@
         [self.actionDelegate performAction];
     } else if (self.actionNextScreen) {
         [self pushNextScreen];
+    } else if (self.actionCMEventName) {
+        [CriticalMoments sendEvent:self.actionCMEventName];
+    } else if (self.actionCMActionName) {
+        NSError *error;
+        [AppcoreSharedAppcore() performNamedAction:self.actionCMActionName
+                                             error:&error];
+        if (error) {
+            NSLog(@"SampleApp: Menu tap action unknown issue: %@", error);
+        }
     } else if (self.actionBlock) {
         self.actionBlock();
     } else if (self.actionTarget && self.actionSelector) {
