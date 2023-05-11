@@ -68,7 +68,7 @@ static CMLibBindings *sharedInstance = nil;
              error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
-        return;
+        return NO;
     }
 
     CMBannerMessage *bannerMessage =
@@ -76,16 +76,32 @@ static CMLibBindings *sharedInstance = nil;
 
     // TODO: main thread?
     [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    return YES;
 }
 
 - (BOOL)showAlert:(DatamodelAlertAction *_Nullable)alertDataModel
             error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!alertDataModel) {
         *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
-        return;
+        return NO;
     }
     CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
     [alert showAlert];
+    return YES;
+}
+
+- (BOOL)showLink:(DatamodelLinkAction *)link
+           error:(NSError *_Nullable __autoreleasing *)error {
+    NSURL *url = [NSURL URLWithString:link.urlString];
+    if (!url || !url.scheme) {
+        *error = [NSError errorWithDomain:@"CMIOS" code:72937634 userInfo:nil];
+        return NO;
+    }
+
+    [UIApplication.sharedApplication openURL:url
+                                     options:@{}
+                           completionHandler:nil];
+    return YES;
 }
 
 @end

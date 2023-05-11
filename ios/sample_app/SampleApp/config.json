@@ -141,6 +141,12 @@
                     ]
                 }
             },
+            "web_link_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io"
+                }
+            },
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
