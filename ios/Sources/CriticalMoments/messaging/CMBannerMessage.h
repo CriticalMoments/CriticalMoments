@@ -13,6 +13,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Enumeration of CMBannerMannager positions
+ @see CMBannerManager.appWideBannerPosition
+ @see CMBannerMessage.bannerPosition
+ */
+typedef NS_ENUM(NSUInteger, CMBannerPosition) {
+    /// Position banners at the bottom of the key window
+    CMBannerPositionBottom,
+    /// Position banners at the top of the key window
+    CMBannerPositionTop
+};
+
 @class CMBannerMessage;
 
 /**
@@ -56,6 +68,25 @@ NS_ASSUME_NONNULL_BEGIN
  @param body The body text to be rendered in the banner
  */
 - (instancetype)initWithBody:(NSString *)body;
+
+#pragma mark Position
+
+/**
+ The position to show this banner: the top or bottom of the screen.
+
+ If multiple banners are presented, the position of the last banner shown is
+ used for all banners. You can't have both bottom and top at the same time.
+
+ @see CMBannerManagerappWideBannerPosition for changing the app wide banner
+ position any time, independent of any single banner message.
+ @warning Be sure to test your app renders well with the chosen position. The
+ banner manager will resize your root view controller to make room for the
+ banner; if you've hard coded offsets, for example the notch or dyamic island,
+ then your app layout may be a bit strange. If you encounter issues, you should
+ adapt use apple layout guides for any offsets, which will solve most of these
+ issues and help on future hardware.
+ */
+@property(nonatomic) CMBannerPosition bannerPosition;
 
 #pragma mark Theme
 

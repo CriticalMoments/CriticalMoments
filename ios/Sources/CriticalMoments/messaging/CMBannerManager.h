@@ -11,17 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- Enumeration of CMBannerMannager positions
- @see CMBannerManager.appWideBannerPosition
- */
-typedef NS_ENUM(NSUInteger, CMBannerPosition) {
-    /// Position banners at the bottom of the key window
-    CMBannerPositionBottom,
-    /// Position banners at the top of the key window
-    CMBannerPositionTop
-};
-
 // clang-format off
 /**
  Manages the presentation of banner messages across your app.
@@ -63,6 +52,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  adapt use apple layout guides for any offsets, which will solve most of these
  issues and help on future hardware.
  @see CMBannerPosition enumeration
+ @see CMBannerMessage.bannerPosition to set the position of a specific message
  */
 @property(nonatomic) CMBannerPosition appWideBannerPosition;
 

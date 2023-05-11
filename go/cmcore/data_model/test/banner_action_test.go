@@ -16,12 +16,28 @@ func TestInvalidBannerMissingField(t *testing.T) {
 		t.Fatal("Banners should require body")
 	}
 	b.Body = "Banner body"
+	if b.Validate() {
+		t.Fatal("Banners should require position")
+	}
+	b.Position = datamodel.BannerPositionTop
 	if !b.Validate() {
 		t.Fatal("Minimal banner failed validation")
 	}
 	b.MaxLineCount = -2
 	if b.Validate() {
 		t.Fatal("Banner allowed negative max line count")
+	}
+	b.MaxLineCount = 4
+	if !b.Validate() {
+		t.Fatal("Minimal banner failed validation")
+	}
+	b.Position = ""
+	if b.Validate() {
+		t.Fatal("Banner allowed empty position")
+	}
+	b.Position = "invalid"
+	if b.Validate() {
+		t.Fatal("Banner allowed invalid position")
 	}
 }
 

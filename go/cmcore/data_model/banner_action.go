@@ -1,9 +1,15 @@
 package datamodel
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 const BannerMaxLineCountSystemDefault = -1
 const BannerMaxLineCountSystemUnlimited = 0
+
+const BannerPositionTop = "top"
+const BannerPositionBottom = "bottom"
 
 type BannerAction struct {
 	Body              string
@@ -11,14 +17,16 @@ type BannerAction struct {
 	MaxLineCount      int
 	TapActionName     string
 	CustomThemeName   string
+	Position          string
 }
 
 type jsonBannerAction struct {
-	Body              string `json:"body"`
-	ShowDismissButton *bool  `json:"showDismissButton,omitempty"`
-	MaxLineCount      *int   `json:"maxLineCount,omitempty"`
-	TapActionName     string `json:"tapActionName,omitempty"`
-	CustomThemeName   string `json:"customThemeName,omitempty"`
+	Body              string  `json:"body"`
+	ShowDismissButton *bool   `json:"showDismissButton,omitempty"`
+	MaxLineCount      *int    `json:"maxLineCount,omitempty"`
+	TapActionName     string  `json:"tapActionName,omitempty"`
+	CustomThemeName   string  `json:"customThemeName,omitempty"`
+	Position          *string `json:"position,omitempty"`
 }
 
 func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
@@ -44,6 +52,9 @@ func (b BannerAction) ValidateReturningUserReadableIssue() string {
 		// Not user facing or a value they should put in json or see in libraries
 		return "Banner max line count must be a positive integer, or 0 for no limit"
 	}
+	if b.Position != BannerPositionTop && b.Position != BannerPositionBottom {
+		return fmt.Sprintf("Banner position must be top or bottom. \"%v\" is not valid", b.Position)
+	}
 
 	return ""
 }
@@ -64,12 +75,17 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	if ja.MaxLineCount != nil {
 		maxLineCount = *ja.MaxLineCount
 	}
+	position := BannerPositionBottom
+	if ja.Position != nil {
+		position = *ja.Position
+	}
 
 	banner.Body = ja.Body
 	banner.ShowDismissButton = showDismissButton
 	banner.MaxLineCount = maxLineCount
 	banner.TapActionName = ja.TapActionName
 	banner.CustomThemeName = ja.CustomThemeName
+	banner.Position = position
 
 	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)

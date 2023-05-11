@@ -27,6 +27,7 @@
     if (self) {
         self.body = body;
         self.showDismissButton = YES;
+        self.bannerPosition = CMBannerPositionBottom;
     }
     return self;
 }
@@ -48,6 +49,11 @@
             CMTheme *customTheme =
                 [CMTheme namedThemeFromAppcore:bannerData.customThemeName];
             self.customTheme = customTheme;
+        }
+        if ([DatamodelBannerPositionTop isEqualToString:bannerData.position]) {
+            self.bannerPosition = CMBannerPositionTop;
+        } else {
+            self.bannerPosition = CMBannerPositionBottom;
         }
     }
     return self;

@@ -30,51 +30,6 @@
 
 - (void)buildSections {
 
-    // Basics
-
-    CMDemoAction *shortBannerAction = [[CMDemoAction alloc] init];
-    shortBannerAction.title = @"Show Short Banner";
-    shortBannerAction.subtitle =
-        @"Display a short single line banner, across entire app";
-    [shortBannerAction addTarget:self action:@selector(showShortMessage)];
-
-    CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
-    longBannerAction.title = @"Show Long Banner";
-    longBannerAction.subtitle =
-        @"Display a long banner message, across entire app";
-    [longBannerAction addTarget:self action:@selector(showLongMessage)];
-
-    CMDemoAction *veryLongBannerAction = [[CMDemoAction alloc] init];
-    veryLongBannerAction.title = @"Show Very Long Banner";
-    veryLongBannerAction.subtitle =
-        @"Display a very long banner message, across entire app";
-    [veryLongBannerAction addTarget:self action:@selector(showVeryLongMessage)];
-
-    CMDemoAction *appcoreBannerAction = [[CMDemoAction alloc] init];
-    appcoreBannerAction.title = @"Show Banner from Config";
-    appcoreBannerAction.subtitle =
-        @"Display a banner built from config with custom theme and action";
-    [appcoreBannerAction addTarget:self action:@selector(showAppcoreBanner)];
-
-    [self addSection:@"App Wide Banners"
-         withActions:@[
-             shortBannerAction, longBannerAction, veryLongBannerAction,
-             appcoreBannerAction
-         ]];
-
-    // Position
-
-    CMDemoAction *swapPosition = [[CMDemoAction alloc] init];
-    swapPosition.title = @"Swap banner position";
-    swapPosition.subtitle =
-        @"Swap the banner location between the top and bottom.";
-    [swapPosition addTarget:self action:@selector(swapBannerPosition)];
-
-    [self addSection:@"Banners Position"
-         withActions:@[
-             swapPosition,
-         ]];
-
     // Mangement
 
     CMDemoAction *clearAllBanners = [[CMDemoAction alloc] init];
@@ -84,53 +39,91 @@
       [CMBannerManager.shared removeAllAppWideMessages];
     };
 
-    [self addSection:@"Banners Management"
+    [self addSection:@"Banner Management"
          withActions:@[
              clearAllBanners,
          ]];
 
+    // Basics
+
+    CMDemoAction *shortBannerAction = [[CMDemoAction alloc] init];
+    shortBannerAction.title = @"Short Banner";
+    shortBannerAction.subtitle =
+        @"Display a short single line banner, in the default theme";
+    shortBannerAction.actionCMActionName = @"short_banner";
+
+    CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
+    longBannerAction.title = @"Long Banner";
+    longBannerAction.subtitle = @"Display a long banner message which will "
+                                @"grow to line wrap, in the default theme";
+    longBannerAction.actionCMActionName = @"long_banner";
+
+    CMDemoAction *veryLongBannerAction = [[CMDemoAction alloc] init];
+    veryLongBannerAction.title = @"Very Long Banner";
+    veryLongBannerAction.subtitle = @"Display a very long banner message which "
+                                    @"will get truncated, in the default theme";
+    veryLongBannerAction.actionCMActionName = @"very_long_banner";
+
+    [self addSection:@"App Wide Banners"
+         withActions:@[
+             shortBannerAction, longBannerAction, veryLongBannerAction
+         ]];
+
+    // Position
+
+    CMDemoAction *topBanner = [[CMDemoAction alloc] init];
+    topBanner.title = @"Top Banner";
+    topBanner.subtitle =
+        @"Display a banner on the top of the app, in the default theme";
+    topBanner.actionCMActionName = @"top_banner";
+
+    CMDemoAction *swapPosition = [[CMDemoAction alloc] init];
+    swapPosition.title = @"Swap banner position";
+    swapPosition.subtitle =
+        @"Swap the banner location between the top and bottom.";
+    [swapPosition addTarget:self action:@selector(swapBannerPosition)];
+
+    [self addSection:@"Banners Position"
+         withActions:@[
+             topBanner,
+             swapPosition,
+         ]];
+
     // Display Options
+
+    CMDemoAction *customThemeBanner = [[CMDemoAction alloc] init];
+    customThemeBanner.title = @"Custom Theme Banner";
+    customThemeBanner.subtitle =
+        @"Display a banner built from config with custom theme and action";
+    customThemeBanner.actionCMActionName = @"custom_theme_banner";
 
     CMDemoAction *undismissableBanner = [[CMDemoAction alloc] init];
     undismissableBanner.title = @"Show undismissable banner";
     undismissableBanner.subtitle =
         @"Show a banner that doesn't have an X to dismiss";
-    [undismissableBanner addTarget:self
-                            action:@selector(showUndismissableBanner)];
+    undismissableBanner.actionCMActionName = @"undismissable_banner";
 
     CMDemoAction *singleLineAction = [[CMDemoAction alloc] init];
     singleLineAction.title = @"Show single line banner";
     singleLineAction.subtitle =
-        @"Show a banner that truncates using `maxLineCount`";
-    [singleLineAction addTarget:self action:@selector(showSingleLineMessage)];
+        @"Show a banner that truncates using `maxLineCount` option";
+    singleLineAction.actionCMActionName = @"single_line_banner";
 
     [self addSection:@"Banners Display Options"
-         withActions:@[ undismissableBanner, singleLineAction ]];
-}
+         withActions:@[
+             customThemeBanner, undismissableBanner, singleLineAction
+         ]];
 
-- (void)showShortMessage {
-    [self showAppWideBanner:@"Short message"];
-}
+    // Hardcoded
 
-- (void)showLongMessage {
-    [self showAppWideBanner:@"Welcome to critical moments! App wide banners "
-                            @"can give your users critical information."];
-}
+    CMDemoAction *codeBanner = [[CMDemoAction alloc] init];
+    codeBanner.title = @"Hardcoded banner";
+    codeBanner.subtitle =
+        @"Show a banner using code instead of config. The banner's apearance "
+        @"and action are hardcoded in this sample app.";
+    [codeBanner addTarget:self action:@selector(showMessageFromCode)];
 
-- (void)showVeryLongMessage {
-    [self showAppWideBanner:
-              @"Welcome to critical moments! App wide banners can give your "
-              @"users critical information. This one happens to be really "
-              @"really long, and will probably be truncated eventually. It was "
-              @"the best of times, it was the worst of times, it was the age "
-              @"of wisdom, it was the age of foolishness, it was the epoch of "
-              @"belief, it was the epoch of incredulity, it was the season of "
-              @"light, it was the season of darkness, it was the spring of "
-              @"hope, it was the winter of despair"];
-}
-
-- (void)showAppcoreBanner {
-    [CriticalMoments sendEvent:@"show_banner"];
+    [self addSection:@"Banners from Code" withActions:@[ codeBanner ]];
 }
 
 - (void)swapBannerPosition {
@@ -141,24 +134,10 @@
     }
 }
 
-- (void)showUndismissableBanner {
-    CMBannerMessage *bannerMessage =
-        [[CMBannerMessage alloc] initWithBody:@"You are stuck with me."];
-    bannerMessage.actionDelegate = self;
-    bannerMessage.showDismissButton = NO;
-    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
-}
-
-- (void)showSingleLineMessage {
-    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc]
-        initWithBody:@"This message will truncate after the first line, unlike "
-                     @"the default."];
-    bannerMessage.actionDelegate = self;
-    bannerMessage.maxLineCount = @1;
-    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
-}
-
-- (void)showAppWideBanner:(NSString *)messageString {
+- (void)showMessageFromCode {
+    NSString *messageString =
+        @"This banner is created in code instead of config. The same options "
+        @"are available in code if you need them.";
     self.counter += 1;
     NSString *messageStingWithCount = [NSString
         stringWithFormat:@"(%ld) %@", (long)self.counter, messageString];

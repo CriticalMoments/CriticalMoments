@@ -67,8 +67,6 @@
         cell =
             [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                    reuseIdentifier:DEMO_CELL_REUSE_ID];
-    } else {
-        NSLog(@"reuse!");
     }
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;

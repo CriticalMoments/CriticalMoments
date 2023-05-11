@@ -14,12 +14,56 @@
     },
     "actions": {
         "namedActions": {
-            "testBannerAction": {
+            "short_banner": {
                 "actionType": "banner",
                 "actionData": {
-                    "body": "A banner from config with a custom theme/action. Tap me!",
-                    "showDismissButton": true,
+                    "body": "A short banner!",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "long_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Welcome to critical moments! App wide banners can give your users crucial information.",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "very_long_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Welcome to critical moments! App wide banners can give your users crucial information. This one happens to be really really long, and will probably be truncated eventually. It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness, it was the spring of hope, it was the winter of despair",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "custom_theme_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "This banner has a custom theme+action set in config. Tap me!",
                     "customThemeName": "blackAndWhiteTheme",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "top_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "This banner will appear at the top! Any banner can specify top or bottom position.",
+                    "position": "top",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "undismissable_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "You are stuck with me... unless you use the \"Clear all banners\" action",
+                    "showDismissButton": false,
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "single_line_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "This message will truncate after the first line, unlike the default of 4 lines.",
+                    "maxLineCount": 1,
                     "tapActionName": "nested_alert"
                 }
             },
@@ -110,7 +154,7 @@
         "namedTriggers": {
             "bannerTestTrigger": {
                 "eventName": "show_banner",
-                "actionName": "testBannerAction"
+                "actionName": "custom_theme_banner"
             }
         }
     }

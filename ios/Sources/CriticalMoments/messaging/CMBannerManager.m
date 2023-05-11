@@ -64,7 +64,11 @@ static CMBannerManager *sharedInstance = nil;
         }
 
         _currentMessage = message;
-        [self renderForCurrentState];
+        bool rendered = [self
+            setAppWideBannerPositionReturningRendered:message.bannerPosition];
+        if (!rendered) {
+            [self renderForCurrentState];
+        }
     }
 }
 
@@ -89,12 +93,18 @@ static CMBannerManager *sharedInstance = nil;
 }
 
 - (void)setAppWideBannerPosition:(CMBannerPosition)appWideBannerPosition {
+    [self setAppWideBannerPositionReturningRendered:appWideBannerPosition];
+}
+
+- (bool)setAppWideBannerPositionReturningRendered:
+    (CMBannerPosition)appWideBannerPosition {
     if (appWideBannerPosition == _appWideBannerPosition) {
-        return;
+        return NO;
     }
     _appWideBannerPosition = appWideBannerPosition;
     [self removeAppWideBannerContainer];
     [self renderForCurrentState];
+    return YES;
 }
 
 - (void)renderForCurrentState {
