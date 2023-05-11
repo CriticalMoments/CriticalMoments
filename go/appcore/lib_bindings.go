@@ -13,7 +13,7 @@ type LibBindings interface {
 	SetDefaultTheme(theme *datamodel.Theme) error
 
 	// Actions
-	ShowBanner(banner *datamodel.BannerAction) error
+	datamodel.ActionBindings
 }
 
 func dispatchActionToLib(action *datamodel.ActionContainer, lb LibBindings) error {

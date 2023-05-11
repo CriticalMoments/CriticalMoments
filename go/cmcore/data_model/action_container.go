@@ -26,15 +26,41 @@ const (
 type ActionContainer struct {
 	ActionType string
 
+	// Strongly typed action data
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
 	AlertAction  *AlertAction
+
+	// generalized interface for functions we need for any actions type.
+	// Typically a pointer to the one value above that is populated.
+	actionData ActionTypeInterface
 }
 
 type jsonActionContainer struct {
 	ActionType    string          `json:"actionType"`
 	RawActionData json.RawMessage `json:"actionData"`
 }
+
+// To be implemented by client libaray (eg: iOS SDK)
+type ActionBindings interface {
+	// Actions
+	ShowBanner(banner *BannerAction) error
+	ShowAlert(alert *AlertAction) error
+}
+
+type ActionTypeInterface interface {
+	AllEmbeddedThemeNames() ([]string, error)
+	AllEmbeddedActionNames() ([]string, error)
+	ValidateReturningUserReadableIssue() string
+	PerformAction(ActionBindings) error
+}
+
+var (
+	actionTypeRegistry = map[string]func(json.RawMessage, *ActionContainer) (ActionTypeInterface, error){
+		ActionTypeEnumBanner: unpackBannerFromJson,
+		ActionTypeEnumAlert:  unpackAlertFromJson,
+	}
+)
 
 func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	// docs suggest no-op for empty data
@@ -48,93 +74,42 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	switch jac.ActionType {
-	case ActionTypeEnumBanner:
-		var banner BannerAction
-		err = json.Unmarshal(jac.RawActionData, &banner)
-		if err != nil {
-			return err
-		}
-		ac.BannerAction = &banner
-		ac.ActionType = ActionTypeEnumBanner
-	case ActionTypeEnumAlert:
-		var alert AlertAction
-		err = json.Unmarshal(jac.RawActionData, &alert)
-		if err != nil {
-			return err
-		}
-		ac.AlertAction = &alert
-		ac.ActionType = ActionTypeEnumAlert
-	default:
+	unpacker, ok := actionTypeRegistry[jac.ActionType]
+	if !ok || unpacker == nil {
 		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
 	}
 
+	actionData, err := unpacker(jac.RawActionData, ac)
+	if err != nil {
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+	}
+	ac.actionData = actionData
+	ac.ActionType = jac.ActionType
 	return nil
-}
-
-func (ac *ActionContainer) AllEmbeddedThemeNames() ([]string, error) {
-	if ac.ActionType == "" {
-		return nil, errors.New("AllEmbeddedThemeNames called on an uninitialized action continer")
-	}
-
-	switch ac.ActionType {
-	case ActionTypeEnumBanner:
-		if ac.BannerAction.CustomThemeName == "" {
-			return []string{}, nil
-		}
-		return []string{ac.BannerAction.CustomThemeName}, nil
-	case ActionTypeEnumAlert:
-		return []string{}, nil
-	default:
-		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
-	}
-}
-
-func (ac *ActionContainer) AllEmbeddedActionNames() ([]string, error) {
-	if ac.ActionType == "" {
-		return nil, errors.New("AllEmbeddedActionNames called on an uninitialized action continer")
-	}
-
-	switch ac.ActionType {
-	case ActionTypeEnumBanner:
-		if ac.BannerAction.TapActionName == "" {
-			return []string{}, nil
-		}
-		return []string{ac.BannerAction.TapActionName}, nil
-	case ActionTypeEnumAlert:
-		// TODO: test in alert_action_test once we generalize
-		alertActions := []string{}
-		if ac.AlertAction.OkButtonActionName != "" {
-			alertActions = append(alertActions, ac.AlertAction.OkButtonActionName)
-		}
-		for _, customButton := range ac.AlertAction.CustomButtons {
-			if customButton.ActionName != "" {
-				alertActions = append(alertActions, customButton.ActionName)
-			}
-		}
-		return alertActions, nil
-	default:
-		return nil, NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType))
-	}
 }
 
 func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	if ac.ActionType == "" {
 		return "Empty actionType"
 	}
-
-	switch ac.ActionType {
-	case ActionTypeEnumBanner:
-		if ac.BannerAction == nil {
-			return "Missing valid banner action data when actionType=banner"
-		}
-		return ac.BannerAction.ValidateReturningUserReadableIssue()
-	case ActionTypeEnumAlert:
-		if ac.AlertAction == nil {
-			return "Missing valid banner action data when actionType=alert"
-		}
-		return ac.AlertAction.ValidateReturningUserReadableIssue()
-	default:
-		return fmt.Sprintf("Unsupported action type: \"%v\"", ac.ActionType)
+	// Check the type hasn't been changed to something unsupported
+	_, ok := actionTypeRegistry[ac.ActionType]
+	if !ok {
+		return "Internal error. Code 776232923."
 	}
+
+	if ac.actionData == nil {
+		// the action type data interface should be set after unmarshaling.
+		// This is a code issue if it occurs, not a data issue
+		return fmt.Sprintf("Action type %v has internal issues", ac.ActionType)
+	}
+
+	return ac.actionData.ValidateReturningUserReadableIssue()
+}
+
+func (ac *ActionContainer) PerformAction(ab ActionBindings) error {
+	if ac.actionData == nil {
+		return errors.New("Attempted to perform action without AD interface")
+	}
+	return ac.actionData.PerformAction(ab)
 }

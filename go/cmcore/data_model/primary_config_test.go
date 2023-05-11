@@ -72,12 +72,16 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Triggers
-	if len(pc.namedTriggers) != 1 {
+	if len(pc.namedTriggers) != 2 {
 		t.Fatal("Wrong trigger count")
 	}
 	trigger1 := pc.namedTriggers["trigger1"]
 	if trigger1.ActionName != "bannerAction1" || trigger1.EventName != "custom_event" {
 		t.Fatal("Trigger 1 parsing failed")
+	}
+	trigger2 := pc.namedTriggers["trigger_alert"]
+	if trigger2.ActionName != "alertAction" || trigger2.EventName != "custom_event_alert" {
+		t.Fatal("Trigger 2 parsing failed")
 	}
 }
 
@@ -150,6 +154,7 @@ func TestNoNamedActions(t *testing.T) {
 	}
 
 	delete(pc.namedTriggers, "trigger1")
+	delete(pc.namedTriggers, "trigger_alert")
 	if !pc.Validate() {
 		t.Fatal("empty actions should be allowed")
 	}

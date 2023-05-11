@@ -180,7 +180,10 @@ func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable(
 
 func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	for sourceActionName, action := range pc.namedActions {
-		themeList, err := action.AllEmbeddedThemeNames()
+		if action.ActionType == "" || action.actionData == nil {
+			return "Internal issue. Code 15234328"
+		}
+		themeList, err := action.actionData.AllEmbeddedThemeNames()
 		if err != nil || themeList == nil {
 			return fmt.Sprintf("Internal issue for action \"%v\". Code: 88456198", sourceActionName)
 		}
@@ -206,7 +209,10 @@ func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() stri
 
 	// validate any named actions embedded in other actions actually exist
 	for sourceActionName, action := range pc.namedActions {
-		actionList, err := action.AllEmbeddedActionNames()
+		if action.ActionType == "" || action.actionData == nil {
+			return "Internal issue. Code 98347134"
+		}
+		actionList, err := action.actionData.AllEmbeddedActionNames()
 		if err != nil || actionList == nil {
 			return fmt.Sprintf("Internal issue for action \"%v\". Code: 798853616", sourceActionName)
 		}

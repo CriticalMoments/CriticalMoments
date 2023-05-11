@@ -21,6 +21,16 @@ type jsonBannerAction struct {
 	CustomThemeName   string `json:"customThemeName,omitempty"`
 }
 
+func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
+	var banner BannerAction
+	err := json.Unmarshal(rawJson, &banner)
+	if err != nil {
+		return nil, err
+	}
+	ac.BannerAction = &banner
+	return &banner, nil
+}
+
 func (ba BannerAction) Validate() bool {
 	return ba.ValidateReturningUserReadableIssue() == ""
 }
@@ -66,4 +76,23 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (b *BannerAction) AllEmbeddedThemeNames() ([]string, error) {
+	if b.CustomThemeName == "" {
+		return []string{}, nil
+	}
+	return []string{b.CustomThemeName}, nil
+}
+
+func (b *BannerAction) AllEmbeddedActionNames() ([]string, error) {
+	if b.TapActionName == "" {
+		return []string{}, nil
+	}
+	return []string{b.TapActionName}, nil
+
+}
+
+func (b *BannerAction) PerformAction(ab ActionBindings) error {
+	return ab.ShowBanner(b)
 }
