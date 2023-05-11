@@ -10,7 +10,65 @@
 #include "ref.h"
 #include "Universe.objc.h"
 
+#include "Cmcore.objc.h"
+#include "Datamodel.objc.h"
+
+@class AppcoreAppcore;
+@protocol AppcoreLibBindings;
+@class AppcoreLibBindings;
+
+@protocol AppcoreLibBindings <NSObject>
+/**
+ * Themes
+ */
+- (BOOL)setDefaultTheme:(DatamodelTheme* _Nullable)theme error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showAlert:(DatamodelAlertAction* _Nullable)alert error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showBanner:(DatamodelBannerAction* _Nullable)banner error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showLink:(DatamodelLinkAction* _Nullable)link error:(NSError* _Nullable* _Nullable)error;
+@end
+
+@interface AppcoreAppcore : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+- (BOOL)performNamedAction:(NSString* _Nullable)actionName error:(NSError* _Nullable* _Nullable)error;
+- (void)registerLibraryBindings:(id<AppcoreLibBindings> _Nullable)lb;
+/**
+ * TODO: method considered WIP, not tested, expect a full re-write for conditions so saving for later
+TODO: events should be queued during setup, and run after postConfigSetup
+ */
+- (void)sendEvent:(NSString* _Nullable)e;
+- (BOOL)setConfigUrl:(NSString* _Nullable)configUrl error:(NSError* _Nullable* _Nullable)error;
+/**
+ * TODO: guard against double start call
+ */
+- (BOOL)start:(NSError* _Nullable* _Nullable)error;
+- (DatamodelTheme* _Nullable)themeForName:(NSString* _Nullable)themeName;
+@end
 
 FOUNDATION_EXPORT NSString* _Nonnull AppcoreGoPing(void);
+
+FOUNDATION_EXPORT AppcoreAppcore* _Nullable AppcoreSharedAppcore(void);
+
+@class AppcoreLibBindings;
+
+/**
+ * To be implemented by client libaray (eg: iOS SDK)
+ */
+@interface AppcoreLibBindings : NSObject <goSeqRefInterface, AppcoreLibBindings> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+/**
+ * Themes
+ */
+- (BOOL)setDefaultTheme:(DatamodelTheme* _Nullable)theme error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showAlert:(DatamodelAlertAction* _Nullable)alert error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showBanner:(DatamodelBannerAction* _Nullable)banner error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)showLink:(DatamodelLinkAction* _Nullable)link error:(NSError* _Nullable* _Nullable)error;
+@end
 
 #endif

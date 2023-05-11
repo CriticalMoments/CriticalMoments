@@ -43,7 +43,7 @@ func (l *LinkAction) ValidateReturningUserReadableIssue() string {
 	// Embedded browser option only available for scheme http(s)
 	if l.UseEmbeddedBrowser {
 		if url.Scheme != "https" && url.Scheme != "http" {
-			return "For a link action OpenWebLinkInEmbeddedBrowser is set to true, but the link is not http/https link. Only web links can be opened in embedded browser. Either disable, or change the link."
+			return "For a link action, useEmbeddedBrowser is set to true, but the link is not a http/https link. Only web links can be opened in the embedded browser. Either disable useEmbeddedBrowser, or change the link to a web link."
 		}
 	}
 
@@ -57,6 +57,7 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=link. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
+	// Defaults
 	useEmbeddedBrowser := false
 	if jl.UseEmbeddedBrowser != nil {
 		useEmbeddedBrowser = *jl.UseEmbeddedBrowser

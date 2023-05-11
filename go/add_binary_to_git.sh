@@ -9,8 +9,8 @@ pathList=(.go_folder_last_build_hashlist appcore/build/Appcore.xcframework/Info.
 for path in ${pathList[@]}; do
   echo "Adding $path"
   git update-index --no-skip-worktree $path 
-  git add $path
-  git update-index --skip-worktree $path
+  #git add $path
+  #git update-index --skip-worktree $path
 done
 
 
