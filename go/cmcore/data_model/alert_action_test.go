@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func TestActionValidators(t *testing.T) {
+func TestAlertActionValidators(t *testing.T) {
 	// valid
 	a := AlertAction{
 		Title:        "Title",

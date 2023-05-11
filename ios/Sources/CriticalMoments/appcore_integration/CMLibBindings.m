@@ -14,8 +14,11 @@
 #import "../messaging/CMBannerMessage_private.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
+#import "../utils/CMUtils.h"
 
 @import Appcore;
+
+@import SafariServices;
 
 @interface CMLibBindings () <AppcoreLibBindings>
 @end
@@ -68,7 +71,7 @@ static CMLibBindings *sharedInstance = nil;
              error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
-        return;
+        return NO;
     }
 
     CMBannerMessage *bannerMessage =
@@ -76,16 +79,52 @@ static CMLibBindings *sharedInstance = nil;
 
     // TODO: main thread?
     [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    return YES;
 }
 
 - (BOOL)showAlert:(DatamodelAlertAction *_Nullable)alertDataModel
             error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!alertDataModel) {
         *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
-        return;
+        return NO;
     }
     CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
     [alert showAlert];
+    return YES;
+}
+
+- (BOOL)showLink:(DatamodelLinkAction *)link
+           error:(NSError *_Nullable __autoreleasing *)error {
+    NSURL *url = [NSURL URLWithString:link.urlString];
+    if (!url || !url.scheme) {
+        *error = [NSError errorWithDomain:@"CMIOS" code:72937634 userInfo:nil];
+        return NO;
+    }
+
+    BOOL isWebLink = [@"http" isEqualToString:url.scheme] ||
+                     [@"https" isEqualToString:url.scheme];
+    if (link.useEmbeddedBrowser && isWebLink) {
+        BOOL success = [self openLinkInEmbeddedBrowser:url];
+        if (success) {
+            return YES;
+        }
+    }
+
+    [UIApplication.sharedApplication openURL:url
+                                     options:@{}
+                           completionHandler:nil];
+    return YES;
+}
+
+- (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
+    SFSafariViewController *safariVc =
+        [[SFSafariViewController alloc] initWithURL:url];
+    UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
+    if (!safariVc || !rootVc) {
+        return NO;
+    }
+    [rootVc presentViewController:safariVc animated:YES completion:nil];
+    return YES;
 }
 
 @end

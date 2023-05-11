@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 3 {
+	if len(pc.namedActions) != 4 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -68,7 +68,11 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 	alertAction := pc.ActionWithName("alertAction")
 	if alertAction == nil || alertAction.AlertAction.Title != "Alert title" {
-		t.Fatal("Didn't parse banner action 2")
+		t.Fatal("Didn't parse alert action")
+	}
+	linkAction := pc.ActionWithName("linkAction")
+	if linkAction == nil || linkAction.LinkAction.UrlString != "https://criticalmoments.io" {
+		t.Fatal("Didn't parse link action")
 	}
 
 	// Triggers

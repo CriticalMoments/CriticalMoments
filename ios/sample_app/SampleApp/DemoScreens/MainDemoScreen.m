@@ -9,6 +9,7 @@
 
 #import "AlertDemoScreen.h"
 #import "BannerDemoScreen.h"
+#import "LinkDemoScreen.h"
 #import "ThemeDemoScreen.h"
 
 @implementation MainDemoScreen
@@ -34,7 +35,13 @@
     alertAction.subtitle = @"UI to display system alerts and action sheets.";
     alertAction.actionNextScreen = [[AlertDemoScreen alloc] init];
 
-    [self addSection:@"UI Actions" withActions:@[ bannersAction, alertAction ]];
+    CMDemoAction *linksAction = [[CMDemoAction alloc] init];
+    linksAction.title = @"Links";
+    linksAction.subtitle = @"Open web links or app deeplinks";
+    linksAction.actionNextScreen = [[LinkDemoScreen alloc] init];
+
+    [self addSection:@"Actions"
+         withActions:@[ bannersAction, alertAction, linksAction ]];
 
     CMDemoAction *themeAction = [[CMDemoAction alloc] init];
     themeAction.title = @"Edit Theme";

@@ -19,6 +19,7 @@ System here for each new type
 const (
 	ActionTypeEnumBanner string = "banner"
 	ActionTypeEnumAlert  string = "alert"
+	ActionTypeEnumLink   string = "link"
 )
 
 // This section is the json data model we use for parsing/masrshaling
@@ -30,6 +31,7 @@ type ActionContainer struct {
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
 	AlertAction  *AlertAction
+	LinkAction   *LinkAction
 
 	// generalized interface for functions we need for any actions type.
 	// Typically a pointer to the one value above that is populated.
@@ -46,6 +48,7 @@ type ActionBindings interface {
 	// Actions
 	ShowBanner(banner *BannerAction) error
 	ShowAlert(alert *AlertAction) error
+	ShowLink(link *LinkAction) error
 }
 
 type ActionTypeInterface interface {
@@ -59,6 +62,7 @@ var (
 	actionTypeRegistry = map[string]func(json.RawMessage, *ActionContainer) (ActionTypeInterface, error){
 		ActionTypeEnumBanner: unpackBannerFromJson,
 		ActionTypeEnumAlert:  unpackAlertFromJson,
+		ActionTypeEnumLink:   unpackLinkFromJson,
 	}
 )
 
