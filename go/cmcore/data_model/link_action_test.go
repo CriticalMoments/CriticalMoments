@@ -37,6 +37,27 @@ func TestLinkActionValidators(t *testing.T) {
 	}
 }
 
+func TestLinkActionValidateEmbedded(t *testing.T) {
+	l := LinkAction{
+		UrlString: "app-settings:main",
+	}
+	if !l.Validate() {
+		t.Fatal("Valid link failed to validate")
+	}
+	l.UseEmbeddedBrowser = true
+	if l.Validate() {
+		t.Fatal("Open embedded browser with no web url should fail")
+	}
+	l.UrlString = "https://scosman.net"
+	if !l.Validate() {
+		t.Fatal("Valid link failed to validate")
+	}
+	l.UrlString = "http://scosman.net"
+	if !l.Validate() {
+		t.Fatal("Valid link failed to validate")
+	}
+}
+
 func TestJsonParsingValidLink(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/link/validLink.json")
 	if err != nil {
@@ -50,8 +71,28 @@ func TestJsonParsingValidLink(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumLink || ac.LinkAction.UrlString != "https://scosman.net" {
 		t.Fatal("Failed to parse valid link action")
 	}
+	if ac.LinkAction.UseEmbeddedBrowser {
+		t.Fatal("Default for embedded browser option should be false")
+	}
 }
 
+func TestJsonParsingValidEmbeddedLink(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/link/validLinkEmbedded.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.ActionType != ActionTypeEnumLink || ac.LinkAction.UrlString != "https://scosman.net" {
+		t.Fatal("Failed to parse valid link action")
+	}
+	if !ac.LinkAction.UseEmbeddedBrowser {
+		t.Fatal("embedded browser option failed to parse")
+	}
+}
 func TestJsonParsingInvalidLink(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/link/invalidLink.json")
 	if err != nil {

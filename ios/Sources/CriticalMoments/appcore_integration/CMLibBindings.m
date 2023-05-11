@@ -14,8 +14,11 @@
 #import "../messaging/CMBannerMessage_private.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
+#import "../utils/CMUtils.h"
 
 @import Appcore;
+
+@import SafariServices;
 
 @interface CMLibBindings () <AppcoreLibBindings>
 @end
@@ -98,10 +101,29 @@ static CMLibBindings *sharedInstance = nil;
         return NO;
     }
 
-    // TODO in app browser option
+    BOOL isWebLink = [@"http" isEqualToString:url.scheme] ||
+                     [@"https" isEqualToString:url.scheme];
+    if (link.useEmbeddedBrowser && isWebLink) {
+        BOOL success = [self openLinkInEmbeddedBrowser:url];
+        if (success) {
+            return YES;
+        }
+    }
+
     [UIApplication.sharedApplication openURL:url
                                      options:@{}
                            completionHandler:nil];
+    return YES;
+}
+
+- (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
+    SFSafariViewController *safariVc =
+        [[SFSafariViewController alloc] initWithURL:url];
+    UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
+    if (!safariVc || !rootVc) {
+        return NO;
+    }
+    [rootVc presentViewController:safariVc animated:YES completion:nil];
     return YES;
 }
 

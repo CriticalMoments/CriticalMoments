@@ -23,20 +23,18 @@
     // Web links
 
     CMDemoAction *openWebLink = [[CMDemoAction alloc] init];
-    openWebLink.title = @"Open web link";
-    openWebLink.subtitle = @"Open criticalmoments.io in your web browser";
+    openWebLink.title = @"Open Safari";
+    openWebLink.subtitle = @"Open criticalmoments.io in the Safari app";
     openWebLink.actionCMActionName = @"web_link_action";
 
-    // TODO another web link, local browser VC
+    CMDemoAction *openEmbeddedWebLink = [[CMDemoAction alloc] init];
+    openEmbeddedWebLink.title = @"Open embedded browser";
+    openEmbeddedWebLink.subtitle =
+        @"Open criticalmoments.io in a browser view embedded in this app";
+    openEmbeddedWebLink.actionCMActionName = @"web_link_embedded_action";
 
     [self addSection:@"Web links"
-         withActions:@[
-             openWebLink,
-         ]];
-
-    // TODO: a app deeplink
-
-    // App deep links
+         withActions:@[ openWebLink, openEmbeddedWebLink ]];
 
     CMDemoAction *openSettingsLink = [[CMDemoAction alloc] init];
     openSettingsLink.title = @"Open settings";

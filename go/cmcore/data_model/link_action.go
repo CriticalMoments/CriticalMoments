@@ -7,11 +7,13 @@ import (
 )
 
 type LinkAction struct {
-	UrlString string
+	UrlString          string
+	UseEmbeddedBrowser bool
 }
 
 type jsonLinkAction struct {
-	UrlString string `json:"url"`
+	UrlString          string `json:"url"`
+	UseEmbeddedBrowser *bool  `json:"useEmbeddedBrowser,omitempty"`
 }
 
 func unpackLinkFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
@@ -38,6 +40,12 @@ func (l *LinkAction) ValidateReturningUserReadableIssue() string {
 	if err != nil || url == nil || url.Scheme == "" {
 		return fmt.Sprintf("Link action url string is not a valid URL: \"%v\"", l.UrlString)
 	}
+	// Embedded browser option only available for scheme http(s)
+	if l.UseEmbeddedBrowser {
+		if url.Scheme != "https" && url.Scheme != "http" {
+			return "For a link action OpenWebLinkInEmbeddedBrowser is set to true, but the link is not http/https link. Only web links can be opened in embedded browser. Either disable, or change the link."
+		}
+	}
 
 	return ""
 }
@@ -49,7 +57,13 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=link. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
+	useEmbeddedBrowser := false
+	if jl.UseEmbeddedBrowser != nil {
+		useEmbeddedBrowser = *jl.UseEmbeddedBrowser
+	}
+
 	l.UrlString = jl.UrlString
+	l.UseEmbeddedBrowser = useEmbeddedBrowser
 
 	if validationIssue := l.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)

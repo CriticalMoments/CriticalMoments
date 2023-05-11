@@ -147,6 +147,13 @@
                     "url": "https://criticalmoments.io"
                 }
             },
+            "web_link_embedded_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io",
+                    "useEmbeddedBrowser": true
+                }
+            },
             "settings_link_action": {
                 "actionType": "link",
                 "actionData": {
