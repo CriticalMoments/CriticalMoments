@@ -35,4 +35,24 @@
     return [[UIColor alloc] initWithRed:red green:green blue:blue alpha:1.0];
 }
 
++ (UIWindow *)keyWindow {
+    UIWindow *keyWindow =
+        [[[UIApplication sharedApplication] windows] firstObject];
+    for (UIWindow *w in [[UIApplication sharedApplication] windows]) {
+        if (w.isKeyWindow) {
+            keyWindow = w;
+            break;
+        }
+    }
+    return keyWindow;
+}
+
++ (NSString *)uiKitLocalizedStringForKey:(NSString *)key {
+    NSBundle *uikitBundle = [NSBundle bundleForClass:[UIButton class]];
+    if (!uikitBundle) {
+        return key;
+    }
+    return [uikitBundle localizedStringForKey:key value:key table:nil];
+}
+
 @end

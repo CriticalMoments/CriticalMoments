@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Only should use one of these
 @property(nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;
 @property(nonatomic, readwrite) CMDemoScreen *actionNextScreen;
+@property(nonatomic, readwrite) NSString *actionCMEventName;
+@property(nonatomic, readwrite) NSString *actionCMActionName;
 @property(nonatomic, copy) void (^actionBlock)(void);
 - (void)addTarget:(nullable id)target action:(SEL)action;
 

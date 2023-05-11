@@ -33,6 +33,9 @@
         NSLog(@"CriticalMoments: Critical Moments was unable to start! %@",
               error);
 #if DEBUG
+        NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
+              @"to help find this issue. Exceptions are only thrown in debug "
+              @"mode, and will not crash apps built for release.");
         @throw NSInternalInconsistencyException;
 #endif
     }
@@ -45,6 +48,9 @@
         NSLog(@"ERROR: CriticalMoments -- invalid remote config url: %@",
               error);
 #if DEBUG
+        NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
+              @"to help find this issue. Exceptions are only thrown in debug "
+              @"mode, and will not crash apps built for release.");
         @throw NSInternalInconsistencyException;
 #endif
     }

@@ -20,14 +20,88 @@
                     "body": "A banner from config with a custom theme/action. Tap me!",
                     "showDismissButton": true,
                     "customThemeName": "blackAndWhiteTheme",
-                    "tapActionName": "nestedBannerAction"
+                    "tapActionName": "nested_alert"
                 }
             },
-            "nestedBannerAction": {
-                "actionType": "banner",
+            "show_notice_alert": {
+                "actionType": "alert",
                 "actionData": {
-                    "body": "Banner from a banner tap?! Wow.",
-                    "showDismissButton": true
+                    "title": "A simple notice alert",
+                    "message": "Title, message, okay button. You get the idea!"
+                }
+            },
+            "show_cancelable_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "A cancelable alert",
+                    "message": "An alert with a cancel button... not exactly rocket science.\n\nTry both buttons to see what they do.",
+                    "showCancelButton": true,
+                    "okButtonActionName": "nested_alert"
+                }
+            },
+            "custom_button_alert_large": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Action sheet deep dive",
+                    "message": "This is an action sheet with several options.\n\nEach can launch a custom action!",
+                    "showOkButton": false,
+                    "showCancelButton": true,
+                    "style": "large",
+                    "customButtons": [
+                        {
+                            "label": "Option 1",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Option 2",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Option 3",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Option 4",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Scary option",
+                            "actionName": "nested_alert",
+                            "style": "destructive"
+                        }
+                    ]
+                }
+            },
+            "custom_button_alert_dialog": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Lots of options",
+                    "message": "This is an alert with several buttons of different styles.",
+                    "showOkButton": false,
+                    "showCancelButton": true,
+                    "customButtons": [
+                        {
+                            "label": "Normal button",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Primary button",
+                            "actionName": "nested_alert",
+                            "style": "primary"
+                        },
+                        {
+                            "label": "Scary button",
+                            "actionName": "nested_alert",
+                            "style": "destructive"
+                        }
+                    ]
+                }
+            },
+            "nested_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Nested Action",
+                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
                 }
             }
         }

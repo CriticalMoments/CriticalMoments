@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMUtils : NSObject
 
 + (UIColor *)colorFromHexString:(NSString *)hexString;
++ (UIWindow *)keyWindow;
++ (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
 
 @end
 

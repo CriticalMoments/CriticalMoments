@@ -7,6 +7,7 @@
 
 #import "MainDemoScreen.h"
 
+#import "AlertDemoScreen.h"
 #import "BannerDemoScreen.h"
 #import "ThemeDemoScreen.h"
 
@@ -28,7 +29,12 @@
                              @"top or bottom of your app.";
     bannersAction.actionNextScreen = [[BannerDemoScreen alloc] init];
 
-    [self addSection:@"UI Actions" withActions:@[ bannersAction ]];
+    CMDemoAction *alertAction = [[CMDemoAction alloc] init];
+    alertAction.title = @"Alerts";
+    alertAction.subtitle = @"UI to display system alerts and action sheets.";
+    alertAction.actionNextScreen = [[AlertDemoScreen alloc] init];
+
+    [self addSection:@"UI Actions" withActions:@[ bannersAction, alertAction ]];
 
     CMDemoAction *themeAction = [[CMDemoAction alloc] init];
     themeAction.title = @"Edit Theme";

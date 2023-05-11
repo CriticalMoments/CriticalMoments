@@ -6,6 +6,7 @@
 //
 
 #import "CMBannerManager.h"
+#import "../utils/CMUtils.h"
 #import "CMBannerMessage_private.h"
 
 #define MAX_BANNER_HEIGHT_PERCENTAGE 0.20
@@ -171,14 +172,7 @@ static CMBannerManager *sharedInstance = nil;
     }
 
     // Find key window, falling back to first window
-    UIWindow *keyWindow =
-        [[[UIApplication sharedApplication] windows] firstObject];
-    for (UIWindow *w in [[UIApplication sharedApplication] windows]) {
-        if (w.isKeyWindow) {
-            keyWindow = w;
-            break;
-        }
-    }
+    UIWindow *keyWindow = [CMUtils keyWindow];
     if (!keyWindow) {
         // no window to render in
         NSLog(@"CriticalMoments: CMBannerManager could not find a key window, "

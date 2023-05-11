@@ -85,11 +85,11 @@ func TestCustomButtonValidation(t *testing.T) {
 	if b.Validate() {
 		t.Fatal("INvalid style should not validate")
 	}
-	b.Style = AlertActionButtonStyleEnumNormal
+	b.Style = AlertActionButtonStyleEnumDestructive
 	if !b.Validate() {
 		t.Fatal("Valid button style fails validation")
 	}
-	b.Style = AlertActionButtonStyleEnumDestructive
+	b.Style = AlertActionButtonStyleEnumDefault
 	if !b.Validate() {
 		t.Fatal("Valid button style fails validation")
 	}
@@ -141,7 +141,7 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 		t.Fatal()
 	}
 	cb3 := a.CustomButtons[2]
-	if cb3.Label != "Custom 3" || cb3.ActionName != "event3" || cb3.Style != AlertActionButtonStyleEnumNormal {
+	if cb3.Label != "Custom 3" || cb3.ActionName != "event3" || cb3.Style != AlertActionButtonStyleEnumDefault {
 		t.Fatal()
 	}
 
