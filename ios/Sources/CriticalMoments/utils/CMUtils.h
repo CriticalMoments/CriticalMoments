@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIColor *)colorFromHexString:(NSString *)hexString;
 + (UIWindow *)keyWindow;
++ (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
 
 @end
 

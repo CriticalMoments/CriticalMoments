@@ -44,9 +44,9 @@
     [self addActionToRootSection:largeAlert];
 
     CMDemoAction *severalButtonAlert = [[CMDemoAction alloc] init];
-    severalButtonAlert.title = @"Show many button alert";
+    severalButtonAlert.title = @"Show multi button alert";
     severalButtonAlert.subtitle =
-        @"Display a alert, with custom buttons and actions";
+        @"Display a alert with custom buttons and actions";
     severalButtonAlert.actionCMActionName = @"custom_button_alert_dialog";
     [self addActionToRootSection:severalButtonAlert];
 }

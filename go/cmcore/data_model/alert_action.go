@@ -12,15 +12,14 @@ Default is an alert with a title, body, and okay button which dismisses but take
  - A Title and/or body is required. Neither is not allowed. Both are suggested.
  - showOkayButton defaults to yes if omitted.
  - okButtonActionName defaults to no action of omitted
- - You can add a standard cancel button with 1 property: showCancelButton:true. It never performs an action other than dismiss. It is not shown by default
- - Buttons are ordered by platform convention. If you desire a separate order use all custom buttons.
-    - ios order: Custom Buttons, Cancel, Ok.
-    - other platforms: TBD
+ - You can add a standard cancel button with 1 property: showCancelButton:true. It never performs an action other than dismiss. It is not shown by default. It's position is optimized for the UI standards of the platform, so if you need a cancel button it's preferred to use showCancelButton:true over a custom button with the word "Cancel"
+ - Buttons are ordered by platform convention (example, cancel moves to bottom on sheets, and left on alerts). If you desire an exact order use all custom buttons.
  - While it's supported, you probably shouldn't have "Ok" and custom buttons. Logically "Ok" works alone for an informational message, or paired with cancel for a confimation message. Ok paired with several custom options is usually confusing to the user.
  - Button styles are automatic for Ok/Cancel, and manual for custom buttons
    - The Ok button will get a treatment following the platform guidelines. On iOS that means "preferred" if paired with cancel, and plain if solo.
-   - Cancel button will get the plain visual treatment.
-   - Custom buttons specify their visual treatment: normal, destructive (red), primary.
+   - Cancel button treatment depends on system UI standards. It's highlighting and position are controlled by iOS depending on the type of alert (dialog/sheet) and number of buttons.
+   - Custom buttons specify their visual treatment: normal, destructive (red), primary. Only one button can be primary on iOS - the last button you specify as primary (including okay) will get the primary treatment.
+ - Cancel and OK buttons are localized using the system UI localization
  - Alert style is based on the platform
    - the default is "dialog", which is UIAlertControllerStyleAlert on iOS and a Material dialog style: https://m3.material.io/components/dialogs/specs#23e479cf-c5a6-4a8b-87b3-1202d51855ac
    - "large" is UIAlertControllerStyleActionSheet on iOS and the material fullscreen style: https://m3.material.io/components/dialogs/specs#bbf1acde-f8d2-4ae1-9d51-343e96c4ac20
@@ -47,8 +46,9 @@ type AlertAction struct {
 }
 
 const (
-	AlertActionButtonStyleEnumNormal      string = "default"
+	AlertActionButtonStyleEnumDefault     string = "default"
 	AlertActionButtonStyleEnumDestructive string = "destructive"
+	AlertActionButtonStyleEnumPrimary     string = "primary"
 )
 
 type AlertActionCustomButton struct {
@@ -117,7 +117,9 @@ func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
 	if b.Label == "" {
 		return "Custom alert buttons must have a label"
 	}
-	if b.Style != AlertActionButtonStyleEnumNormal && b.Style != AlertActionButtonStyleEnumDestructive {
+	if b.Style != AlertActionButtonStyleEnumDefault &&
+		b.Style != AlertActionButtonStyleEnumPrimary &&
+		b.Style != AlertActionButtonStyleEnumDestructive {
 		return "Custom alert buttons must have a valid style: default or destuctive"
 	}
 
@@ -169,7 +171,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 }
 
 func customButtonFromJson(jb *jsonAlertCustomButton) *AlertActionCustomButton {
-	buttonStyle := AlertActionButtonStyleEnumNormal
+	buttonStyle := AlertActionButtonStyleEnumDefault
 	if jb.Style != nil {
 		buttonStyle = *jb.Style
 	}

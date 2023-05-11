@@ -28,6 +28,7 @@
     bannersAction.subtitle = @"UI to display announcement banners across the "
                              @"top or bottom of your app.";
     bannersAction.actionNextScreen = [[BannerDemoScreen alloc] init];
+
     CMDemoAction *alertAction = [[CMDemoAction alloc] init];
     alertAction.title = @"Alerts";
     alertAction.subtitle = @"UI to display system alerts/dialogs.";

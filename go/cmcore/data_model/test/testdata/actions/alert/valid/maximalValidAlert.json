@@ -11,7 +11,7 @@
             {
                 "label": "Custom 1",
                 "actionName": "event1",
-                "style": "default"
+                "style": "primary"
             },
             {
                 "label": "Custom 2",

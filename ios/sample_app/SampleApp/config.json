@@ -56,15 +56,23 @@
                     "style": "large",
                     "customButtons": [
                         {
-                            "label": "Button 1",
+                            "label": "Option 1",
                             "actionName": "nested_alert"
                         },
                         {
-                            "label": "Button 2",
+                            "label": "Option 2",
                             "actionName": "nested_alert"
                         },
                         {
-                            "label": "Scary button",
+                            "label": "Option 3",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Option 4",
+                            "actionName": "nested_alert"
+                        },
+                        {
+                            "label": "Scary option",
                             "actionName": "nested_alert",
                             "style": "destructive"
                         }
@@ -75,20 +83,21 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Lots of options",
-                    "message": "This is an alert with several options. Consider style='large' for multiple options as it may be cleaner UI!",
+                    "message": "This is an alert with several buttons of different styles.",
                     "showOkButton": false,
                     "showCancelButton": true,
                     "customButtons": [
                         {
-                            "label": "Button 1",
+                            "label": "Normal button",
                             "actionName": "nested_alert"
                         },
                         {
-                            "label": "Button 2",
-                            "actionName": "nested_alert"
+                            "label": "Primary button",
+                            "actionName": "nested_alert",
+                            "style": "primary"
                         },
                         {
-                            "label": "Big red button",
+                            "label": "Scary button",
                             "actionName": "nested_alert",
                             "style": "destructive"
                         }
@@ -98,8 +107,8 @@
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
-                    "title": "Nested action alert",
-                    "message": "Whoa... you got a follow up action from tapping something... entirely from config.\n\n\nRadical man."
+                    "title": "Nested Action",
+                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including nothing, showing a infomation sheet, deeplinking into part of your app, or launching Safari with a link!"
                 }
             }
         }

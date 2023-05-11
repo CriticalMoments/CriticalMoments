@@ -12,30 +12,19 @@
 
 #import "../utils/CMUtils.h"
 
+// Wrapper for our custom data
+@interface CMCustomAlertButton : UIAlertAction
+
+@property(nonatomic) bool isPrimaryAction;
+
+@end
+
+@implementation CMCustomAlertButton
+@end
+
 @interface CMAlert ()
 
 @property(nonatomic, readwrite) DatamodelAlertAction *dataModel;
-
-//@property (nonatomic, readwrite) NSString* title, *message,
-//*okButtonActionName, *style;
-//@property (nonatomic, readwrite) bool showCancelButton, showOkButton;
-
-/*
-
- type AlertAction struct {
-     ShowCancelButton   bool
-     ShowOkButton       bool
-     OkButtonActionName string
-     Style              string // AlertActionStyleEnum
-     CustomButtons      []*AlertActionCustomButton
- }
-
- type AlertActionCustomButton struct {
-     Label      string
-     ActionName string
-     Style      string // AlertActionButtonStyleEnum
- }
- */
 
 @end
 
@@ -66,24 +55,28 @@
                                             message:message
                                      preferredStyle:style];
 
-    NSArray<UIAlertAction *> *customButtonActions = [self customButtonActions];
-    for (UIAlertAction *customButtonAction in customButtonActions) {
-        [alert addAction:customButtonAction];
-        [alert setPreferredAction:customButtonAction];
-    }
-
     if (dataModel.showCancelButton) {
+        NSString *cancelString = [CMUtils uiKitLocalizedStringForKey:@"Cancel"];
         UIAlertAction *cancelAction =
-            [UIAlertAction actionWithTitle:@"Cancel"
+            [UIAlertAction actionWithTitle:cancelString
                                      style:UIAlertActionStyleCancel
                                    handler:nil];
         [alert addAction:cancelAction];
-        [alert setPreferredAction:cancelAction];
+    }
+
+    NSArray<CMCustomAlertButton *> *customButtonActions =
+        [self customButtonActions];
+    for (CMCustomAlertButton *customButtonAction in customButtonActions) {
+        [alert addAction:customButtonAction];
+        if (customButtonAction.isPrimaryAction) {
+            [alert setPreferredAction:customButtonAction];
+        }
     }
 
     if (dataModel.showOkButton) {
+        NSString *okString = [CMUtils uiKitLocalizedStringForKey:@"OK"];
         UIAlertAction *okAction = [UIAlertAction
-            actionWithTitle:@"OK"
+            actionWithTitle:okString
                       style:UIAlertActionStyleDefault
                     handler:^(UIAlertAction *_Nonnull action) {
                       if (self.dataModel.okButtonActionName.length > 0) {
@@ -92,7 +85,12 @@
                       }
                     }];
         [alert addAction:okAction];
-        [alert setPreferredAction:okAction];
+
+        // Only highlight ok as primary if there's other buttons (system UI
+        // standard)
+        if (dataModel.showCancelButton || customButtonActions.count > 0) {
+            [alert setPreferredAction:okAction];
+        }
     }
 
     UIWindow *keyWindow = [CMUtils keyWindow];
@@ -106,9 +104,10 @@
     }
 }
 
-- (NSArray<UIAlertAction *> *)customButtonActions {
-    NSMutableArray<UIAlertAction *> *customActions = [[NSMutableArray alloc]
-        initWithCapacity:self.dataModel.customButtonsCount];
+- (NSArray<CMCustomAlertButton *> *)customButtonActions {
+    NSMutableArray<CMCustomAlertButton *> *customActions =
+        [[NSMutableArray alloc]
+            initWithCapacity:self.dataModel.customButtonsCount];
     for (int i = 0; i < self.dataModel.customButtonsCount; i++) {
         DatamodelAlertActionCustomButton *buttonModel =
             [self.dataModel customButtonAtIndex:i];
@@ -122,7 +121,7 @@
             style = UIAlertActionStyleDestructive;
         }
 
-        UIAlertAction *action = [UIAlertAction
+        CMCustomAlertButton *action = [CMCustomAlertButton
             actionWithTitle:buttonModel.label
                       style:style
                     handler:^(UIAlertAction *action) {
@@ -130,6 +129,8 @@
                           [self performAction:buttonModel.actionName];
                       }
                     }];
+        action.isPrimaryAction = [DatamodelAlertActionButtonStyleEnumPrimary
+            isEqualToString:buttonModel.style];
 
         [customActions addObject:action];
     }

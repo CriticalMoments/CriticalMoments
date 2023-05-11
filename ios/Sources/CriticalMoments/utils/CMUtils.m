@@ -47,4 +47,12 @@
     return keyWindow;
 }
 
++ (NSString *)uiKitLocalizedStringForKey:(NSString *)key {
+    NSBundle *uikitBundle = [NSBundle bundleForClass:[UIButton class]];
+    if (!uikitBundle) {
+        return key;
+    }
+    return [uikitBundle localizedStringForKey:key value:key table:nil];
+}
+
 @end
