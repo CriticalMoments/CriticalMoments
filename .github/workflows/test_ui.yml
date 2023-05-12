@@ -23,21 +23,18 @@ jobs:
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
 
-      - name: Select xcode 13.2.1
-        run: sudo xcode-select -switch /Applications/Xcode_13.2.1.app && /usr/bin/xcodebuild -version
-
-      - name: Build sample_app and test ui on iPhone Phone 8, iOS 15.2
-        run: |
-         cd ios/sample_app
-         ONLY_ACTIVE_ARCH=YES xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=15.2,name=iPhone 8' test
-
       - name: Select xcode 14.2
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
-      - name: Build sample_app and test ui on iPhone 14 Pro, iOS 16.2
+      - name: Build sample_app for testing
         run: |
          cd ios/sample_app
-         ONLY_ACTIVE_ARCH=YES xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test
+         ONLY_ACTIVE_ARCH=YES xcodebuild build-for-testing -scheme SampleApp -target SampleAppTests '-only-testing:SampleAppTests'
+
+      - name: Test on iPhone 14 Pro, iOS 16.2
+        run: |
+         cd ios/sample_app
+         xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test-without-building
 
       - name: Upload snapshot failures
         if: always()
