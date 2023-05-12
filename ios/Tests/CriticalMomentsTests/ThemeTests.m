@@ -25,8 +25,6 @@
     // each test method in the class.
 }
 
-// TODO: test default theme integration
-
 // TODO remove test theme, use E2E config named/default theme instead
 - (void)testAppcoreThemeEndToEnd {
     CMTheme *testTheme = [CMTheme testTheme];
