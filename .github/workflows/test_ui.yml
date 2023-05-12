@@ -15,7 +15,7 @@ jobs:
           cache-dependency-path: go/go.sum
 
       - name: Setup gomobile
-        run: go install golang.org/x/mobile/cmd/gomobile && gomobile init
+        run: cd go && go install golang.org/x/mobile/cmd/gomobile && gomobile init && cd ..
 
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
