@@ -27,6 +27,12 @@
 
     // Needed for system UI and transparency
     self.usesDrawViewHierarchyInRect = YES;
+
+    // Filename options
+    self.fileNameOptions = FBSnapshotTestCaseFileNameIncludeOptionOS |
+                           FBSnapshotTestCaseFileNameIncludeOptionDevice |
+                           FBSnapshotTestCaseFileNameIncludeOptionScreenScale |
+                           FBSnapshotTestCaseFileNameIncludeOptionScreenSize;
 }
 
 - (void)tearDown {
