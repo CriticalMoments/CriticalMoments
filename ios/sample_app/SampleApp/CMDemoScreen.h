@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, readwrite) NSString *title;
 @property(nonatomic, readwrite) NSString *subtitle;
+@property(nonatomic, readwrite) bool skipInUiTesting;
 
 // Only should use one of these
 @property(nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;
@@ -29,8 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readwrite) NSString *actionCMActionName;
 @property(nonatomic, copy) void (^actionBlock)(void);
 - (void)addTarget:(nullable id)target action:(SEL)action;
+- (void)addResetTestTarget:(nullable id)target action:(SEL)action;
 
 - (void)performAction;
+- (void)resetForTests;
 
 @end
 

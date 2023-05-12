@@ -33,7 +33,8 @@ xcframework.zip
 go/.go_folder_hashlist
 # docs folder
 docs/
-
+# Snapshot test failures
+ios/sample_app/SnapshotTests/FailureDiffs
 
 ## End build tools ignore
 

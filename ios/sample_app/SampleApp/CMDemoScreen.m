@@ -16,8 +16,8 @@
 
 @interface CMDemoAction ()
 
-@property(nonatomic) id actionTarget;
-@property(nonatomic) SEL actionSelector;
+@property(nonatomic) id actionTarget, resetTestTarget;
+@property(nonatomic) SEL actionSelector, resetTestSelector;
 
 @end
 
@@ -26,6 +26,11 @@
 - (void)addTarget:(nullable id)target action:(SEL)action {
     self.actionTarget = target;
     self.actionSelector = action;
+}
+
+- (void)addResetTestTarget:(nullable id)target action:(SEL)action {
+    self.resetTestTarget = target;
+    self.resetTestSelector = action;
 }
 
 - (void)performAction {
@@ -52,20 +57,19 @@
     }
 }
 
+- (void)resetForTests {
+    if (self.resetTestTarget && self.resetTestSelector) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [self.resetTestTarget performSelector:self.resetTestSelector];
+#pragma clang diagnostic pop
+    }
+}
+
 - (void)pushNextScreen {
     DemoViewContoller *demoVc =
         [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
-    UINavigationController *navController;
-    UIViewController *rootVC = Utils.keyWindow.rootViewController;
-    if ([rootVC isKindOfClass:[UITabBarController class]]) {
-        UITabBarController *tab = (UITabBarController *)rootVC;
-        rootVC = tab.selectedViewController;
-    }
-    if ([rootVC isKindOfClass:[UINavigationController class]]) {
-        navController = (UINavigationController *)rootVC;
-    } else {
-        navController = rootVC.navigationController;
-    }
+    UINavigationController *navController = [Utils appNavControl];
     [navController pushViewController:demoVc animated:YES];
 }
 

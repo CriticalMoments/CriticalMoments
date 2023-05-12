@@ -5,7 +5,7 @@
 //  Created by Steve Cosman on 2023-04-22.
 //
 
-#import "ViewController.h"
+#import "SampleAppCoreViewController.h"
 
 #import "DemoViewContoller.h"
 #import "MainDemoScreen.h"
@@ -14,16 +14,19 @@
 
 @import CriticalMoments;
 
-@interface ViewController ()
+@interface SampleAppCoreViewController ()
+
+@property(nonatomic, strong) CMDemoScreen *demoRoot;
 
 @end
 
-@implementation ViewController
+@implementation SampleAppCoreViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     CMDemoScreen *mainDemoScreen = [[MainDemoScreen alloc] init];
+    _demoRoot = mainDemoScreen;
     DemoViewContoller *mainTabRoot =
         [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
     UINavigationController *mainTabNav =
@@ -41,6 +44,12 @@
     mainTabNav.tabBarItem = mainTabBarItem;
     self.viewControllers = @[ mainTabNav ];
 
+    // Only visible in snapshot test cases where we hack the opacity of the
+    // views over this
+    if (self.backgroundColor) {
+        mainTabNav.view.backgroundColor = self.backgroundColor;
+    }
+
     if (@available(iOS 15.0, *)) {
         UITabBarAppearance *tabAppearance = [[UITabBarAppearance alloc] init];
         [tabAppearance configureWithOpaqueBackground];
@@ -50,8 +59,15 @@
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"config"
                                          withExtension:@"json"];
 
-    [CriticalMoments setRemoteConfigUrl:url.absoluteString];
+    [CriticalMoments setConfigUrl:url.absoluteString];
     [CriticalMoments start];
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    _backgroundColor = backgroundColor;
+    if (self.view) {
+        self.viewControllers.firstObject.view.backgroundColor = backgroundColor;
+    }
 }
 
 @end
