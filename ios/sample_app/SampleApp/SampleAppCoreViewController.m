@@ -43,9 +43,12 @@
                                         tag:0];
     mainTabNav.tabBarItem = mainTabBarItem;
     self.viewControllers = @[ mainTabNav ];
+
     // Only visible in snapshot test cases where we hack the opacity of the
     // views over this
-    mainTabNav.view.backgroundColor = [UIColor greenColor];
+    if (self.backgroundColor) {
+        mainTabNav.view.backgroundColor = self.backgroundColor;
+    }
 
     if (@available(iOS 15.0, *)) {
         UITabBarAppearance *tabAppearance = [[UITabBarAppearance alloc] init];
@@ -58,6 +61,13 @@
 
     [CriticalMoments setConfigUrl:url.absoluteString];
     [CriticalMoments start];
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    _backgroundColor = backgroundColor;
+    if (self.view) {
+        self.viewControllers.firstObject.view.backgroundColor = backgroundColor;
+    }
 }
 
 @end

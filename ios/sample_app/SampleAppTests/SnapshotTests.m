@@ -34,11 +34,17 @@
 }
 
 - (void)testScreenshotAllSampleAppFeatures {
-    UIWindow *window = [[UIWindow alloc] init];
-    SampleAppCoreViewController *mainVc =
-        [[SampleAppCoreViewController alloc] init];
-    window.rootViewController = mainVc;
-    [window makeKeyAndVisible];
+    [[NSRunLoop currentRunLoop]
+        runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    SampleAppCoreViewController *mainVc;
+    UIWindow *window = [Utils keyWindow];
+    UIViewController *rvc = window.rootViewController;
+    if ([rvc isKindOfClass:SampleAppCoreViewController.class]) {
+        mainVc = (SampleAppCoreViewController *)rvc;
+        mainVc.backgroundColor = [UIColor greenColor];
+    } else {
+        XCTAssertTrue(false, @"Could not get root vc");
+    }
 
     // make animations super fast (20x)
     [Utils keyWindow].layer.speed = 20.0;

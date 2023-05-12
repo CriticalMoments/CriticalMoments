@@ -12,5 +12,6 @@
 @interface SampleAppCoreViewController : UITabBarController
 
 @property(nonatomic, readonly) CMDemoScreen *demoRoot;
+@property(nonatomic, readwrite) UIColor *backgroundColor;
 
 @end
