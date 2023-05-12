@@ -29,7 +29,7 @@ jobs:
       - name: Build sample_app and test ui
         run: |
          cd ios/sample_app
-         xcodebuild -scheme SampleApp -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test
+         ONLY_ACTIVE_ARCH=YES xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test
 
       - name: Upload snapshot failures
         if: always()
