@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build_and_test:
-    name: Build and analyse default scheme using xcodebuild command
+    name: Build & test SPM
     runs-on: macos-12
 
     steps:
