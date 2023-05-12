@@ -21,4 +21,19 @@
     return keyWindow;
 }
 
++ (UINavigationController *)appNavControl {
+    UINavigationController *navController;
+    UIViewController *rootVC = Utils.keyWindow.rootViewController;
+    if ([rootVC isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tab = (UITabBarController *)rootVC;
+        rootVC = tab.selectedViewController;
+    }
+    if ([rootVC isKindOfClass:[UINavigationController class]]) {
+        navController = (UINavigationController *)rootVC;
+    } else {
+        navController = rootVC.navigationController;
+    }
+    return navController;
+}
+
 @end

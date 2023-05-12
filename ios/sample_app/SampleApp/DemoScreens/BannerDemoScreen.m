@@ -35,6 +35,7 @@
     CMDemoAction *clearAllBanners = [[CMDemoAction alloc] init];
     clearAllBanners.title = @"Clear all banners";
     clearAllBanners.subtitle = @"Remove all banners from this app";
+    clearAllBanners.skipInUiTesting = true;
     clearAllBanners.actionBlock = ^{
       [CMBannerManager.shared removeAllAppWideMessages];
     };
@@ -51,18 +52,23 @@
     shortBannerAction.subtitle =
         @"Display a short single line banner, in the default theme";
     shortBannerAction.actionCMActionName = @"short_banner";
+    [shortBannerAction addResetTestTarget:self
+                                   action:@selector(dismissBanners)];
 
     CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
     longBannerAction.title = @"Long Banner";
     longBannerAction.subtitle = @"Display a long banner message which will "
                                 @"grow to line wrap, in the default theme";
     longBannerAction.actionCMActionName = @"long_banner";
+    [longBannerAction addResetTestTarget:self action:@selector(dismissBanners)];
 
     CMDemoAction *veryLongBannerAction = [[CMDemoAction alloc] init];
     veryLongBannerAction.title = @"Very Long Banner";
     veryLongBannerAction.subtitle = @"Display a very long banner message which "
                                     @"will get truncated, in the default theme";
     veryLongBannerAction.actionCMActionName = @"very_long_banner";
+    [veryLongBannerAction addResetTestTarget:self
+                                      action:@selector(dismissBanners)];
 
     [self addSection:@"App Wide Banners"
          withActions:@[
@@ -82,6 +88,7 @@
     swapPosition.subtitle =
         @"Swap the banner location between the top and bottom.";
     [swapPosition addTarget:self action:@selector(swapBannerPosition)];
+    [swapPosition addResetTestTarget:self action:@selector(dismissBanners)];
 
     [self addSection:@"Banners Position"
          withActions:@[
@@ -96,18 +103,23 @@
     customThemeBanner.subtitle =
         @"Display a banner built from config with custom theme and action";
     customThemeBanner.actionCMActionName = @"custom_theme_banner";
+    [customThemeBanner addResetTestTarget:self
+                                   action:@selector(dismissBanners)];
 
     CMDemoAction *undismissableBanner = [[CMDemoAction alloc] init];
     undismissableBanner.title = @"Show undismissable banner";
     undismissableBanner.subtitle =
         @"Show a banner that doesn't have an X to dismiss";
     undismissableBanner.actionCMActionName = @"undismissable_banner";
+    [undismissableBanner addResetTestTarget:self
+                                     action:@selector(dismissBanners)];
 
     CMDemoAction *singleLineAction = [[CMDemoAction alloc] init];
     singleLineAction.title = @"Show single line banner";
     singleLineAction.subtitle =
         @"Show a banner that truncates using `maxLineCount` option";
     singleLineAction.actionCMActionName = @"single_line_banner";
+    [singleLineAction addResetTestTarget:self action:@selector(dismissBanners)];
 
     [self addSection:@"Banners Display Options"
          withActions:@[
@@ -122,8 +134,13 @@
         @"Show a banner using code instead of config. The banner's apearance "
         @"and action are hardcoded in this sample app.";
     [codeBanner addTarget:self action:@selector(showMessageFromCode)];
+    [codeBanner addResetTestTarget:self action:@selector(dismissBanners)];
 
     [self addSection:@"Banners from Code" withActions:@[ codeBanner ]];
+}
+
+- (void)dismissBanners {
+    [CMBannerManager.shared removeAllAppWideMessages];
 }
 
 - (void)swapBannerPosition {

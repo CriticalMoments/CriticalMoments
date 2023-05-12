@@ -7,6 +7,8 @@
 
 #import "LinkDemoScreen.h"
 
+#import "Utils.h"
+
 @implementation LinkDemoScreen
 
 - (instancetype)init {
@@ -25,6 +27,7 @@
     CMDemoAction *openWebLink = [[CMDemoAction alloc] init];
     openWebLink.title = @"Open Safari";
     openWebLink.subtitle = @"Open criticalmoments.io in the Safari app";
+    openWebLink.skipInUiTesting = true;
     openWebLink.actionCMActionName = @"web_link_action";
 
     CMDemoAction *openEmbeddedWebLink = [[CMDemoAction alloc] init];
@@ -32,6 +35,7 @@
     openEmbeddedWebLink.subtitle =
         @"Open criticalmoments.io in a browser view embedded in this app";
     openEmbeddedWebLink.actionCMActionName = @"web_link_embedded_action";
+    openEmbeddedWebLink.skipInUiTesting = true;
 
     [self addSection:@"Web links"
          withActions:@[ openWebLink, openEmbeddedWebLink ]];
@@ -40,12 +44,14 @@
     openSettingsLink.title = @"Open settings";
     openSettingsLink.subtitle =
         @"Open an app deeplink into the iOS Settings app";
+    openSettingsLink.skipInUiTesting = true;
     openSettingsLink.actionCMActionName = @"settings_link_action";
 
     CMDemoAction *openMainScreenLink = [[CMDemoAction alloc] init];
     openMainScreenLink.title = @"Open deeplink";
     openMainScreenLink.subtitle =
         @"Open an app deeplink into this sample app's main screen";
+    openMainScreenLink.skipInUiTesting = true;
     openMainScreenLink.actionCMActionName = @"main_screen_deeplink_action";
 
     [self addSection:@"App deep links"

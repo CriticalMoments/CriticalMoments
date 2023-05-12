@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Utils : NSObject
 
 + (UIWindow *)keyWindow;
++ (UINavigationController *)appNavControl;
 
 @end
 

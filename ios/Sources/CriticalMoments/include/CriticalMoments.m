@@ -41,7 +41,7 @@
     }
 }
 
-+ (void)setRemoteConfigUrl:(NSString *)urlString {
++ (void)setConfigUrl:(NSString *)urlString {
     NSError *error;
     [AppcoreSharedAppcore() setConfigUrl:urlString error:&error];
     if (error != nil) {

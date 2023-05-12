@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
  file can present messages directly to your users, and you should treat security
  seriously, as you would your app update release process or webpage.
  */
-+ (void)setRemoteConfigUrl:(NSString *)urlString;
++ (void)setConfigUrl:(NSString *)urlString;
 
 // TODO: improve docs
 // TODO: enforce naming limits (ascii, no spaces)?
