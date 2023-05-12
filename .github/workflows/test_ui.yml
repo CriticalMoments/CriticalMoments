@@ -27,6 +27,7 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test 
-        run: cd ios/sample_app
-        run: xcodebuild -scheme SampleApp -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' clean test 
+        run: |
+         cd ios/sample_app
+         xcodebuild -scheme SampleApp -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' clean test 
 
