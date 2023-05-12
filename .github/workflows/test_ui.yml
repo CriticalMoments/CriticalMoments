@@ -26,15 +26,10 @@ jobs:
       - name: Select xcode 14.2
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
-      - name: Build sample_app for testing
+      - name: Build sample_app and test on iPhone 14 Pro, iOS 16.2
         run: |
          cd ios/sample_app
-         ONLY_ACTIVE_ARCH=YES xcodebuild build-for-testing -scheme SampleApp -target SampleAppTests '-only-testing:SampleAppTests'
-
-      - name: Test on iPhone 14 Pro, iOS 16.2
-        run: |
-         cd ios/sample_app
-         xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test-without-building
+         ONLY_ACTIVE_ARCH=YES xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test
 
       - name: Upload snapshot failures
         if: always()
