@@ -40,11 +40,6 @@
     window.rootViewController = mainVc;
     [window makeKeyAndVisible];
 
-    [[NSRunLoop currentRunLoop]
-        runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-
-    FBSnapshotVerifyView([Utils keyWindow], @"startup");
-
     // make animations super fast (20x)
     [Utils keyWindow].layer.speed = 20.0;
 
@@ -55,14 +50,12 @@
     // "Play" each action in each section, screenshot, revert changes,
     // then move on. Goes into menus recursively when it finds one.
 
-    // Hide the scroll bar as it can cause tests to fail
+    // Hide the demo UI as we aren't testing it. Things like the scroll bars
+    // can mess up tests, but also, as we add features we don't want tests to
+    // fail because the table view updates
     UINavigationController *navController = [Utils appNavControl];
     UIViewController *vc = navController.visibleViewController;
-    if ([vc isKindOfClass:UITableViewController.class]) {
-        UITableViewController *tableVc = (UITableViewController *)vc;
-        tableVc.tableView.showsHorizontalScrollIndicator = NO;
-        tableVc.tableView.showsVerticalScrollIndicator = NO;
-    }
+    vc.view.alpha = 0.0;
 
     for (CMDemoSection *section in demoscreen.sections) {
         for (CMDemoAction *action in section.actions) {
