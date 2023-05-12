@@ -96,18 +96,9 @@
                 // https://github.com/pointfreeco/swift-snapshot-testing This
                 // API is a nightmare.
 
-                // Hack the internal API a bit here. If the snapshot doesn't
-                // match, turn on record mode save the image we should have had
-                // in the failure DIR, and then keep going. Lets us get the
-                // files we need from CI server artifacts
-                NSString *errorDescription = [self
-                    snapshotVerifyViewOrLayer:[Utils keyWindow]
-                                   identifier:action.title
-                                     suffixes:
-                                         FBSnapshotTestCaseDefaultSuffixes()
-                             overallTolerance:0
-                    defaultReferenceDirectory:(@FB_REFERENCE_IMAGE_DIR)
-                    defaultImageDiffDirectory:(@IMAGE_DIFF_DIR)];
+                NSString *errorDescription = [self snapshot:[Utils keyWindow]
+                                            withDescription:action.title];
+
                 if (errorDescription != nil) {
                     XCTAssert(false, @"UI Test case failed: %@",
                               errorDescription);
@@ -115,33 +106,8 @@
                     // We still want to record failures for "no reference
                     // image". Bit of a hack but it works
                     if (!self.recordMode) {
-                        self.recordMode = YES;
-                        NSString *origEnvReferenceImageDirectory =
-                            [NSProcessInfo processInfo]
-                                .environment[@"FB_REFERENCE_IMAGE_DIR"];
-                        NSString *imageDiffDir =
-                            [NSProcessInfo processInfo]
-                                .environment[@"IMAGE_DIFF_DIR"];
-                        NSString *missingDir = [NSString
-                            stringWithFormat:@"%@/Generated", imageDiffDir];
-                        setenv("FB_REFERENCE_IMAGE_DIR",
-                               [missingDir
-                                   cStringUsingEncoding:NSUTF8StringEncoding],
-                               1);
-
-                        [self
-                            snapshotVerifyViewOrLayer:[Utils keyWindow]
-                                           identifier:action.title
-                                             suffixes:
-                                                 FBSnapshotTestCaseDefaultSuffixes()
-                                     overallTolerance:0
-                            defaultReferenceDirectory:(@FB_REFERENCE_IMAGE_DIR)
-                            defaultImageDiffDirectory:(@IMAGE_DIFF_DIR)];
-                        self.recordMode = NO;
-                        setenv("FB_REFERENCE_IMAGE_DIR",
-                               [origEnvReferenceImageDirectory
-                                   cStringUsingEncoding:NSUTF8StringEncoding],
-                               1);
+                        [self recordSnapshotToFailureDirectory:[Utils keyWindow]
+                                               withDescription:action.title];
                     }
                 }
             }
@@ -152,6 +118,45 @@
                 runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
         }
     }
+}
+
+- (NSString *)snapshot:(UIView *)view withDescription:(NSString *)description {
+    return [self snapshotVerifyViewOrLayer:view
+                                identifier:description
+                                  suffixes:FBSnapshotTestCaseDefaultSuffixes()
+                          overallTolerance:0
+                 defaultReferenceDirectory:(@FB_REFERENCE_IMAGE_DIR)
+                 defaultImageDiffDirectory:(@IMAGE_DIFF_DIR)];
+}
+
+- (void)recordSnapshotToFailureDirectory:(UIView *)view
+                         withDescription:(NSString *)description {
+    if (self.recordMode) {
+        return;
+    }
+
+    // Hack the internal API a bit here. If the snapshot doesn't
+    // match, turn on record mode save the image we should have had
+    // in the failure DIR, and then keep going. Lets us get the
+    // files we need from CI server artifacts
+
+    self.recordMode = YES;
+    NSString *origEnvReferenceImageDirectory =
+        [NSProcessInfo processInfo].environment[@"FB_REFERENCE_IMAGE_DIR"];
+    NSString *imageDiffDir =
+        [NSProcessInfo processInfo].environment[@"IMAGE_DIFF_DIR"];
+    NSString *missingDir =
+        [NSString stringWithFormat:@"%@/Generated", imageDiffDir];
+    setenv("FB_REFERENCE_IMAGE_DIR",
+           [missingDir cStringUsingEncoding:NSUTF8StringEncoding], 1);
+
+    [self snapshot:view withDescription:description];
+
+    self.recordMode = NO;
+    setenv("FB_REFERENCE_IMAGE_DIR",
+           [origEnvReferenceImageDirectory
+               cStringUsingEncoding:NSUTF8StringEncoding],
+           1);
 }
 
 @end
