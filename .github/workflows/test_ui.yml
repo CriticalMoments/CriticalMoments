@@ -32,6 +32,7 @@ jobs:
          xcodebuild -scheme SampleApp -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' test
 
       - name: Upload snapshot failures
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: snapshot-failure-images
