@@ -80,7 +80,7 @@
             // Perform the action and give it time to render
             [action performAction];
             [[NSRunLoop currentRunLoop]
-                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.6]];
+                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
 
             if (action.actionNextScreen) {
                 // this is a nav action, follow it!
@@ -115,7 +115,7 @@
             // reset state for next test, and give it time to render
             [action resetForTests];
             [[NSRunLoop currentRunLoop]
-                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
         }
     }
 }
