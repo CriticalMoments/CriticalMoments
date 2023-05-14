@@ -40,12 +40,26 @@
 }
 
 - (void)showAlert {
+    UIWindow *keyWindow = [CMUtils keyWindow];
+    UIViewController *rootVc = keyWindow.rootViewController;
+    if (!rootVc) {
+        NSLog(@"CriticalMoments: can't find root vc for presenting alert");
+    }
+
     DatamodelAlertAction *dataModel = self.dataModel;
     NSString *title = dataModel.title.length > 0 ? dataModel.title : nil;
     NSString *message = dataModel.message.length > 0 ? dataModel.message : nil;
 
     UIAlertControllerStyle style = UIAlertControllerStyleAlert;
-    if ([DatamodelAlertActionStyleEnumLarge isEqualToString:dataModel.style]) {
+    BOOL isPhone =
+        UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
+    // Only use action sheet style on iPhone. On iPad it's visually the same as
+    // alert, but without cancel button. The "large" format actually ends up
+    // smaller on iPad if we don't do this. Also adds other usability issues
+    // (tapping away to dismiss not easy to discoverable without an
+    // permittedArrowDirections and position skewed on rotate)
+    if (isPhone &&
+        [DatamodelAlertActionStyleEnumLarge isEqualToString:dataModel.style]) {
         style = UIAlertControllerStyleActionSheet;
     }
 
@@ -53,6 +67,16 @@
         [UIAlertController alertControllerWithTitle:title
                                             message:message
                                      preferredStyle:style];
+
+    // if popoverPresentationController is present, we need to set these or it
+    // will crash. However, this shouldn't be present in any case we know of,
+    // since we don't use action sheet look on iPad
+    if (alert.popoverPresentationController) {
+        alert.popoverPresentationController.permittedArrowDirections = 0;
+        alert.popoverPresentationController.sourceRect =
+            CGRectMake(rootVc.view.center.x, rootVc.view.center.y, 0, 0);
+        alert.popoverPresentationController.sourceView = rootVc.view;
+    }
 
     if (dataModel.showCancelButton) {
         NSString *cancelString = [CMUtils uiKitLocalizedStringForKey:@"Cancel"];
@@ -92,15 +116,9 @@
         }
     }
 
-    UIWindow *keyWindow = [CMUtils keyWindow];
-    UIViewController *rootVc = keyWindow.rootViewController;
-    if (!rootVc) {
-        NSLog(@"CriticalMoments: can't find root vc for presenting alert");
-    } else {
-        [keyWindow.rootViewController presentViewController:alert
-                                                   animated:YES
-                                                 completion:nil];
-    }
+    [keyWindow.rootViewController presentViewController:alert
+                                               animated:YES
+                                             completion:nil];
 }
 
 - (NSArray<CMCustomAlertButton *> *)customButtonActions {
