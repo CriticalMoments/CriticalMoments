@@ -47,7 +47,7 @@
                 "actionType": "banner",
                 "actionData": {
                     "body": "This banner will appear at the top! Any banner can specify top or bottom position.",
-                    "position": "top",
+                    "preferredPosition": "top",
                     "tapActionName": "nested_alert"
                 }
             },

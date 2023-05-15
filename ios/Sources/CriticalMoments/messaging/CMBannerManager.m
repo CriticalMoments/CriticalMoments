@@ -65,8 +65,15 @@ static CMBannerManager *sharedInstance = nil;
         }
 
         _currentMessage = message;
-        bool rendered = [self
-            setAppWideBannerPositionReturningRendered:message.bannerPosition];
+
+        // update the app wide banner position if message has a preference on
+        // location
+        bool rendered = NO;
+        if (message.preferredPosition != CMBannerPositionNoPreference) {
+            rendered = [self setAppWideBannerPositionReturningRendered:
+                                 message.preferredPosition];
+        }
+
         if (!rendered) {
             [self renderForCurrentState];
         }
@@ -99,7 +106,12 @@ static CMBannerManager *sharedInstance = nil;
 
 - (bool)setAppWideBannerPositionReturningRendered:
     (CMBannerPosition)appWideBannerPosition {
+    // don't do work work if no change
     if (appWideBannerPosition == _appWideBannerPosition) {
+        return NO;
+    }
+    // No preference isn't valid for manager. Keep prior value.
+    if (appWideBannerPosition == CMBannerPositionNoPreference) {
         return NO;
     }
     _appWideBannerPosition = appWideBannerPosition;
@@ -259,7 +271,7 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
 
-    UIViewController* rootVc = _appWideContainerView.window.rootViewController;
+    UIViewController *rootVc = _appWideContainerView.window.rootViewController;
     [_appWideContainerView removeFromSuperview];
     _appWideContainerView = nil;
 
@@ -267,9 +279,9 @@ static CMBannerManager *sharedInstance = nil;
     if (rootVc == _injectedInsetsRootVc) {
         UIEdgeInsets newInsets = rootVc.additionalSafeAreaInsets;
         newInsets.bottom = MAX(0, rootVc.additionalSafeAreaInsets.bottom -
-                               _insetAddedForBanner.bottom);
+                                      _insetAddedForBanner.bottom);
         newInsets.top = MAX(0, rootVc.additionalSafeAreaInsets.top -
-                            _insetAddedForBanner.top);
+                                   _insetAddedForBanner.top);
         rootVc.additionalSafeAreaInsets = newInsets;
         _insetAddedForBanner = UIEdgeInsetsZero;
         _injectedInsetsRootVc = nil;

@@ -9,8 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @import Appcore;
 
-@protocol CMBannerDismissDelegate
+@protocol CMBannerMessageManagerDelegate
 - (void)dismissedMessage:(CMBannerMessage *)message;
+- (void)messageDidLayout:(CMBannerMessage *)message;
 @end
 
 @protocol CMBannerNextMessageDelegate
@@ -31,7 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 // breaking/overriding our delegation system for dismiss/next
 @property(nonatomic, readwrite, nullable) id<CMBannerNextMessageDelegate>
     nextMessageDelegate;
-@property(nonatomic, readwrite) id<CMBannerDismissDelegate> dismissDelegate;
+@property(nonatomic, readwrite) id<CMBannerMessageManagerDelegate>
+    messageManagerDelegate;
 
 @end
 

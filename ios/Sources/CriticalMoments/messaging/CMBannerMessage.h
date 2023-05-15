@@ -14,15 +14,17 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Enumeration of CMBannerMannager positions
- @see CMBannerManager.appWideBannerPosition
+ Enumeration of CMBannerMessage positions
  @see CMBannerMessage.bannerPosition
+ @see CMBannerManager.appWideBannerPosition
  */
 typedef NS_ENUM(NSUInteger, CMBannerPosition) {
-    /// Position banners at the bottom of the key window
+    /// Position banners at the bottom of the key window (default)
     CMBannerPositionBottom,
     /// Position banners at the top of the key window
-    CMBannerPositionTop
+    CMBannerPositionTop,
+    /// Positions banner at last used position, or default bottom
+    CMBannerPositionNoPreference,
 };
 
 @class CMBannerMessage;
@@ -72,21 +74,24 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 #pragma mark Position
 
 /**
- The position to show this banner: the top or bottom of the screen.
+ The preferred position to show this banner: the top or bottom of the screen.
+
+ Not required. If not set will use the last banner position used, or system
+ default.
 
  If multiple banners are presented, the position of the last banner shown is
  used for all banners. You can't have both bottom and top at the same time.
 
  @see CMBannerManagerappWideBannerPosition for changing the app wide banner
- position any time, independent of any single banner message.
+ position any time, independent of any single banner message's preference.
  @warning Be sure to test your app renders well with the chosen position. The
- banner manager will resize your root view controller to make room for the
+ banner manager will add TODO your root view controller to make room for the
  banner; if you've hard coded offsets, for example the notch or dyamic island,
  then your app layout may be a bit strange. If you encounter issues, you should
  adapt use apple layout guides for any offsets, which will solve most of these
  issues and help on future hardware.
  */
-@property(nonatomic) CMBannerPosition bannerPosition;
+@property(nonatomic) CMBannerPosition preferredPosition;
 
 #pragma mark Theme
 
