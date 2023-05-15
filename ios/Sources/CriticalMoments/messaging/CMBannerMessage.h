@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
   - You should respect showDismissButton and maxLineCount properties in your
  view
  */
-@interface CMBannerMessage : NSObject
+@interface CMBannerMessage : UIView
 
 #pragma mark Initializers
 
@@ -130,7 +130,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  usage. See CMBannerMessage class documentation for notes on how to subclass
  properly.
  */
-- (UIView *)buildViewForMessage;
+//- (UIView *)buildViewForMessage;
 
 /**
  This method is only exposed for subclassing and should not be called in normal
