@@ -16,10 +16,6 @@ func TestInvalidBannerMissingField(t *testing.T) {
 		t.Fatal("Banners should require body")
 	}
 	b.Body = "Banner body"
-	if b.Validate() {
-		t.Fatal("Banners should require position")
-	}
-	b.Position = datamodel.BannerPositionTop
 	if !b.Validate() {
 		t.Fatal("Minimal banner failed validation")
 	}
@@ -31,13 +27,13 @@ func TestInvalidBannerMissingField(t *testing.T) {
 	if !b.Validate() {
 		t.Fatal("Minimal banner failed validation")
 	}
-	b.Position = ""
-	if b.Validate() {
-		t.Fatal("Banner allowed empty position")
-	}
-	b.Position = "invalid"
+	b.PreferredPosition = "invalid"
 	if b.Validate() {
 		t.Fatal("Banner allowed invalid position")
+	}
+	b.PreferredPosition = datamodel.BannerPositionBottom
+	if !b.Validate() {
+		t.Fatal("Banner disallowed valid position")
 	}
 }
 
@@ -130,6 +126,9 @@ func TestJsonParsingAllFieldsBanner(t *testing.T) {
 		t.Fatal()
 	}
 	if banner.ShowDismissButton == true {
+		t.Fatal()
+	}
+	if banner.PreferredPosition != datamodel.BannerPositionTop {
 		t.Fatal()
 	}
 }

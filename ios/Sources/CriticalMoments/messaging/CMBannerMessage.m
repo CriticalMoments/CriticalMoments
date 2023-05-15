@@ -17,6 +17,8 @@
 @property(nonatomic, strong, readwrite) NSString *body;
 @property(nonatomic, strong, readwrite) NSString *appcoreTapActionName;
 @property(nonatomic, strong, readwrite) NSString *appcoreThemeName;
+@property(nonnull, strong, readwrite) UIButton *nextButton, *dismissButton;
+@property(nonnull, strong, readwrite) UILabel *bodyLabel;
 
 @end
 
@@ -27,7 +29,9 @@
     if (self) {
         self.body = body;
         self.showDismissButton = YES;
-        self.bannerPosition = CMBannerPositionBottom;
+        self.preferredPosition = CMBannerPositionNoPreference;
+
+        [self buildView];
     }
     return self;
 }
@@ -36,6 +40,7 @@
     self = [super init];
     if (self) {
         self.body = bannerData.body;
+
         self.showDismissButton = bannerData.showDismissButton;
         if (bannerData.maxLineCount !=
             DatamodelBannerMaxLineCountSystemDefault) {
@@ -50,16 +55,27 @@
                 [CMTheme namedThemeFromAppcore:bannerData.customThemeName];
             self.customTheme = customTheme;
         }
-        if ([DatamodelBannerPositionTop isEqualToString:bannerData.position]) {
-            self.bannerPosition = CMBannerPositionTop;
-        } else {
-            self.bannerPosition = CMBannerPositionBottom;
+
+        self.preferredPosition = CMBannerPositionNoPreference;
+        if ([DatamodelBannerPositionTop
+                isEqualToString:bannerData.preferredPosition]) {
+            self.preferredPosition = CMBannerPositionTop;
+        } else if ([DatamodelBannerPositionBottom
+                       isEqualToString:bannerData.preferredPosition]) {
+            self.preferredPosition = CMBannerPositionBottom;
         }
+
+        [self buildView];
     }
     return self;
 }
 
-- (UIView *)buildViewForMessage {
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self.messageManagerDelegate messageDidLayout:self];
+}
+
+- (void)buildView {
     CMTheme *theme = self.customTheme;
     if (!theme) {
         theme = CMTheme.current;
@@ -68,123 +84,144 @@
     UIColor *backgroundBannerColor = theme.bannerBackgroundColor;
     UIFont *bannerFont = [theme boldFontOfSize:UIFont.systemFontSize];
 
-    UIView *view = [[UIView alloc] init];
-    view.backgroundColor = backgroundBannerColor;
+    self.backgroundColor = backgroundBannerColor;
 
-    UILabel *bodyLabel = [[UILabel alloc] init];
-    bodyLabel.text = self.body;
-    bodyLabel.textColor = forgroundBannerColor;
-    bodyLabel.font = bannerFont;
-    bodyLabel.backgroundColor = [UIColor clearColor];
-    bodyLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    _bodyLabel = [[UILabel alloc] init];
+    _bodyLabel.text = self.body;
+    _bodyLabel.textColor = forgroundBannerColor;
+    _bodyLabel.font = bannerFont;
+    _bodyLabel.backgroundColor = [UIColor clearColor];
+    _bodyLabel.translatesAutoresizingMaskIntoConstraints = NO;
     if (self.maxLineCount) {
-        bodyLabel.numberOfLines = [self.maxLineCount intValue];
+        _bodyLabel.numberOfLines = [self.maxLineCount intValue];
     } else {
-        bodyLabel.numberOfLines = 4;
+        _bodyLabel.numberOfLines = 4;
     }
-    [view addSubview:bodyLabel];
+    [self addSubview:_bodyLabel];
 
     // Gesture for action
-    if (self.actionDelegate) {
-        UITapGestureRecognizer *tapReco = [[UITapGestureRecognizer alloc]
-            initWithTarget:self
-                    action:@selector(bannerTapped)];
-        [view setUserInteractionEnabled:YES];
-        [view addGestureRecognizer:tapReco];
-    }
+    UITapGestureRecognizer *tapReco =
+        [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                action:@selector(bannerTapped)];
+    [self setUserInteractionEnabled:YES];
+    [self addGestureRecognizer:tapReco];
 
     // Layout
 
     NSArray<NSLayoutConstraint *> *constraints = @[
-        [bodyLabel.topAnchor
-            constraintEqualToAnchor:view.layoutMarginsGuide.topAnchor],
-        [bodyLabel.bottomAnchor
-            constraintEqualToAnchor:view.layoutMarginsGuide.bottomAnchor],
-        [bodyLabel.leftAnchor
-            constraintGreaterThanOrEqualToAnchor:view.layoutMarginsGuide
+        [_bodyLabel.topAnchor
+            constraintEqualToAnchor:self.layoutMarginsGuide.topAnchor],
+        [_bodyLabel.bottomAnchor
+            constraintEqualToAnchor:self.layoutMarginsGuide.bottomAnchor],
+        [_bodyLabel.leftAnchor
+            constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide
                                                      .leftAnchor],
-        [bodyLabel.rightAnchor
-            constraintLessThanOrEqualToAnchor:view.layoutMarginsGuide
+        [_bodyLabel.rightAnchor
+            constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide
                                                   .rightAnchor],
-        [bodyLabel.centerXAnchor constraintEqualToAnchor:view.centerXAnchor],
+        [_bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
         // Max width for iPad, based on readableContentGuide from Apple
-        [bodyLabel.widthAnchor constraintLessThanOrEqualToConstant:672],
+        [_bodyLabel.widthAnchor constraintLessThanOrEqualToConstant:672],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
 
-    if (self.showDismissButton) {
-        UIButton *dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        if (@available(iOS 13.0, *)) {
-            UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"]
-                imageWithTintColor:forgroundBannerColor
-                     renderingMode:UIImageRenderingModeAlwaysOriginal];
-            [dismissButton setImage:dismissImage forState:UIControlStateNormal];
-        } else {
-            // TODO: check this unicode on earliest deployment target: ios 11
-            [dismissButton setTitle:@"✕" forState:UIControlStateNormal];
-            [dismissButton setTitleColor:forgroundBannerColor
-                                forState:UIControlStateNormal];
-        }
-        [dismissButton addTarget:self
-                          action:@selector(dismissTapped:)
-                forControlEvents:UIControlEventPrimaryActionTriggered];
-        dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [view addSubview:dismissButton];
-
-        // Layout for dismiss button, making room for body
-        constraints = [constraints arrayByAddingObjectsFromArray:@[
-            // 44=HIG accessibility recommendation
-            [dismissButton.heightAnchor constraintEqualToConstant:44],
-            [dismissButton.widthAnchor constraintEqualToConstant:44],
-            [dismissButton.rightAnchor
-                constraintEqualToAnchor:view.layoutMarginsGuide.rightAnchor],
-            [dismissButton.centerYAnchor
-                constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-            // -6 is just visual padding on left of X button
-            [bodyLabel.rightAnchor
-                constraintLessThanOrEqualToAnchor:dismissButton.leftAnchor
-                                         constant:-6],
-        ]];
-    }
-
-    // Check for multiple messages
-    if (self.nextMessageDelegate) {
-        // Create "ᐊᐅ" button
-        UIButton *nextMessageButton =
-            [UIButton buttonWithType:UIButtonTypeCustom];
+    _dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    if (@available(iOS 13.0, *)) {
+        UIImage *dismissImage = [[UIImage systemImageNamed:@"xmark"]
+            imageWithTintColor:forgroundBannerColor
+                 renderingMode:UIImageRenderingModeAlwaysOriginal];
+        [_dismissButton setImage:dismissImage forState:UIControlStateNormal];
+    } else {
         // TODO: check this unicode on earliest deployment target: ios 11
-        [nextMessageButton setTitle:@"ᐊᐅ" forState:UIControlStateNormal];
-        [nextMessageButton setTitleColor:forgroundBannerColor
-                                forState:UIControlStateNormal];
-        [nextMessageButton addTarget:self
-                              action:@selector(nextMessageButtonTapped:)
-                    forControlEvents:UIControlEventPrimaryActionTriggered];
-        nextMessageButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [view addSubview:nextMessageButton];
+        [_dismissButton setTitle:@"✕" forState:UIControlStateNormal];
+        [_dismissButton setTitleColor:forgroundBannerColor
+                             forState:UIControlStateNormal];
+    }
+    [_dismissButton addTarget:self
+                       action:@selector(dismissTapped:)
+             forControlEvents:UIControlEventPrimaryActionTriggered];
+    _dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self updateDismissButonState];
 
-        // 44=HIG min size for tap target
-        constraints = [constraints arrayByAddingObjectsFromArray:@[
-            [nextMessageButton.heightAnchor
-                constraintGreaterThanOrEqualToConstant:44],
-            [nextMessageButton.widthAnchor
-                constraintGreaterThanOrEqualToConstant:44],
-            [nextMessageButton.leftAnchor
-                constraintEqualToAnchor:view.layoutMarginsGuide.leftAnchor],
-            [nextMessageButton.centerYAnchor
-                constraintEqualToAnchor:view.layoutMarginsGuide.centerYAnchor],
-            [bodyLabel.leftAnchor
-                constraintGreaterThanOrEqualToAnchor:nextMessageButton
-                                                         .rightAnchor],
-        ]];
+    // Create "ᐊᐅ" button for next message
+    _nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    // TODO: check this unicode on earliest deployment target: ios 11
+    [_nextButton setTitle:@"ᐊᐅ" forState:UIControlStateNormal];
+    [_nextButton setTitleColor:forgroundBannerColor
+                      forState:UIControlStateNormal];
+    [_nextButton addTarget:self
+                    action:@selector(nextMessageButtonTapped:)
+          forControlEvents:UIControlEventPrimaryActionTriggered];
+    _nextButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self updateNextButtonState];
+}
+
+- (void)setShowDismissButton:(bool)showDismissButton {
+    _showDismissButton = showDismissButton;
+    [self updateDismissButonState];
+}
+
+- (void)setNextMessageDelegate:
+    (id<CMBannerNextMessageDelegate>)nextMessageDelegate {
+    _nextMessageDelegate = nextMessageDelegate;
+    [self updateNextButtonState];
+}
+
+- (void)updateDismissButonState {
+    if (!_dismissButton) {
+        return;
     }
 
-    [NSLayoutConstraint activateConstraints:constraints];
+    if (!self.showDismissButton && _dismissButton.superview) {
+        [_dismissButton removeFromSuperview];
+    } else if (self.showDismissButton && _dismissButton.superview == nil) {
+        // Layout for dismiss button, making room for body
+        [self addSubview:_dismissButton];
 
-    return view;
+        NSArray<NSLayoutConstraint *> *constraints = @[
+            // 44=HIG accessibility recommendation
+            [_dismissButton.heightAnchor constraintEqualToConstant:44],
+            [_dismissButton.widthAnchor constraintEqualToConstant:44],
+            [_dismissButton.rightAnchor
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.rightAnchor],
+            [_dismissButton.centerYAnchor
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.centerYAnchor],
+            // -6 is just visual padding on left of X button
+            [_bodyLabel.rightAnchor
+                constraintLessThanOrEqualToAnchor:_dismissButton.leftAnchor
+                                         constant:-6],
+        ];
+        [NSLayoutConstraint activateConstraints:constraints];
+    }
+}
+
+- (void)updateNextButtonState {
+    if (!_nextButton) {
+        return;
+    }
+
+    if (_nextMessageDelegate == nil && _nextButton.superview != nil) {
+        [_nextButton removeFromSuperview];
+    } else if (_nextMessageDelegate != nil && _nextButton.superview == nil) {
+        [self addSubview:_nextButton];
+
+        NSArray<NSLayoutConstraint *> *constraints = @[
+            [_nextButton.heightAnchor
+                constraintGreaterThanOrEqualToConstant:44],
+            [_nextButton.widthAnchor constraintGreaterThanOrEqualToConstant:44],
+            [_nextButton.leftAnchor
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.leftAnchor],
+            [_nextButton.centerYAnchor
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.centerYAnchor],
+            [_bodyLabel.leftAnchor
+                constraintGreaterThanOrEqualToAnchor:_nextButton.rightAnchor],
+        ];
+        [NSLayoutConstraint activateConstraints:constraints];
+    }
 }
 
 - (void)dismissTapped:(UIButton *)sender {
-    [self.dismissDelegate dismissedMessage:self];
+    [self.messageManagerDelegate dismissedMessage:self];
 }
 
 - (void)nextMessageButtonTapped:(UIButton *)sender {

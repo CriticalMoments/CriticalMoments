@@ -5,6 +5,7 @@
         "maxLineCount": 1,
         "tapActionName": "customAction",
         "customThemeName": "navy",
-        "showDismissButton": false
+        "showDismissButton": false,
+        "preferredPosition": "top"
     }
 }

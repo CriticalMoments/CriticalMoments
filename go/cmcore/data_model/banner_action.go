@@ -17,7 +17,7 @@ type BannerAction struct {
 	MaxLineCount      int
 	TapActionName     string
 	CustomThemeName   string
-	Position          string
+	PreferredPosition string
 }
 
 type jsonBannerAction struct {
@@ -26,7 +26,7 @@ type jsonBannerAction struct {
 	MaxLineCount      *int    `json:"maxLineCount,omitempty"`
 	TapActionName     string  `json:"tapActionName,omitempty"`
 	CustomThemeName   string  `json:"customThemeName,omitempty"`
-	Position          *string `json:"position,omitempty"`
+	PreferredPosition *string `json:"preferredPosition,omitempty"`
 }
 
 func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
@@ -52,8 +52,8 @@ func (b BannerAction) ValidateReturningUserReadableIssue() string {
 		// Not user facing or a value they should put in json or see in libraries
 		return "Banner max line count must be a positive integer, or 0 for no limit"
 	}
-	if b.Position != BannerPositionTop && b.Position != BannerPositionBottom {
-		return fmt.Sprintf("Banner position must be top or bottom. \"%v\" is not valid", b.Position)
+	if b.PreferredPosition != "" && b.PreferredPosition != BannerPositionTop && b.PreferredPosition != BannerPositionBottom {
+		return fmt.Sprintf("Banner preferred position must be empty, top or bottom. \"%v\" is not valid", b.PreferredPosition)
 	}
 
 	return ""
@@ -75,9 +75,9 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	if ja.MaxLineCount != nil {
 		maxLineCount = *ja.MaxLineCount
 	}
-	position := BannerPositionBottom
-	if ja.Position != nil {
-		position = *ja.Position
+	preferredPosition := ""
+	if ja.PreferredPosition != nil {
+		preferredPosition = *ja.PreferredPosition
 	}
 
 	banner.Body = ja.Body
@@ -85,7 +85,7 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.MaxLineCount = maxLineCount
 	banner.TapActionName = ja.TapActionName
 	banner.CustomThemeName = ja.CustomThemeName
-	banner.Position = position
+	banner.PreferredPosition = preferredPosition
 
 	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)
