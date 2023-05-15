@@ -44,20 +44,6 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 /**
  This class represents individual banner message which can be presented across
  the top or bottom of your app.
-
- This class can be subclassed to implement completely custom views. Before
- subclassing, try using themes to achieve desired look. If you choose to
- subclass:
-  - You should implement buildViewForMessage
-  - Your view should have dismiss buttons, which targets the dismissTapped
- method
-  - Your view should have a "next message" button, which targets the
- nextMessageButtonTapped method
-  - Your view should call the actionDelegate on tap
-  - Text should be loaded from the body property. If you hardcode, server driven
- messaging won't be available
-  - You should respect showDismissButton and maxLineCount properties in your
- view
  */
 @interface CMBannerMessage : UIView
 
@@ -76,8 +62,8 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 /**
  The preferred position to show this banner: the top or bottom of the screen.
 
- Not required. If not set will use the last banner position used, or system
- default.
+ By default set to "no preference" and message will use the last banner position
+ used, or system default.
 
  If multiple banners are presented, the position of the last banner shown is
  used for all banners. You can't have both bottom and top at the same time.
@@ -85,11 +71,12 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  @see CMBannerManagerappWideBannerPosition for changing the app wide banner
  position any time, independent of any single banner message's preference.
  @warning Be sure to test your app renders well with the chosen position. The
- banner manager will add TODO your root view controller to make room for the
- banner; if you've hard coded offsets, for example the notch or dyamic island,
- then your app layout may be a bit strange. If you encounter issues, you should
- adapt use apple layout guides for any offsets, which will solve most of these
- issues and help on future hardware.
+ banner manager will add to your root view controller's
+ `additionalSafeAreaInsets` to make room for the banner; if you've hard coded
+ offsets, for example the notch or dyamic island, then your app layout may be a
+ bit strange. If you encounter issues, you should adapt use apple layout guides
+ / safe-area-insets for any offsets, which will solve most of these issues and
+ help on future hardware.
  */
 @property(nonatomic) CMBannerPosition preferredPosition;
 
@@ -127,29 +114,6 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  set, tapping will not perform any action.
  */
 @property(nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
-
-#pragma mark Subclassing
-
-/**
- This method is only exposed for subclassing and should not be called in normal
- usage. See CMBannerMessage class documentation for notes on how to subclass
- properly.
- */
-//- (UIView *)buildViewForMessage;
-
-/**
- This method is only exposed for subclassing and should not be called in normal
- usage. See CMBannerMessage class documentation for notes on how to subclass
- properly.
- */
-- (void)dismissTapped:(UIButton *)sender;
-
-/**
- This method is only exposed for subclassing and should not be called in normal
- usage. See CMBannerMessage class documentation for notes on how to subclass
- properly.
- */
-- (void)nextMessageButtonTapped:(UIButton *)sender;
 
 @end
 

@@ -210,9 +210,9 @@
                 constraintGreaterThanOrEqualToConstant:44],
             [_nextButton.widthAnchor constraintGreaterThanOrEqualToConstant:44],
             [_nextButton.leftAnchor
-                constraintEqualToAnchor:self.layoutMarginsGuide.leftAnchor],
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.leftAnchor],
             [_nextButton.centerYAnchor
-                constraintEqualToAnchor:self.layoutMarginsGuide.centerYAnchor],
+                constraintEqualToAnchor:self.safeAreaLayoutGuide.centerYAnchor],
             [_bodyLabel.leftAnchor
                 constraintGreaterThanOrEqualToAnchor:_nextButton.rightAnchor],
         ];

@@ -217,7 +217,7 @@ static CMBannerManager *sharedInstance = nil;
         return;
     }
 
-    // Add the container view to the key window root VC
+    // Add the banner container view to the key window
     _appWideContainerView = [[UIView alloc] init];
     [keyWindow addSubview:_appWideContainerView];
 
@@ -317,14 +317,14 @@ static CMBannerManager *sharedInstance = nil;
     // zero
     if (rootVc != _injectedInsetsRootVc) {
         _insetAddedForBanner = UIEdgeInsetsZero;
+        _injectedInsetsRootVc = nil;
     }
 
     // We want to have minimal impact to apps when setting the
     // additionalSafeAreaInsets New inset is:
     // - The height of our banner
     // - subtract the height of the safeAreaInset on that side, since we're
-    // laying out over that
-    //   and the app shouldn't double up the safe area
+    // laying out over that and the app shouldn't double up the safe area
     // - Add back in any insets the app set for their own UI reasons.
 
     UIEdgeInsets newInsets = rootVc.additionalSafeAreaInsets;

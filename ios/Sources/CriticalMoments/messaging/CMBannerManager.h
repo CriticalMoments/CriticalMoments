@@ -46,11 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
  Set this to configure if the banner messages are presented at the top or bottom
  of your app.
  @warning Be sure to test your app renders well with the chosen position. The
- banner manager will resize your root view controller to make room for the
- banner; if you've hard coded offsets, for example the notch or dyamic island,
- then your app layout may be a bit strange. If you encounter issues, you should
- adapt use apple layout guides for any offsets, which will solve most of these
- issues and help on future hardware.
+ banner manager will add to your root view controller's
+ `additionalSafeAreaInsets` to make room for the banner; if you've hard coded
+ offsets, for example the notch or dyamic island, then your app layout may be a
+ bit strange. If you encounter issues, you should adapt use apple layout guides
+ / safe-area-insets for any offsets, which will solve most of these issues and
+ help on future hardware.
  @see CMBannerPosition enumeration
  @see CMBannerMessage.bannerPosition to set the position of a specific message
  */
