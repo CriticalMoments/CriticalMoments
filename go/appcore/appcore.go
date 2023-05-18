@@ -22,6 +22,9 @@ type Appcore struct {
 	// Primary configuration
 	configUrlString string
 	config          *datamodel.PrimaryConfig
+
+	// Cache
+	cache *cache
 }
 
 var sharedAppcore Appcore = newAppcore()
@@ -46,6 +49,16 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	return nil
 }
 
+func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
+	cache, err := newCacheWithBaseDir(cacheDirPath)
+	if err != nil {
+		return err
+	}
+
+	ac.cache = cache
+	return nil
+}
+
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	ac.libBindings = lb
 }
@@ -57,6 +70,9 @@ func (ac *Appcore) Start() error {
 	}
 	if ac.libBindings == nil {
 		return errors.New("The SDK must register LibBindings before calling start")
+	}
+	if ac.cache == nil {
+		return errors.New("The SDK must register a cache directory before calling start")
 	}
 
 	// Load file:// urls load sync

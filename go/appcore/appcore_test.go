@@ -2,6 +2,8 @@ package appcore
 
 import (
 	"fmt"
+	"math/rand"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -67,6 +69,12 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	}
 	configUrl := fmt.Sprintf("file://%v", configPath)
 	err = ac.SetConfigUrl(configUrl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	baseCachePath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
+	os.MkdirAll(baseCachePath, os.ModePerm)
+	err = ac.SetCacheDirPath(baseCachePath)
 	if err != nil {
 		t.Fatal(err)
 	}
