@@ -22,13 +22,7 @@
 }
 
 + (void)start {
-    // TODO: move to bg thread?
-
-    // Register the action dispatcher
-    [CMLibBindings registerWithAppcore];
-
-    NSError *error;
-    [AppcoreSharedAppcore() start:&error];
+    NSError *error = [CriticalMoments startReturningError];
     if (error) {
         NSLog(@"CriticalMoments: Critical Moments was unable to start! %@",
               error);
@@ -39,6 +33,39 @@
         @throw NSInternalInconsistencyException;
 #endif
     }
+}
+
++ (NSError *)startReturningError {
+    // TODO: move to bg thread?
+
+    // Register the action dispatcher
+    [CMLibBindings registerWithAppcore];
+
+    // Set the cache directory to applicationSupport/CriticalMomentsData
+    NSURL *appSupportDir = [[NSFileManager.defaultManager
+        URLsForDirectory:NSApplicationSupportDirectory
+               inDomains:NSUserDomainMask] lastObject];
+    NSURL *criticalMomentsCacheDir =
+        [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
+    NSError *error;
+    [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsCacheDir
+                           withIntermediateDirectories:YES
+                                            attributes:nil
+                                                 error:&error];
+    if (error) {
+        return error;
+    }
+    [AppcoreSharedAppcore() setCacheDirPath:[criticalMomentsCacheDir path]
+                                      error:&error];
+    if (error) {
+        return error;
+    }
+
+    [AppcoreSharedAppcore() start:&error];
+    if (error) {
+        return error;
+    }
+    return nil;
 }
 
 + (void)setConfigUrl:(NSString *)urlString {
