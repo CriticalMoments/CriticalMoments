@@ -22,22 +22,26 @@
 }
 
 + (void)start {
-    NSError *error = [CriticalMoments startReturningError];
-    if (error) {
-        NSLog(@"CriticalMoments: Critical Moments was unable to start! %@",
-              error);
+    dispatch_async(
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+          NSError *error = [CriticalMoments startReturningError];
+          if (error) {
+              NSLog(
+                  @"CriticalMoments: Critical Moments was unable to start! %@",
+                  error);
 #if DEBUG
-        NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
-              @"to help find this issue. Exceptions are only thrown in debug "
-              @"mode, and will not crash apps built for release.");
-        @throw NSInternalInconsistencyException;
+              NSLog(@"CriticalMoments: throwing a "
+                    @"NSInternalInconsistencyException "
+                    @"to help find this issue. Exceptions are only thrown in "
+                    @"debug "
+                    @"mode, and will not crash apps built for release.");
+              @throw NSInternalInconsistencyException;
 #endif
-    }
+          }
+        });
 }
 
 + (NSError *)startReturningError {
-    // TODO: move to bg thread?
-
     // Register the action dispatcher
     [CMLibBindings registerWithAppcore];
 

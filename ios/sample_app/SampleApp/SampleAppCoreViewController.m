@@ -56,10 +56,15 @@
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
 
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"config"
-                                         withExtension:@"json"];
+    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config"
+                                                    withExtension:@"json"];
+    [CriticalMoments setConfigUrl:localConfigUrl.absoluteString];
 
-    [CriticalMoments setConfigUrl:url.absoluteString];
+    /*NSString *webBasedConfigUrl =
+        @"https://storage.googleapis.com/critical-moments-test-cases/"
+        @"demoAppConfig.json?a=123";
+    [CriticalMoments setConfigUrl:webBasedConfigUrl];*/
+
     [CriticalMoments start];
 }
 
