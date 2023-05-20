@@ -75,26 +75,36 @@ func (ac *Appcore) Start() error {
 		return errors.New("The SDK must register a cache directory before calling start")
 	}
 
-	// Load file:// urls load sync
+	var configFilePath string
+	var err error
+
 	if strings.HasPrefix(ac.configUrlString, filePrefix) {
 		// Strip file:// prefix
-		filePath := ac.configUrlString[len(filePrefix):]
-		configFileData, err := os.ReadFile(filePath)
-		if err != nil {
-			return err
-		}
-		var pc datamodel.PrimaryConfig
-		err = json.Unmarshal(configFileData, &pc)
-		if err != nil {
-			return err
-		}
-		ac.config = &pc
-		err = ac.postConfigSetup()
-		if err != nil {
-			return err
-		}
+		configFilePath = ac.configUrlString[len(filePrefix):]
 	} else if strings.HasPrefix(ac.configUrlString, httpsPrefix) {
-		// TODO: Load http urls async and call postConfigSetup
+		configFilePath, err = ac.cache.verifyOrFetchRemoteConfigFile(ac.configUrlString, "primary")
+		if err != nil {
+			return err
+		}
+	}
+	if configFilePath == "" {
+		// TODO: network error not fatal
+		return errors.New("CriticalMoments: Invalid config url")
+	}
+
+	configFileData, err := os.ReadFile(configFilePath)
+	if err != nil {
+		return err
+	}
+	var pc datamodel.PrimaryConfig
+	err = json.Unmarshal(configFileData, &pc)
+	if err != nil {
+		return err
+	}
+	ac.config = &pc
+	err = ac.postConfigSetup()
+	if err != nil {
+		return err
 	}
 
 	return nil
