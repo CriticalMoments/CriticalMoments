@@ -90,7 +90,7 @@ func TestDeletePriorCache(t *testing.T) {
 		t.Fatal("verify or fetch didn't fetch file")
 	}
 
-	if _, err := os.Stat(full); os.IsNotExist(err) {
+	if _, err := os.Stat(full); !os.IsNotExist(err) {
 		t.Fatal("Didn't delete prior cache file when we got a new one")
 	}
 }

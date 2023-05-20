@@ -48,22 +48,27 @@ func (c *cache) verifyOrFetchRemoteConfigFile(rawUrl string, configFileName stri
 	}
 
 	// find existing config in cache
-	existingCached, existingEtag := c.existingCacheFileOfName(configFileName)
-	if existingEtag != "" {
+	priorCached, priorEtag := c.existingCacheFileOfName(configFileName)
+	if priorEtag != "" {
 		// validate etag hasn't changed, so we don't have to request full file
 		currentEtag := fetchEtag(url)
-		if currentEtag == existingEtag {
-			return existingCached, nil
-		} else {
-			// existing cached is no longer valid
-			// TODO: not until new is successful
-			os.Remove(existingCached)
+		if currentEtag == priorEtag {
+			return priorCached, nil
 		}
 	}
 
 	newCached, err := c.fetchAndCache(url, configFileName)
 	if err != nil {
 		return "", nil
+	}
+
+	// Prior cache has been replaced, delete it
+	if priorCached != "" {
+		err = os.Remove(priorCached)
+		if err != nil {
+			// Shouldn't happen, shouldn't be fatal if it does
+			fmt.Println("CriticalMoments: Could not delete prior cache file, cache directory is accumulating files")
+		}
 	}
 
 	return newCached, nil
