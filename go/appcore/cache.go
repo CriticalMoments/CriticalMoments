@@ -60,7 +60,7 @@ func (c *cache) verifyOrFetchRemoteConfigFile(rawUrl string, configFileName stri
 	newCached, err := c.fetchAndCache(url, configFileName)
 	if err != nil {
 		if priorCached != "" {
-			fmt.Printf("CriticalMoments: Unable to update CM config file. This may be a temporarly a network issue (ie, you're offline). Using an older cached file. Please verify url is valid if you're online and expect this to work: %v\n", url)
+			fmt.Printf("CriticalMoments: Unable to update CM config file. This may be a temporarly a network issue (ie, you're offline). For now, CM will use a cached config file. Please verify url is valid if you're online and expect this to work: %v\n", url)
 			return priorCached, nil
 		}
 		return "", nil
@@ -160,8 +160,8 @@ func (c *cache) fetchAndCache(url string, fileName string) (cachedFile string, e
 
 	// Jump though hoops of write then move to make this atomic (via Rename)
 	tmpCache := filepath.Join(c.baseDirectory, "tmp")
-	err = os.Mkdir(tmpCache, 0744)
-	if err != nil && !os.IsExist(err) {
+	err = os.MkdirAll(tmpCache, 0744)
+	if err != nil {
 		return "", err
 	}
 	tmpFilePath := filepath.Join(tmpCache, fmt.Sprintf("%v", rand.Int()))
