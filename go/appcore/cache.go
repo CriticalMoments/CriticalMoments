@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,9 +35,17 @@ func newCacheWithBaseDir(cacheDirPath string) (*cache, error) {
 	return &cache, nil
 }
 
-func (c *cache) verifyOrFetchRemoteConfigFile(url string, configFileName string) (filepath string, err error) {
+func (c *cache) verifyOrFetchRemoteConfigFile(rawUrl string, configFileName string) (filepath string, err error) {
 	// filename: primary--etag--[ETAG].config if etag, if not primary.config
 	// only one "primary*.config" at a time.
+
+	// Some cloud hosts add caching headers by default, meaning the network edge caches files for long periods
+	// making updates slow. This can be really painful if you have an urgent message to get out or bug in your config file
+	// We force loading from origin by adding a unique query param
+	url, err := cacheBustUrl(rawUrl)
+	if err != nil {
+		return "", err
+	}
 
 	// find existing config in cache
 	existingCached, existingEtag := c.existingCacheFileOfName(configFileName)
@@ -47,6 +56,7 @@ func (c *cache) verifyOrFetchRemoteConfigFile(url string, configFileName string)
 			return existingCached, nil
 		} else {
 			// existing cached is no longer valid
+			// TODO: not until new is successful
 			os.Remove(existingCached)
 		}
 	}
@@ -184,4 +194,15 @@ func cleanEtag(etag string) string {
 		return ""
 	}
 	return coreEtag
+}
+
+func cacheBustUrl(urlString string) (cacheBustUrl string, err error) {
+	url, err := url.Parse(urlString)
+	if err != nil {
+		return "", err
+	}
+	values := url.Query()
+	values.Set("cm_cache_buster", fmt.Sprintf("%v", rand.Int()))
+	url.RawQuery = values.Encode()
+	return url.String(), nil
 }

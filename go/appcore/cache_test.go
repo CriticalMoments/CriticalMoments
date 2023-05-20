@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -222,5 +223,23 @@ func TestCheckNetworkFetchMainPath(t *testing.T) {
 
 	if preVerifyOrFetchFileInfo.ModTime() != postVerifyOrFetchFileInfo.ModTime() {
 		t.Fatal("Fetched when cache was available")
+	}
+}
+
+func TestCacheBuster(t *testing.T) {
+	baseUrl := "https://criticalmoments.io/resource.config?a=a"
+	cb1, err := cacheBustUrl(baseUrl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasPrefix(cb1, "https://criticalmoments.io/resource.config?a=a&cm_cache_buster=") {
+		t.Fatalf("Cache not busted or existing query clobbered %v", cb1)
+	}
+	cb2, err := cacheBustUrl(baseUrl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cb2 == cb1 {
+		t.Fatalf("Cache not uniquely busted %v, %v", cb1, cb2)
 	}
 }
