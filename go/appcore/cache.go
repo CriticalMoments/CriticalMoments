@@ -142,7 +142,7 @@ func (c *cache) fetchAndCache(url string, fileName string) (cachedFile string, e
 	// Jump though hoops of write then move to make this atomic (via Rename)
 	tmpCache := filepath.Join(c.baseDirectory, "tmp")
 	err = os.Mkdir(tmpCache, 0744)
-	if err != nil {
+	if err != nil && !os.IsExist(err) {
 		return "", err
 	}
 	tmpFilePath := filepath.Join(tmpCache, fmt.Sprintf("%v", rand.Int()))
@@ -155,6 +155,9 @@ func (c *cache) fetchAndCache(url string, fileName string) (cachedFile string, e
 	if err != nil {
 		defer os.Remove(cacheFileFullPath)
 		return "", err
+	}
+	if cacheFileFullPath == "" {
+		return "", errors.New("Unknown issue caching config file")
 	}
 
 	return cacheFileFullPath, nil
