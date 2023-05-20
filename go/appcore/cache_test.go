@@ -95,6 +95,33 @@ func TestDeletePriorCache(t *testing.T) {
 	}
 }
 
+func TestFallbackOnNetworkIssue(t *testing.T) {
+	// expensive TLD. You can mess with me but not for free :)
+	url := "https://notarealpathsothiswillfail.game"
+	configName := "primary"
+
+	base := fmt.Sprintf("/tmp/criticalmoments/testdeletepriorconfig-%v", rand.Int())
+	full := base + "/primary.config"
+	os.MkdirAll(base, os.ModePerm)
+	os.OpenFile(full, os.O_RDONLY|os.O_CREATE, 0666)
+	cache, _ := newCacheWithBaseDir(base)
+	path, etag := cache.existingCacheFileOfName("primary")
+	if path == "" || etag != "" {
+		t.Fatal()
+	}
+	if _, err := os.Stat(full); err != nil {
+		t.Fatal("issue with manually created cache file, test invalid")
+	}
+
+	filePath, err := cache.verifyOrFetchRemoteConfigFile(url, configName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if filePath != full {
+		t.Fatal("Failed to fallback to cached on network issue")
+	}
+}
+
 func TestCheckCleanEtag(t *testing.T) {
 	c := cleanEtag("W/\"weaktag\"")
 	if c != "" {
