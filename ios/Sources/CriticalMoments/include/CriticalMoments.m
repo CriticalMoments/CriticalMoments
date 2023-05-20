@@ -22,23 +22,54 @@
 }
 
 + (void)start {
-    // TODO: move to bg thread?
+    dispatch_async(
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+          NSError *error = [CriticalMoments startReturningError];
+          if (error) {
+              NSLog(
+                  @"CriticalMoments: Critical Moments was unable to start! %@",
+                  error);
+#if DEBUG
+              NSLog(@"CriticalMoments: throwing a "
+                    @"NSInternalInconsistencyException "
+                    @"to help find this issue. Exceptions are only thrown in "
+                    @"debug "
+                    @"mode, and will not crash apps built for release.");
+              @throw NSInternalInconsistencyException;
+#endif
+          }
+        });
+}
 
++ (NSError *)startReturningError {
     // Register the action dispatcher
     [CMLibBindings registerWithAppcore];
 
+    // Set the cache directory to applicationSupport/CriticalMomentsData
+    NSURL *appSupportDir = [[NSFileManager.defaultManager
+        URLsForDirectory:NSApplicationSupportDirectory
+               inDomains:NSUserDomainMask] lastObject];
+    NSURL *criticalMomentsCacheDir =
+        [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
     NSError *error;
+    [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsCacheDir
+                           withIntermediateDirectories:YES
+                                            attributes:nil
+                                                 error:&error];
+    if (error) {
+        return error;
+    }
+    [AppcoreSharedAppcore() setCacheDirPath:[criticalMomentsCacheDir path]
+                                      error:&error];
+    if (error) {
+        return error;
+    }
+
     [AppcoreSharedAppcore() start:&error];
     if (error) {
-        NSLog(@"CriticalMoments: Critical Moments was unable to start! %@",
-              error);
-#if DEBUG
-        NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
-              @"to help find this issue. Exceptions are only thrown in debug "
-              @"mode, and will not crash apps built for release.");
-        @throw NSInternalInconsistencyException;
-#endif
+        return error;
     }
+    return nil;
 }
 
 + (void)setConfigUrl:(NSString *)urlString {
