@@ -88,7 +88,6 @@ func (ac *Appcore) Start() error {
 		}
 	}
 	if configFilePath == "" {
-		// TODO: network error not fatal
 		return errors.New("CriticalMoments: Invalid config url")
 	}
 
