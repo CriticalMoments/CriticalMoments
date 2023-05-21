@@ -39,6 +39,9 @@ func newPropertyRegistry() *propertyRegistry {
 			"locale_language_code": reflect.String,
 			"locale_country_code":  reflect.String,
 			"locale_currency_code": reflect.String,
+			"app_version_string":   reflect.String,
+			"user_interface_idiom": reflect.String,
+			"app_id":               reflect.String,
 		},
 		wellKnownPropertyTypes: map[string]reflect.Kind{
 			"user_signed_in": reflect.Bool,

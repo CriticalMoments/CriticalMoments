@@ -28,6 +28,36 @@
                                value:locale.countryCode];
     [ac registerStaticStringProperty:@"locale_currency_code"
                                value:locale.currencyCode];
+
+    [ac registerStaticStringProperty:@"app_id"
+                               value:NSBundle.mainBundle.bundleIdentifier];
+    NSString *appVersion = [NSBundle.mainBundle
+        objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    [ac registerStaticStringProperty:@"app_version_string" value:appVersion];
+
+    NSString *stringUserInterfaceIdiom = @"unknown";
+    switch (UIDevice.currentDevice.userInterfaceIdiom) {
+    case UIUserInterfaceIdiomPhone:
+        stringUserInterfaceIdiom = @"phone";
+        break;
+    case UIUserInterfaceIdiomPad:
+        stringUserInterfaceIdiom = @"tablet";
+        break;
+    case UIUserInterfaceIdiomTV:
+        stringUserInterfaceIdiom = @"tv";
+        break;
+    case UIUserInterfaceIdiomCarPlay:
+        stringUserInterfaceIdiom = @"car";
+        break;
+    case UIUserInterfaceIdiomMac:
+        stringUserInterfaceIdiom = @"computer";
+        break;
+
+    default:
+        break;
+    }
+    [ac registerStaticStringProperty:@"user_interface_idiom"
+                               value:stringUserInterfaceIdiom];
 }
 
 @end
