@@ -1,8 +1,11 @@
 package appcore
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 type PropertyProvider interface {
@@ -61,7 +64,11 @@ func (p *propertyRegistry) registerStaticProperty(key string, value interface{})
 }
 
 func (p *propertyRegistry) propertyValue(key string) interface{} {
-	return p.providers[key].Value()
+	v, ok := p.providers[key]
+	if !ok {
+		return nil
+	}
+	return v.Value()
 }
 
 func (p *propertyRegistry) validatePropertiesReturningUserReadable() string {
@@ -89,4 +96,37 @@ func (p *propertyRegistry) validatePropertiesReturningUserReadable() string {
 	}
 
 	return ""
+}
+
+func (p *propertyRegistry) registerStaticVersionNumberProperty(prefix string, versionString string) error {
+	componentNames := []string{"major", "minor", "patch", "mini", "micro", "nano", "smol"}
+
+	if prefix == "" {
+		return errors.New("Prefix required for version property")
+	}
+
+	// Save string even if we can't parse the rest. Can target using exact strings worst case.
+	stringProperty := staticPropertyProvider{
+		value: versionString,
+	}
+	p.providers[fmt.Sprintf("%v_version_string", prefix)] = &stringProperty
+
+	components := strings.Split(versionString, ".")
+	intComponents := make([]int, len(components))
+	for i, component := range components {
+		intComponent, err := strconv.Atoi(component)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Invalid version number format: \"%v\"", versionString))
+		}
+		intComponents[i] = intComponent
+	}
+
+	for i := 0; i < len(intComponents) && i < len(componentNames); i++ {
+		componentProperty := staticPropertyProvider{
+			value: intComponents[i],
+		}
+		p.providers[fmt.Sprintf("%v_version_%v", prefix, componentNames[i])] = &componentProperty
+	}
+
+	return nil
 }

@@ -13,14 +13,31 @@
 
 + (void)registerDefaultPropertiesToAppcore {
     AppcoreAppcore *ac = AppcoreSharedAppcore();
-    [ac registerStaticStringProperty:@"platform"
-                               value:UIDevice.currentDevice.systemName];
-    [ac registerStaticStringProperty:@"os_version_string"
-                               value:UIDevice.currentDevice.systemVersion];
+
+    // This API returns different values on older iOS. Make these consistent.
+    // iOS, iPadOS (iPad and iPad app on Mac), tvOS
+    NSString *systemOsName = UIDevice.currentDevice.systemName;
+    if ([@"iOS" isEqualToString:systemOsName] &&
+        UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        systemOsName = @"iPadOS";
+    }
+    [ac registerStaticStringProperty:@"platform" value:systemOsName];
+
+    NSError *error;
+    [ac registerStaticVersionNumberProperty:@"os"
+                              versionString:UIDevice.currentDevice.systemVersion
+                                      error:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: issue saving os version number property: %@",
+              UIDevice.currentDevice.systemVersion);
+    }
+
+    // Make/Model
     [ac registerStaticStringProperty:@"device_manufacturer" value:@"Apple"];
     [ac registerStaticStringProperty:@"device_model"
                                value:UIDevice.currentDevice.model];
 
+    // Locale
     NSLocale *locale = [NSLocale currentLocale];
     [ac registerStaticStringProperty:@"locale_language_code"
                                value:locale.languageCode];
@@ -29,12 +46,23 @@
     [ac registerStaticStringProperty:@"locale_currency_code"
                                value:locale.currencyCode];
 
+    // Bundle ID
     [ac registerStaticStringProperty:@"app_id"
                                value:NSBundle.mainBundle.bundleIdentifier];
+
+    // App Version
     NSString *appVersion = [NSBundle.mainBundle
         objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    [ac registerStaticStringProperty:@"app_version_string" value:appVersion];
+    error = nil;
+    [ac registerStaticVersionNumberProperty:@"app"
+                              versionString:appVersion
+                                      error:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: issue saving app version number property: %@",
+              appVersion);
+    }
 
+    // UserInterfaceIdiom
     NSString *stringUserInterfaceIdiom = @"unknown";
     switch (UIDevice.currentDevice.userInterfaceIdiom) {
     case UIUserInterfaceIdiomPhone:

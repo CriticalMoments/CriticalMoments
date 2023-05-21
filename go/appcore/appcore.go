@@ -79,6 +79,7 @@ func (ac *Appcore) Start() error {
 	if ac.cache == nil {
 		return errors.New("The SDK must register a cache directory before calling start")
 	}
+	// TODO: not fatal error? Loud in dev mode but not fatal.
 	if ac.propertyRegistry.validatePropertiesReturningUserReadable() != "" {
 		return errors.New(ac.propertyRegistry.validatePropertiesReturningUserReadable())
 	}
@@ -162,4 +163,7 @@ func (ac *Appcore) RegisterStaticIntProperty(key string, value int) {
 }
 func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) {
 	ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
+	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
 }
