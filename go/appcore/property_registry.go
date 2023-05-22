@@ -45,9 +45,16 @@ func newPropertyRegistry() *propertyRegistry {
 			"app_version_string":   reflect.String,
 			"user_interface_idiom": reflect.String,
 			"app_id":               reflect.String,
+			"screen_width_pixels":  reflect.Int,
+			"screen_height_pixels": reflect.Int,
 		},
 		wellKnownPropertyTypes: map[string]reflect.Kind{
-			"user_signed_in": reflect.Bool,
+			"user_signed_in":       reflect.Bool,
+			"device_model_class":   reflect.String,
+			"device_model_version": reflect.Float64,
+			"screen_width_points":  reflect.Int,
+			"screen_height_points": reflect.Int,
+			"screen_scale":         reflect.Float64,
 		},
 	}
 }

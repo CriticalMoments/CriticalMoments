@@ -7,6 +7,8 @@
 
 #import "CMDefaultProperties.h"
 
+#import <sys/utsname.h>
+
 @import UIKit;
 
 @implementation CMDefaultProperties
@@ -14,8 +16,8 @@
 + (void)registerDefaultPropertiesToAppcore {
     AppcoreAppcore *ac = AppcoreSharedAppcore();
 
-    // This API returns different values on older iOS. Make these consistent.
-    // iOS, iPadOS (iPad and iPad app on Mac), tvOS
+    // This API returns different values on older iPads. Make these
+    // consistent (documented in docs)
     NSString *systemOsName = UIDevice.currentDevice.systemName;
     if ([@"iOS" isEqualToString:systemOsName] &&
         UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
@@ -23,19 +25,8 @@
     }
     [ac registerStaticStringProperty:@"platform" value:systemOsName];
 
-    NSError *error;
-    [ac registerStaticVersionNumberProperty:@"os"
-                              versionString:UIDevice.currentDevice.systemVersion
-                                      error:&error];
-    if (error) {
-        NSLog(@"CriticalMoments: issue saving os version number property: %@",
-              UIDevice.currentDevice.systemVersion);
-    }
-
-    // Make/Model
-    [ac registerStaticStringProperty:@"device_manufacturer" value:@"Apple"];
-    [ac registerStaticStringProperty:@"device_model"
-                               value:UIDevice.currentDevice.model];
+    [CMDefaultProperties setVersionString:UIDevice.currentDevice.systemVersion
+                                forPrefix:@"os"];
 
     // Locale
     NSLocale *locale = [NSLocale currentLocale];
@@ -53,16 +44,43 @@
     // App Version
     NSString *appVersion = [NSBundle.mainBundle
         objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    error = nil;
-    [ac registerStaticVersionNumberProperty:@"app"
-                              versionString:appVersion
-                                      error:&error];
-    if (error) {
-        NSLog(@"CriticalMoments: issue saving app version number property: %@",
-              appVersion);
-    }
+    [CMDefaultProperties setVersionString:appVersion forPrefix:@"app"];
 
-    // UserInterfaceIdiom
+    // Screen size / scale
+    CGSize screenSize = UIScreen.mainScreen.bounds.size;
+    [ac registerStaticIntProperty:@"screen_width_points"
+                            value:MIN(screenSize.width, screenSize.height)];
+    [ac registerStaticIntProperty:@"screen_height_points"
+                            value:MAX(screenSize.width, screenSize.height)];
+    CGFloat screenWidthPixels = screenSize.width * UIScreen.mainScreen.scale;
+    CGFloat screenHeightPixels = screenSize.height * UIScreen.mainScreen.scale;
+    [ac registerStaticIntProperty:@"screen_width_pixels"
+                            value:MIN(screenHeightPixels, screenWidthPixels)];
+    [ac registerStaticIntProperty:@"screen_height_pixels"
+                            value:MAX(screenHeightPixels, screenWidthPixels)];
+    [ac registerStaticFloatProperty:@"screen_scale"
+                              value:UIScreen.mainScreen.scale];
+
+    [CMDefaultProperties setUserInterfaceIdiom];
+
+    [CMDefaultProperties setDeviceModel];
+}
+
++ (void)setVersionString:(NSString *)versionString
+               forPrefix:(NSString *)prefix {
+    NSError *error;
+    [AppcoreSharedAppcore() registerStaticVersionNumberProperty:prefix
+                                                  versionString:versionString
+                                                          error:&error];
+    if (error) {
+        NSLog(
+            @"CriticalMoments: issue saving version number property: %@ -- %@",
+            prefix, versionString);
+    }
+}
+
++ (void)setUserInterfaceIdiom {
+
     NSString *stringUserInterfaceIdiom = @"unknown";
     switch (UIDevice.currentDevice.userInterfaceIdiom) {
     case UIUserInterfaceIdiomPhone:
@@ -84,8 +102,49 @@
     default:
         break;
     }
-    [ac registerStaticStringProperty:@"user_interface_idiom"
+    [AppcoreSharedAppcore()
+        registerStaticStringProperty:@"user_interface_idiom"
                                value:stringUserInterfaceIdiom];
+}
+
++ (void)setDeviceModel {
+    AppcoreAppcore *ac = AppcoreSharedAppcore();
+
+    [ac registerStaticStringProperty:@"device_manufacturer" value:@"Apple"];
+    [ac registerStaticStringProperty:@"device_model_class"
+                               value:UIDevice.currentDevice.model];
+
+    struct utsname systemInfo;
+    uname(&systemInfo);
+
+    NSString *deviceModel = [NSString stringWithCString:systemInfo.machine
+                                               encoding:NSUTF8StringEncoding];
+
+    if (deviceModel == nil || deviceModel.length == 0) {
+        [ac registerStaticStringProperty:@"device_model" value:@"unknown"];
+        return;
+    }
+
+    if ([@[ @"arm64", @"i386", @"x86_64" ] containsObject:deviceModel]) {
+        // This is a simulator. They don't return a model_version_number
+        [ac registerStaticStringProperty:@"device_model" value:@"simulator"];
+        return;
+    }
+
+    // https://everyi.com/by-identifier/ipod-iphone-ipad-specs-by-model-identifier.html
+    [ac registerStaticStringProperty:@"device_model" value:deviceModel];
+    // Number uses a comma
+    NSString *numericString = [[deviceModel
+        componentsSeparatedByCharactersInSet:
+            [[NSCharacterSet characterSetWithCharactersInString:@"0123456789,."]
+                invertedSet]] componentsJoinedByString:@""];
+    numericString = [numericString stringByReplacingOccurrencesOfString:@","
+                                                             withString:@"."];
+    double modelVersionNumber = [numericString doubleValue];
+    if (modelVersionNumber > 0) {
+        [ac registerStaticFloatProperty:@"device_model_version"
+                                  value:modelVersionNumber];
+    }
 }
 
 @end
