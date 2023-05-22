@@ -117,3 +117,42 @@ func TestPropertyRegistryVersionNumber(t *testing.T) {
 		t.Fatal("Valid version number failed to save component")
 	}
 }
+
+type testPropertyProvider struct {
+	val int
+}
+
+func (p *testPropertyProvider) Type() int {
+	return LibPropertyProviderTypeInt
+}
+func (p *testPropertyProvider) IntValue() int {
+	p.val = p.val + 1
+	return p.val
+}
+func (p *testPropertyProvider) StringValue() string {
+	return ""
+}
+func (p *testPropertyProvider) FloatValue() float64 {
+	return 0.0
+}
+func (p *testPropertyProvider) BoolValue() bool {
+	return false
+}
+
+func TestDynamicProperties(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+
+	dp := testPropertyProvider{}
+	pr.registerLibPropertyProvider("a", &dp)
+	if pr.propertyValue("a") != 1 {
+		t.Fatal("dynamic property doesn't work")
+	}
+	if pr.propertyValue("a") != 2 {
+		t.Fatal("dynamic property not dynamic")
+	}
+	if pr.propertyValue("a") != 3 {
+		t.Fatal("dynamic property not dynamic")
+	}
+}

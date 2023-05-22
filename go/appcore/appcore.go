@@ -167,3 +167,6 @@ func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) {
 func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
 	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
 }
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) {
+	ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
+}

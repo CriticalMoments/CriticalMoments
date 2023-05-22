@@ -7,6 +7,8 @@
 
 #import "CMDefaultProperties.h"
 
+#import "CMBatteryLevelPropertyProvider.h"
+
 #import <sys/utsname.h>
 
 @import UIKit;
@@ -64,6 +66,20 @@
     [CMDefaultProperties setUserInterfaceIdiom];
 
     [CMDefaultProperties setDeviceModel];
+
+    // Battery
+    CMBatteryLevelPropertyProvider *batteryLevelProvider =
+        [[CMBatteryLevelPropertyProvider alloc] init];
+    [ac registerLibPropertyProvider:@"device_battery_level"
+                                dpp:batteryLevelProvider];
+    CMBatteryStatePropertyProvider *batteryStateProvider =
+        [[CMBatteryStatePropertyProvider alloc] init];
+    [ac registerLibPropertyProvider:@"device_battery_state"
+                                dpp:batteryStateProvider];
+    CMLowPowerModePropertyProvider *lowPowerModeProvider =
+        [[CMLowPowerModePropertyProvider alloc] init];
+    [ac registerLibPropertyProvider:@"device_low_power_mode"
+                                dpp:lowPowerModeProvider];
 }
 
 + (void)setVersionString:(NSString *)versionString
@@ -131,19 +147,19 @@
         return;
     }
 
+    // format:
     // https://everyi.com/by-identifier/ipod-iphone-ipad-specs-by-model-identifier.html
     [ac registerStaticStringProperty:@"device_model" value:deviceModel];
-    // Number uses a comma
+    // remove non numeric chars, and replace comma with .
     NSString *numericString = [[deviceModel
         componentsSeparatedByCharactersInSet:
             [[NSCharacterSet characterSetWithCharactersInString:@"0123456789,."]
                 invertedSet]] componentsJoinedByString:@""];
     numericString = [numericString stringByReplacingOccurrencesOfString:@","
                                                              withString:@"."];
-    double modelVersionNumber = [numericString doubleValue];
-    if (modelVersionNumber > 0) {
-        [ac registerStaticFloatProperty:@"device_model_version"
-                                  value:modelVersionNumber];
+    if (numericString.length > 0) {
+        [CMDefaultProperties setVersionString:numericString
+                                    forPrefix:@"device_model"];
     }
 }
 
