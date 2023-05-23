@@ -7,17 +7,60 @@ import (
 
 func TestPropertyRegistrySetGet(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.registerStaticProperty("a", "a")
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int, "c": reflect.Float64, "d": reflect.Bool}
+	err := pr.registerStaticProperty("a", "a")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if pr.propertyValue("a") != "a" {
 		t.Fatal("Property registry failed for string")
 	}
-	pr.registerStaticProperty("b", 2)
+	err = pr.registerStaticProperty("b", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if pr.propertyValue("b") != 2 {
 		t.Fatal("Property registry failed for int")
 	}
-	pr.registerStaticProperty("c", 3.3)
+	err = pr.registerStaticProperty("c", 3.3)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if pr.propertyValue("c") != 3.3 {
 		t.Fatal("Property registry failed for int")
+	}
+	err = pr.registerStaticProperty("d", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pr.propertyValue("d") != true {
+		t.Fatal("Property registry failed for bool")
+	}
+}
+
+func TestPropertyRegistrySetInvalid(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int}
+	err := pr.registerStaticProperty("a", 1) // type mismatch from expected
+	if err == nil {
+		t.Fatal("Allowed type mismatch")
+	}
+	if pr.propertyValue("a") != nil {
+		t.Fatal("Property registry allowed invalid")
+	}
+	err = pr.registerStaticProperty("b", []string{}) // invalid type
+	if err == nil {
+		t.Fatal("Allowed invalid type")
+	}
+	if pr.propertyValue("b") != nil {
+		t.Fatal("Property registry allowed invalid")
+	}
+	err = pr.registerStaticProperty("c", 3.3) // unexpected key
+	if err == nil {
+		t.Fatal("Allowed unexpected key")
+	}
+	if pr.propertyValue("c") != nil {
+		t.Fatal("Property registry allowed invalid")
 	}
 }
 
@@ -28,15 +71,15 @@ func TestPropertyRegistryValidateRequired(t *testing.T) {
 	}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
-	if pr.validatePropertiesReturningUserReadable() == "" {
+	if pr.validateProperties() == nil {
 		t.Fatal("Validated missing required properties")
 	}
 	pr.registerStaticProperty("platform", 42)
-	if pr.validatePropertiesReturningUserReadable() == "" {
+	if pr.validateProperties() == nil {
 		t.Fatal("Validated with type mismatch")
 	}
 	pr.registerStaticProperty("platform", "ios")
-	if pr.validatePropertiesReturningUserReadable() != "" {
+	if pr.validateProperties() != nil {
 		t.Fatal("Validation failed on valid type")
 	}
 }
@@ -48,15 +91,15 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 		"user_signed_in": reflect.Bool,
 	}
 
-	if pr.validatePropertiesReturningUserReadable() != "" {
+	if pr.validateProperties() != nil {
 		t.Fatal("Missing well known failed validation")
 	}
-	pr.registerStaticProperty("user_signed_in", 42)
-	if pr.validatePropertiesReturningUserReadable() == "" {
-		t.Fatal("Validated with type mismatch")
+	err := pr.registerStaticProperty("user_signed_in", 42)
+	if err == nil {
+		t.Fatal("Added with type mismatch")
 	}
 	pr.registerStaticProperty("user_signed_in", true)
-	if pr.validatePropertiesReturningUserReadable() != "" {
+	if pr.validateProperties() != nil {
 		t.Fatal("Validation failed on valid type")
 	}
 }
@@ -64,7 +107,7 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 func TestPropertyRegistryVersionNumber(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": cmKindVersionNumber, "b": reflect.Bool, "c_version": cmKindVersionNumber, "d_version": cmKindVersionNumber}
 
 	// invalid version should error
 	if err := pr.registerStaticVersionNumberProperty("a", ""); err == nil {
@@ -82,38 +125,49 @@ func TestPropertyRegistryVersionNumber(t *testing.T) {
 	if err := pr.registerStaticVersionNumberProperty("", "1.1"); err == nil {
 		t.Fatal("Must provide a prefix")
 	}
-	if pr.propertyValue("a_version_major") != nil {
-		t.Fatal("Failed version numbers saved")
+	if pr.propertyValue("a_major") != nil {
+		t.Fatal("Invalid version numbers saved component")
 	}
-	if pr.propertyValue("a_version_string") != "1.1.a" {
+	if pr.propertyValue("a_string") != "1.1.a" {
 		t.Fatal("Failed version number failed to at least save string version")
 	}
 
+	// Invalid type
+	if err := pr.registerStaticVersionNumberProperty("b", "1.2.3"); err == nil {
+		t.Fatal("Allowed registering a version number to a bool type")
+	}
+	if pr.propertyValue("b_major") != nil {
+		t.Fatal("Invalid version numbers saved component")
+	}
+	if pr.propertyValue("b_string") != nil {
+		t.Fatal("Saved version for type mismatch")
+	}
+
 	// Valid
-	if err := pr.registerStaticVersionNumberProperty("b", "1.2.3"); err != nil {
+	if err := pr.registerStaticVersionNumberProperty("c_version", "1.2.3"); err != nil {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("b_version_string") != "1.2.3" {
+	if pr.propertyValue("c_version_string") != "1.2.3" {
 		t.Fatal("Valid version number failed to save component")
 	}
-	if pr.propertyValue("b_version_major") != 1 {
+	if pr.propertyValue("c_version_major") != 1 {
 		t.Fatal("Valid version number failed to save component")
 	}
-	if pr.propertyValue("b_version_minor") != 2 {
+	if pr.propertyValue("c_version_minor") != 2 {
 		t.Fatal("Valid version number failed to save component")
 	}
-	if pr.propertyValue("b_version_patch") != 3 {
+	if pr.propertyValue("c_version_patch") != 3 {
 		t.Fatal("Valid version number failed to save component")
 	}
-	if pr.propertyValue("b_version_micro") != nil {
+	if pr.propertyValue("c_version_micro") != nil {
 		t.Fatal("Valid version saved extra component")
 	}
 
 	// Very long -- should save 7 deep and not error
-	if err := pr.registerStaticVersionNumberProperty("c", "1.2.3.4.5.6.7.8.9.10.11.12"); err != nil {
+	if err := pr.registerStaticVersionNumberProperty("d_version", "1.2.3.4.5.6.7.8.9.10.11.12"); err != nil {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("c_version_smol") != 7 {
+	if pr.propertyValue("d_version_smol") != 7 {
 		t.Fatal("Valid version number failed to save component")
 	}
 }
@@ -142,7 +196,7 @@ func (p *testPropertyProvider) BoolValue() bool {
 func TestDynamicProperties(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.Int}
 
 	dp := testPropertyProvider{}
 	pr.registerLibPropertyProvider("a", &dp)

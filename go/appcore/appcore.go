@@ -80,8 +80,8 @@ func (ac *Appcore) Start() error {
 		return errors.New("The SDK must register a cache directory before calling start")
 	}
 	// TODO: not fatal error? Loud in dev mode but not fatal.
-	if ac.propertyRegistry.validatePropertiesReturningUserReadable() != "" {
-		return errors.New(ac.propertyRegistry.validatePropertiesReturningUserReadable())
+	if err := ac.propertyRegistry.validateProperties(); err != nil {
+		return err
 	}
 
 	var configFilePath string
@@ -155,18 +155,21 @@ func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
 }
 
 // Repeitive, but gomobile doesn't allow for `interface{}`
-func (ac *Appcore) RegisterStaticStringProperty(key string, value string) {
-	ac.propertyRegistry.registerStaticProperty(key, value)
+func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
-func (ac *Appcore) RegisterStaticIntProperty(key string, value int) {
-	ac.propertyRegistry.registerStaticProperty(key, value)
+func (ac *Appcore) RegisterStaticIntProperty(key string, value int) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
-func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) {
-	ac.propertyRegistry.registerStaticProperty(key, value)
+func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
 	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
 }
-func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) {
-	ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }

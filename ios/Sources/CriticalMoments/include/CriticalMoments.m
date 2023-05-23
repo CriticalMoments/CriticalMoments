@@ -45,7 +45,10 @@
 + (NSError *)startReturningError {
     // Register the action dispatcher and properties
     [CMLibBindings registerWithAppcore];
-    [CMDefaultProperties registerDefaultPropertiesToAppcore];
+
+    CMDefaultProperties *propertryRegisterer =
+        [[CMDefaultProperties alloc] init];
+    [propertryRegisterer registerDefaultPropertiesToAppcore];
 
     // Set the cache directory to applicationSupport/CriticalMomentsData
     NSURL *appSupportDir = [[NSFileManager.defaultManager

@@ -11,9 +11,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// TODO rename
 @interface CMDefaultProperties : NSObject
 
-+ (void)registerDefaultPropertiesToAppcore;
+- (void)registerDefaultPropertiesToAppcore;
 
 @end
 
