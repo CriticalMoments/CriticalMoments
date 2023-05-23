@@ -134,7 +134,7 @@ func (ac *Appcore) postConfigSetup() error {
 func (ac *Appcore) SendEvent(e string) {
 	actions := ac.config.ActionsForEvent(e)
 	for _, action := range actions {
-		err := dispatchActionToLib(&action, ac.libBindings)
+		err := action.PerformAction(ac.libBindings)
 		if err != nil {
 			fmt.Printf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err)
 		}
