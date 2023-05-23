@@ -30,4 +30,24 @@ func TestConditionVariableExtraction(t *testing.T) {
 	if !arraysEqualOrderInsensitive(variables, []string{"a", "b", "c", "d"}) {
 		t.Fatal("Extract variables failed")
 	}
+
+	// It can optimize out the unneeded vars
+	code = "a || (false && b + c + d > 0)"
+	variables, err = extractVariablesFromCode(code)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !arraysEqualOrderInsensitive(variables, []string{"a"}) {
+		t.Fatal("Extract variables failed")
+	}
+
+	// don't optimize out needed var
+	code = "(a || false)"
+	variables, err = extractVariablesFromCode(code)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !arraysEqualOrderInsensitive(variables, []string{"a"}) {
+		t.Fatalf("Extract variables failed: %v", variables)
+	}
 }
