@@ -5,7 +5,7 @@
 //  Created by Steve Cosman on 2023-05-20.
 //
 
-#import "CMDefaultProperties.h"
+#import "CMPropertyRegisterer.h"
 
 #import "CMBatteryLevelPropertyProvider.h"
 
@@ -13,7 +13,7 @@
 
 @import UIKit;
 
-@implementation CMDefaultProperties
+@implementation CMPropertyRegisterer
 
 - (void)processError:(NSError *)error {
     if (!error) {

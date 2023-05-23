@@ -8,7 +8,7 @@
 #import "CriticalMoments.h"
 
 #import "../appcore_integration/CMLibBindings.h"
-#import "../properties/CMDefaultProperties.h"
+#import "../properties/CMPropertyRegisterer.h"
 
 @import Appcore;
 
@@ -46,8 +46,8 @@
     // Register the action dispatcher and properties
     [CMLibBindings registerWithAppcore];
 
-    CMDefaultProperties *propertryRegisterer =
-        [[CMDefaultProperties alloc] init];
+    CMPropertyRegisterer *propertryRegisterer =
+        [[CMPropertyRegisterer alloc] init];
     [propertryRegisterer registerDefaultPropertiesToAppcore];
 
     // Set the cache directory to applicationSupport/CriticalMomentsData
