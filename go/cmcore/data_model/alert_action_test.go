@@ -113,6 +113,9 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumAlert {
 		t.Fatal()
 	}
+	if ac.Condition != "platform == 'iOS'" {
+		t.Fatal()
+	}
 	a := ac.AlertAction
 	if a == nil || !a.Validate() {
 		t.Fatal()
@@ -180,6 +183,9 @@ func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumAlert {
 		t.Fatal()
 	}
+	if ac.Condition != "" {
+		t.Fatal()
+	}
 	a := ac.AlertAction
 	if a == nil || !a.Validate() {
 		t.Fatal()
@@ -225,6 +231,19 @@ func TestJsonParsingOkayDisabledAlert(t *testing.T) {
 	if a.ShowOkButton {
 		t.Fatal("failed to parse showOkayButton")
 	}
+}
+
+func TestParsingInvalidConditionAlert(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/invalid/invalidCondition.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil {
+		t.Fatal("invalid condition should return error")
+	}
+
 }
 
 func TestJsonParsingInvalidAlert(t *testing.T) {

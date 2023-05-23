@@ -86,7 +86,7 @@ func extractVariablesFromCode(code string) ([]string, error) {
 	return visitor.variables, nil
 }
 
-func validateCodeCompatibleWithCMProps(code string) error {
+func ValidateCondition(code string) error {
 	variables, err := extractVariablesFromCode(code)
 	if err != nil {
 		return err

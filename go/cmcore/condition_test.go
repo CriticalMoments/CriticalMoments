@@ -63,34 +63,33 @@ func TestConditionVariableExtraction(t *testing.T) {
 }
 
 func TestValidateProps(t *testing.T) {
-	err := validateCodeCompatibleWithCMProps("1 < 2")
+	err := ValidateCondition("1 < 2")
 	if err != nil {
 		t.Fatal("Simple case failed prop validation")
 	}
 
-	err = validateCodeCompatibleWithCMProps("not_a_supported_prop > 1")
+	err = ValidateCondition("not_a_supported_prop > 1")
 	if err == nil {
 		t.Fatal("Invalid prop passed validation")
 	}
 
-	err = validateCodeCompatibleWithCMProps("AddTwo(1) > 1")
+	err = ValidateCondition("AddTwo(1) > 1")
 	if err == nil {
 		t.Fatal("Unrecognized method passed validation")
 	}
 
-	err = validateCodeCompatibleWithCMProps("AddOne(1) > 1")
+	err = ValidateCondition("AddOne(1) > 1")
 	if err != nil {
 		t.Fatal("Valid method failed validation")
 	}
 
-	err = validateCodeCompatibleWithCMProps("platform == 'iOS'")
+	err = ValidateCondition("platform == 'iOS'")
 	if err != nil {
 		t.Fatal("Valid required property failed validation")
 	}
 
-	err = validateCodeCompatibleWithCMProps("screen_scale > 2.0")
+	err = ValidateCondition("screen_scale > 2.0")
 	if err != nil {
 		t.Fatal("Valid well known property failed validation")
 	}
-
 }

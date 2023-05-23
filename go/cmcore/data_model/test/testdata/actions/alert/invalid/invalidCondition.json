@@ -1,0 +1,7 @@
+{
+    "actionType": "alert",
+    "condition": "fake_property > 1",
+    "actionData": {
+        "title": "For real?"
+    }
+}

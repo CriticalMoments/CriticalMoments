@@ -3,6 +3,8 @@ package appcore
 import (
 	"reflect"
 	"testing"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 func TestPropertyRegistrySetGet(t *testing.T) {
@@ -107,7 +109,7 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 func TestPropertyRegistryVersionNumber(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": cmKindVersionNumber, "b": reflect.Bool, "c_version": cmKindVersionNumber, "d_version": cmKindVersionNumber}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": cmcore.CMKindVersionNumber, "b": reflect.Bool, "c_version": cmcore.CMKindVersionNumber, "d_version": cmcore.CMKindVersionNumber}
 
 	// invalid version should error
 	if err := pr.registerStaticVersionNumberProperty("a", ""); err == nil {

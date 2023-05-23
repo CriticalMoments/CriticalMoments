@@ -3,15 +3,13 @@ package appcore
 import (
 	"errors"
 	"fmt"
-	"math"
 	"reflect"
 	"strconv"
 	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"golang.org/x/exp/slices"
 )
-
-const cmKindVersionNumber reflect.Kind = math.MaxInt
 
 type propertyRegistry struct {
 	providers              map[string]propertyProvider
@@ -21,32 +19,9 @@ type propertyRegistry struct {
 
 func newPropertyRegistry() *propertyRegistry {
 	return &propertyRegistry{
-		providers: make(map[string]propertyProvider),
-		requiredPropertyTypes: map[string]reflect.Kind{
-			"platform":              reflect.String,
-			"os_version":            cmKindVersionNumber,
-			"device_manufacturer":   reflect.String,
-			"device_model":          reflect.String,
-			"locale_language_code":  reflect.String,
-			"locale_country_code":   reflect.String,
-			"locale_currency_code":  reflect.String,
-			"app_version":           cmKindVersionNumber,
-			"user_interface_idiom":  reflect.String,
-			"app_id":                reflect.String,
-			"screen_width_pixels":   reflect.Int,
-			"screen_height_pixels":  reflect.Int,
-			"device_battery_state":  reflect.String,
-			"device_battery_level":  reflect.Float64,
-			"device_low_power_mode": reflect.Bool,
-		},
-		wellKnownPropertyTypes: map[string]reflect.Kind{
-			"user_signed_in":       reflect.Bool,
-			"device_model_class":   reflect.String,
-			"device_model_version": cmKindVersionNumber,
-			"screen_width_points":  reflect.Int,
-			"screen_height_points": reflect.Int,
-			"screen_scale":         reflect.Float64,
-		},
+		providers:              make(map[string]propertyProvider),
+		requiredPropertyTypes:  cmcore.RequiredPropertyTypes(),
+		wellKnownPropertyTypes: cmcore.WellKnownPropertyTypes(),
 	}
 }
 
@@ -131,7 +106,7 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	var provider propertyProvider
 	var ok bool
 
-	if expectedKind != cmKindVersionNumber {
+	if expectedKind != cmcore.CMKindVersionNumber {
 		provider, ok = p.providers[propName]
 	} else {
 		// custom validation for version numbers, expect a string key with _string postfix
@@ -161,7 +136,7 @@ func (p *propertyRegistry) registerStaticVersionNumberProperty(prefix string, ve
 	}
 
 	expectedType := p.expectedTypeForKey(prefix)
-	if expectedType != cmKindVersionNumber {
+	if expectedType != cmcore.CMKindVersionNumber {
 		return errors.New("Not expecting a version number for key: " + prefix)
 	}
 
