@@ -50,4 +50,15 @@ func TestConditionVariableExtraction(t *testing.T) {
 	if !arraysEqualOrderInsensitive(variables, []string{"a"}) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
+
+	// unregistered method names should be included (ab), registered ones should not (AddOne)
+	// TODO: add test later that unregistered methods fail final validation
+	code = "a || ab() || AddOne(1) > 1"
+	variables, err = extractVariablesFromCode(code)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !arraysEqualOrderInsensitive(variables, []string{"a", "ab"}) {
+		t.Fatalf("Extract variables failed: %v", variables)
+	}
 }

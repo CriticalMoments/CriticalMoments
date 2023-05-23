@@ -1,45 +1,49 @@
 package appcore
 
 import (
-	"errors"
-
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/vm"
-	"golang.org/x/exp/maps"
+	"github.com/antonmedv/expr/ast"
+	"github.com/antonmedv/expr/checker"
+	"github.com/antonmedv/expr/conf"
+	"github.com/antonmedv/expr/optimizer"
+	"github.com/antonmedv/expr/parser"
 )
 
-func extractVariablesFromCode(code string) ([]string, error) {
-	emptyEnv := expr.Env(map[string]interface{}{})
+type cmExprEnv struct{}
 
-	program, err := expr.Compile(code, emptyEnv, expr.AllowUndefinedVariables(), expr.AsBool())
+// To add methods, add them to our ExprEnv. Example for testing:
+func (cmExprEnv) AddOne(i int) int { return i + 1 }
+
+// An AST walker we use to analyize code, to see if it's compatible with CM
+type cmAnalysisVisitor struct {
+	variables []string
+}
+
+func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
+	if node, ok := (*n).(*ast.IdentifierNode); ok {
+		if !node.Method {
+			v.variables = append(v.variables, node.Value)
+		}
+	}
+}
+
+func extractVariablesFromCode(code string) ([]string, error) {
+	tree, err := parser.Parse(code)
 	if err != nil {
 		return nil, err
 	}
 
-	variableMap := map[string]bool{}
-	for i, bytecode := range program.Bytecode {
-		// TODO: other loads (field?)
-		// OpLoadConst -> runtime.Fetch(env, program.Constants[arg])
-		// OpLoadField -> runtime.FetchField(env, program.Constants[arg].(*runtime.Field))
-		// OpFetchField -> runtime.FetchField(a, program.Constants[arg].(*runtime.Field)
-
-		// find all opcodeloadfast which loads variable from env, get var name
-		if bytecode == vm.OpLoadFast {
-			if i >= len(program.Arguments) {
-				return nil, errors.New("Unexpected issue extracting variables from condition")
-			}
-			arg := program.Arguments[i]
-			if arg >= len(program.Constants) {
-				return nil, errors.New("Unexpected issue extracting variables from condition")
-			}
-			varName, ok := program.Constants[arg].(string)
-			if ok {
-				variableMap[varName] = true
-			} else {
-				return nil, errors.New("Unexpected issue extracting variables from condition")
-			}
-		}
+	config := conf.New(cmExprEnv{})
+	config.Strict = false
+	_, err = checker.Check(tree, config)
+	if err != nil {
+		return nil, err
 	}
-	variables := maps.Keys(variableMap)
-	return variables, nil
+	err = optimizer.Optimize(&tree.Node, config)
+	if err != nil {
+		return nil, err
+	}
+
+	visitor := &cmAnalysisVisitor{}
+	ast.Walk(&tree.Node, visitor)
+	return visitor.variables, nil
 }
