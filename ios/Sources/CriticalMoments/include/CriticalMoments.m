@@ -8,6 +8,7 @@
 #import "CriticalMoments.h"
 
 #import "../appcore_integration/CMLibBindings.h"
+#import "../properties/CMPropertyRegisterer.h"
 
 @import Appcore;
 
@@ -42,8 +43,12 @@
 }
 
 + (NSError *)startReturningError {
-    // Register the action dispatcher
+    // Register the action dispatcher and properties
     [CMLibBindings registerWithAppcore];
+
+    CMPropertyRegisterer *propertryRegisterer =
+        [[CMPropertyRegisterer alloc] init];
+    [propertryRegisterer registerDefaultPropertiesToAppcore];
 
     // Set the cache directory to applicationSupport/CriticalMomentsData
     NSURL *appSupportDir = [[NSFileManager.defaultManager

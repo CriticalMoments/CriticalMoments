@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -80,6 +81,9 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
+	// Clear required properties, for easier setup
+	ac.propertyRegistry = newPropertyRegistry()
+	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
 	return &ac, nil
 }
 

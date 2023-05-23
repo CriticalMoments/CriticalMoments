@@ -25,6 +25,9 @@ type Appcore struct {
 
 	// Cache
 	cache *cache
+
+	// Properties
+	propertyRegistry *propertyRegistry
 }
 
 var sharedAppcore Appcore = newAppcore()
@@ -33,7 +36,9 @@ func SharedAppcore() *Appcore {
 	return &sharedAppcore
 }
 func newAppcore() Appcore {
-	return Appcore{}
+	return Appcore{
+		propertyRegistry: newPropertyRegistry(),
+	}
 }
 
 // Hopefully no one wants http (no TLS) in 2023... but given the importance of the config file we can't open this up to injection attacks
@@ -73,6 +78,9 @@ func (ac *Appcore) Start() error {
 	}
 	if ac.cache == nil {
 		return errors.New("The SDK must register a cache directory before calling start")
+	}
+	if err := ac.propertyRegistry.validateProperties(); err != nil {
+		return err
 	}
 
 	var configFilePath string
@@ -143,4 +151,24 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 
 func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
 	return ac.config.ThemeWithName(themeName)
+}
+
+// Repeitive, but gomobile doesn't allow for `interface{}`
+func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticIntProperty(key string, value int) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
+	return ac.propertyRegistry.registerStaticProperty(key, value)
+}
+func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
+	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
+}
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }
