@@ -20,6 +20,10 @@ func dispatchActionToLib(action *datamodel.ActionContainer, lb LibBindings) erro
 	switch action.ActionType {
 	case datamodel.ActionTypeEnumBanner:
 		return lb.ShowBanner(action.BannerAction)
+	case datamodel.ActionTypeEnumAlert:
+		return lb.ShowAlert(action.AlertAction)
+	case datamodel.ActionTypeEnumLink:
+		return lb.ShowLink(action.LinkAction)
 	default:
 		return errors.New(fmt.Sprintf("Action Dispatcher doesn't support action type %v", action.ActionType))
 	}
