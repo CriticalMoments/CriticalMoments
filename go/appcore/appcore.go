@@ -79,7 +79,6 @@ func (ac *Appcore) Start() error {
 	if ac.cache == nil {
 		return errors.New("The SDK must register a cache directory before calling start")
 	}
-	// TODO: not fatal error? Loud in dev mode but not fatal.
 	if err := ac.propertyRegistry.validateProperties(); err != nil {
 		return err
 	}
