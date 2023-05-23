@@ -1,4 +1,4 @@
-package appcore
+package cmcore
 
 import (
 	"testing"
@@ -52,7 +52,6 @@ func TestConditionVariableExtraction(t *testing.T) {
 	}
 
 	// unregistered method names should be included (ab), registered ones should not (AddOne)
-	// TODO: add test later that unregistered methods fail final validation
 	code = "a || ab() || AddOne(1) > 1"
 	variables, err = extractVariablesFromCode(code)
 	if err != nil {
@@ -61,4 +60,37 @@ func TestConditionVariableExtraction(t *testing.T) {
 	if !arraysEqualOrderInsensitive(variables, []string{"a", "ab"}) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
+}
+
+func TestValidateProps(t *testing.T) {
+	err := validateCodeCompatibleWithCMProps("1 < 2")
+	if err != nil {
+		t.Fatal("Simple case failed prop validation")
+	}
+
+	err = validateCodeCompatibleWithCMProps("not_a_supported_prop > 1")
+	if err == nil {
+		t.Fatal("Invalid prop passed validation")
+	}
+
+	err = validateCodeCompatibleWithCMProps("AddTwo(1) > 1")
+	if err == nil {
+		t.Fatal("Unrecognized method passed validation")
+	}
+
+	err = validateCodeCompatibleWithCMProps("AddOne(1) > 1")
+	if err != nil {
+		t.Fatal("Valid method failed validation")
+	}
+
+	err = validateCodeCompatibleWithCMProps("platform == 'iOS'")
+	if err != nil {
+		t.Fatal("Valid required property failed validation")
+	}
+
+	err = validateCodeCompatibleWithCMProps("screen_scale > 2.0")
+	if err != nil {
+		t.Fatal("Valid well known property failed validation")
+	}
+
 }
