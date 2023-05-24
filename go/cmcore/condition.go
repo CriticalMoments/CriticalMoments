@@ -37,7 +37,6 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 
 func WellKnownPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
-		"user_signed_in":       reflect.Bool,
 		"device_model_class":   reflect.String,
 		"device_model_version": CMKindVersionNumber,
 		"screen_width_points":  reflect.Int,
