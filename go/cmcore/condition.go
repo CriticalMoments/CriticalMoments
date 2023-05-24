@@ -72,7 +72,7 @@ func versionNumberComponent(versionString string, index int) interface{} {
 
 // An AST walker we use to analyize code, to see if it's compatible with CM
 type cmAnalysisVisitor struct {
-	variables []string
+	variables map[string]bool
 }
 
 func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
@@ -80,7 +80,7 @@ func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
 		// exclude methods
 		helperMethod := ConditionEnvWithHelpers()[node.Value]
 		if helperMethod == nil {
-			v.variables = append(v.variables, node.Value)
+			v.variables[node.Value] = true
 		}
 	}
 }
@@ -102,9 +102,11 @@ func ExtractVariablesFromCondition(code string) ([]string, error) {
 		return nil, err
 	}
 
-	visitor := &cmAnalysisVisitor{}
+	visitor := &cmAnalysisVisitor{
+		variables: make(map[string]bool),
+	}
 	ast.Walk(&tree.Node, visitor)
-	return visitor.variables, nil
+	return maps.Keys(visitor.variables), nil
 }
 
 func ValidateCondition(code string) error {

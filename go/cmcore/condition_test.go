@@ -51,8 +51,11 @@ func TestConditionVariableExtraction(t *testing.T) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
 
-	// unregistered method names should be included (ab), registered ones should not (versionNumberComponent)
-	code = "a || ab() || versionNumberComponent(1) > 1"
+	// unregistered method names should be included (ab),
+	// registered ones should not (versionNumberComponent)
+	// build in methods (startsWith) should not
+	// repeated var a should only be listed once
+	code = "a || ab() || versionNumberComponent(1) > 1 || a startsWith 'hello'"
 	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)

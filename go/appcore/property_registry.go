@@ -132,10 +132,7 @@ func (p *propertyRegistry) validateProperties() error {
 }
 
 func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKind reflect.Kind, allowMissing bool) error {
-	var provider propertyProvider
-	var ok bool
-
-	provider, ok = p.providers[propName]
+	provider, ok := p.providers[propName]
 
 	if !ok && !allowMissing {
 		return errors.New(fmt.Sprintf("Missing required property: %v", propName))
