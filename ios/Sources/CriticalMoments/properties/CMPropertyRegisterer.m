@@ -8,6 +8,7 @@
 #import "CMPropertyRegisterer.h"
 
 #import "CMBatteryLevelPropertyProvider.h"
+#import "CMViewPropertyProvider.h"
 
 #import <sys/utsname.h>
 
@@ -136,6 +137,16 @@
         [[CMLowPowerModePropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"device_low_power_mode"
                                 value:lowPowerModeProvider];
+
+    // Screen/views
+    CMDeviceOrientationPropertyProvider *deviceOrientationProvider =
+        [[CMDeviceOrientationPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"device_orientation"
+                                value:deviceOrientationProvider];
+    CMInterfaceOrientationPropertyProvider *uiOrientationProvider =
+        [[CMInterfaceOrientationPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"interface_orientation"
+                                value:uiOrientationProvider];
 }
 
 - (void)setUserInterfaceIdiom {

@@ -32,6 +32,8 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"device_battery_state":  reflect.String,
 		"device_battery_level":  reflect.Float64,
 		"device_low_power_mode": reflect.Bool,
+		"device_orientation":    reflect.String,
+		"interface_orientation": reflect.String,
 	}
 }
 
