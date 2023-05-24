@@ -34,6 +34,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"device_low_power_mode": reflect.Bool,
 		"device_orientation":    reflect.String,
 		"interface_orientation": reflect.String,
+		"dark_mode":             reflect.Bool,
 	}
 }
 

@@ -16,4 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
     : CMBaseDynamicPropertyProvider
 @end
 
+@interface CMDarkModePropertyProvider : CMBaseDynamicPropertyProvider
+@end
+
 NS_ASSUME_NONNULL_END

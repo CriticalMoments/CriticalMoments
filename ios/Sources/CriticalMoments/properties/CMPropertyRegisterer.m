@@ -147,6 +147,9 @@
         [[CMInterfaceOrientationPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"interface_orientation"
                                 value:uiOrientationProvider];
+    CMDarkModePropertyProvider *darkModeProvider =
+        [[CMDarkModePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"dark_mode" value:darkModeProvider];
 }
 
 - (void)setUserInterfaceIdiom {

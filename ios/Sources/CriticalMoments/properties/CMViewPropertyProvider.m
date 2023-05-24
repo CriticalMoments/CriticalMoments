@@ -50,3 +50,21 @@
 }
 
 @end
+
+@implementation CMDarkModePropertyProvider
+
+- (BOOL)boolValue {
+    if (@available(iOS 12.0, *)) {
+        UITraitCollection *tc = UIScreen.mainScreen.traitCollection;
+        if (tc.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeBool;
+}
+
+@end
