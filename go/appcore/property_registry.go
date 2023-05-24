@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"github.com/antonmedv/expr"
@@ -89,10 +87,12 @@ func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
 		return false, err
 	}
 
-	env := map[string]interface{}{}
+	// Build env with helper functions and vars from props
+	env := cmcore.ConditionEnvWithHelpers()
 	for _, v := range variables {
-		value := p.propertyValue(v)
-		env[v] = value
+		if _, ok := env[v]; !ok {
+			env[v] = p.propertyValue(v)
+		}
 	}
 
 	// TODO functions not bound here. bind to cmExprEnv if we add function support
@@ -135,13 +135,7 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	var provider propertyProvider
 	var ok bool
 
-	if expectedKind != cmcore.CMKindVersionNumber {
-		provider, ok = p.providers[propName]
-	} else {
-		// custom validation for version numbers, expect a string key with _string postfix
-		provider, ok = p.providers[fmt.Sprintf(versionNumberStringKeyFormat, propName)]
-		expectedKind = reflect.String
-	}
+	provider, ok = p.providers[propName]
 
 	if !ok && !allowMissing {
 		return errors.New(fmt.Sprintf("Missing required property: %v", propName))
@@ -152,45 +146,5 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	if provider.Kind() != expectedKind {
 		return errors.New(fmt.Sprintf("Property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String()))
 	}
-	return nil
-}
-
-const versionNumberStringKeyFormat = "%v_string"
-
-func (p *propertyRegistry) registerStaticVersionNumberProperty(prefix string, versionString string) error {
-	componentNames := []string{"major", "minor", "patch", "mini", "micro", "nano", "smol"}
-
-	if prefix == "" {
-		return errors.New("Prefix required for version property")
-	}
-
-	expectedType := p.expectedTypeForKey(prefix)
-	if expectedType != cmcore.CMKindVersionNumber {
-		return errors.New("Not expecting a version number for key: " + prefix)
-	}
-
-	// Save string even if we can't parse the rest. Can target using exact strings worst case.
-	stringProperty := staticPropertyProvider{
-		value: versionString,
-	}
-	p.providers[fmt.Sprintf(versionNumberStringKeyFormat, prefix)] = &stringProperty
-
-	components := strings.Split(versionString, ".")
-	intComponents := make([]int, len(components))
-	for i, component := range components {
-		intComponent, err := strconv.Atoi(component)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Invalid version number format: \"%v\"", versionString))
-		}
-		intComponents[i] = intComponent
-	}
-
-	for i := 0; i < len(intComponents) && i < len(componentNames); i++ {
-		componentProperty := staticPropertyProvider{
-			value: intComponents[i],
-		}
-		p.providers[fmt.Sprintf("%v_%v", prefix, componentNames[i])] = &componentProperty
-	}
-
 	return nil
 }

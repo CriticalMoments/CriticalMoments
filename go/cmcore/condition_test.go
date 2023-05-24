@@ -51,8 +51,8 @@ func TestConditionVariableExtraction(t *testing.T) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
 
-	// unregistered method names should be included (ab), registered ones should not (AddOne)
-	code = "a || ab() || AddOne(1) > 1"
+	// unregistered method names should be included (ab), registered ones should not (versionNumberComponent)
+	code = "a || ab() || versionNumberComponent(1) > 1"
 	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +78,7 @@ func TestValidateProps(t *testing.T) {
 		t.Fatal("Unrecognized method passed validation")
 	}
 
-	err = ValidateCondition("AddOne(1) > 1")
+	err = ValidateCondition("versionNumberComponent('1.2.3', 1) == 1")
 	if err != nil {
 		t.Fatal("Valid method failed validation")
 	}
@@ -91,5 +91,10 @@ func TestValidateProps(t *testing.T) {
 	err = ValidateCondition("screen_scale > 2.0")
 	if err != nil {
 		t.Fatal("Valid well known property failed validation")
+	}
+
+	err = ValidateCondition("app_version == 'iPhone13,3' && versionNumberComponent(os_version, 1) >= 15")
+	if err != nil {
+		t.Fatal("Valid version strings failed validation")
 	}
 }

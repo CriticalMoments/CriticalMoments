@@ -185,9 +185,6 @@ func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error 
 func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
-func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
-	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
-}
 func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }

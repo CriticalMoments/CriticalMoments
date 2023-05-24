@@ -3,8 +3,6 @@ package appcore
 import (
 	"reflect"
 	"testing"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 func TestPropertyRegistrySetGet(t *testing.T) {
@@ -109,68 +107,40 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 func TestPropertyRegistryVersionNumber(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": cmcore.CMKindVersionNumber, "b": reflect.Bool, "c_version": cmcore.CMKindVersionNumber, "d_version": cmcore.CMKindVersionNumber}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"c_version": reflect.String, "a_version": reflect.String}
 
-	// invalid version should error
-	if err := pr.registerStaticVersionNumberProperty("a", ""); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "a.b.c"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "1.1.0x45"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "1.1.a"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("", "1.1"); err == nil {
-		t.Fatal("Must provide a prefix")
-	}
-	if pr.propertyValue("a_major") != nil {
-		t.Fatal("Invalid version numbers saved component")
-	}
-	if pr.propertyValue("a_string") != "1.1.a" {
-		t.Fatal("Failed version number failed to at least save string version")
-	}
-
-	// Invalid type
-	if err := pr.registerStaticVersionNumberProperty("b", "1.2.3"); err == nil {
-		t.Fatal("Allowed registering a version number to a bool type")
-	}
-	if pr.propertyValue("b_major") != nil {
-		t.Fatal("Invalid version numbers saved component")
-	}
-	if pr.propertyValue("b_string") != nil {
-		t.Fatal("Saved version for type mismatch")
-	}
-
-	// Valid
-	if err := pr.registerStaticVersionNumberProperty("c_version", "1.2.3"); err != nil {
+	// Valid string -- saves and able to parse components with function
+	if err := pr.registerStaticProperty("c_version", "1.2.3"); err != nil {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("c_version_string") != "1.2.3" {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_major") != 1 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_minor") != 2 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_patch") != 3 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_micro") != nil {
-		t.Fatal("Valid version saved extra component")
-	}
-
-	// Very long -- should save 7 deep and not error
-	if err := pr.registerStaticVersionNumberProperty("d_version", "1.2.3.4.5.6.7.8.9.10.11.12"); err != nil {
+	if pr.propertyValue("c_version") != "1.2.3" {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("d_version_smol") != 7 {
-		t.Fatal("Valid version number failed to save component")
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 0) == 1"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 0) == 2"); err != nil || r {
+		t.Fatal("Valid version number failed to extract component that fails test")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 1) == 2"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 2) == 3"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 3) == nil"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+
+	// Invalid version string
+	if err := pr.registerStaticProperty("a_version", "1.b.3"); err != nil {
+		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
+	}
+	if pr.propertyValue("a_version") != "1.b.3" {
+		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(a_version, 0) == nil"); err != nil || !r {
+		t.Fatal("Invalid version failed to return nil for component")
 	}
 }
 
@@ -233,7 +203,7 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 
 	_, err := pr.evaluateCondition("a > 2")
 	if err == nil {
-		t.Fatal("Allowed invalid conditions")
+		t.Fatal("Allowed invalid conditions: nil > 2")
 	}
 
 	result, err := pr.evaluateCondition("3 > 2")
