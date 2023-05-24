@@ -71,14 +71,6 @@
     [self processError:error];
 }
 
-- (void)registerStaticVersionProperty:(NSString *)key value:(NSString *)value {
-    NSError *error;
-    [AppcoreSharedAppcore() registerStaticVersionNumberProperty:key
-                                                  versionString:value
-                                                          error:&error];
-    [self processError:error];
-}
-
 - (void)registerDefaultPropertiesToAppcore {
 
     // This API returns different values on older iPads. Make these
@@ -91,8 +83,8 @@
     [self registerStaticStringProperty:@"platform" value:systemOsName];
 
     // OS Version
-    [self registerStaticVersionProperty:@"os_version"
-                                  value:UIDevice.currentDevice.systemVersion];
+    [self registerStaticStringProperty:@"os_version"
+                                 value:UIDevice.currentDevice.systemVersion];
 
     // Locale
     NSLocale *locale = [NSLocale currentLocale];
@@ -110,7 +102,7 @@
     // App Version
     NSString *appVersion = [NSBundle.mainBundle
         objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    [self registerStaticVersionProperty:@"app_version" value:appVersion];
+    [self registerStaticStringProperty:@"app_version" value:appVersion];
 
     // Screen size / scale
     CGSize screenSize = UIScreen.mainScreen.bounds.size;
@@ -206,8 +198,8 @@
     versionString = [versionString stringByReplacingOccurrencesOfString:@","
                                                              withString:@"."];
     if (versionString.length > 0) {
-        [self registerStaticVersionProperty:@"device_model_version"
-                                      value:versionString];
+        [self registerStaticStringProperty:@"device_model_version"
+                                     value:versionString];
     }
 }
 

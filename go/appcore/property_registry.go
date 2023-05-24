@@ -3,15 +3,12 @@ package appcore
 import (
 	"errors"
 	"fmt"
-	"math"
 	"reflect"
-	"strconv"
-	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/antonmedv/expr"
 	"golang.org/x/exp/slices"
 )
-
-const cmKindVersionNumber reflect.Kind = math.MaxInt
 
 type propertyRegistry struct {
 	providers              map[string]propertyProvider
@@ -21,32 +18,9 @@ type propertyRegistry struct {
 
 func newPropertyRegistry() *propertyRegistry {
 	return &propertyRegistry{
-		providers: make(map[string]propertyProvider),
-		requiredPropertyTypes: map[string]reflect.Kind{
-			"platform":              reflect.String,
-			"os_version":            cmKindVersionNumber,
-			"device_manufacturer":   reflect.String,
-			"device_model":          reflect.String,
-			"locale_language_code":  reflect.String,
-			"locale_country_code":   reflect.String,
-			"locale_currency_code":  reflect.String,
-			"app_version":           cmKindVersionNumber,
-			"user_interface_idiom":  reflect.String,
-			"app_id":                reflect.String,
-			"screen_width_pixels":   reflect.Int,
-			"screen_height_pixels":  reflect.Int,
-			"device_battery_state":  reflect.String,
-			"device_battery_level":  reflect.Float64,
-			"device_low_power_mode": reflect.Bool,
-		},
-		wellKnownPropertyTypes: map[string]reflect.Kind{
-			"user_signed_in":       reflect.Bool,
-			"device_model_class":   reflect.String,
-			"device_model_version": cmKindVersionNumber,
-			"screen_width_points":  reflect.Int,
-			"screen_height_points": reflect.Int,
-			"screen_scale":         reflect.Float64,
-		},
+		providers:              make(map[string]propertyProvider),
+		requiredPropertyTypes:  cmcore.RequiredPropertyTypes(),
+		wellKnownPropertyTypes: cmcore.WellKnownPropertyTypes(),
 	}
 }
 
@@ -107,6 +81,36 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 	return v.Value()
 }
 
+func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
+	variables, err := cmcore.ExtractVariablesFromCondition(condition)
+	if err != nil {
+		return false, err
+	}
+
+	// Build env with helper functions and vars from props
+	env := cmcore.ConditionEnvWithHelpers()
+	for _, v := range variables {
+		if _, ok := env[v]; !ok {
+			env[v] = p.propertyValue(v)
+		}
+	}
+
+	// TODO functions not bound here. bind to cmExprEnv if we add function support
+	program, err := expr.Compile(condition, expr.Env(env), expr.AllowUndefinedVariables(), expr.AsBool())
+	if err != nil {
+		return false, err
+	}
+	result, err := expr.Run(program, env)
+	if err != nil {
+		return false, err
+	}
+	boolResult, ok := result.(bool)
+	if !ok {
+		return false, nil
+	}
+	return boolResult, nil
+}
+
 func (p *propertyRegistry) validateProperties() error {
 	// Check required
 	for propName, expectedKind := range p.requiredPropertyTypes {
@@ -131,13 +135,7 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	var provider propertyProvider
 	var ok bool
 
-	if expectedKind != cmKindVersionNumber {
-		provider, ok = p.providers[propName]
-	} else {
-		// custom validation for version numbers, expect a string key with _string postfix
-		provider, ok = p.providers[fmt.Sprintf(versionNumberStringKeyFormat, propName)]
-		expectedKind = reflect.String
-	}
+	provider, ok = p.providers[propName]
 
 	if !ok && !allowMissing {
 		return errors.New(fmt.Sprintf("Missing required property: %v", propName))
@@ -148,45 +146,5 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	if provider.Kind() != expectedKind {
 		return errors.New(fmt.Sprintf("Property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String()))
 	}
-	return nil
-}
-
-const versionNumberStringKeyFormat = "%v_string"
-
-func (p *propertyRegistry) registerStaticVersionNumberProperty(prefix string, versionString string) error {
-	componentNames := []string{"major", "minor", "patch", "mini", "micro", "nano", "smol"}
-
-	if prefix == "" {
-		return errors.New("Prefix required for version property")
-	}
-
-	expectedType := p.expectedTypeForKey(prefix)
-	if expectedType != cmKindVersionNumber {
-		return errors.New("Not expecting a version number for key: " + prefix)
-	}
-
-	// Save string even if we can't parse the rest. Can target using exact strings worst case.
-	stringProperty := staticPropertyProvider{
-		value: versionString,
-	}
-	p.providers[fmt.Sprintf(versionNumberStringKeyFormat, prefix)] = &stringProperty
-
-	components := strings.Split(versionString, ".")
-	intComponents := make([]int, len(components))
-	for i, component := range components {
-		intComponent, err := strconv.Atoi(component)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Invalid version number format: \"%v\"", versionString))
-		}
-		intComponents[i] = intComponent
-	}
-
-	for i := 0; i < len(intComponents) && i < len(componentNames); i++ {
-		componentProperty := staticPropertyProvider{
-			value: intComponents[i],
-		}
-		p.providers[fmt.Sprintf("%v_%v", prefix, componentNames[i])] = &componentProperty
-	}
-
 	return nil
 }

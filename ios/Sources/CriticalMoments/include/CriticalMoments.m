@@ -93,7 +93,11 @@
 }
 
 + (void)sendEvent:(NSString *)eventName {
-    [AppcoreSharedAppcore() sendEvent:eventName];
+    NSError *error;
+    [AppcoreSharedAppcore() sendEvent:eventName error:&error];
+    if (error) {
+        NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
+    }
 }
 
 @end

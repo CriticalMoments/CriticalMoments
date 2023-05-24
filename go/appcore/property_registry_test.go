@@ -107,68 +107,40 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 func TestPropertyRegistryVersionNumber(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": cmKindVersionNumber, "b": reflect.Bool, "c_version": cmKindVersionNumber, "d_version": cmKindVersionNumber}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"c_version": reflect.String, "a_version": reflect.String}
 
-	// invalid version should error
-	if err := pr.registerStaticVersionNumberProperty("a", ""); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "a.b.c"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "1.1.0x45"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("a", "1.1.a"); err == nil {
-		t.Fatal("Must provide a valid version number")
-	}
-	if err := pr.registerStaticVersionNumberProperty("", "1.1"); err == nil {
-		t.Fatal("Must provide a prefix")
-	}
-	if pr.propertyValue("a_major") != nil {
-		t.Fatal("Invalid version numbers saved component")
-	}
-	if pr.propertyValue("a_string") != "1.1.a" {
-		t.Fatal("Failed version number failed to at least save string version")
-	}
-
-	// Invalid type
-	if err := pr.registerStaticVersionNumberProperty("b", "1.2.3"); err == nil {
-		t.Fatal("Allowed registering a version number to a bool type")
-	}
-	if pr.propertyValue("b_major") != nil {
-		t.Fatal("Invalid version numbers saved component")
-	}
-	if pr.propertyValue("b_string") != nil {
-		t.Fatal("Saved version for type mismatch")
-	}
-
-	// Valid
-	if err := pr.registerStaticVersionNumberProperty("c_version", "1.2.3"); err != nil {
+	// Valid string -- saves and able to parse components with function
+	if err := pr.registerStaticProperty("c_version", "1.2.3"); err != nil {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("c_version_string") != "1.2.3" {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_major") != 1 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_minor") != 2 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_patch") != 3 {
-		t.Fatal("Valid version number failed to save component")
-	}
-	if pr.propertyValue("c_version_micro") != nil {
-		t.Fatal("Valid version saved extra component")
-	}
-
-	// Very long -- should save 7 deep and not error
-	if err := pr.registerStaticVersionNumberProperty("d_version", "1.2.3.4.5.6.7.8.9.10.11.12"); err != nil {
+	if pr.propertyValue("c_version") != "1.2.3" {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("d_version_smol") != 7 {
-		t.Fatal("Valid version number failed to save component")
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 0) == 1"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 0) == 2"); err != nil || r {
+		t.Fatal("Valid version number failed to extract component that fails test")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 1) == 2"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 2) == 3"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(c_version, 3) == nil"); err != nil || !r {
+		t.Fatal("Valid version number failed to extract component")
+	}
+
+	// Invalid version string
+	if err := pr.registerStaticProperty("a_version", "1.b.3"); err != nil {
+		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
+	}
+	if pr.propertyValue("a_version") != "1.b.3" {
+		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
+	}
+	if r, err := pr.evaluateCondition("versionNumberComponent(a_version, 0) == nil"); err != nil || !r {
+		t.Fatal("Invalid version failed to return nil for component")
 	}
 }
 
@@ -208,5 +180,79 @@ func TestDynamicProperties(t *testing.T) {
 	}
 	if pr.propertyValue("a") != 3 {
 		t.Fatal("dynamic property not dynamic")
+	}
+}
+
+func TestPropertyRegistryConditionEval(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"a_val":     reflect.String,
+		"a_int":     reflect.Int,
+		"a_missing": reflect.String,
+	}
+
+	pr.registerStaticProperty("a_val", "hello")
+	pr.registerStaticProperty("a_int", 42)
+	if pr.propertyValue("a_val") != "hello" {
+		t.Fatal("property not set")
+	}
+	if pr.propertyValue("a_int") != 42 {
+		t.Fatal("property not set")
+	}
+
+	_, err := pr.evaluateCondition("a > 2")
+	if err == nil {
+		t.Fatal("Allowed invalid conditions: nil > 2")
+	}
+
+	result, err := pr.evaluateCondition("3 > 2")
+	if err != nil || !result {
+		t.Fatal("Failed to eval simple true condition")
+	}
+
+	result, err = pr.evaluateCondition("1 > 2")
+	if err != nil || result {
+		t.Fatal("Failed to eval simple false condition")
+	}
+
+	result, err = pr.evaluateCondition("a_val == 'hello'")
+	if err != nil || !result {
+		t.Fatal("Failed to eval true condition")
+	}
+
+	result, err = pr.evaluateCondition("a_val startsWith 'hel'")
+	if err != nil || !result {
+		t.Fatal("Failed to eval true condition with builtin function")
+	}
+
+	result, err = pr.evaluateCondition("a_val == 'world'")
+	if err != nil || result {
+		t.Fatal("Failed to eval false condition with property")
+	}
+
+	result, err = pr.evaluateCondition("1 + 2 + 3")
+	if err == nil {
+		t.Fatal("Allowed condition with non bool result")
+	}
+
+	result, err = pr.evaluateCondition("a_val ^#$%")
+	if err == nil {
+		t.Fatal("Allowed invalid condition")
+	}
+
+	result, err = pr.evaluateCondition("a_int > 99")
+	if err != nil && result {
+		t.Fatal("false condition passed")
+	}
+
+	result, err = pr.evaluateCondition("a_int > 2")
+	if err != nil && !result {
+		t.Fatal("true condition failed")
+	}
+
+	result, err = pr.evaluateCondition("a_missing == nil")
+	if err != nil && !result {
+		t.Fatal("true condition for allowed missing var failed")
 	}
 }

@@ -1,5 +1,6 @@
 {
     "actionType": "alert",
+    "condition": "platform == 'iOS'",
     "actionData": {
         "title": "For real?",
         "message": "Are you sure you want to?",

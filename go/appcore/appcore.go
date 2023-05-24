@@ -129,22 +129,41 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-// TODO: method considered WIP, not tested, expect a full re-write for conditions so saving for later
 // TODO: events should be queued during setup, and run after postConfigSetup
-func (ac *Appcore) SendEvent(e string) {
+func (ac *Appcore) SendEvent(e string) error {
 	actions := ac.config.ActionsForEvent(e)
+	if len(actions) == 0 {
+		return errors.New(fmt.Sprintf("Event not found: %v", e))
+	}
+	var lastErr error
 	for _, action := range actions {
-		err := dispatchActionToLib(&action, ac.libBindings)
+		err := ac.PerformAction(&action)
 		if err != nil {
-			fmt.Printf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err)
+			// return an error, but don't stop sending
+			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err))
 		}
 	}
+	return lastErr
 }
 
 func (ac *Appcore) PerformNamedAction(actionName string) error {
 	action := ac.config.ActionWithName(actionName)
 	if action == nil {
 		return errors.New(fmt.Sprintf("No action found named %v", actionName))
+	}
+	return ac.PerformAction(action)
+}
+
+func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
+	if action.Condition != "" {
+		conditionResult, err := ac.propertyRegistry.evaluateCondition(action.Condition)
+		if err != nil {
+			return err
+		}
+		if !conditionResult {
+			// failing conditions are not errors
+			return nil
+		}
 	}
 	return action.PerformAction(ac.libBindings)
 }
@@ -165,9 +184,6 @@ func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error 
 }
 func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
 	return ac.propertyRegistry.registerStaticProperty(key, value)
-}
-func (ac *Appcore) RegisterStaticVersionNumberProperty(prefix string, versionString string) error {
-	return ac.propertyRegistry.registerStaticVersionNumberProperty(prefix, versionString)
 }
 func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)

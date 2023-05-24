@@ -61,7 +61,7 @@ func (d *dynamicPropertyProviderWrapper) Value() interface{} {
 	case LibPropertyProviderTypeString:
 		return d.propertyProvider.StringValue()
 	}
-	fmt.Println("Invalid property type!")
+	fmt.Println("CriticalMoments: Invalid property type!")
 	return nil
 }
 
@@ -76,6 +76,6 @@ func (d *dynamicPropertyProviderWrapper) Kind() reflect.Kind {
 	case LibPropertyProviderTypeString:
 		return reflect.String
 	}
-	fmt.Println("Invalid property type!")
+	fmt.Println("CriticalMoments: Invalid property type!")
 	return reflect.String
 }

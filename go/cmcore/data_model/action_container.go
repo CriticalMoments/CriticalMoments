@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 /*
@@ -27,6 +29,8 @@ const (
 type ActionContainer struct {
 	ActionType string
 
+	Condition string
+
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
 	BannerAction *BannerAction
@@ -40,6 +44,7 @@ type ActionContainer struct {
 
 type jsonActionContainer struct {
 	ActionType    string          `json:"actionType"`
+	Condition     string          `json:"condition"`
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
@@ -87,8 +92,16 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
 	}
+
+	if jac.Condition != "" {
+		if err = cmcore.ValidateCondition(jac.Condition); err != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", jac.Condition), err)
+		}
+	}
+
 	ac.actionData = actionData
 	ac.ActionType = jac.ActionType
+	ac.Condition = jac.Condition
 	return nil
 }
 
