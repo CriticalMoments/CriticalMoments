@@ -64,7 +64,7 @@ func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
 	}
 }
 
-func extractVariablesFromCode(code string) ([]string, error) {
+func ExtractVariablesFromCondition(code string) ([]string, error) {
 	tree, err := parser.Parse(code)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func extractVariablesFromCode(code string) ([]string, error) {
 }
 
 func ValidateCondition(code string) error {
-	variables, err := extractVariablesFromCode(code)
+	variables, err := ExtractVariablesFromCondition(code)
 	if err != nil {
 		return err
 	}
@@ -96,6 +96,7 @@ func ValidateCondition(code string) error {
 	wellKnown := WellKnownPropertyTypes()
 
 	for _, v := range variables {
+		// TODO: expand version strings
 		if _, ok := required[v]; ok {
 			continue
 		}

@@ -14,7 +14,7 @@ func arraysEqualOrderInsensitive(a []string, b []string) bool {
 
 func TestConditionVariableExtraction(t *testing.T) {
 	code := "(a > 5555) && b && 'constantString' == c && 2 in [d, 3, 4]"
-	variables, err := extractVariablesFromCode(code)
+	variables, err := ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +23,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 	}
 
 	code = "a && b.startsWith('constString') && c + d > 3"
-	variables, err = extractVariablesFromCode(code)
+	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 
 	// It can optimize out the unneeded vars
 	code = "a || (false && b + c + d > 0)"
-	variables, err = extractVariablesFromCode(code)
+	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 
 	// don't optimize out needed var
 	code = "(a || false)"
-	variables, err = extractVariablesFromCode(code)
+	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 
 	// unregistered method names should be included (ab), registered ones should not (AddOne)
 	code = "a || ab() || AddOne(1) > 1"
-	variables, err = extractVariablesFromCode(code)
+	variables, err = ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -212,3 +212,71 @@ func TestDynamicProperties(t *testing.T) {
 		t.Fatal("dynamic property not dynamic")
 	}
 }
+
+func TestPropertyRegistryConditionEval(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"a_val": reflect.String,
+		"a_int": reflect.Int,
+	}
+
+	pr.registerStaticProperty("a_val", "hello")
+	pr.registerStaticProperty("a_int", 42)
+	if pr.propertyValue("a_val") != "hello" {
+		t.Fatal("property not set")
+	}
+	if pr.propertyValue("a_int") != 42 {
+		t.Fatal("property not set")
+	}
+
+	_, err := pr.evaluateCondition("a > 2")
+	if err == nil {
+		t.Fatal("Allowed invalid conditions")
+	}
+
+	result, err := pr.evaluateCondition("3 > 2")
+	if err != nil || !result {
+		t.Fatal("Failed to eval simple true condition")
+	}
+
+	result, err = pr.evaluateCondition("1 > 2")
+	if err != nil || result {
+		t.Fatal("Failed to eval simple false condition")
+	}
+
+	result, err = pr.evaluateCondition("a_val == 'hello'")
+	if err != nil || !result {
+		t.Fatal("Failed to eval true condition")
+	}
+
+	result, err = pr.evaluateCondition("a_val startsWith 'hel'")
+	if err != nil || !result {
+		t.Fatal("Failed to eval true condition with builtin function")
+	}
+
+	result, err = pr.evaluateCondition("a_val == 'world'")
+	if err != nil || result {
+		t.Fatal("Failed to eval false condition with property")
+	}
+
+	result, err = pr.evaluateCondition("1 + 2 + 3")
+	if err == nil {
+		t.Fatal("Allowed condition with non bool result")
+	}
+
+	result, err = pr.evaluateCondition("a_val ^#$%")
+	if err == nil {
+		t.Fatal("Allowed invalid condition")
+	}
+
+	result, err = pr.evaluateCondition("a_int > 99")
+	if err != nil && result {
+		t.Fatal("false condition passed")
+	}
+
+	result, err = pr.evaluateCondition("a_int > 2")
+	if err != nil && !result {
+		t.Fatal("true condition failed")
+	}
+}

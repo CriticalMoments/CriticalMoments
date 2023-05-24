@@ -59,6 +59,13 @@
                 "actionData": {
                     "url": "https://criticalmoments.io"
                 }
+            },
+            "alertActionWithFailingCondition": {
+                "actionType": "alert",
+                "condition": "1 > 2",
+                "actionData": {
+                    "title": "Alert title"
+                }
             }
         }
     },

@@ -147,7 +147,7 @@ func TestAppcoreStartBadConfig(t *testing.T) {
 	}
 }
 
-func TestPerformNamedAction(t *testing.T) {
+func TestPerformingAction(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
@@ -159,10 +159,33 @@ func TestPerformNamedAction(t *testing.T) {
 	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
 		t.Fatal("last banner action should be nil on new appcore test binding")
 	}
-	// should fire bannerAction1
-	ac.SendEvent("custom_event")
+	// should fire bannerAction1 via a trigger
+	err = ac.SendEvent("custom_event")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if ac.libBindings.(*testLibBindings).lastBannerAction.Body != "Hello world, but on a banner!" {
 		t.Fatal("last banner action should be nil on new appcore test binding")
+	}
+
+	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+		t.Fatal("last alert action should be nil on new appcore test binding")
+	}
+	// condition should stop it from firing
+	err = ac.PerformNamedAction("alertActionWithFailingCondition")
+	if err != nil {
+		// Specifically, no not found error
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+		t.Fatal("event fired when condition false")
+	}
+	err = ac.PerformNamedAction("alertAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+		t.Fatal("alert event didn't fire")
 	}
 }
 

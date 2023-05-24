@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/antonmedv/expr"
 	"golang.org/x/exp/slices"
 )
 
@@ -80,6 +81,37 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 		return nil
 	}
 	return v.Value()
+}
+
+func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
+	variables, err := cmcore.ExtractVariablesFromCondition(condition)
+	if err != nil {
+		return false, err
+	}
+
+	env := map[string]interface{}{}
+	for _, v := range variables {
+		value := p.propertyValue(v)
+		if value == nil {
+			return false, errors.New(fmt.Sprintf("Could not access variable: %v", v))
+		}
+		env[v] = value
+	}
+
+	// TODO functions not bound here. bind to cmExprEnv if we add function support
+	program, err := expr.Compile(condition, expr.Env(env), expr.AsBool())
+	if err != nil {
+		return false, err
+	}
+	result, err := expr.Run(program, env)
+	if err != nil {
+		return false, err
+	}
+	boolResult, ok := result.(bool)
+	if !ok {
+		return false, nil
+	}
+	return boolResult, nil
 }
 
 func (p *propertyRegistry) validateProperties() error {

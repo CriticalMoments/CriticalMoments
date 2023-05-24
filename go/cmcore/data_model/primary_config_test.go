@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 4 {
+	if len(pc.namedActions) != 5 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
