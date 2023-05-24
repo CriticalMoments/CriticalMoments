@@ -217,8 +217,9 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"a_val": reflect.String,
-		"a_int": reflect.Int,
+		"a_val":     reflect.String,
+		"a_int":     reflect.Int,
+		"a_missing": reflect.String,
 	}
 
 	pr.registerStaticProperty("a_val", "hello")
@@ -278,5 +279,10 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	result, err = pr.evaluateCondition("a_int > 2")
 	if err != nil && !result {
 		t.Fatal("true condition failed")
+	}
+
+	result, err = pr.evaluateCondition("a_missing == nil")
+	if err != nil && !result {
+		t.Fatal("true condition for allowed missing var failed")
 	}
 }

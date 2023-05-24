@@ -92,14 +92,11 @@ func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
 	env := map[string]interface{}{}
 	for _, v := range variables {
 		value := p.propertyValue(v)
-		if value == nil {
-			return false, errors.New(fmt.Sprintf("Could not access variable: %v", v))
-		}
 		env[v] = value
 	}
 
 	// TODO functions not bound here. bind to cmExprEnv if we add function support
-	program, err := expr.Compile(condition, expr.Env(env), expr.AsBool())
+	program, err := expr.Compile(condition, expr.Env(env), expr.AllowUndefinedVariables(), expr.AsBool())
 	if err != nil {
 		return false, err
 	}
