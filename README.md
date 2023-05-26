@@ -10,7 +10,7 @@ This project is a work in progress, and is not ready for any usage.
 
 # Requirements
 
-Currenlty CriticalMoments supports iOS and iPad OS, for iOS 11+.
+Currenlty CriticalMoments supports iOS and iPad OS, for iOS 12+.
 
 The API supports both Objective-C and Swift.
 
