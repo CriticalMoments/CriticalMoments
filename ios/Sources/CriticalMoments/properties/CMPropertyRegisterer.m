@@ -8,6 +8,7 @@
 #import "CMPropertyRegisterer.h"
 
 #import "CMBatteryLevelPropertyProvider.h"
+#import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
 
 #import <sys/utsname.h>
@@ -150,6 +151,54 @@
     CMDarkModePropertyProvider *darkModeProvider =
         [[CMDarkModePropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"dark_mode" value:darkModeProvider];
+
+    // Networking
+
+    CMHasActiveNetworkPropertyProvider *hasNetworkPP =
+        [[CMHasActiveNetworkPropertyProvider alloc] init];
+    // TODO test
+    bool hasNetwork = [hasNetworkPP boolValue];
+    [self registerLibPropertyProvider:@"has_active_network" value:hasNetworkPP];
+
+    CMNetworkTypePropertyProvider *networkTypePP =
+        [[CMNetworkTypePropertyProvider alloc] init];
+    // TODO test
+    NSString *networkType = [networkTypePP stringValue];
+    [self registerLibPropertyProvider:@"network_connection_type"
+                                value:networkTypePP];
+
+    // low network mode added in ios 13
+    BOOL deviceHasLowDataMode = false;
+    if (@available(iOS 13, *)) {
+        deviceHasLowDataMode = true;
+    }
+    if (deviceHasLowDataMode) {
+        CMLowDataModePropertyProvider *lowDataProvider =
+            [[CMLowDataModePropertyProvider alloc] init];
+        // TODO test
+        bool ldm = [lowDataProvider boolValue];
+        [self registerLibPropertyProvider:@"low_data_mode"
+                                    value:lowDataProvider];
+    }
+
+    CMExpensiveNetworkPropertyProvider *expensiveNetworkPP =
+        [[CMExpensiveNetworkPropertyProvider alloc] init];
+    // TODO test
+    bool isExpensive = [expensiveNetworkPP boolValue];
+    [self registerLibPropertyProvider:@"expensive_network"
+                                value:expensiveNetworkPP];
+
+    CMHasWifiConnectionPropertyProvider *hasWifiPP =
+        [[CMHasWifiConnectionPropertyProvider alloc] init];
+    // TODO test
+    bool hasWifi = [hasWifiPP boolValue];
+    [self registerLibPropertyProvider:@"has_wifi_connection" value:hasWifiPP];
+
+    CMHasCellConnectionPropertyProvider *hasCellPP =
+        [[CMHasCellConnectionPropertyProvider alloc] init];
+    // TODO test
+    bool hasCell = [hasCellPP boolValue];
+    [self registerLibPropertyProvider:@"has_cell_connection" value:hasCellPP];
 }
 
 - (void)setUserInterfaceIdiom {
