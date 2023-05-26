@@ -8,6 +8,7 @@
 #import "CMPropertyRegisterer.h"
 
 #import "CMBatteryLevelPropertyProvider.h"
+#import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
 
 #import <sys/utsname.h>
@@ -150,6 +151,43 @@
     CMDarkModePropertyProvider *darkModeProvider =
         [[CMDarkModePropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"dark_mode" value:darkModeProvider];
+
+    // Networking
+
+    CMHasActiveNetworkPropertyProvider *hasActiveNetworkPP =
+        [[CMHasActiveNetworkPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"has_active_network"
+                                value:hasActiveNetworkPP];
+
+    CMNetworkTypePropertyProvider *networkTypePP =
+        [[CMNetworkTypePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"network_connection_type"
+                                value:networkTypePP];
+
+    // low network mode added in ios 13
+    BOOL deviceHasLowDataMode = false;
+    if (@available(iOS 13, *)) {
+        deviceHasLowDataMode = true;
+    }
+    if (deviceHasLowDataMode) {
+        CMLowDataModePropertyProvider *lowDataProvider =
+            [[CMLowDataModePropertyProvider alloc] init];
+        [self registerLibPropertyProvider:@"low_data_mode"
+                                    value:lowDataProvider];
+    }
+
+    CMExpensiveNetworkPropertyProvider *expensiveNetworkPP =
+        [[CMExpensiveNetworkPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"expensive_network"
+                                value:expensiveNetworkPP];
+
+    CMHasWifiConnectionPropertyProvider *hasWifiPP =
+        [[CMHasWifiConnectionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"has_wifi_connection" value:hasWifiPP];
+
+    CMHasCellConnectionPropertyProvider *hasCellPP =
+        [[CMHasCellConnectionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"has_cell_connection" value:hasCellPP];
 }
 
 - (void)setUserInterfaceIdiom {

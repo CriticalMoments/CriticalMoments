@@ -255,4 +255,9 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	if err != nil && !result {
 		t.Fatal("true condition for allowed missing var failed")
 	}
+
+	result, err = pr.evaluateCondition("a_missing")
+	if err != nil && result {
+		t.Fatal("nil condition did not eval to false")
+	}
 }

@@ -17,24 +17,26 @@ import (
 
 func RequiredPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
-		"platform":              reflect.String,
-		"os_version":            reflect.String,
-		"device_manufacturer":   reflect.String,
-		"device_model":          reflect.String,
-		"locale_language_code":  reflect.String,
-		"locale_country_code":   reflect.String,
-		"locale_currency_code":  reflect.String,
-		"app_version":           reflect.String,
-		"user_interface_idiom":  reflect.String,
-		"app_id":                reflect.String,
-		"screen_width_pixels":   reflect.Int,
-		"screen_height_pixels":  reflect.Int,
-		"device_battery_state":  reflect.String,
-		"device_battery_level":  reflect.Float64,
-		"device_low_power_mode": reflect.Bool,
-		"device_orientation":    reflect.String,
-		"interface_orientation": reflect.String,
-		"dark_mode":             reflect.Bool,
+		"platform":                reflect.String,
+		"os_version":              reflect.String,
+		"device_manufacturer":     reflect.String,
+		"device_model":            reflect.String,
+		"locale_language_code":    reflect.String,
+		"locale_country_code":     reflect.String,
+		"locale_currency_code":    reflect.String,
+		"app_version":             reflect.String,
+		"user_interface_idiom":    reflect.String,
+		"app_id":                  reflect.String,
+		"screen_width_pixels":     reflect.Int,
+		"screen_height_pixels":    reflect.Int,
+		"device_battery_state":    reflect.String,
+		"device_battery_level":    reflect.Float64,
+		"device_low_power_mode":   reflect.Bool,
+		"device_orientation":      reflect.String,
+		"interface_orientation":   reflect.String,
+		"dark_mode":               reflect.Bool,
+		"network_connection_type": reflect.String,
+		"has_active_network":      reflect.Bool,
 	}
 }
 
@@ -45,6 +47,10 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 		"screen_width_points":  reflect.Int,
 		"screen_height_points": reflect.Int,
 		"screen_scale":         reflect.Float64,
+		"low_data_mode":        reflect.Bool,
+		"expensive_network":    reflect.Bool,
+		"has_wifi_connection":  reflect.Bool,
+		"has_cell_connection":  reflect.Bool,
 	}
 }
 
