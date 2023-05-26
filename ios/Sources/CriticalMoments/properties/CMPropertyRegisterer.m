@@ -154,14 +154,13 @@
 
     // Networking
 
-    CMHasActiveNetworkPropertyProvider *hasNetworkPP =
+    CMHasActiveNetworkPropertyProvider *hasActiveNetworkPP =
         [[CMHasActiveNetworkPropertyProvider alloc] init];
-    bool hasNetwork = [hasNetworkPP boolValue];
-    [self registerLibPropertyProvider:@"has_active_network" value:hasNetworkPP];
+    [self registerLibPropertyProvider:@"has_active_network"
+                                value:hasActiveNetworkPP];
 
     CMNetworkTypePropertyProvider *networkTypePP =
         [[CMNetworkTypePropertyProvider alloc] init];
-    NSString *networkType = [networkTypePP stringValue];
     [self registerLibPropertyProvider:@"network_connection_type"
                                 value:networkTypePP];
 
@@ -173,25 +172,21 @@
     if (deviceHasLowDataMode) {
         CMLowDataModePropertyProvider *lowDataProvider =
             [[CMLowDataModePropertyProvider alloc] init];
-        bool ldm = [lowDataProvider boolValue];
         [self registerLibPropertyProvider:@"low_data_mode"
                                     value:lowDataProvider];
     }
 
     CMExpensiveNetworkPropertyProvider *expensiveNetworkPP =
         [[CMExpensiveNetworkPropertyProvider alloc] init];
-    bool isExpensive = [expensiveNetworkPP boolValue];
     [self registerLibPropertyProvider:@"expensive_network"
                                 value:expensiveNetworkPP];
 
     CMHasWifiConnectionPropertyProvider *hasWifiPP =
         [[CMHasWifiConnectionPropertyProvider alloc] init];
-    bool hasWifi = [hasWifiPP boolValue];
     [self registerLibPropertyProvider:@"has_wifi_connection" value:hasWifiPP];
 
     CMHasCellConnectionPropertyProvider *hasCellPP =
         [[CMHasCellConnectionPropertyProvider alloc] init];
-    bool hasCell = [hasCellPP boolValue];
     [self registerLibPropertyProvider:@"has_cell_connection" value:hasCellPP];
 }
 

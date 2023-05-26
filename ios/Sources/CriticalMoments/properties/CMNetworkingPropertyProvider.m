@@ -15,7 +15,7 @@
 
 @property(nonatomic, strong) nw_path_monitor_t monitor;
 @property(nonatomic, strong) nw_path_t currentPath;
-@property(nonatomic, strong) dispatch_semaphore_t readReadySemaphor;
+@property(nonatomic, strong) dispatch_semaphore_t readReadySemaphore;
 @property(nonatomic, strong) dispatch_group_t readReadyGroup;
 
 @end
@@ -43,27 +43,26 @@ static CMNetworkMonitor *sharedInstance = nil;
     if (self) {
         // Sync code: wait for initial write before allowing any reads
         // using a waitGroup, and semaphor to signal the task in the group
-        self.readReadySemaphor = dispatch_semaphore_create(0);
+        self.readReadySemaphore = dispatch_semaphore_create(0);
         self.readReadyGroup = dispatch_group_create();
         dispatch_group_async(
             self.readReadyGroup,
             dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-              dispatch_semaphore_wait(self.readReadySemaphor,
+              dispatch_semaphore_wait(self.readReadySemaphore,
                                       DISPATCH_TIME_FOREVER);
             });
 
         // Network monitor, which signals the read group once we have data
         // stored
         self.monitor = nw_path_monitor_create();
-        __weak CMNetworkMonitor *weakSelf = self;
         nw_path_monitor_set_queue(
             self.monitor,
             dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
+        __weak CMNetworkMonitor *weakSelf = self;
         nw_path_monitor_set_update_handler(
             self.monitor, ^(nw_path_t _Nonnull path) {
-              nw_path_status_t status = nw_path_get_status(path);
               weakSelf.currentPath = path;
-              dispatch_semaphore_signal(weakSelf.readReadySemaphor);
+              dispatch_semaphore_signal(weakSelf.readReadySemaphore);
             });
         nw_path_monitor_start(self.monitor);
     }
@@ -82,8 +81,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return nw_path_get_status(self.currentPath) == nw_path_status_satisfied;
 }
 
-- (bool)isLowNetworkMode {
-    // low network mode added in ios 13
+- (bool)isLowDataMode {
+    // low data mode added in ios 13
     if (@available(iOS 13.0, *)) {
         bool err = dispatch_group_wait(self.readReadyGroup, NETWORK_READ_WAIT);
         if (err) {
@@ -150,7 +149,7 @@ static CMNetworkMonitor *sharedInstance = nil;
 @implementation CMLowDataModePropertyProvider
 
 - (BOOL)boolValue {
-    return [CMNetworkMonitor.shared isLowNetworkMode];
+    return [CMNetworkMonitor.shared isLowDataMode];
 }
 
 - (long)type {
