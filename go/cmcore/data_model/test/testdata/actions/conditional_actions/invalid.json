@@ -1,0 +1,7 @@
+{
+    "actionType": "conditional_action",
+    "actionData": {
+        "condition": "asdf",
+        "failedActionName": "conditional_false_alert"
+    }
+}
