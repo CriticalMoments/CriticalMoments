@@ -25,6 +25,14 @@
 }
 
 - (void)buildSections {
+    CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
+    conditionDemos.title = @"Conditions";
+    conditionDemos.subtitle = @"Evaluate powerful conditions at runtime";
+    conditionDemos.actionNextScreen = [[ConditionsDemoScreen alloc] init];
+    conditionDemos.skipInUiTesting = true;
+
+    [self addSection:@"Conditions" withActions:@[ conditionDemos ]];
+
     CMDemoAction *bannersAction = [[CMDemoAction alloc] init];
     bannersAction.title = @"Banners";
     bannersAction.subtitle = @"UI to display announcement banners across the "
@@ -51,14 +59,6 @@
     themeAction.skipInUiTesting = true;
 
     [self addSection:@"Themes / Style" withActions:@[ themeAction ]];
-
-    CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
-    conditionDemos.title = @"Conditions";
-    conditionDemos.subtitle = @"Evaluate powerful conditions at runtime";
-    conditionDemos.actionNextScreen = [[ConditionsDemoScreen alloc] init];
-    conditionDemos.skipInUiTesting = true;
-
-    [self addSection:@"Conditions" withActions:@[ conditionDemos ]];
 }
 
 @end

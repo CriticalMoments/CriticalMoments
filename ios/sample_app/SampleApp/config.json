@@ -177,14 +177,14 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition True",
-                    "message": "The condition was evaluated, and was true!"
+                    "message": "The condition was evaluated, and was true.\n\nTry changing your device's state to make it true, then tap again."
                 }
             },
             "conditional_false_alert": {
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition False",
-                    "message": "The condition was evaluated, and was false!"
+                    "message": "The condition was evaluated, and was false.\n\nTry changing your device's state to make it false, then tap again."
                 }
             },
             "conditional_landscape": {
