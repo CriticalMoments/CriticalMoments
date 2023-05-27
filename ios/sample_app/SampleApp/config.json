@@ -234,6 +234,14 @@
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
+            },
+            "conditional_complex": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(interface_orientation == 'landscape' ? 1 : 0) + (network_connection_type == 'wifi' ? 1 : 0) + ((device_battery_state == 'charging' || device_battery_state == 'full') ? 1 : 0) >= 2",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
             }
         }
     },
