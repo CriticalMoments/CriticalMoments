@@ -242,22 +242,27 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	}
 
 	result, err = pr.evaluateCondition("a_int > 99")
-	if err != nil && result {
+	if err != nil || result {
 		t.Fatal("false condition passed")
 	}
 
 	result, err = pr.evaluateCondition("a_int > 2")
-	if err != nil && !result {
+	if err != nil || !result {
 		t.Fatal("true condition failed")
 	}
 
 	result, err = pr.evaluateCondition("a_missing == nil")
-	if err != nil && !result {
+	if err != nil || !result {
 		t.Fatal("true condition for allowed missing var failed")
 	}
 
-	result, err = pr.evaluateCondition("a_missing")
-	if err != nil && result {
+	result, err = pr.evaluateCondition("a_missing ?? false")
+	if err != nil || result {
 		t.Fatal("nil condition did not eval to false")
+	}
+
+	result, err = pr.evaluateCondition("a_missing == false")
+	if err != nil || result {
+		t.Fatal("missing condition should be differentiateable from false bool")
 	}
 }

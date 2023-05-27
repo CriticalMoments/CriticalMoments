@@ -10,5 +10,7 @@ type LibBindings interface {
 	SetDefaultTheme(theme *datamodel.Theme) error
 
 	// Actions
-	datamodel.ActionBindings
+	ShowBanner(banner *datamodel.BannerAction) error
+	ShowAlert(alert *datamodel.AlertAction) error
+	ShowLink(link *datamodel.LinkAction) error
 }

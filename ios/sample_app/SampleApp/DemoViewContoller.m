@@ -70,7 +70,7 @@
     }
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
-    cell.detailTextLabel.numberOfLines = 4;
+    cell.detailTextLabel.numberOfLines = 10;
     return cell;
 }
 

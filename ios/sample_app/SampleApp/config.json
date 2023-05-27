@@ -172,6 +172,76 @@
                     "title": "Nested Action",
                     "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
                 }
+            },
+            "conditional_true_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Condition True",
+                    "message": "The condition was evaluated, and was true!"
+                }
+            },
+            "conditional_false_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Condition False",
+                    "message": "The condition was evaluated, and was false!"
+                }
+            },
+            "conditional_landscape": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(interface_orientation == 'landscape')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_flat": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(device_orientation == 'face_up' || device_orientation == 'face_down')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_wifi": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(network_connection_type == 'wifi')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_charging": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(device_battery_state == 'charging' || device_battery_state == 'full')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_os_version": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(versionNumberComponent(os_version,0) >= 16)",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_compound": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(interface_orientation == 'landscape') && (network_connection_type == 'wifi')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_complex": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(interface_orientation == 'landscape' ? 1 : 0) + (network_connection_type == 'wifi' ? 1 : 0) + ((device_battery_state == 'charging' || device_battery_state == 'full') ? 1 : 0) >= 2",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
             }
         }
     },

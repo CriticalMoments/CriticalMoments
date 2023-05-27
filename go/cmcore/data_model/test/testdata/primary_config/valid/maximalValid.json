@@ -66,6 +66,29 @@
                 "actionData": {
                     "title": "Alert title"
                 }
+            },
+            "conditionalWithTrueCondition": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "2 > 1",
+                    "passedActionName": "alertAction",
+                    "failedActionName": "bannerAction1"
+                }
+            },
+            "conditionalWithFalseCondition": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "1 > 2",
+                    "passedActionName": "bannerAction2",
+                    "failedActionName": "linkAction"
+                }
+            },
+            "conditionalWithoutFalseAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "1 > 2",
+                    "passedActionName": "bannerAction2"
+                }
             }
         }
     },

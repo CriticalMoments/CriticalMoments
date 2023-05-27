@@ -165,7 +165,10 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
 			return nil
 		}
 	}
-	return action.PerformAction(ac.libBindings)
+	ad := actionDispatcher{
+		appcore: ac,
+	}
+	return action.PerformAction(&ad)
 }
 
 func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {

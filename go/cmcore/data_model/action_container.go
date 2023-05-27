@@ -19,9 +19,10 @@ System here for each new type
 */
 
 const (
-	ActionTypeEnumBanner string = "banner"
-	ActionTypeEnumAlert  string = "alert"
-	ActionTypeEnumLink   string = "link"
+	ActionTypeEnumBanner      string = "banner"
+	ActionTypeEnumAlert       string = "alert"
+	ActionTypeEnumLink        string = "link"
+	ActionTypeEnumConditional string = "conditional_action"
 )
 
 // This section is the json data model we use for parsing/masrshaling
@@ -33,9 +34,10 @@ type ActionContainer struct {
 
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
-	BannerAction *BannerAction
-	AlertAction  *AlertAction
-	LinkAction   *LinkAction
+	BannerAction      *BannerAction
+	AlertAction       *AlertAction
+	LinkAction        *LinkAction
+	ConditionalAction *ConditionalAction
 
 	// generalized interface for functions we need for any actions type.
 	// Typically a pointer to the one value above that is populated.
@@ -48,12 +50,13 @@ type jsonActionContainer struct {
 	RawActionData json.RawMessage `json:"actionData"`
 }
 
-// To be implemented by client libaray (eg: iOS SDK)
+// To be implemented by client libaray (eg: iOS SDK or Appcore)
 type ActionBindings interface {
 	// Actions
 	ShowBanner(banner *BannerAction) error
 	ShowAlert(alert *AlertAction) error
 	ShowLink(link *LinkAction) error
+	PerformConditionalAction(conditionalAction *ConditionalAction) error
 }
 
 type ActionTypeInterface interface {
@@ -65,9 +68,10 @@ type ActionTypeInterface interface {
 
 var (
 	actionTypeRegistry = map[string]func(json.RawMessage, *ActionContainer) (ActionTypeInterface, error){
-		ActionTypeEnumBanner: unpackBannerFromJson,
-		ActionTypeEnumAlert:  unpackAlertFromJson,
-		ActionTypeEnumLink:   unpackLinkFromJson,
+		ActionTypeEnumBanner:      unpackBannerFromJson,
+		ActionTypeEnumAlert:       unpackAlertFromJson,
+		ActionTypeEnumLink:        unpackLinkFromJson,
+		ActionTypeEnumConditional: unpackConditionalActionFromJson,
 	}
 )
 
