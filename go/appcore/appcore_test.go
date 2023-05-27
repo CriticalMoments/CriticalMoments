@@ -208,6 +208,9 @@ func TestConditionalActionDispatching(t *testing.T) {
 		t.Fatal("last action should be nil on new appcore test binding")
 	}
 	err = ac.PerformNamedAction("conditionalWithTrueCondition")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
 		t.Fatal("last action should be nil after condition run 1")
 	}
@@ -218,6 +221,9 @@ func TestConditionalActionDispatching(t *testing.T) {
 		t.Fatal("last action should be nil after condition run 1")
 	}
 	err = ac.PerformNamedAction("conditionalWithFalseCondition")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
 		t.Fatal("last action should be nil after condition run 2")
 	}
@@ -226,6 +232,19 @@ func TestConditionalActionDispatching(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).lastLinkAction == nil {
 		t.Fatal("last action should not be nil after condition run 2")
+	}
+	err = ac.PerformNamedAction("conditionalWithoutFalseAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil after condition run 3")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+		t.Fatal("last alert action should not be nil after condiiton run 3")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction == nil {
+		t.Fatal("last action should not be nil after condition run 3")
 	}
 }
 

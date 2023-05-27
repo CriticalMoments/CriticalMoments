@@ -82,6 +82,13 @@
                     "passedActionName": "bannerAction2",
                     "failedActionName": "linkAction"
                 }
+            },
+            "conditionalWithoutFalseAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "1 > 2",
+                    "passedActionName": "bannerAction2"
+                }
             }
         }
     },

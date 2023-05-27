@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 7 {
+	if len(pc.namedActions) != 8 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -85,6 +85,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	ca2 := pc.ActionWithName("conditionalWithFalseCondition")
 	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition != "1 > 2" {
 		t.Fatal("Didn't parse conditional action 2")
+	}
+	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")
+	if ca3.ConditionalAction == nil || ca3.ConditionalAction.FailedActionName != "" {
+		t.Fatal("Didn't parse conditional action 3")
 	}
 
 	// Triggers
