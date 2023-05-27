@@ -7,6 +7,7 @@
 
 #import "CMPropertyRegisterer.h"
 
+#import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
 #import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
@@ -188,6 +189,13 @@
     CMHasCellConnectionPropertyProvider *hasCellPP =
         [[CMHasCellConnectionPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"has_cell_connection" value:hasCellPP];
+
+    // Audio
+    CMAudioPlayingPropertyProvider *audioPlayingProvider =
+        [[CMAudioPlayingPropertyProvider alloc] init];
+    bool audio = [audioPlayingProvider boolValue];
+    [self registerLibPropertyProvider:@"other_audio_playing"
+                                value:audioPlayingProvider];
 }
 
 - (void)setUserInterfaceIdiom {
