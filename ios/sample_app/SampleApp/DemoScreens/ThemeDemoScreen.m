@@ -53,7 +53,19 @@ static CMTheme *staticCustomTheme = nil;
     resetThemeAction.subtitle = @"Clear all theme changes, restoring default";
     [resetThemeAction addTarget:self action:@selector(resetTheme)];
 
-    [self addSection:@"General" withActions:@[ resetThemeAction ]];
+    CMDemoAction *cannedTheme = [[CMDemoAction alloc] init];
+    cannedTheme.title = @"Set demo theme";
+    cannedTheme.subtitle = @"Set default theme to a new look.";
+    [cannedTheme addTarget:self action:@selector(cannedTheme)];
+
+    CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
+    longBannerAction.title = @"Show banner with current theme";
+    longBannerAction.subtitle =
+        @"Display a new banner message to see theme edits.";
+    longBannerAction.actionCMActionName = @"long_banner";
+
+    [self addSection:@"General"
+         withActions:@[ resetThemeAction, cannedTheme, longBannerAction ]];
 
     // Banners
 
@@ -238,6 +250,17 @@ static CMTheme *staticCustomTheme = nil;
 - (void)resetTheme {
     staticCustomTheme = [[CMTheme alloc] init];
     [CMTheme setCurrentTheme:staticCustomTheme];
+    [CMBannerManager.shared removeAllAppWideMessages];
+}
+
+- (void)cannedTheme {
+    CMTheme *customTheme = [[CMTheme alloc] init];
+    customTheme.boldFontName = @"AmericanTypewriter-Bold";
+    customTheme.fontName = @"AmericanTypewriter";
+    customTheme.fontScale = 1.1;
+    customTheme.bannerBackgroundColor = [UIColor blackColor];
+    customTheme.bannerForegroundColor = [UIColor whiteColor];
+    [CMTheme setCurrentTheme:customTheme];
     [CMBannerManager.shared removeAllAppWideMessages];
 }
 
