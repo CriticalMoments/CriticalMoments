@@ -27,10 +27,10 @@
 
 - (void)testBasicIntegration {
     NSString *pongResponse = [CriticalMoments objcPing];
-    XCTAssert([@"objcPong" isEqual:pongResponse], @"CM integration broken");
+    XCTAssert([@"objcPong" isEqualToString:pongResponse], @"CM integration broken");
 
     NSString *goPongResponse = [CriticalMoments goPing];
-    XCTAssert([@"AppcorePong->PongCmCore" isEqual:goPongResponse], @"CM Go integration broken");
+    XCTAssert([@"AppcorePong->PongCmCore" isEqualToString:goPongResponse], @"CM Go integration broken");
 }
 
 - (void)testDefaultTheme {
@@ -40,17 +40,22 @@
     [CriticalMoments setConfigUrl:url.absoluteString];
     [CriticalMoments start];
 
-    XCTAssert([UIColor.redColor isEqual:CMTheme.current.bannerBackgroundColor],
-              @"Default theme should have loaded bg from config");
-    XCTAssert([UIColor.greenColor isEqual:CMTheme.current.bannerForegroundColor],
-              @"Default theme should have loaded fg from config");
-}
+    // Ugly wait to wait for startup of CM which is async
+    XCTestExpectation *expectation = [self expectationWithDescription:@"CM startup done"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [expectation fulfill];
+      });
+    });
 
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
+    [self waitForExpectationsWithTimeout:10.0
+                                 handler:^(NSError *error) {
+                                   XCTAssert(error == nil, @"Error with test %@", error);
+                                   XCTAssert([UIColor.redColor isEqual:CMTheme.current.bannerBackgroundColor],
+                                             @"Default theme should have loaded bg from config");
+                                   XCTAssert([UIColor.greenColor isEqual:CMTheme.current.bannerForegroundColor],
+                                             @"Default theme should have loaded fg from config");
+                                 }];
 }
 
 @end
