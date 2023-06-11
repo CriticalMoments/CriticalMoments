@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 8 {
+	if len(pc.namedActions) != 9 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -89,6 +89,11 @@ func TestPrimaryConfigJson(t *testing.T) {
 	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")
 	if ca3.ConditionalAction == nil || ca3.ConditionalAction.FailedActionName != "" {
 		t.Fatal("Didn't parse conditional action 3")
+	}
+	ua := pc.ActionWithName("unknownActionTypeFutureProof")
+	_, ok := ua.actionData.(*UnknownAction)
+	if ua.ActionType != "unknown_future_type" || !ok {
+		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
 	}
 
 	// Triggers

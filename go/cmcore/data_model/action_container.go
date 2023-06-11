@@ -88,13 +88,15 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	}
 
 	unpacker, ok := actionTypeRegistry[jac.ActionType]
-	if !ok || unpacker == nil {
-		return NewUserPresentableError(fmt.Sprintf("Unsupported action type: \"%v\"", jac.ActionType))
-	}
-
-	actionData, err := unpacker(jac.RawActionData, ac)
-	if err != nil {
-		return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+	var actionData ActionTypeInterface
+	if ok && unpacker != nil {
+		actionData, err = unpacker(jac.RawActionData, ac)
+		if err != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+		}
+	} else {
+		fmt.Printf("CriticalMoments: Unsupported action type: \"%v\" found in config file. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", jac.ActionType)
+		actionData = &UnknownAction{ActionType: jac.ActionType}
 	}
 
 	if jac.Condition != "" {
@@ -116,7 +118,10 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	// Check the type hasn't been changed to something unsupported
 	_, ok := actionTypeRegistry[ac.ActionType]
 	if !ok {
-		return "Internal error. Code 776232923."
+		_, ok := ac.actionData.(*UnknownAction)
+		if !ok {
+			return "Internal error. Code 776232923."
+		}
 	}
 
 	if ac.actionData == nil {

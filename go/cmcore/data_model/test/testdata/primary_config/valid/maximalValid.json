@@ -89,6 +89,12 @@
                     "condition": "1 > 2",
                     "passedActionName": "bannerAction2"
                 }
+            },
+            "unknownActionTypeFutureProof": {
+                "actionType": "unknown_future_type",
+                "actionData": {
+                    "unknownProp": 1234
+                }
             }
         }
     },
