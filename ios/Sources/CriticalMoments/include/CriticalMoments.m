@@ -23,23 +23,30 @@
 }
 
 + (void)start {
-    dispatch_async(
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-          NSError *error = [CriticalMoments startReturningError];
-          if (error) {
-              NSLog(
-                  @"CriticalMoments: Critical Moments was unable to start! %@",
-                  error);
+    // Nested dispatch to main then background. Why?
+    // We want critical moments to start on background thread, but we want it to
+    // start after the app setup is done. Some property providers will provide
+    // unknown values before the main thread is ready. This puts CM startup
+    // after core app setup.
+    dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_async(
+          dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSError *error = [CriticalMoments startReturningError];
+            if (error) {
+                NSLog(@"CriticalMoments: Critical Moments was unable to start! "
+                      @"%@",
+                      error);
 #if DEBUG
-              NSLog(@"CriticalMoments: throwing a "
-                    @"NSInternalInconsistencyException "
-                    @"to help find this issue. Exceptions are only thrown in "
-                    @"debug "
-                    @"mode, and will not crash apps built for release.");
-              @throw NSInternalInconsistencyException;
+                NSLog(@"CriticalMoments: throwing a "
+                      @"NSInternalInconsistencyException "
+                      @"to help find this issue. Exceptions are only thrown in "
+                      @"debug "
+                      @"mode, and will not crash apps built for release.");
+                @throw NSInternalInconsistencyException;
 #endif
-          }
-        });
+            }
+          });
+    });
 }
 
 + (NSError *)startReturningError {
