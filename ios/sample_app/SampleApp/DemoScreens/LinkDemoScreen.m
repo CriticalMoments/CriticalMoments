@@ -32,30 +32,25 @@
 
     CMDemoAction *openEmbeddedWebLink = [[CMDemoAction alloc] init];
     openEmbeddedWebLink.title = @"Open embedded browser";
-    openEmbeddedWebLink.subtitle =
-        @"Open criticalmoments.io in a browser view embedded in this app";
+    openEmbeddedWebLink.subtitle = @"Open criticalmoments.io in a browser view embedded in this app";
     openEmbeddedWebLink.actionCMActionName = @"web_link_embedded_action";
     openEmbeddedWebLink.skipInUiTesting = true;
 
-    [self addSection:@"Web links"
-         withActions:@[ openWebLink, openEmbeddedWebLink ]];
+    [self addSection:@"Web links" withActions:@[ openWebLink, openEmbeddedWebLink ]];
 
     CMDemoAction *openSettingsLink = [[CMDemoAction alloc] init];
     openSettingsLink.title = @"Open settings";
-    openSettingsLink.subtitle =
-        @"Open an app deeplink into the iOS Settings app";
+    openSettingsLink.subtitle = @"Open an app deeplink into the iOS Settings app";
     openSettingsLink.skipInUiTesting = true;
     openSettingsLink.actionCMActionName = @"settings_link_action";
 
     CMDemoAction *openMainScreenLink = [[CMDemoAction alloc] init];
     openMainScreenLink.title = @"Open deeplink";
-    openMainScreenLink.subtitle =
-        @"Open an app deeplink into this sample app's main screen";
+    openMainScreenLink.subtitle = @"Open an app deeplink into this sample app's main screen";
     openMainScreenLink.skipInUiTesting = true;
     openMainScreenLink.actionCMActionName = @"main_screen_deeplink_action";
 
-    [self addSection:@"App deep links"
-         withActions:@[ openSettingsLink, openMainScreenLink ]];
+    [self addSection:@"App deep links" withActions:@[ openSettingsLink, openMainScreenLink ]];
 }
 
 @end

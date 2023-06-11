@@ -37,20 +37,12 @@
 
     // Valid colors
     UIColor *black = [[UIColor alloc] initWithRed:0 green:0 blue:0 alpha:1];
-    XCTAssert([black isEqual:[CMUtils colorFromHexString:@"#000000"]],
-              @"not black enough");
+    XCTAssert([black isEqual:[CMUtils colorFromHexString:@"#000000"]], @"not black enough");
     UIColor *white = [[UIColor alloc] initWithRed:1 green:1 blue:1 alpha:1];
-    XCTAssert([white isEqual:[CMUtils colorFromHexString:@"#ffffff"]],
-              @"not white enough");
-    XCTAssert(
-        [UIColor.blueColor isEqual:[CMUtils colorFromHexString:@"#0000ff"]],
-        @"not blue enough");
-    XCTAssert(
-        [UIColor.greenColor isEqual:[CMUtils colorFromHexString:@"#00ff00"]],
-        @"not green enough");
-    XCTAssert(
-        [UIColor.redColor isEqual:[CMUtils colorFromHexString:@"#ff0000"]],
-        @"not red enough");
+    XCTAssert([white isEqual:[CMUtils colorFromHexString:@"#ffffff"]], @"not white enough");
+    XCTAssert([UIColor.blueColor isEqual:[CMUtils colorFromHexString:@"#0000ff"]], @"not blue enough");
+    XCTAssert([UIColor.greenColor isEqual:[CMUtils colorFromHexString:@"#00ff00"]], @"not green enough");
+    XCTAssert([UIColor.redColor isEqual:[CMUtils colorFromHexString:@"#ff0000"]], @"not red enough");
 }
 
 @end

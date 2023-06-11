@@ -26,12 +26,10 @@
 
     CMDemoAction *horizontalCondition = [[CMDemoAction alloc] init];
     horizontalCondition.title = @"Interface Orientation";
-    horizontalCondition.subtitle =
-        @"Condition is true of device is in landscape "
-        @"orientation.\n\n(interface_orientation == 'landscape')";
+    horizontalCondition.subtitle = @"Condition is true of device is in landscape "
+                                   @"orientation.\n\n(interface_orientation == 'landscape')";
     horizontalCondition.actionCMActionName = @"conditional_landscape";
-    [horizontalCondition addResetTestTarget:self
-                                     action:@selector(dismissAlerts)];
+    [horizontalCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
     CMDemoAction *flatCondition = [[CMDemoAction alloc] init];
     flatCondition.title = @"Device position";
@@ -43,34 +41,29 @@
 
     CMDemoAction *wifiConditon = [[CMDemoAction alloc] init];
     wifiConditon.title = @"Wifi connection";
-    wifiConditon.subtitle =
-        @"Condition true if the device's primary network is wifi (not "
-        @"cellular).\n\n(network_connection_type == "
-        @"'wifi')";
+    wifiConditon.subtitle = @"Condition true if the device's primary network is wifi (not "
+                            @"cellular).\n\n(network_connection_type == "
+                            @"'wifi')";
     wifiConditon.actionCMActionName = @"conditional_wifi";
     [wifiConditon addResetTestTarget:self action:@selector(dismissAlerts)];
 
     CMDemoAction *chargingCondition = [[CMDemoAction alloc] init];
     chargingCondition.title = @"Charging battery";
-    chargingCondition.subtitle =
-        @"Condition is true if device is charging.\n\n(device_battery_state == "
-        @"'charging' || "
-        @"device_battery_state == 'full')";
+    chargingCondition.subtitle = @"Condition is true if device is charging.\n\n(device_battery_state == "
+                                 @"'charging' || "
+                                 @"device_battery_state == 'full')";
     chargingCondition.actionCMActionName = @"conditional_charging";
     [chargingCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
     [self addSection:@"Simple conditions"
-         withActions:@[
-             horizontalCondition, flatCondition, wifiConditon, chargingCondition
-         ]];
+         withActions:@[ horizontalCondition, flatCondition, wifiConditon, chargingCondition ]];
 
     CMDemoAction *compoundCondition = [[CMDemoAction alloc] init];
     compoundCondition.title = @"Combining conditions";
-    compoundCondition.subtitle =
-        @"Condition true if device is landscape and connected to "
-        @"wifi.\n\n(interface_orientation == 'landscape') && "
-        @"(network_connection_type == "
-        @"'wifi')";
+    compoundCondition.subtitle = @"Condition true if device is landscape and connected to "
+                                 @"wifi.\n\n(interface_orientation == 'landscape') && "
+                                 @"(network_connection_type == "
+                                 @"'wifi')";
     compoundCondition.actionCMActionName = @"conditional_compound";
     [compoundCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
@@ -78,12 +71,11 @@
 
     CMDemoAction *osVersion = [[CMDemoAction alloc] init];
     osVersion.title = @"Function Example";
-    osVersion.subtitle =
-        @"Checks if running iOS 16 or newer, using a function to extract the "
-        @"major release number "
-        @"from the longer release string, eg "
-        @"'16.4.1'.\n\n(versionNumberComponent(os_version,0) >= "
-        @"16)";
+    osVersion.subtitle = @"Checks if running iOS 16 or newer, using a function to extract the "
+                         @"major release number "
+                         @"from the longer release string, eg "
+                         @"'16.4.1'.\n\n(versionNumberComponent(os_version,0) >= "
+                         @"16)";
     osVersion.actionCMActionName = @"conditional_os_version";
     [osVersion addResetTestTarget:self action:@selector(dismissAlerts)];
 
@@ -104,8 +96,7 @@
 }
 
 - (void)dismissAlerts {
-    [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO
-                                                           completion:nil];
+    [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
 }
 
 @end

@@ -32,9 +32,8 @@
 
 - (void)testObjcPing {
     NSString *response = [CriticalMoments objcPing];
-    XCTAssert(
-        [@"objcPong" isEqualToString:response],
-        @"Expected ping to pong -- objective C tests not working end to end");
+    XCTAssert([@"objcPong" isEqualToString:response],
+              @"Expected ping to pong -- objective C tests not working end to end");
 }
 
 - (void)testAppcoreIntegration {
@@ -44,10 +43,9 @@
               @"working end to end");
 
     NSString *fullyIntegratedRespons = [CriticalMoments goPing];
-    XCTAssert(
-        [@"AppcorePong->PongCmCore" isEqualToString:fullyIntegratedRespons],
-        @"Expected ping to pong -- Appcore e2e framework integration not "
-        @"working end to end");
+    XCTAssert([@"AppcorePong->PongCmCore" isEqualToString:fullyIntegratedRespons],
+              @"Expected ping to pong -- Appcore e2e framework integration not "
+              @"working end to end");
 }
 
 @end

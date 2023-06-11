@@ -49,8 +49,7 @@
     linksAction.subtitle = @"Open web links or app deeplinks";
     linksAction.actionNextScreen = [[LinkDemoScreen alloc] init];
 
-    [self addSection:@"Actions"
-         withActions:@[ bannersAction, alertAction, linksAction ]];
+    [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction ]];
 
     CMDemoAction *themeAction = [[CMDemoAction alloc] init];
     themeAction.title = @"Edit Theme";

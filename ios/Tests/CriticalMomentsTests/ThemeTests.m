@@ -36,14 +36,10 @@
               @"banner background should be red on test theme");
 
     // fonts
-    XCTAssert(fabs(testTheme.fontScale - 1.1) < FLT_EPSILON,
-              @"font scale integration issue");
-    XCTAssert(!testTheme.scaleFontForDynamicType,
-              @"dynamic type integration issue");
-    XCTAssert([@"Palatino-Roman" isEqualToString:testTheme.fontName],
-              @"font name mismatch");
-    XCTAssert([@"Palatino-Bold" isEqualToString:testTheme.boldFontName],
-              @"font name mismatch");
+    XCTAssert(fabs(testTheme.fontScale - 1.1) < FLT_EPSILON, @"font scale integration issue");
+    XCTAssert(!testTheme.scaleFontForDynamicType, @"dynamic type integration issue");
+    XCTAssert([@"Palatino-Roman" isEqualToString:testTheme.fontName], @"font name mismatch");
+    XCTAssert([@"Palatino-Bold" isEqualToString:testTheme.boldFontName], @"font name mismatch");
 }
 
 @end

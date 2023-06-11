@@ -29,23 +29,22 @@
     // unknown values before the main thread is ready. This puts CM startup
     // after core app setup.
     dispatch_async(dispatch_get_main_queue(), ^{
-      dispatch_async(
-          dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSError *error = [CriticalMoments startReturningError];
-            if (error) {
-                NSLog(@"CriticalMoments: Critical Moments was unable to start! "
-                      @"%@",
-                      error);
+      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *error = [CriticalMoments startReturningError];
+        if (error) {
+            NSLog(@"CriticalMoments: Critical Moments was unable to start! "
+                  @"%@",
+                  error);
 #if DEBUG
-                NSLog(@"CriticalMoments: throwing a "
-                      @"NSInternalInconsistencyException "
-                      @"to help find this issue. Exceptions are only thrown in "
-                      @"debug "
-                      @"mode, and will not crash apps built for release.");
-                @throw NSInternalInconsistencyException;
+            NSLog(@"CriticalMoments: throwing a "
+                  @"NSInternalInconsistencyException "
+                  @"to help find this issue. Exceptions are only thrown in "
+                  @"debug "
+                  @"mode, and will not crash apps built for release.");
+            @throw NSInternalInconsistencyException;
 #endif
-            }
-          });
+        }
+      });
     });
 }
 
@@ -53,16 +52,13 @@
     // Register the action dispatcher and properties
     [CMLibBindings registerWithAppcore];
 
-    CMPropertyRegisterer *propertryRegisterer =
-        [[CMPropertyRegisterer alloc] init];
+    CMPropertyRegisterer *propertryRegisterer = [[CMPropertyRegisterer alloc] init];
     [propertryRegisterer registerDefaultPropertiesToAppcore];
 
     // Set the cache directory to applicationSupport/CriticalMomentsData
-    NSURL *appSupportDir = [[NSFileManager.defaultManager
-        URLsForDirectory:NSApplicationSupportDirectory
-               inDomains:NSUserDomainMask] lastObject];
-    NSURL *criticalMomentsCacheDir =
-        [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
+    NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
+                                                                 inDomains:NSUserDomainMask] lastObject];
+    NSURL *criticalMomentsCacheDir = [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
     NSError *error;
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsCacheDir
                            withIntermediateDirectories:YES
@@ -71,8 +67,7 @@
     if (error) {
         return error;
     }
-    [AppcoreSharedAppcore() setCacheDirPath:[criticalMomentsCacheDir path]
-                                      error:&error];
+    [AppcoreSharedAppcore() setCacheDirPath:[criticalMomentsCacheDir path] error:&error];
     if (error) {
         return error;
     }
@@ -88,8 +83,7 @@
     NSError *error;
     [AppcoreSharedAppcore() setConfigUrl:urlString error:&error];
     if (error != nil) {
-        NSLog(@"ERROR: CriticalMoments -- invalid remote config url: %@",
-              error);
+        NSLog(@"ERROR: CriticalMoments -- invalid remote config url: %@", error);
 #if DEBUG
         NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
               @"to help find this issue. Exceptions are only thrown in debug "

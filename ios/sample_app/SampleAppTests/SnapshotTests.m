@@ -29,8 +29,7 @@
     self.usesDrawViewHierarchyInRect = YES;
 
     // Filename options
-    self.fileNameOptions = FBSnapshotTestCaseFileNameIncludeOptionOS |
-                           FBSnapshotTestCaseFileNameIncludeOptionDevice |
+    self.fileNameOptions = FBSnapshotTestCaseFileNameIncludeOptionOS | FBSnapshotTestCaseFileNameIncludeOptionDevice |
                            FBSnapshotTestCaseFileNameIncludeOptionScreenScale |
                            FBSnapshotTestCaseFileNameIncludeOptionScreenSize;
 
@@ -42,8 +41,7 @@
 }
 
 - (void)testScreenshotAllSampleAppFeatures {
-    [[NSRunLoop currentRunLoop]
-        runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     SampleAppCoreViewController *mainVc;
     UIWindow *window = [Utils keyWindow];
     UIViewController *rvc = window.rootViewController;
@@ -79,8 +77,7 @@
 
             // Perform the action and give it time to render
             [action performAction];
-            [[NSRunLoop currentRunLoop]
-                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
 
             if (action.actionNextScreen) {
                 // this is a nav action, follow it!
@@ -96,8 +93,7 @@
 
             // reset state for next test, and give it time to render
             [action resetForTests];
-            [[NSRunLoop currentRunLoop]
-                runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
         }
     }
 }

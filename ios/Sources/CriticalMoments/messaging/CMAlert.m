@@ -30,8 +30,7 @@
 
 @implementation CMAlert
 
-- (nonnull instancetype)initWithAppcoreDataModel:
-    (DatamodelAlertAction *)alertDataModel {
+- (nonnull instancetype)initWithAppcoreDataModel:(DatamodelAlertAction *)alertDataModel {
     self = [super init];
     if (self) {
         self.dataModel = alertDataModel;
@@ -51,44 +50,36 @@
     NSString *message = dataModel.message.length > 0 ? dataModel.message : nil;
 
     UIAlertControllerStyle style = UIAlertControllerStyleAlert;
-    BOOL isPhone =
-        UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
+    BOOL isPhone = UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPhone;
     // Only use action sheet style on iPhone. On iPad it's visually the same as
     // alert, but without cancel button. The "large" format actually ends up
     // smaller on iPad if we don't do this. Also adds other usability issues
     // (tapping away to dismiss not easy to discoverable without an
     // permittedArrowDirections and position skewed on rotate)
-    if (isPhone &&
-        [DatamodelAlertActionStyleEnumLarge isEqualToString:dataModel.style]) {
+    if (isPhone && [DatamodelAlertActionStyleEnumLarge isEqualToString:dataModel.style]) {
         style = UIAlertControllerStyleActionSheet;
     }
 
-    UIAlertController *alert =
-        [UIAlertController alertControllerWithTitle:title
-                                            message:message
-                                     preferredStyle:style];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
 
     // if popoverPresentationController is present, we need to set these or it
     // will crash. However, this shouldn't be present in any case we know of,
     // since we don't use action sheet look on iPad
     if (alert.popoverPresentationController) {
         alert.popoverPresentationController.permittedArrowDirections = 0;
-        alert.popoverPresentationController.sourceRect =
-            CGRectMake(rootVc.view.center.x, rootVc.view.center.y, 0, 0);
+        alert.popoverPresentationController.sourceRect = CGRectMake(rootVc.view.center.x, rootVc.view.center.y, 0, 0);
         alert.popoverPresentationController.sourceView = rootVc.view;
     }
 
     if (dataModel.showCancelButton) {
         NSString *cancelString = [CMUtils uiKitLocalizedStringForKey:@"Cancel"];
-        UIAlertAction *cancelAction =
-            [UIAlertAction actionWithTitle:cancelString
-                                     style:UIAlertActionStyleCancel
-                                   handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelString
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:nil];
         [alert addAction:cancelAction];
     }
 
-    NSArray<CMCustomAlertButton *> *customButtonActions =
-        [self customButtonActions];
+    NSArray<CMCustomAlertButton *> *customButtonActions = [self customButtonActions];
     for (CMCustomAlertButton *customButtonAction in customButtonActions) {
         [alert addAction:customButtonAction];
         if (customButtonAction.isPrimaryAction) {
@@ -98,15 +89,13 @@
 
     if (dataModel.showOkButton) {
         NSString *okString = [CMUtils uiKitLocalizedStringForKey:@"OK"];
-        UIAlertAction *okAction = [UIAlertAction
-            actionWithTitle:okString
-                      style:UIAlertActionStyleDefault
-                    handler:^(UIAlertAction *_Nonnull action) {
-                      if (self.dataModel.okButtonActionName.length > 0) {
-                          [self
-                              performAction:self.dataModel.okButtonActionName];
-                      }
-                    }];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:okString
+                                                           style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction *_Nonnull action) {
+                                                           if (self.dataModel.okButtonActionName.length > 0) {
+                                                               [self performAction:self.dataModel.okButtonActionName];
+                                                           }
+                                                         }];
         [alert addAction:okAction];
 
         // Only highlight ok as primary if there's other buttons.
@@ -116,40 +105,33 @@
         }
     }
 
-    [keyWindow.rootViewController presentViewController:alert
-                                               animated:YES
-                                             completion:nil];
+    [keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (NSArray<CMCustomAlertButton *> *)customButtonActions {
 
     NSMutableArray<CMCustomAlertButton *> *customActions =
-        [[NSMutableArray alloc]
-            initWithCapacity:self.dataModel.customButtonsCount];
+        [[NSMutableArray alloc] initWithCapacity:self.dataModel.customButtonsCount];
 
     for (int i = 0; i < self.dataModel.customButtonsCount; i++) {
-        DatamodelAlertActionCustomButton *buttonModel =
-            [self.dataModel customButtonAtIndex:i];
+        DatamodelAlertActionCustomButton *buttonModel = [self.dataModel customButtonAtIndex:i];
         if (!buttonModel) {
             continue;
         }
 
         UIAlertActionStyle style = UIAlertActionStyleDefault;
-        if ([DatamodelAlertActionButtonStyleEnumDestructive
-                isEqualToString:buttonModel.style]) {
+        if ([DatamodelAlertActionButtonStyleEnumDestructive isEqualToString:buttonModel.style]) {
             style = UIAlertActionStyleDestructive;
         }
 
-        CMCustomAlertButton *action = [CMCustomAlertButton
-            actionWithTitle:buttonModel.label
-                      style:style
-                    handler:^(UIAlertAction *action) {
-                      if (buttonModel.actionName.length > 0) {
-                          [self performAction:buttonModel.actionName];
-                      }
-                    }];
-        action.isPrimaryAction = [DatamodelAlertActionButtonStyleEnumPrimary
-            isEqualToString:buttonModel.style];
+        CMCustomAlertButton *action = [CMCustomAlertButton actionWithTitle:buttonModel.label
+                                                                     style:style
+                                                                   handler:^(UIAlertAction *action) {
+                                                                     if (buttonModel.actionName.length > 0) {
+                                                                         [self performAction:buttonModel.actionName];
+                                                                     }
+                                                                   }];
+        action.isPrimaryAction = [DatamodelAlertActionButtonStyleEnumPrimary isEqualToString:buttonModel.style];
 
         [customActions addObject:action];
     }

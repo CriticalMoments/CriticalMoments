@@ -42,25 +42,21 @@
 
     CMDemoAction *largeAlert = [[CMDemoAction alloc] init];
     largeAlert.title = @"Show Action Sheet Alert";
-    largeAlert.subtitle =
-        @"Display a sheet style alert, with custom buttons and actions";
+    largeAlert.subtitle = @"Display a sheet style alert, with custom buttons and actions";
     largeAlert.actionCMActionName = @"custom_button_alert_large";
     [largeAlert addResetTestTarget:self action:@selector(dismissAlerts)];
     [self addActionToRootSection:largeAlert];
 
     CMDemoAction *severalButtonAlert = [[CMDemoAction alloc] init];
     severalButtonAlert.title = @"Show multi button alert";
-    severalButtonAlert.subtitle =
-        @"Display a alert with custom buttons and actions";
+    severalButtonAlert.subtitle = @"Display a alert with custom buttons and actions";
     severalButtonAlert.actionCMActionName = @"custom_button_alert_dialog";
-    [severalButtonAlert addResetTestTarget:self
-                                    action:@selector(dismissAlerts)];
+    [severalButtonAlert addResetTestTarget:self action:@selector(dismissAlerts)];
     [self addActionToRootSection:severalButtonAlert];
 }
 
 - (void)dismissAlerts {
-    [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO
-                                                           completion:nil];
+    [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
 }
 
 @end

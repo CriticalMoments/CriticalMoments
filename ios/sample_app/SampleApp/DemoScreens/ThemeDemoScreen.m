@@ -60,12 +60,10 @@ static CMTheme *staticCustomTheme = nil;
 
     CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
     longBannerAction.title = @"Show banner with current theme";
-    longBannerAction.subtitle =
-        @"Display a new banner message to see theme edits.";
+    longBannerAction.subtitle = @"Display a new banner message to see theme edits.";
     longBannerAction.actionCMActionName = @"long_banner";
 
-    [self addSection:@"General"
-         withActions:@[ resetThemeAction, cannedTheme, longBannerAction ]];
+    [self addSection:@"General" withActions:@[ resetThemeAction, cannedTheme, longBannerAction ]];
 
     // Banners
 
@@ -79,8 +77,7 @@ static CMTheme *staticCustomTheme = nil;
     banneBgColorAction.subtitle = @"Change the banner background color";
     [banneBgColorAction addTarget:self action:@selector(changeBannerBg)];
 
-    [self addSection:@"Banner Message Style"
-         withActions:@[ bannerFgColorAction, banneBgColorAction ]];
+    [self addSection:@"Banner Message Style" withActions:@[ bannerFgColorAction, banneBgColorAction ]];
 
     CMDemoAction *fontNameAction = [[CMDemoAction alloc] init];
     fontNameAction.title = @"Change font";
@@ -94,12 +91,10 @@ static CMTheme *staticCustomTheme = nil;
 
     CMDemoAction *fontScaleAction = [[CMDemoAction alloc] init];
     fontScaleAction.title = @"Change font scale";
-    fontScaleAction.subtitle =
-        @"Scale the font larger or smaller across all UI";
+    fontScaleAction.subtitle = @"Scale the font larger or smaller across all UI";
     [fontScaleAction addTarget:self action:@selector(changeFontScale)];
 
-    [self addSection:@"Fonts"
-         withActions:@[ fontNameAction, boldFontNameAction, fontScaleAction ]];
+    [self addSection:@"Fonts" withActions:@[ fontNameAction, boldFontNameAction, fontScaleAction ]];
 }
 
 - (void)changeBannerFg {
@@ -124,127 +119,110 @@ static CMTheme *staticCustomTheme = nil;
                  }];
 }
 
-- (void)colorPickerForColor:(UIColor *)color
-               withCallback:(void (^)(UIColor *))callback {
-    UIColorPickerViewController *colorPicker =
-        [[UIColorPickerViewController alloc] init];
+- (void)colorPickerForColor:(UIColor *)color withCallback:(void (^)(UIColor *))callback {
+    UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
     colorPicker.supportsAlpha = false;
     colorPicker.selectedColor = color;
     self.currentColorCallback = callback;
     colorPicker.delegate = self;
-    [Utils.keyWindow.rootViewController presentViewController:colorPicker
-                                                     animated:YES
-                                                   completion:nil];
+    [Utils.keyWindow.rootViewController presentViewController:colorPicker animated:YES completion:nil];
 }
 
-- (void)colorPickerViewControllerDidSelectColor:
-    (UIColorPickerViewController *)viewController {
+- (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
     if (self.currentColorCallback) {
         self.currentColorCallback(viewController.selectedColor);
     }
 }
 
 - (void)changeFontName {
-    UIAlertController *alert = [UIAlertController
-        alertControllerWithTitle:@"Change Font By Name"
-                         message:
-                             @"Specify a font by name. See iosfonts.com for "
-                             @"supported values. An empty resets to default."
-                  preferredStyle:UIAlertControllerStyleAlert];
-    [alert addTextFieldWithConfigurationHandler:^(
-               UITextField *_Nonnull textField) {
+    UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:@"Change Font By Name"
+                                            message:@"Specify a font by name. See iosfonts.com for "
+                                                    @"supported values. An empty resets to default."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
       textField.placeholder = @"Font name";
       textField.text = @"Baskerville";
     }];
 
     UIAlertController *__weak weakAlert = alert;
-    UIAlertAction *defaultAction = [UIAlertAction
-        actionWithTitle:@"OK"
-                  style:UIAlertActionStyleDefault
-                handler:^(UIAlertAction *action) {
-                  NSString *newFontName = weakAlert.textFields.firstObject.text;
-                  if (newFontName.length == 0) {
-                      newFontName = nil;
-                  }
-                  CMTheme *customTheme = [ThemeDemoScreen customTheme];
-                  customTheme.fontName = newFontName;
-                  [CMTheme setCurrentTheme:customTheme];
-                  [CMBannerManager.shared removeAllAppWideMessages];
-                }];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *action) {
+                                                            NSString *newFontName =
+                                                                weakAlert.textFields.firstObject.text;
+                                                            if (newFontName.length == 0) {
+                                                                newFontName = nil;
+                                                            }
+                                                            CMTheme *customTheme = [ThemeDemoScreen customTheme];
+                                                            customTheme.fontName = newFontName;
+                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                          }];
     [alert addAction:defaultAction];
 
-    [Utils.keyWindow.rootViewController presentViewController:alert
-                                                     animated:YES
-                                                   completion:nil];
+    [Utils.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)changeBoldFontName {
-    UIAlertController *alert = [UIAlertController
-        alertControllerWithTitle:@"Change Bold Font By Name"
-                         message:@"Specify the 'bold' font by name. See "
-                                 @"iosfonts.com for supported values. An empty "
-                                 @"string resets to default."
-                  preferredStyle:UIAlertControllerStyleAlert];
-    [alert addTextFieldWithConfigurationHandler:^(
-               UITextField *_Nonnull textField) {
+    UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:@"Change Bold Font By Name"
+                                            message:@"Specify the 'bold' font by name. See "
+                                                    @"iosfonts.com for supported values. An empty "
+                                                    @"string resets to default."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
       textField.placeholder = @"Bold font name";
       textField.text = @"Baskerville-Bold";
     }];
 
     UIAlertController *__weak weakAlert = alert;
-    UIAlertAction *defaultAction = [UIAlertAction
-        actionWithTitle:@"OK"
-                  style:UIAlertActionStyleDefault
-                handler:^(UIAlertAction *action) {
-                  NSString *newBoldFontName =
-                      weakAlert.textFields.firstObject.text;
-                  if (newBoldFontName.length == 0) {
-                      newBoldFontName = nil;
-                  }
-                  CMTheme *customTheme = [ThemeDemoScreen customTheme];
-                  customTheme.boldFontName = newBoldFontName;
-                  [CMTheme setCurrentTheme:customTheme];
-                  [CMBannerManager.shared removeAllAppWideMessages];
-                }];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *action) {
+                                                            NSString *newBoldFontName =
+                                                                weakAlert.textFields.firstObject.text;
+                                                            if (newBoldFontName.length == 0) {
+                                                                newBoldFontName = nil;
+                                                            }
+                                                            CMTheme *customTheme = [ThemeDemoScreen customTheme];
+                                                            customTheme.boldFontName = newBoldFontName;
+                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                          }];
     [alert addAction:defaultAction];
 
-    [Utils.keyWindow.rootViewController presentViewController:alert
-                                                     animated:YES
-                                                   completion:nil];
+    [Utils.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)changeFontScale {
-    UIAlertController *alert = [UIAlertController
-        alertControllerWithTitle:@"Change font scale"
-                         message:@"Specify a float value to scale UI fonts by "
-                                 @"(example: 0.9 or 1.3). An empty string or "
-                                 @"invalid float return to default (1.0)."
-                  preferredStyle:UIAlertControllerStyleAlert];
-    [alert addTextFieldWithConfigurationHandler:^(
-               UITextField *_Nonnull textField) {
+    UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:@"Change font scale"
+                                            message:@"Specify a float value to scale UI fonts by "
+                                                    @"(example: 0.9 or 1.3). An empty string or "
+                                                    @"invalid float return to default (1.0)."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
       textField.placeholder = @"Font scale factor";
     }];
 
     UIAlertController *__weak weakAlert = alert;
-    UIAlertAction *defaultAction = [UIAlertAction
-        actionWithTitle:@"OK"
-                  style:UIAlertActionStyleDefault
-                handler:^(UIAlertAction *action) {
-                  NSString *textScale = weakAlert.textFields.firstObject.text;
-                  float scale = [textScale floatValue];
-                  if (scale <= 0) {
-                      scale = 1.0;
-                  }
-                  CMTheme *customTheme = [ThemeDemoScreen customTheme];
-                  customTheme.fontScale = scale;
-                  [CMTheme setCurrentTheme:customTheme];
-                  [CMBannerManager.shared removeAllAppWideMessages];
-                }];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *action) {
+                                                            NSString *textScale = weakAlert.textFields.firstObject.text;
+                                                            float scale = [textScale floatValue];
+                                                            if (scale <= 0) {
+                                                                scale = 1.0;
+                                                            }
+                                                            CMTheme *customTheme = [ThemeDemoScreen customTheme];
+                                                            customTheme.fontScale = scale;
+                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                          }];
     [alert addAction:defaultAction];
 
-    [Utils.keyWindow.rootViewController presentViewController:alert
-                                                     animated:YES
-                                                   completion:nil];
+    [Utils.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)resetTheme {
