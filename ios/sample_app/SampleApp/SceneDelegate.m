@@ -58,11 +58,9 @@
     // state.
 }
 
-- (void)scene:(UIScene *)scene
-    openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
+- (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
     NSURL *url = URLContexts.allObjects.firstObject.URL;
-    if ([@"critical-moments-sampleapp:main"
-            isEqualToString:url.absoluteString]) {
+    if ([@"critical-moments-sampleapp:main" isEqualToString:url.absoluteString]) {
         // return to the main screen of the app
         UIViewController *rootVC = Utils.keyWindow.rootViewController;
         if ([rootVC isKindOfClass:[UITabBarController class]]) {

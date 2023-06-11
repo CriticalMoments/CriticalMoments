@@ -30,10 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // We want people to overrider CMBannerMessage buildViewForMessage without
 // breaking/overriding our delegation system for dismiss/next
-@property(nonatomic, readwrite, nullable) id<CMBannerNextMessageDelegate>
-    nextMessageDelegate;
-@property(nonatomic, readwrite) id<CMBannerMessageManagerDelegate>
-    messageManagerDelegate;
+@property(nonatomic, readwrite, nullable) id<CMBannerNextMessageDelegate> nextMessageDelegate;
+@property(nonatomic, readwrite) id<CMBannerMessageManagerDelegate> messageManagerDelegate;
 
 @end
 

@@ -10,8 +10,7 @@
 @implementation Utils
 
 + (UIWindow *)keyWindow {
-    UIWindow *keyWindow =
-        [[[UIApplication sharedApplication] windows] firstObject];
+    UIWindow *keyWindow = [[[UIApplication sharedApplication] windows] firstObject];
     for (UIWindow *w in [[UIApplication sharedApplication] windows]) {
         if (w.isKeyWindow) {
             keyWindow = w;

@@ -12,8 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMDeviceOrientationPropertyProvider : CMBaseDynamicPropertyProvider
 @end
 
-@interface CMInterfaceOrientationPropertyProvider
-    : CMBaseDynamicPropertyProvider
+@interface CMInterfaceOrientationPropertyProvider : CMBaseDynamicPropertyProvider
 @end
 
 @interface CMDarkModePropertyProvider : CMBaseDynamicPropertyProvider

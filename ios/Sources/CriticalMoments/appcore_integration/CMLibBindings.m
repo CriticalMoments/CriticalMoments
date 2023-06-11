@@ -49,8 +49,7 @@ static CMLibBindings *sharedInstance = nil;
 #pragma mark AppcoreLibBindings
 
 // TODO test case
-- (BOOL)setDefaultTheme:(DatamodelTheme *_Nullable)actheme
-                  error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)setDefaultTheme:(DatamodelTheme *_Nullable)actheme error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!actheme) {
         *error = [NSError errorWithDomain:@"CMIOS" code:73923755 userInfo:nil];
         return NO;
@@ -67,15 +66,13 @@ static CMLibBindings *sharedInstance = nil;
 }
 
 // TODO test case
-- (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner
-             error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
         return NO;
     }
 
-    CMBannerMessage *bannerMessage =
-        [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
+    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
 
     // TODO: main thread?
     [[CMBannerManager shared] showAppWideMessage:bannerMessage];
@@ -93,16 +90,14 @@ static CMLibBindings *sharedInstance = nil;
     return YES;
 }
 
-- (BOOL)showLink:(DatamodelLinkAction *)link
-           error:(NSError *_Nullable __autoreleasing *)error {
+- (BOOL)showLink:(DatamodelLinkAction *)link error:(NSError *_Nullable __autoreleasing *)error {
     NSURL *url = [NSURL URLWithString:link.urlString];
     if (!url || !url.scheme) {
         *error = [NSError errorWithDomain:@"CMIOS" code:72937634 userInfo:nil];
         return NO;
     }
 
-    BOOL isWebLink = [@"http" isEqualToString:url.scheme] ||
-                     [@"https" isEqualToString:url.scheme];
+    BOOL isWebLink = [@"http" isEqualToString:url.scheme] || [@"https" isEqualToString:url.scheme];
     if (link.useEmbeddedBrowser && isWebLink) {
         BOOL success = [self openLinkInEmbeddedBrowser:url];
         if (success) {
@@ -110,15 +105,12 @@ static CMLibBindings *sharedInstance = nil;
         }
     }
 
-    [UIApplication.sharedApplication openURL:url
-                                     options:@{}
-                           completionHandler:nil];
+    [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
     return YES;
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
-    SFSafariViewController *safariVc =
-        [[SFSafariViewController alloc] initWithURL:url];
+    SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
     UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
     if (!safariVc || !rootVc) {
         return NO;

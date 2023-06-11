@@ -50,8 +50,7 @@ static CMTheme *currentTheme = nil;
 #pragma mark Named Themes From Appcore
 
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
-    DatamodelTheme *appcoreTheme =
-        [AppcoreSharedAppcore() themeForName:themeName];
+    DatamodelTheme *appcoreTheme = [AppcoreSharedAppcore() themeForName:themeName];
     if (appcoreTheme) {
         return [CMTheme themeFromAppcoreTheme:appcoreTheme];
     }
@@ -76,15 +75,12 @@ static CMTheme *currentTheme = nil;
     CMTheme *theme = [[CMTheme alloc] init];
 
     // banners
-    theme.bannerBackgroundColor =
-        [CMUtils colorFromHexString:acTheme.bannerBackgroundColor];
-    theme.bannerForegroundColor =
-        [CMUtils colorFromHexString:acTheme.bannerForegroundColor];
+    theme.bannerBackgroundColor = [CMUtils colorFromHexString:acTheme.bannerBackgroundColor];
+    theme.bannerForegroundColor = [CMUtils colorFromHexString:acTheme.bannerForegroundColor];
 
     // fonts
     theme.fontName = acTheme.fontName.length > 0 ? acTheme.fontName : nil;
-    theme.boldFontName =
-        acTheme.fontName.length > 0 ? acTheme.boldFontName : nil;
+    theme.boldFontName = acTheme.fontName.length > 0 ? acTheme.boldFontName : nil;
     theme.scaleFontForDynamicType = acTheme.scaleFontForUserPreference;
     theme.fontScale = acTheme.fontScale;
     return theme;

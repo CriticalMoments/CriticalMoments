@@ -33,14 +33,12 @@
 }
 
 - (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
-    return [[self.screen.sections objectAtIndex:indexPath.section].actions
-        objectAtIndex:indexPath.row];
+    return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
 }
 
 #pragma mark UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView
-    didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     CMDemoAction *action = [self actionForIndexPath:indexPath];
     [action performAction];
@@ -48,8 +46,7 @@
 
 #pragma mark UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView
-    numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [self.screen.sections objectAtIndex:section].actions.count;
 }
 
@@ -57,16 +54,12 @@
     return self.screen.sections.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CMDemoAction *action = [self actionForIndexPath:indexPath];
 
-    UITableViewCell *cell =
-        [tableView dequeueReusableCellWithIdentifier:DEMO_CELL_REUSE_ID];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:DEMO_CELL_REUSE_ID];
     if (!cell) {
-        cell =
-            [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                   reuseIdentifier:DEMO_CELL_REUSE_ID];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:DEMO_CELL_REUSE_ID];
     }
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
@@ -74,8 +67,7 @@
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView
-    titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return [self.screen.sections objectAtIndex:section].title;
 }
 

@@ -11,8 +11,7 @@
 
 #define MAX_BANNER_HEIGHT_PERCENTAGE 0.20
 
-@interface CMBannerManager () <CMBannerMessageManagerDelegate,
-                               CMBannerNextMessageDelegate>
+@interface CMBannerManager () <CMBannerMessageManagerDelegate, CMBannerNextMessageDelegate>
 
 // Access should be @synchronized(self)
 @property(nonatomic, strong) NSMutableArray<CMBannerMessage *> *appWideMessages;
@@ -70,8 +69,7 @@ static CMBannerManager *sharedInstance = nil;
         // location
         bool rendered = NO;
         if (message.preferredPosition != CMBannerPositionNoPreference) {
-            rendered = [self setAppWideBannerPositionReturningRendered:
-                                 message.preferredPosition];
+            rendered = [self setAppWideBannerPositionReturningRendered:message.preferredPosition];
         }
 
         if (!rendered) {
@@ -104,8 +102,7 @@ static CMBannerManager *sharedInstance = nil;
     [self setAppWideBannerPositionReturningRendered:appWideBannerPosition];
 }
 
-- (bool)setAppWideBannerPositionReturningRendered:
-    (CMBannerPosition)appWideBannerPosition {
+- (bool)setAppWideBannerPositionReturningRendered:(CMBannerPosition)appWideBannerPosition {
     // don't do work work if no change
     if (appWideBannerPosition == _appWideBannerPosition) {
         return NO;
@@ -170,14 +167,10 @@ static CMBannerManager *sharedInstance = nil;
     _currentMessage.translatesAutoresizingMaskIntoConstraints = NO;
     [_appWideContainerView addSubview:_currentMessage];
     NSArray<NSLayoutConstraint *> *constraints = @[
-        [_currentMessage.topAnchor
-            constraintEqualToAnchor:_appWideContainerView.topAnchor],
-        [_currentMessage.leftAnchor
-            constraintEqualToAnchor:_appWideContainerView.leftAnchor],
-        [_currentMessage.rightAnchor
-            constraintEqualToAnchor:_appWideContainerView.rightAnchor],
-        [_currentMessage.bottomAnchor
-            constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
+        [_currentMessage.topAnchor constraintEqualToAnchor:_appWideContainerView.topAnchor],
+        [_currentMessage.leftAnchor constraintEqualToAnchor:_appWideContainerView.leftAnchor],
+        [_currentMessage.rightAnchor constraintEqualToAnchor:_appWideContainerView.rightAnchor],
+        [_currentMessage.bottomAnchor constraintEqualToAnchor:_appWideContainerView.bottomAnchor],
     ];
 
     [NSLayoutConstraint activateConstraints:constraints];
@@ -229,31 +222,24 @@ static CMBannerManager *sharedInstance = nil;
 
     NSArray<NSLayoutConstraint *> *constraints = @[
         // position banner to the side edges
-        [_appWideContainerView.leftAnchor
-            constraintEqualToAnchor:keyWindow.leftAnchor],
-        [_appWideContainerView.rightAnchor
-            constraintEqualToAnchor:keyWindow.rightAnchor],
+        [_appWideContainerView.leftAnchor constraintEqualToAnchor:keyWindow.leftAnchor],
+        [_appWideContainerView.rightAnchor constraintEqualToAnchor:keyWindow.rightAnchor],
 
         // Make the banner at most 20% window height. Backstop for way too much
         // text.
-        [_appWideContainerView.heightAnchor
-            constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor
-                                   multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
+        [_appWideContainerView.heightAnchor constraintLessThanOrEqualToAnchor:keyWindow.heightAnchor
+                                                                   multiplier:MAX_BANNER_HEIGHT_PERCENTAGE],
     ];
 
     // Top vs Bottom layout for banner
     if (self.appWideBannerPosition == CMBannerPositionBottom) {
         // Banner container at bottom of app
         constraints = [constraints
-            arrayByAddingObject:[_appWideContainerView.bottomAnchor
-                                    constraintEqualToAnchor:keyWindow
-                                                                .bottomAnchor]];
+            arrayByAddingObject:[_appWideContainerView.bottomAnchor constraintEqualToAnchor:keyWindow.bottomAnchor]];
     } else {
         // Banner container at top of app
         constraints = [constraints
-            arrayByAddingObject:[_appWideContainerView.topAnchor
-                                    constraintEqualToAnchor:keyWindow
-                                                                .topAnchor]];
+            arrayByAddingObject:[_appWideContainerView.topAnchor constraintEqualToAnchor:keyWindow.topAnchor]];
     }
 
     [NSLayoutConstraint activateConstraints:constraints];
@@ -278,10 +264,8 @@ static CMBannerManager *sharedInstance = nil;
     // reset insets to zero added for banner
     if (rootVc == _injectedInsetsRootVc) {
         UIEdgeInsets newInsets = rootVc.additionalSafeAreaInsets;
-        newInsets.bottom = MAX(0, rootVc.additionalSafeAreaInsets.bottom -
-                                      _insetAddedForBanner.bottom);
-        newInsets.top = MAX(0, rootVc.additionalSafeAreaInsets.top -
-                                   _insetAddedForBanner.top);
+        newInsets.bottom = MAX(0, rootVc.additionalSafeAreaInsets.bottom - _insetAddedForBanner.bottom);
+        newInsets.top = MAX(0, rootVc.additionalSafeAreaInsets.top - _insetAddedForBanner.top);
         rootVc.additionalSafeAreaInsets = newInsets;
         _insetAddedForBanner = UIEdgeInsetsZero;
         _injectedInsetsRootVc = nil;
@@ -332,33 +316,24 @@ static CMBannerManager *sharedInstance = nil;
 
     if (self.appWideBannerPosition == CMBannerPositionBottom) {
         // reset top to zero added for banner
-        newInsets.top = MAX(0, rootVc.additionalSafeAreaInsets.top -
-                                   _insetAddedForBanner.top);
+        newInsets.top = MAX(0, rootVc.additionalSafeAreaInsets.top - _insetAddedForBanner.top);
         newInsetsAddedForBanner.top = 0;
 
         // Calculate bottom inset
-        CGFloat appAddedBottomInset =
-            MAX(0, rootVc.additionalSafeAreaInsets.bottom -
-                       _insetAddedForBanner.bottom);
-        newInsetsAddedForBanner.bottom =
-            MAX(0, message.frame.size.height - message.safeAreaInsets.bottom);
-        newInsets.bottom =
-            MAX(0, newInsetsAddedForBanner.bottom + appAddedBottomInset);
+        CGFloat appAddedBottomInset = MAX(0, rootVc.additionalSafeAreaInsets.bottom - _insetAddedForBanner.bottom);
+        newInsetsAddedForBanner.bottom = MAX(0, message.frame.size.height - message.safeAreaInsets.bottom);
+        newInsets.bottom = MAX(0, newInsetsAddedForBanner.bottom + appAddedBottomInset);
     } else {
         // reset bottom to zero added for banner
-        newInsets.bottom = MAX(0, rootVc.additionalSafeAreaInsets.bottom -
-                                      _insetAddedForBanner.bottom);
+        newInsets.bottom = MAX(0, rootVc.additionalSafeAreaInsets.bottom - _insetAddedForBanner.bottom);
         newInsetsAddedForBanner.bottom = 0;
 
         // Calculate bottom inset
-        CGFloat appAddedTopInset = MAX(0, rootVc.additionalSafeAreaInsets.top -
-                                              _insetAddedForBanner.top);
-        newInsetsAddedForBanner.top =
-            MAX(0, message.frame.size.height - message.safeAreaInsets.top);
+        CGFloat appAddedTopInset = MAX(0, rootVc.additionalSafeAreaInsets.top - _insetAddedForBanner.top);
+        newInsetsAddedForBanner.top = MAX(0, message.frame.size.height - message.safeAreaInsets.top);
         newInsets.top = MAX(0, newInsetsAddedForBanner.top + appAddedTopInset);
     }
-    if (UIEdgeInsetsEqualToEdgeInsets(newInsets,
-                                      rootVc.additionalSafeAreaInsets)) {
+    if (UIEdgeInsetsEqualToEdgeInsets(newInsets, rootVc.additionalSafeAreaInsets)) {
         // save a layout, no change
         return;
     }
@@ -375,8 +350,7 @@ static CMBannerManager *sharedInstance = nil;
         if (_appWideMessages.count == 0) {
             return;
         }
-        NSUInteger nextIndex =
-            [_appWideMessages indexOfObject:_currentMessage] + 1;
+        NSUInteger nextIndex = [_appWideMessages indexOfObject:_currentMessage] + 1;
         nextIndex = nextIndex % _appWideMessages.count;
         _currentMessage = [_appWideMessages objectAtIndex:nextIndex];
         [self renderForCurrentState];

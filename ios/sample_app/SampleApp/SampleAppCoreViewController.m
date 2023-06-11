@@ -27,20 +27,14 @@
 
     CMDemoScreen *mainDemoScreen = [[MainDemoScreen alloc] init];
     _demoRoot = mainDemoScreen;
-    DemoViewContoller *mainTabRoot =
-        [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
-    UINavigationController *mainTabNav =
-        [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
+    DemoViewContoller *mainTabRoot = [[DemoViewContoller alloc] initWithDemoScreen:mainDemoScreen];
+    UINavigationController *mainTabNav = [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
     mainTabNav.navigationBar.prefersLargeTitles = YES;
 
-    UIImageConfiguration *largeImageConfig = [UIImageSymbolConfiguration
-        configurationWithScale:UIImageSymbolScaleLarge];
-    UIImage *mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays"
-                                        withConfiguration:largeImageConfig];
-    UITabBarItem *mainTabBarItem =
-        [[UITabBarItem alloc] initWithTitle:@"Demo"
-                                      image:mainTabIconImage
-                                        tag:0];
+    UIImageConfiguration *largeImageConfig =
+        [UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge];
+    UIImage *mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays" withConfiguration:largeImageConfig];
+    UITabBarItem *mainTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Demo" image:mainTabIconImage tag:0];
     mainTabNav.tabBarItem = mainTabBarItem;
     self.viewControllers = @[ mainTabNav ];
 
@@ -56,8 +50,7 @@
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
 
-    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config"
-                                                    withExtension:@"json"];
+    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
     [CriticalMoments setConfigUrl:localConfigUrl.absoluteString];
 
     /*NSString *webBasedConfigUrl =

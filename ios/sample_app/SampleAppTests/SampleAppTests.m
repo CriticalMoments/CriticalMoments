@@ -30,23 +30,20 @@
     XCTAssert([@"objcPong" isEqual:pongResponse], @"CM integration broken");
 
     NSString *goPongResponse = [CriticalMoments goPing];
-    XCTAssert([@"AppcorePong->PongCmCore" isEqual:goPongResponse],
-              @"CM Go integration broken");
+    XCTAssert([@"AppcorePong->PongCmCore" isEqual:goPongResponse], @"CM Go integration broken");
 }
 
 - (void)testDefaultTheme {
     // Ensure a default theme from config is loaded into app
     NSBundle *testBundle = [NSBundle bundleForClass:self.class];
-    NSURL *url = [testBundle URLForResource:@"defaultThemeTest"
-                              withExtension:@"json"];
+    NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
     [CriticalMoments setConfigUrl:url.absoluteString];
     [CriticalMoments start];
 
     XCTAssert([UIColor.redColor isEqual:CMTheme.current.bannerBackgroundColor],
               @"Default theme should have loaded bg from config");
-    XCTAssert(
-        [UIColor.greenColor isEqual:CMTheme.current.bannerForegroundColor],
-        @"Default theme should have loaded fg from config");
+    XCTAssert([UIColor.greenColor isEqual:CMTheme.current.bannerForegroundColor],
+              @"Default theme should have loaded fg from config");
 }
 
 - (void)testPerformanceExample {

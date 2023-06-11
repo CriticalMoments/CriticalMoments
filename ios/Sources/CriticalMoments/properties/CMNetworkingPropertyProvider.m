@@ -45,25 +45,19 @@ static CMNetworkMonitor *sharedInstance = nil;
         // using a waitGroup, and semaphor to signal the task in the group
         self.readReadySemaphore = dispatch_semaphore_create(0);
         self.readReadyGroup = dispatch_group_create();
-        dispatch_group_async(
-            self.readReadyGroup,
-            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-              dispatch_semaphore_wait(self.readReadySemaphore,
-                                      DISPATCH_TIME_FOREVER);
-            });
+        dispatch_group_async(self.readReadyGroup, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+          dispatch_semaphore_wait(self.readReadySemaphore, DISPATCH_TIME_FOREVER);
+        });
 
         // Network monitor, which signals the read group once we have data
         // stored
         self.monitor = nw_path_monitor_create();
-        nw_path_monitor_set_queue(
-            self.monitor,
-            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
+        nw_path_monitor_set_queue(self.monitor, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
         __weak CMNetworkMonitor *weakSelf = self;
-        nw_path_monitor_set_update_handler(
-            self.monitor, ^(nw_path_t _Nonnull path) {
-              weakSelf.currentPath = path;
-              dispatch_semaphore_signal(weakSelf.readReadySemaphore);
-            });
+        nw_path_monitor_set_update_handler(self.monitor, ^(nw_path_t _Nonnull path) {
+          weakSelf.currentPath = path;
+          dispatch_semaphore_signal(weakSelf.readReadySemaphore);
+        });
         nw_path_monitor_start(self.monitor);
     }
     return self;
@@ -108,8 +102,7 @@ static CMNetworkMonitor *sharedInstance = nil;
         nw_path_t path = self.currentPath;
         if (nw_path_uses_interface_type(path, nw_interface_type_wifi)) {
             return @"wifi";
-        } else if (nw_path_uses_interface_type(path,
-                                               nw_interface_type_cellular)) {
+        } else if (nw_path_uses_interface_type(path, nw_interface_type_cellular)) {
             return @"cellular";
         } else if (nw_path_uses_interface_type(path, nw_interface_type_wired)) {
             return @"wired";
@@ -133,14 +126,13 @@ static CMNetworkMonitor *sharedInstance = nil;
     }
     nw_path_t path = self.currentPath;
     __block bool returnVal = NO;
-    nw_path_enumerate_interfaces(
-        path, ^bool(nw_interface_t _Nonnull interface) {
-          if (nw_interface_get_type(interface) == type) {
-              returnVal = YES;
-          }
-          // keep iterating until done or found
-          return !returnVal;
-        });
+    nw_path_enumerate_interfaces(path, ^bool(nw_interface_t _Nonnull interface) {
+      if (nw_interface_get_type(interface) == type) {
+          returnVal = YES;
+      }
+      // keep iterating until done or found
+      return !returnVal;
+    });
     return returnVal;
 }
 

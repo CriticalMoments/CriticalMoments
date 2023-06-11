@@ -51,8 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<CMDemoSection *> *)sections;
 
-- (void)addSection:(NSString *)section
-       withActions:(NSArray<CMDemoAction *> *)actions;
+- (void)addSection:(NSString *)section withActions:(NSArray<CMDemoAction *> *)actions;
 - (void)addActionToRootSection:(CMDemoAction *)action;
 
 @end

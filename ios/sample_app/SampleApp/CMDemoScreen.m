@@ -42,8 +42,7 @@
         [CriticalMoments sendEvent:self.actionCMEventName];
     } else if (self.actionCMActionName) {
         NSError *error;
-        [AppcoreSharedAppcore() performNamedAction:self.actionCMActionName
-                                             error:&error];
+        [AppcoreSharedAppcore() performNamedAction:self.actionCMActionName error:&error];
         if (error) {
             NSLog(@"SampleApp: Menu tap action unknown issue: %@", error);
         }
@@ -67,8 +66,7 @@
 }
 
 - (void)pushNextScreen {
-    DemoViewContoller *demoVc =
-        [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
+    DemoViewContoller *demoVc = [[DemoViewContoller alloc] initWithDemoScreen:self.actionNextScreen];
     UINavigationController *navController = [Utils appNavControl];
     [navController pushViewController:demoVc animated:YES];
 }
@@ -124,8 +122,7 @@
     [rootSection.actionsList addObject:action];
 }
 
-- (void)addSection:(NSString *)title
-       withActions:(NSArray<CMDemoAction *> *)actions {
+- (void)addSection:(NSString *)title withActions:(NSArray<CMDemoAction *> *)actions {
     CMDemoSection *section = [[CMDemoSection alloc] init];
     section.title = title;
     NSMutableArray *mutableActions;
