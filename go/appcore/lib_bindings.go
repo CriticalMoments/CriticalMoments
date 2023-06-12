@@ -13,5 +13,5 @@ type LibBindings interface {
 	ShowBanner(banner *datamodel.BannerAction) error
 	ShowAlert(alert *datamodel.AlertAction) error
 	ShowLink(link *datamodel.LinkAction) error
-	ShowReview() error
+	ShowReviewPrompt() error
 }

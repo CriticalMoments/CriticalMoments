@@ -62,7 +62,7 @@ func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
 	lb.defaultTheme = theme
 	return nil
 }
-func (lb *testLibBindings) ShowReview() error {
+func (lb *testLibBindings) ShowReviewPrompt() error {
 	lb.reviewCount += 1
 	return nil
 }

@@ -20,7 +20,7 @@ func (ap *actionDispatcher) ShowLink(link *datamodel.LinkAction) error {
 }
 
 func (ap *actionDispatcher) ShowReviewPrompt() error {
-	return ap.appcore.libBindings.ShowReview()
+	return ap.appcore.libBindings.ShowReviewPrompt()
 }
 
 func (ap *actionDispatcher) PerformConditionalAction(ca *datamodel.ConditionalAction) error {

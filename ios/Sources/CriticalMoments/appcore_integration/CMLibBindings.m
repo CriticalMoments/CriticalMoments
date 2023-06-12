@@ -110,7 +110,7 @@ static CMLibBindings *sharedInstance = nil;
     return YES;
 }
 
-- (BOOL)showReview:(NSError *_Nullable __autoreleasing *)error {
+- (BOOL)showReviewPrompt:(NSError *_Nullable __autoreleasing *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
       if (@available(iOS 14.0, *)) {
           UIWindowScene *scene = [CMUtils keyWindow].windowScene;
