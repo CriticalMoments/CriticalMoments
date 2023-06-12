@@ -66,6 +66,8 @@
 		E07B775029FA0144001521F4 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		E07B775229FA04FF001521F4 /* MainDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainDemoScreen.h; sourceTree = "<group>"; };
 		E07B775329FA04FF001521F4 /* MainDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainDemoScreen.m; sourceTree = "<group>"; };
+		E089CE482A361F0D00BD2BB9 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+		E089CE4A2A367FB100BD2BB9 /* CITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = CITestPlan.xctestplan; sourceTree = "<group>"; };
 		E0B545E929F407C2002A25A8 /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B545EC29F407C2002A25A8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E0B545ED29F407C2002A25A8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -125,6 +127,8 @@
 		E0B545E029F407C2002A25A8 = {
 			isa = PBXGroup;
 			children = (
+				E089CE4A2A367FB100BD2BB9 /* CITestPlan.xctestplan */,
+				E089CE482A361F0D00BD2BB9 /* TestPlan.xctestplan */,
 				E0B5462129F4082C002A25A8 /* Packages */,
 				E0B545EB29F407C2002A25A8 /* SampleApp */,
 				E0B5460729F407C3002A25A8 /* SampleAppTests */,
