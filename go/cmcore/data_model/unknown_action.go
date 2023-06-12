@@ -6,10 +6,6 @@ type UnknownAction struct {
 	ActionType string
 }
 
-func (u *UnknownAction) Validate() bool {
-	return true
-}
-
 func (u *UnknownAction) ValidateReturningUserReadableIssue() string {
 	return ""
 }

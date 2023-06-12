@@ -23,6 +23,7 @@ const (
 	ActionTypeEnumAlert       string = "alert"
 	ActionTypeEnumLink        string = "link"
 	ActionTypeEnumConditional string = "conditional_action"
+	ActionTypeEnumReview      string = "review_prompt"
 )
 
 // This section is the json data model we use for parsing/masrshaling
@@ -57,6 +58,7 @@ type ActionBindings interface {
 	ShowAlert(alert *AlertAction) error
 	ShowLink(link *LinkAction) error
 	PerformConditionalAction(conditionalAction *ConditionalAction) error
+	ShowReviewPrompt() error
 }
 
 type ActionTypeInterface interface {
@@ -72,6 +74,7 @@ var (
 		ActionTypeEnumAlert:       unpackAlertFromJson,
 		ActionTypeEnumLink:        unpackLinkFromJson,
 		ActionTypeEnumConditional: unpackConditionalActionFromJson,
+		ActionTypeEnumReview:      unpackReviewFromJson,
 	}
 )
 

@@ -19,6 +19,7 @@
 @import Appcore;
 
 @import SafariServices;
+@import StoreKit;
 
 @interface CMLibBindings () <AppcoreLibBindings>
 @end
@@ -107,6 +108,19 @@ static CMLibBindings *sharedInstance = nil;
 
     [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
     return YES;
+}
+
+- (BOOL)showReviewPrompt:(NSError *_Nullable __autoreleasing *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (@available(iOS 14.0, *)) {
+          UIWindowScene *scene = [CMUtils keyWindow].windowScene;
+          if (scene) {
+              [SKStoreReviewController requestReviewInScene:scene];
+          }
+      } else {
+          [SKStoreReviewController requestReview];
+      }
+    });
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
