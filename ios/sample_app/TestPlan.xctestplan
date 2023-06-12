@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "83B56889-6F70-4EFE-80C4-B9E2B6B3D9B2",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:..\/..",
+        "identifier" : "CriticalMomentsSwiftTests",
+        "name" : "CriticalMomentsSwiftTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:..\/..",
+        "identifier" : "CriticalMomentsTests",
+        "name" : "CriticalMomentsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:SampleApp.xcodeproj",
+        "identifier" : "E0B5460329F407C3002A25A8",
+        "name" : "SampleAppTests"
+      }
+    }
+  ],
+  "version" : 1
+}
