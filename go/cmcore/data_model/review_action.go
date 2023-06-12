@@ -7,9 +7,6 @@ import (
 type ReviewAction struct {
 }
 
-type jsonReviewAction struct {
-}
-
 func unpackReviewFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
 	return &ReviewAction{}, nil
 }
