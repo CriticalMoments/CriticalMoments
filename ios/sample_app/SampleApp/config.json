@@ -242,6 +242,10 @@
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
+            },
+            "reviewAction": {
+                "actionType": "review_prompt",
+                "actionData": {}
             }
         }
     },
