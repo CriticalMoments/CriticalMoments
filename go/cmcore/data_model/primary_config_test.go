@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 9 {
+	if len(pc.namedActions) != 10 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -94,6 +94,11 @@ func TestPrimaryConfigJson(t *testing.T) {
 	_, ok := ua.actionData.(*UnknownAction)
 	if ua.ActionType != "unknown_future_type" || !ok {
 		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
+	}
+	ra := pc.ActionWithName("reviewAction")
+	_, ok = ra.actionData.(*ReviewAction)
+	if !ok {
+		t.Fatal("Review action failed to parse")
 	}
 
 	// Triggers

@@ -42,6 +42,7 @@ type testLibBindings struct {
 	lastBannerAction *datamodel.BannerAction
 	lastAlertAction  *datamodel.AlertAction
 	lastLinkAction   *datamodel.LinkAction
+	reviewCount      int
 	defaultTheme     *datamodel.Theme
 }
 
@@ -59,6 +60,10 @@ func (lb *testLibBindings) ShowLink(l *datamodel.LinkAction) error {
 }
 func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
 	lb.defaultTheme = theme
+	return nil
+}
+func (lb *testLibBindings) ShowReview() error {
+	lb.reviewCount += 1
 	return nil
 }
 
@@ -186,6 +191,14 @@ func TestPerformingAction(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
 		t.Fatal("alert event didn't fire")
+	}
+
+	err = ac.PerformNamedAction("reviewAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).reviewCount != 1 {
+		t.Fatal("review action didn't fire")
 	}
 }
 

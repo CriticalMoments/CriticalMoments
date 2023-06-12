@@ -19,6 +19,10 @@ func (ap *actionDispatcher) ShowLink(link *datamodel.LinkAction) error {
 	return ap.appcore.libBindings.ShowLink(link)
 }
 
+func (ap *actionDispatcher) ShowReviewPrompt() error {
+	return ap.appcore.libBindings.ShowReview()
+}
+
 func (ap *actionDispatcher) PerformConditionalAction(ca *datamodel.ConditionalAction) error {
 	passed, err := ap.appcore.propertyRegistry.evaluateCondition(ca.Condition)
 	if err != nil {
