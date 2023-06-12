@@ -27,9 +27,6 @@
       }
     },
     {
-      "skippedTests" : [
-        "SnapshotTests"
-      ],
       "target" : {
         "containerPath" : "container:SampleApp.xcodeproj",
         "identifier" : "E0B5460329F407C3002A25A8",

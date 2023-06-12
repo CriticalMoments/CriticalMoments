@@ -32,4 +32,4 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan CITestPlan -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test && cd ../..
+        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test && cd ../..

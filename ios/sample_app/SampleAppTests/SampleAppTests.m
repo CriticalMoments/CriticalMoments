@@ -34,15 +34,18 @@
 }
 
 - (void)testDefaultTheme {
-    // Ensure a default theme from config is loaded into app
-    NSBundle *testBundle = [NSBundle bundleForClass:self.class];
-    NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
-    [CriticalMoments setConfigUrl:url.absoluteString];
-    [CriticalMoments start];
+    // TOOD: this test isn't robust. Race condition with app config,
+    // and edits global state impacting other tests/app.
 
     // Ugly wait to wait for startup of CM which is async
     XCTestExpectation *expectation = [self expectationWithDescription:@"CM startup done"];
     dispatch_async(dispatch_get_main_queue(), ^{
+      // Ensure a default theme from config is loaded into app
+      NSBundle *testBundle = [NSBundle bundleForClass:self.class];
+      NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
+      [CriticalMoments setConfigUrl:url.absoluteString];
+      [CriticalMoments start];
+
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [expectation fulfill];
       });

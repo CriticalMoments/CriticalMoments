@@ -49,9 +49,6 @@
          <TestPlanReference
             reference = "container:TestPlan.xctestplan">
          </TestPlanReference>
-         <TestPlanReference
-            reference = "container:CITestPlan.xctestplan">
-         </TestPlanReference>
       </TestPlans>
       <Testables>
          <TestableReference
