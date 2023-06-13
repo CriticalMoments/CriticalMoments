@@ -47,7 +47,6 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 		return errors.New("Invalid property registered. Properties must be required or well known. Arbitrary properties are not allowed.")
 	}
 
-	// cmKindVersionNumber is also valid, but is validated below
 	validTypes := []reflect.Kind{reflect.Bool, reflect.String, reflect.Int, reflect.Float64}
 	if !slices.Contains(validTypes, expectedType) {
 		return errors.New("Invalid property type for key: " + key)
