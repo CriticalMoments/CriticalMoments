@@ -5,4 +5,6 @@ framework_root: ./ios/Sources
 umbrella_header: ./ios/Sources/CriticalMoments/include/CriticalMoments.h
 theme: fullwidth
 readme: api_ref.md
+author: Critical Moments
+author_url: https://criticalmoments.io
 
