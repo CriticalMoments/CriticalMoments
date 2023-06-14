@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Classes  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/objc/Section/Classes" class="dashAnchor"></a>
+
+    <a title="Classes  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          CriticalMoments 0.1.4-beta Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">CriticalMoments Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      Classes  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMBannerManager.html">CMBannerManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMBannerMessage.html">CMBannerMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMTheme.html">CMTheme</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CMBannerPosition.html">CMBannerPosition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CMBannerActionDelegate.html">CMBannerActionDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Classes</h1>
+            <p>The following classes are available globally.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager"></a>
+                    <a name="//apple_ref/objc/Class/CMBannerManager" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager">CMBannerManager</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Manages the presentation of banner messages across your app.</p>
+
+<p>Example usage Swift:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">message</span> <span class="o">=</span> <span class="kt">CMBannerMessage</span><span class="o">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">body</span><span class="p">:</span> <span class="s">"Important msg"</span><span class="p">)</span>
+<span class="kt">CMBannerManager</span><span class="o">.</span><span class="nf">shared</span><span class="p">()</span><span class="o">.</span><span class="nf">showAppWideMessage</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre>
+
+<p>Example usage Objective-C:</p>
+<pre class="highlight objective_c"><code><span class="n">CMBannerMessage</span><span class="o">*</span> <span class="n">bannerMessage</span> <span class="o">=</span> <span class="p">[[</span><span class="n">CMBannerMessage</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithBody</span><span class="p">:</span><span class="s">@"Important msg"</span><span class="p">];</span>
+<span class="p">[</span><span class="n">CMBannerManager</span><span class="p">.</span><span class="n">shared</span> <span class="nf">showAppWideMessage</span><span class="p">:</span><span class="n">bannerMessage</span><span class="p">];</span>
+</code></pre>
+
+                        <a href="Classes/CMBannerManager.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">@interface</span> <span class="nc">CMBannerManager</span> <span class="p">:</span> <span class="nc">NSObject</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">CMBannerManager</span> <span class="p">:</span> <span class="kt">NSObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerMessage"></a>
+                    <a name="//apple_ref/objc/Class/CMBannerMessage" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerMessage">CMBannerMessage</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This class represents individual banner message which can be presented across
+the top or bottom of your app.</p>
+
+                        <a href="Classes/CMBannerMessage.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">@interface</span> <span class="nc">CMBannerMessage</span> <span class="p">:</span> <span class="nc">UIView</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">CMBannerMessage</span> <span class="p">:</span> <span class="kt">UIView</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMTheme"></a>
+                    <a name="//apple_ref/objc/Class/CMTheme" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMTheme">CMTheme</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A class to control the theme/style of our UI controls.</p>
+
+<p>To create a custom theme, create a new instance, modify the properties which
+control style, and make if your current theme with <code>setCurrentsTheme</code>. Swift
+example of custom theme:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">customTheme</span> <span class="o">=</span> <span class="kt">CMTheme</span><span class="o">.</span><span class="nf">init</span><span class="p">()</span>
+<span class="n">customTheme</span><span class="o">.</span><span class="n">bannerBackgroundColor</span> <span class="o">=</span> <span class="kt">UIColor</span><span class="o">.</span><span class="n">red</span><span class="p">;</span>
+<span class="n">customTheme</span><span class="o">.</span><span class="n">bannerForegroundColor</span> <span class="o">=</span> <span class="kt">UIColor</span><span class="o">.</span><span class="n">white</span><span class="p">;</span>
+<span class="kt">CMTheme</span><span class="o">.</span><span class="nf">setCurrent</span><span class="p">(</span><span class="n">customTheme</span><span class="p">)</span>
+</code></pre>
+
+                        <a href="Classes/CMTheme.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">@interface</span> <span class="nc">CMTheme</span> <span class="p">:</span> <span class="nc">NSObject</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">CMTheme</span> <span class="p">:</span> <span class="kt">NSObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2023 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Steve Cosman</a>. All rights reserved. (Last updated: 2023-06-14)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

@@ -57,14 +57,14 @@ NS_ASSUME_NONNULL_BEGIN
 /// options, or use your own app-installed font.
 /// @warning If you set this, it's highly recommended you also set boldFontName
 /// for consistent style.
-@property(nonatomic, readwrite) NSString *fontName;
+@property(nonatomic, readwrite) NSString *_Nullable fontName;
 
 /// The default font to use for bold. If nil, this theme will use the system
 /// bold font. Example: "AvenirNext-Bold". Check out https://iosfontlist.com/
 /// for options, or use your own app-installed font.
 /// @warning If you set this, it's highly recommended you also set fontName for
 /// consistent style.
-@property(nonatomic, readwrite) NSString *boldFontName;
+@property(nonatomic, readwrite) NSString *_Nullable boldFontName;
 
 /// If YES, will scale the font size based on the user settings in "Settings"
 /// app or control center. Defaults to YES. Helps for accessibility.
@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// A theme to be used if the user has opted to use iOS's dark mode. If unspecified the primary theme will be used in
 /// both light and dark modes.
-@property(nonatomic, readwrite) CMTheme *darkModeTheme;
+@property(nonatomic, readwrite) CMTheme *_Nullable darkModeTheme;
 
 /// Returns a font respecting the theme settings (fontName, scaleForDynamicType,
 /// etc).  Defaults to systemFont.

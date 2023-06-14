@@ -31,8 +31,6 @@ CriticalMoments.xcframework/
 xcframework.zip
 # go build system artifact, but the other hashlist should be checked in
 go/.go_folder_hashlist
-# docs folder
-docs/
 # Snapshot test failures
 ios/sample_app/SnapshotTests/FailureDiffs
 
