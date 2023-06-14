@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CriticalMoments  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="CriticalMoments  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          CriticalMoments 0.1.4-beta Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">CriticalMoments Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      CriticalMoments  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMBannerManager.html">CMBannerManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMBannerMessage.html">CMBannerMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/CMTheme.html">CMTheme</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CMBannerPosition.html">CMBannerPosition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CMBannerActionDelegate.html">CMBannerActionDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <h1 id='criticalmoments-ios' class='heading'>CriticalMoments iOS</h1>
+
+<p><a href="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml"><img src="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml/badge.svg" alt="Release Build"></a>
+<a href="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml"><img src="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg" alt="Release Tests"></a>
+<a href="https://github.com/Carthage/Carthage"><img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat" alt="Carthage compatible"></a></p>
+<h1 id='work-in-progress' class='heading'>Work in Progress</h1>
+
+<p>This project is a work in progress, and is not ready for any usage.</p>
+<h1 id='requirements' class='heading'>Requirements</h1>
+
+<p>Currenlty CriticalMoments supports iOS and iPad OS, for iOS 12+.</p>
+
+<p>The API supports both Objective-C and Swift.</p>
+<h1 id='installation-options' class='heading'>Installation Options</h1>
+
+<p>CriticalMoments can be installed several ways:</p>
+
+<ul>
+<li><a href="#swift-package-manager-installation">Swift Package Manager (recommended)</a></li>
+<li><a href="#cocoapods-installation">CocoaPods</a></li>
+<li><a href="#direct-framework-download-objective-c">Direct framework download</a></li>
+<li><a href="#carthage-installation">Carthage</a></li>
+</ul>
+<h2 id='swift-package-manager-installation' class='heading'>Swift Package Manager Installation</h2>
+
+<p>Follow Apple&rsquo;s instructions for <a href="https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app">Adding package dependencies to your app using swift package manager</a>.</p>
+
+<p>The git URL to enter is simply: <code>https://github.com/CriticalMoments/CriticalMoments</code></p>
+
+<p>We suggest specifing &ldquo;Up to next major version&rdquo; as your dependancy rule. We don&rsquo;t recommend the dependancy rule <code>branch=main</code>, as main may contain pre-release code.</p>
+
+<p>Then import and use where needed:</p>
+
+<ul>
+<li>Objective C: <code>@import CriticalMoments</code></li>
+<li>Swift: <code>import CriticalMoments</code></li>
+</ul>
+<h2 id='cocoapods-installation' class='heading'>CocoaPods Installation</h2>
+
+<p>CriticalMoments is available through <a href="https://cocoapods.org">CocoaPods</a>. </p>
+
+<p>To install it, follow the usual Cocoapods steps: </p>
+
+<ul>
+<li>Add the pod to your Podfile. A line like <code>pod &#39;CriticalMoments&#39;, &#39;&gt;= 0.1.4-beta&#39;</code>, optionally modifing the version requirement</li>
+<li>Run <code>pod install</code> and confirm the output indicates the CM installation was successful</li>
+<li>Clean and build your project</li>
+<li>Restart Xcode (yes, this is usually needed&hellip;)</li>
+<li>Link Critical Moments in the &ldquo;Link Binary with Libraries&rdquo; section, inside &ldquo;Build Phases&rdquo; tab of your target</li>
+<li>Import critical moments where needed
+
+<ul>
+<li>Objective C: <code>#import &quot;CriticalMoments.h&quot;</code></li>
+<li>Swift: <code>import CriticalMoments</code></li>
+</ul></li>
+</ul>
+<h2 id='direct-framework-download-objective-c' class='heading'>Direct Framework Download (Objective C)</h2>
+
+<p>You can download an XCFramework for use in your Objective C apps from our <a href="https://github.com/CriticalMoments/CriticalMoments/releases/latest">Github Releases</a>. This approach is not recommended for Swift, as the framework must be built with the exact same toolchain as you app, which is unlikely to match. For Swift, use <a href="#swift-package-manager-installation">Swift Package Manager</a>.</p>
+
+<p>Note: if you choose this route, you should manually update for bug fixes and enhancements.</p>
+
+<p>Process: </p>
+
+<ul>
+<li>Download <code>xcframework.zip</code> from the latest <a href="https://github.com/CriticalMoments/CriticalMoments/releases/latest">Github Release</a></li>
+<li>Add the framework to your project by dragging into the &ldquo;Frameworks, Libraries, and Embedded Content&rdquo; section of your project in xcode</li>
+<li>Import and use the framework where needed
+
+<ul>
+<li>Objective C: <code>@import CriticalMoments;</code></li>
+<li>Swift: <code>import CriticalMoments</code></li>
+</ul></li>
+</ul>
+<h2 id='carthage-installation' class='heading'>Carthage Installation</h2>
+
+<p>There are a few extra steps to install via Carthage so please follow steps below carefully. These are needed because this project uses <code>Package.swift</code>, and Carthage doesn&rsquo;t yet support it. You must run the <a href="https://github.com/yonaskolb/XcodeGen">XcodeGen</a> tool to build the project files Carthage needs. If you prefer to not install other tools, we suggest using Swift Package Manager.</p>
+
+<ul>
+<li>Add CriticalMoments to you <code>Cartfile</code> with a line like <code>github &quot;https://github.com/CriticalMoments/CriticalMoments&quot; &gt;= 0.1.4-beta</code>, optionally modifing the version requirement</li>
+<li>Run <code>carthage update --no-build</code></li>
+<li>Run <code>xcodegen generate --spec ./Carthage/Checkouts/criticalmoments/ios/project.yml</code>. If you don&rsquo;t already have xcodegen installed already, you&rsquo;ll need to install with <code>brew install xcodegen</code>.</li>
+<li>Run <code>carthage build --use-xcframeworks</code>, this time the build should succeed as the step above created needed project files</li>
+<li>Drag the built .xcframework bundles from Carthage/Build into the &ldquo;Frameworks and Libraries&rdquo; section of your application’s Xcode project.</li>
+<li>Build the project</li>
+<li>Import CriticalMoments where needed:
+
+<ul>
+<li>Objective C: <code>@import CriticalMoments;</code></li>
+<li>Swift: <code>import CriticalMoments</code></li>
+</ul></li>
+</ul>
+<h1 id='author' class='heading'>Author</h1>
+
+<p>Steve Cosman: <a href="https://scosman.net">https://scosman.net</a></p>
+<h1 id='trademark' class='heading'>Trademark</h1>
+
+<p>&ldquo;Critical Moments&rdquo; and our logos are trademarks. All rights reserved.</p>
+<h1 id='license' class='heading'>License</h1>
+
+<p>Copyright &copy; 2023 Stephen Cosman.</p>
+
+<p>All rights reserved. </p>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2023 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Steve Cosman</a>. All rights reserved. (Last updated: 2023-06-14)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
