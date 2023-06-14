@@ -28,17 +28,29 @@ static CMTheme *currentTheme = nil;
 
 + (CMTheme *)current {
     // avoid lock if we can
-    if (currentTheme) {
-        return currentTheme;
-    }
-
-    @synchronized(CMTheme.class) {
-        if (!currentTheme) {
-            currentTheme = [[self alloc] init];
+    if (!currentTheme) {
+        @synchronized(CMTheme.class) {
+            if (!currentTheme) {
+                currentTheme = [[self alloc] init];
+            }
         }
-
-        return currentTheme;
     }
+
+    return [CMTheme themeAdaptedForDarkModeFromTheme:currentTheme];
+}
+
++ (CMTheme *)themeAdaptedForDarkModeFromTheme:(CMTheme *)theme {
+    if (!theme.darkModeTheme) {
+        return theme;
+    }
+
+    if (@available(iOS 12.0, *)) {
+        UITraitCollection *tc = UIScreen.mainScreen.traitCollection;
+        if (tc.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return theme.darkModeTheme;
+        }
+    }
+    return theme;
 }
 
 + (void)setCurrentTheme:(CMTheme *)theme {
@@ -52,7 +64,8 @@ static CMTheme *currentTheme = nil;
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
     DatamodelTheme *appcoreTheme = [AppcoreSharedAppcore() themeForName:themeName];
     if (appcoreTheme) {
-        return [CMTheme themeFromAppcoreTheme:appcoreTheme];
+        CMTheme *theme = [CMTheme themeFromAppcoreTheme:appcoreTheme];
+        return [CMTheme themeAdaptedForDarkModeFromTheme:theme];
     }
     return nil;
 }
@@ -83,6 +96,12 @@ static CMTheme *currentTheme = nil;
     theme.boldFontName = acTheme.fontName.length > 0 ? acTheme.boldFontName : nil;
     theme.scaleFontForDynamicType = acTheme.scaleFontForUserPreference;
     theme.fontScale = acTheme.fontScale;
+
+    // dark mode
+    if (acTheme.darkModeTheme) {
+        theme.darkModeTheme = [CMTheme themeFromAppcoreTheme:acTheme.darkModeTheme];
+    }
+
     return theme;
 }
 

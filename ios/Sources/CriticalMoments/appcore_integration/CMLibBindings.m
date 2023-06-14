@@ -49,7 +49,6 @@ static CMLibBindings *sharedInstance = nil;
 
 #pragma mark AppcoreLibBindings
 
-// TODO test case
 - (BOOL)setDefaultTheme:(DatamodelTheme *_Nullable)actheme error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!actheme) {
         *error = [NSError errorWithDomain:@"CMIOS" code:73923755 userInfo:nil];

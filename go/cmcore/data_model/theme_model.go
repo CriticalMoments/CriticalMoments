@@ -51,6 +51,10 @@ var (
 		FontName:                   "Palatino-Roman",
 		BoldFontName:               "Palatino-Bold",
 		ScaleFontForUserPreference: false,
+		DarkModeTheme: &Theme{
+			BannerBackgroundColor: "#00ff00", // Green
+			BannerForegroundColor: "#ff0000", // Red
+		},
 	}
 )
 
