@@ -1,0 +1,10 @@
+{
+    "bannerBackgroundColor": "#ffffff",
+    "bannerForegroundColor": "#000000",
+    "fontScale": 1.0,
+    "darkModeTheme": {
+        "bannerBackgroundColor": "#x",
+        "bannerForegroundColor": "#ffffff",
+        "fontScale": 1.0
+    }
+}

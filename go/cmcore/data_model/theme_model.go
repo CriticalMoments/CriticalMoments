@@ -14,6 +14,9 @@ type Theme struct {
 	BoldFontName               string
 	ScaleFontForUserPreference bool
 	FontScale                  float64
+
+	// Dark Mode Theme
+	DarkModeTheme *Theme
 }
 
 // Currently very close to Theme model, but don't want to couple
@@ -28,8 +31,12 @@ type jsonTheme struct {
 	BoldFontName               string   `json:"boldFontName,omitempty"`
 	ScaleFontForUserPreference *bool    `json:"scaleFontForUserPreference,omitempty"` // pointer == nullable
 	FontScale                  *float64 `json:"fontScale,omitempty"`                  // pointer == nullable
+
+	// Dark mode theme
+	DarkModeTheme *Theme `json:"darkModeTheme,omitempty"`
 }
 
+// TODO Dark mode
 var (
 	elegantTheme = Theme{
 		BannerBackgroundColor: "#000000", // Black
@@ -86,6 +93,7 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	t.BannerForegroundColor = jt.BannerForegroundColor
 	t.FontName = jt.FontName
 	t.BoldFontName = jt.BoldFontName
+	t.DarkModeTheme = jt.DarkModeTheme
 
 	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)

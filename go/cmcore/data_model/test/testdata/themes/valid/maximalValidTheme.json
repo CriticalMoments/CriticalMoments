@@ -4,5 +4,13 @@
     "fontScale": 1.1,
     "fontName": "AvenirNext-Regular",
     "boldFontName": "AvenirNext-Bold",
-    "scaleFontForUserPreference": false
+    "scaleFontForUserPreference": false,
+    "darkModeTheme": {
+        "bannerBackgroundColor": "#000000",
+        "bannerForegroundColor": "#ffffff",
+        "fontScale": 0.9,
+        "fontName": "AvenirNext-RegularD",
+        "boldFontName": "AvenirNext-BoldD",
+        "scaleFontForUserPreference": false
+    }
 }

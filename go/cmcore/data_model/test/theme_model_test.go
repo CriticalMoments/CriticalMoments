@@ -200,4 +200,43 @@ func TestJsonParsingAllFieldsTheme(t *testing.T) {
 	if theme.BoldFontName != "AvenirNext-Bold" {
 		t.Fatal()
 	}
+
+	if theme.DarkModeTheme.FontScale != 0.9 {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.ScaleFontForUserPreference != false {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.BannerBackgroundColor != "#000000" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.BannerForegroundColor != "#ffffff" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.FontName != "AvenirNext-RegularD" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.BoldFontName != "AvenirNext-BoldD" {
+		t.Fatal()
+	}
+}
+
+func TestJsonParsingInvalidNestedTheme(t *testing.T) {
+	testFileData, err := os.ReadFile("./testdata/themes/invalid/invalidDarkTheme.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var theme datamodel.Theme
+	err = theme.UnmarshalJSON(testFileData)
+	if err == nil {
+		t.Fatal()
+	}
+	uerr, ok := err.(*datamodel.UserPresentableError)
+	if !ok || uerr.SourceError == nil {
+		t.Fatal("nested error not returned")
+	}
+	_, uok := uerr.SourceError.(*datamodel.UserPresentableError)
+	if !uok {
+		t.Fatal("Nested error not user presentable")
+	}
 }
