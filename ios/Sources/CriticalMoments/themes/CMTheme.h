@@ -75,6 +75,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// default sizes.
 @property(nonatomic, readwrite) float fontScale;
 
+/// A theme to be used if the user has opted to use iOS's dark mode. If unspecified the primary theme will be used in
+/// both light and dark modes.
+@property(nonatomic, readwrite) CMTheme *darkModeTheme;
+
 /// Returns a font respecting the theme settings (fontName, scaleForDynamicType,
 /// etc).  Defaults to systemFont.
 /// @param fontSize The font size to use. Will scale for dynamic type unless

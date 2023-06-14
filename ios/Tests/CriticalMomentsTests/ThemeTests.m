@@ -40,6 +40,12 @@
     XCTAssert(!testTheme.scaleFontForDynamicType, @"dynamic type integration issue");
     XCTAssert([@"Palatino-Roman" isEqualToString:testTheme.fontName], @"font name mismatch");
     XCTAssert([@"Palatino-Bold" isEqualToString:testTheme.boldFontName], @"font name mismatch");
+
+    // Dark mode reverses colors
+    XCTAssert([UIColor.redColor isEqual:testTheme.darkModeTheme.bannerForegroundColor],
+              @"banner foreground should be green on test theme");
+    XCTAssert([UIColor.greenColor isEqual:testTheme.darkModeTheme.bannerBackgroundColor],
+              @"banner background should be red on test theme");
 }
 
 @end
