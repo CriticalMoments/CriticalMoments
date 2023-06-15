@@ -11,6 +11,12 @@
 
 @import Appcore;
 
+@interface CMTheme ()
+
+@property(nonatomic, readwrite) UIColor *primaryColor;
+
+@end
+
 @implementation CMTheme
 
 - (instancetype)init {
@@ -121,6 +127,58 @@ static CMTheme *currentTheme = nil;
     return [UIColor blackColor];
 }
 
+#pragma mark Colors
+
+- (UIColor *)backgroundColor {
+    if (_backgroundColor) {
+        return _backgroundColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor systemBackgroundColor];
+    } else {
+        return [UIColor whiteColor];
+    }
+}
+
+- (UIColor *)primaryTextColor {
+    if (_primaryTextColor) {
+        return _primaryTextColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor labelColor];
+    } else {
+        return [UIColor blackColor];
+    }
+}
+
+- (UIColor *)secondaryTextColor {
+    if (_secondaryTextColor) {
+        return _secondaryTextColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor secondaryLabelColor];
+    } else {
+        return [UIColor systemGrayColor];
+    }
+}
+
+- (void)setPrimaryColor:(UIColor *)color {
+    _primaryColor = color;
+}
+
+- (UIColor *)primaryColorForView:(UIView *)view {
+    if (_primaryColor) {
+        return _primaryColor;
+    }
+    if (@available(iOS 15.0, *)) {
+        return [UIColor tintColor];
+    } else if (view) {
+        return [view tintColor];
+    } else {
+        return [UIColor systemBlueColor];
+    }
+}
+
 #pragma mark Fonts
 
 - (UIFont *)fontOfSize:(CGFloat)fontSize {
@@ -161,6 +219,14 @@ static CMTheme *currentTheme = nil;
     }
 
     return font;
+}
+
+- (CGFloat)titleFontSize {
+    return UIFont.systemFontSize * 2.2;
+}
+
+- (CGFloat)subtitleFontSize {
+    return UIFont.systemFontSize * 1.4;
 }
 
 @end

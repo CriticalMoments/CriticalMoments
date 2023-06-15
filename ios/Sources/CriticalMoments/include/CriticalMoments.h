@@ -9,6 +9,7 @@
 
 #import "../messaging/CMBannerManager.h"
 #import "../messaging/CMBannerMessage.h"
+#import "../messaging/CMSheetViewController.h"
 #import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
