@@ -17,9 +17,41 @@
     return self;
 }
 
+- (CMTheme *)theme {
+    if (self.customTheme) {
+        return self.customTheme;
+    }
+    return CMTheme.current;
+}
+
+- (UIImage *)getImageFromDatamodel {
+    // TODO case for options in data model. V1: symbol, built in.
+    UIImage *image = [self imageForSymbolImage];
+
+    if (!image) {
+        // TODO -- get fallback image
+    }
+    return image;
+}
+
 - (void)buildSubviews {
-    // TODO case for options. V1: symbol, built in.
-    [self buildSubviewsForSymbolImage];
+    UIImage *image = [self getImageFromDatamodel];
+
+    UIImageView *iv = [[UIImageView alloc] initWithImage:image];
+    iv.tintColor = [self.theme primaryColorForView:self];
+    iv.contentMode = UIViewContentModeScaleAspectFit;
+    iv.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:iv];
+
+    // Layout
+
+    NSArray<NSLayoutConstraint *> *constraints = @[
+        [iv.topAnchor constraintEqualToAnchor:self.topAnchor],
+        [iv.leftAnchor constraintEqualToAnchor:self.leftAnchor],
+        [iv.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+        [iv.rightAnchor constraintEqualToAnchor:self.rightAnchor],
+    ];
+    [NSLayoutConstraint activateConstraints:constraints];
 }
 
 /*
@@ -33,7 +65,8 @@
 
  */
 
-- (void)buildSubviewsForSymbolImage {
+- (UIImage *)imageForSymbolImage {
+    UIImage *image;
     if (@available(iOS 13.0, *)) {
         UIImageSymbolConfiguration *c = [UIImageSymbolConfiguration unspecifiedConfiguration];
 
@@ -41,24 +74,10 @@
         // [UIImageSymbolConfiguration configurationWithPointSize:<#(CGFloat)#> weight:<#(UIImageSymbolWeight)#>
         // scale:<#(UIImageSymbolScale)#>];
 
-        UIImage *image = [UIImage systemImageNamed:@"square.and.pencil" withConfiguration:c];
-        UIImageView *iv = [[UIImageView alloc] initWithImage:image];
-        iv.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:iv];
-
-        // Layout
-
-        NSArray<NSLayoutConstraint *> *constraints = @[
-            [iv.topAnchor constraintEqualToAnchor:self.topAnchor],
-            [iv.leftAnchor constraintEqualToAnchor:self.leftAnchor],
-            [iv.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
-            [iv.rightAnchor constraintEqualToAnchor:self.rightAnchor],
-        ];
-        [NSLayoutConstraint activateConstraints:constraints];
-    } else {
-        // TODO -- get fallback image
-        return;
+        // TODO hardcode
+        image = [UIImage systemImageNamed:@"square.and.pencil" withConfiguration:c];
     }
+    return image;
 }
 
 @end

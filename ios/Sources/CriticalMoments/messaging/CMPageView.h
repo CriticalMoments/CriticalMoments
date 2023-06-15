@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMPageView : UIView
 
-/// A custom theme, which will be used instead of the default theme if set
+/// The custom theme to use for the style of this page. Defaults to the default theme.
 @property(nonatomic, readwrite) CMTheme *customTheme;
 
 @end

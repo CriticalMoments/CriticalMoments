@@ -1,6 +1,12 @@
 {
     "configVersion": "v1",
     "themes": {
+        "not_defaultTheme": {
+            "bannerBackgroundColor": "#000000",
+            "bannerForegroundColor": "#ffffff",
+            "fontName": "AvenirNext-Regular",
+            "boldFontName": "AvenirNext-Bold"
+        },
         "namedThemes": {
             "blackAndWhiteTheme": {
                 "bannerBackgroundColor": "#000000",
