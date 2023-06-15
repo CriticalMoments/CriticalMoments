@@ -12,7 +12,8 @@
 
 #define CM_PAGE_SIDE_PADDING 40
 #define CM_SIMPLE_IMAGE_SIZE 40
-#define CM_MIN_BTN_WIDTH 240
+#define CM_MIN_BTN_WIDTH 280
+#define CM_SCROLL_SHIM_SIZE 20
 
 @interface CMPageStack : NSObject
 
@@ -50,7 +51,7 @@
 
     UIScrollView *scrollView = [[UIScrollView alloc] init];
     // add padding at the bottom
-    scrollView.contentInset = UIEdgeInsetsMake(0, 0, 12, 0);
+    scrollView.contentInset = UIEdgeInsetsMake(0, 0, CM_SCROLL_SHIM_SIZE, 0);
     scrollView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:scrollView];
 
@@ -63,6 +64,16 @@
     buttonArea.backgroundColor = self.theme.backgroundColor;
     buttonArea.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:buttonArea];
+
+    UIView *shimView = [[UIView alloc] init];
+    shimView.translatesAutoresizingMaskIntoConstraints = NO;
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    // layers don't autolayout, so just make it wide enough
+    gradient.frame = CGRectMake(0, 0, 5000, CM_SCROLL_SHIM_SIZE);
+    UIColor *clearBgColor = [self.theme.backgroundColor colorWithAlphaComponent:0.0];
+    gradient.colors = @[ (id)clearBgColor.CGColor, (id)self.theme.backgroundColor.CGColor ];
+    [shimView.layer insertSublayer:gradient atIndex:0];
+    [self addSubview:shimView];
 
     CMPageStack *stack = self.simpleLayoutViewStack;
     if (stack.views.count == 0) {
@@ -87,6 +98,11 @@
         [topSpace.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:0.08],
 
         [stack.views.lastObject.bottomAnchor constraintEqualToAnchor:scrollView.bottomAnchor],
+
+        [shimView.bottomAnchor constraintEqualToAnchor:buttonArea.topAnchor],
+        [shimView.leftAnchor constraintEqualToAnchor:self.leftAnchor],
+        [shimView.rightAnchor constraintEqualToAnchor:self.rightAnchor],
+        [shimView.heightAnchor constraintEqualToConstant:CM_SCROLL_SHIM_SIZE],
     ]];
 
     NSLayoutYAxisAnchor *lastTop = topSpace.bottomAnchor;
@@ -127,7 +143,7 @@
             [buttonArea addSubview:btn];
             [constraints addObjectsFromArray:@[
                 [btn.centerXAnchor constraintEqualToAnchor:buttonArea.centerXAnchor],
-                [btn.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:2.0],
+                [btn.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:1.6],
 
                 // min width
                 [btn.widthAnchor constraintGreaterThanOrEqualToConstant:CM_MIN_BTN_WIDTH],
@@ -140,9 +156,14 @@
         }
 
         // button above guide, and area
+        CGFloat belowButtonPadding = buttons.count > 1 ? 0.0 : 30.0;
         [constraints addObjectsFromArray:@[
+            // Last button up into layout margin guide. If only 1 button, move it up to more tapable position since we
+            // have space
             [buttons.lastObject.bottomAnchor
-                constraintGreaterThanOrEqualToAnchor:buttonArea.layoutMarginsGuide.bottomAnchor],
+                constraintGreaterThanOrEqualToAnchor:buttonArea.layoutMarginsGuide.bottomAnchor
+                                            constant:-belowButtonPadding],
+
             [buttonArea.bottomAnchor constraintGreaterThanOrEqualToAnchor:buttons.lastObject.bottomAnchor],
         ]];
     }
@@ -200,6 +221,8 @@
         @"dapibus mi elementum vitae. Suspendisse tempus maximus diam sed blandit. Fusce dignissim velit at dapibus "
         @"rutrum. Vestibulum sollicitudin nec nunc at molestie. Mauris vel nisi tincidunt, efficitur velit a, congue "
         @"odio.";
+    bodyLabel.text =
+        @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque ";
     bodyLabel.numberOfLines = 0; // no limit
     bodyLabel.textAlignment = NSTextAlignmentCenter;
     bodyLabel.textColor = self.theme.secondaryTextColor;
@@ -219,6 +242,8 @@
     UIButton *fifth = [CMButton buttonWithWithDataModel:@"info" andTheme:self.theme];       // text
     UIButton *sixth = [CMButton buttonWithWithDataModel:@"info-small" andTheme:self.theme]; // text
 
+    return @[ primary ];
+    return @[ secondary, sixth ];
     return @[ primary, secondary, third, forth, fifth, sixth ];
 }
 
