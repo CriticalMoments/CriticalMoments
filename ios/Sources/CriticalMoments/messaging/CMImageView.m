@@ -7,6 +7,8 @@
 
 #import "CMImageView.h"
 
+#define CM_SIMPLE_IMAGE_SIZE 40
+
 @implementation CMImageView
 
 - (instancetype)init {
@@ -32,6 +34,11 @@
         // TODO -- get fallback image
     }
     return image;
+}
+
+- (CGSize)intrinsicContentSize {
+    // TODO: adapt based on data model size
+    return CGSizeMake(CM_SIMPLE_IMAGE_SIZE, CM_SIMPLE_IMAGE_SIZE);
 }
 
 - (void)buildSubviews {
@@ -79,6 +86,7 @@
         // TODO hardcode
         image = [UIImage systemImageNamed:@"square.and.pencil" withConfiguration:c];
     }
+
     return image;
 }
 

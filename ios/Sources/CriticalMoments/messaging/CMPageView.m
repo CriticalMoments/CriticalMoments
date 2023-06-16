@@ -8,10 +8,10 @@
 #import "CMPageView.h"
 
 #import "CMButton.h"
+#import "CMGradientView.h"
 #import "CMImageView.h"
 
 #define CM_PAGE_SIDE_PADDING 40
-#define CM_SIMPLE_IMAGE_SIZE 40
 #define CM_MIN_BTN_WIDTH 280
 #define CM_SCROLL_SHIM_SIZE 20
 
@@ -65,14 +65,9 @@
     buttonArea.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:buttonArea];
 
-    UIView *shimView = [[UIView alloc] init];
+    CMGradientView *shimView = [[CMGradientView alloc] init];
+    shimView.customTheme = self.customTheme;
     shimView.translatesAutoresizingMaskIntoConstraints = NO;
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    // layers don't autolayout, so just make it wide enough
-    gradient.frame = CGRectMake(0, 0, 5000, CM_SCROLL_SHIM_SIZE);
-    UIColor *clearBgColor = [self.theme.backgroundColor colorWithAlphaComponent:0.0];
-    gradient.colors = @[ (id)clearBgColor.CGColor, (id)self.theme.backgroundColor.CGColor ];
-    [shimView.layer insertSublayer:gradient atIndex:0];
     [self addSubview:shimView];
 
     CMPageStack *stack = self.simpleLayoutViewStack;
@@ -173,11 +168,6 @@
 
 - (CMPageStack *)simpleLayoutViewStack {
     CMImageView *iv = [[CMImageView alloc] init];
-    NSArray<NSLayoutConstraint *> *constraints = @[
-        [iv.heightAnchor constraintEqualToConstant:CM_SIMPLE_IMAGE_SIZE],
-        [iv.widthAnchor constraintEqualToConstant:CM_SIMPLE_IMAGE_SIZE],
-    ];
-    [NSLayoutConstraint activateConstraints:constraints];
 
     UILabel *titleView = [[UILabel alloc] init];
     // TODO
@@ -221,8 +211,8 @@
         @"dapibus mi elementum vitae. Suspendisse tempus maximus diam sed blandit. Fusce dignissim velit at dapibus "
         @"rutrum. Vestibulum sollicitudin nec nunc at molestie. Mauris vel nisi tincidunt, efficitur velit a, congue "
         @"odio.";
-    bodyLabel.text =
-        @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque ";
+    // bodyLabel.text =
+    @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque ";
     bodyLabel.numberOfLines = 0; // no limit
     bodyLabel.textAlignment = NSTextAlignmentCenter;
     bodyLabel.textColor = self.theme.secondaryTextColor;
@@ -243,7 +233,7 @@
     UIButton *sixth = [CMButton buttonWithWithDataModel:@"info-small" andTheme:self.theme]; // text
 
     return @[ primary ];
-    return @[ secondary, sixth ];
+    // return @[ secondary, sixth ];
     return @[ primary, secondary, third, forth, fifth, sixth ];
 }
 
