@@ -17,9 +17,6 @@ func minValidTheme() datamodel.Theme {
 }
 
 func TestBuiltinThemesValid(t *testing.T) {
-	if !datamodel.ElegantTheme().Validate() {
-		t.Fatal()
-	}
 	if !datamodel.TestTheme().Validate() {
 		t.Fatal()
 	}
@@ -80,16 +77,47 @@ func TestColorValidation(t *testing.T) {
 	if !theme.Validate() {
 		t.Fatal()
 	}
-	// empty: requires you set both colors
-	theme.BannerForegroundColor = ""
+
+	// Each color should validate -- allows nil (above), allows valid, disallows invalid
+	theme.BannerForegroundColor = "#x"
 	if theme.Validate() {
-		t.Fatal()
+		t.Fatal("allowed invalid color")
 	}
-	// empty: requires you set both colors
 	theme.BannerForegroundColor = "#000000"
-	theme.BannerBackgroundColor = ""
+	if !theme.Validate() {
+		t.Fatal("disallowed valid color")
+	}
+	theme.PrimaryColor = "#x"
 	if theme.Validate() {
-		t.Fatal()
+		t.Fatal("allowed invalid color")
+	}
+	theme.PrimaryColor = "#000000"
+	if !theme.Validate() {
+		t.Fatal("disallowed valid color")
+	}
+	theme.PrimaryTextColor = "#x"
+	if theme.Validate() {
+		t.Fatal("allowed invalid color")
+	}
+	theme.PrimaryTextColor = "#000000"
+	if !theme.Validate() {
+		t.Fatal("disallowed valid color")
+	}
+	theme.SecondaryTextColor = "#x"
+	if theme.Validate() {
+		t.Fatal("allowed invalid color")
+	}
+	theme.SecondaryTextColor = "#000000"
+	if !theme.Validate() {
+		t.Fatal("disallowed valid color")
+	}
+	theme.BackgroundColor = "#x"
+	if theme.Validate() {
+		t.Fatal("allowed invalid color")
+	}
+	theme.BackgroundColor = "#000000"
+	if !theme.Validate() {
+		t.Fatal("disallowed valid color")
 	}
 }
 
@@ -194,6 +222,19 @@ func TestJsonParsingAllFieldsTheme(t *testing.T) {
 	if theme.BannerForegroundColor != "#000000" {
 		t.Fatal()
 	}
+	if theme.PrimaryColor != "#ff0000" {
+		t.Fatal()
+	}
+	if theme.BackgroundColor != "#ffffff" {
+		t.Fatal()
+	}
+	if theme.PrimaryTextColor != "#ff0000" {
+		t.Fatal()
+	}
+	if theme.SecondaryTextColor != "#00ff00" {
+		t.Fatal()
+	}
+
 	if theme.FontName != "AvenirNext-Regular" {
 		t.Fatal()
 	}
@@ -217,6 +258,18 @@ func TestJsonParsingAllFieldsTheme(t *testing.T) {
 		t.Fatal()
 	}
 	if theme.DarkModeTheme.BoldFontName != "AvenirNext-BoldD" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.PrimaryColor != "#ff0000" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.BackgroundColor != "#ffffff" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.PrimaryTextColor != "#ff0000" {
+		t.Fatal()
+	}
+	if theme.DarkModeTheme.SecondaryTextColor != "#00ff00" {
 		t.Fatal()
 	}
 }

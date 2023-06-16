@@ -78,11 +78,6 @@ static CMTheme *currentTheme = nil;
 
 #pragma mark Built in themes
 
-+ (CMTheme *)elegantTheme {
-    DatamodelTheme *appcoreTheme = DatamodelElegantTheme();
-    return [CMTheme themeFromAppcoreTheme:appcoreTheme];
-}
-
 + (CMTheme *)testTheme {
     DatamodelTheme *appcoreTheme = DatamodelTestTheme();
     return [CMTheme themeFromAppcoreTheme:appcoreTheme];
@@ -96,6 +91,12 @@ static CMTheme *currentTheme = nil;
     // banners
     theme.bannerBackgroundColor = [CMUtils colorFromHexString:acTheme.bannerBackgroundColor];
     theme.bannerForegroundColor = [CMUtils colorFromHexString:acTheme.bannerForegroundColor];
+
+    // colors
+    theme.primaryColor = [CMUtils colorFromHexString:acTheme.primaryColor];
+    theme.backgroundColor = [CMUtils colorFromHexString:acTheme.backgroundColor];
+    theme.primaryTextColor = [CMUtils colorFromHexString:acTheme.primaryColor];
+    theme.secondaryTextColor = [CMUtils colorFromHexString:acTheme.secondaryTextColor];
 
     // fonts
     theme.fontName = acTheme.fontName.length > 0 ? acTheme.fontName : nil;

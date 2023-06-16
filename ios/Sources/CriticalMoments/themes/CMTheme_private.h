@@ -6,6 +6,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 // _private header prevents exposing these to public SDK.
 
+/// :nodoc: Test Theme for e2e testing
++ (CMTheme *)testTheme;
+
 /**
  :nodoc:
  @param acTheme The appcore theme to convert to CMTheme

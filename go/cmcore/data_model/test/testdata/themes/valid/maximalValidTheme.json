@@ -5,12 +5,20 @@
     "fontName": "AvenirNext-Regular",
     "boldFontName": "AvenirNext-Bold",
     "scaleFontForUserPreference": false,
+	"primaryColor":               "#ff0000",
+	"backgroundColor":            "#ffffff",
+	"primaryTextColor":           "#ff0000",
+	"secondaryTextColor":         "#00ff00",
     "darkModeTheme": {
         "bannerBackgroundColor": "#000000",
         "bannerForegroundColor": "#ffffff",
         "fontScale": 0.9,
         "fontName": "AvenirNext-RegularD",
         "boldFontName": "AvenirNext-BoldD",
-        "scaleFontForUserPreference": false
+        "scaleFontForUserPreference": false,
+        "primaryColor":               "#ff0000",
+        "backgroundColor":            "#ffffff",
+        "primaryTextColor":           "#ff0000",
+        "secondaryTextColor":         "#00ff00"
     }
 }

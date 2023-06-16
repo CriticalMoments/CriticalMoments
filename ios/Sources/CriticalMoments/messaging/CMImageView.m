@@ -37,6 +37,8 @@
 - (void)buildSubviews {
     UIImage *image = [self getImageFromDatamodel];
 
+    // TODO size = 0 or return nil if can't create an image. Don't want empty space.
+
     UIImageView *iv = [[UIImageView alloc] initWithImage:image];
     iv.tintColor = [self.theme primaryColorForView:self];
     iv.contentMode = UIViewContentModeScaleAspectFit;
