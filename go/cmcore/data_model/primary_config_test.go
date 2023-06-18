@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 10 {
+	if len(pc.namedActions) != 11 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -99,6 +99,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	_, ok = ra.actionData.(*ReviewAction)
 	if !ok {
 		t.Fatal("Review action failed to parse")
+	}
+	ma := pc.ActionWithName("modalAction")
+	if ma.ModalAction == nil || len(ma.ModalAction.Content.Sections) != 1 {
+		t.Fatal("failed to parse modal action")
 	}
 
 	// Triggers

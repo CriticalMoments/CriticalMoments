@@ -1,0 +1,22 @@
+{
+    "showCloseButton": false,
+    "customThemeName": "theme1",
+    "content": {
+        "sections": [
+            {
+                "pageSectionType": "title",
+                "pageSectionData": {
+                    "title": "title1"
+                }
+            }
+        ],
+        "buttons": [
+            {
+                "title": "button1",
+                "preventDefault": true,
+                "style": "large",
+                "actionName": "action1"
+            }
+        ]
+    }
+}

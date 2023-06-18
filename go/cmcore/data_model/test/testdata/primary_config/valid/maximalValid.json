@@ -98,6 +98,23 @@
             },
             "reviewAction": {
                 "actionType": "review_prompt"
+            },
+            "modalAction": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": false,
+                    "customTheme": "theme1",
+                    "content": {
+                        "sections": [
+                            {
+                                "pageSectionType": "title",
+                                "pageSectionData": {
+                                    "title": "title1"
+                                }
+                            }
+                        ]
+                    }
+                }
             }
         }
     },

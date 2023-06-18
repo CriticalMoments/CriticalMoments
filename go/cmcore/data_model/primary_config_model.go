@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+// Enables "Strict mode" validation for datamodel parsing
+// Should only be enabled where we know the library is the latest version, which typically
+// is not true. Will throw errors for unrecognized types, which could break forwards compatibility.
+var StrictDatamodelParsing = false
+
 type PrimaryConfig struct {
 	// Version number
 	ConfigVersion string
