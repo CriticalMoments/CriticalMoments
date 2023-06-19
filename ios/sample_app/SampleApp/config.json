@@ -291,13 +291,13 @@
                         "buttons": [
                             {
                                 "title": "Got it!",
-                                "preventDefault": true,
                                 "style": "large"
                             },
                             {
                                 "title": "More info",
                                 "preventDefault": true,
-                                "style": "info"
+                                "style": "info",
+                                "actionName": "web_link_action"
                             }
                         ]
                     }

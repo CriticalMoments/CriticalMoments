@@ -54,6 +54,10 @@
     if (self.customTheme) {
         pv.customTheme = self.customTheme;
     }
+    __weak CMModalViewController *weakSelf = self;
+    pv.anyButtonDefaultAction = ^{
+      [weakSelf dismissSheet];
+    };
     pv.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:pv];
 
@@ -89,9 +93,16 @@
 }
 
 - (void)closeButtonTapped:(UIButton *)sender {
-    UIViewController *pvc = self.presentingViewController;
-    [pvc dismissViewControllerAnimated:YES completion:nil];
-    // TODO dispatch event for dismissed based on sheet name? if so need to get the swipe dismissal as well
+    [self dismissSheet];
+}
+
+- (void)dismissSheet {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      UIViewController *pvc = self.presentingViewController;
+      [pvc dismissViewControllerAnimated:YES completion:nil];
+
+      // TODO dispatch event for "sheet dismissed" based on sheet name? if so need to get the swipe dismissal as well
+    });
 }
 
 @end

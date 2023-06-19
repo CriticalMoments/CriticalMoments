@@ -34,6 +34,7 @@
     return self;
 }
 
+// TODO: if set after init, will this have any effect??
 - (CMTheme *)theme {
     if (self.customTheme) {
         return self.customTheme;
@@ -119,14 +120,12 @@
         lastTop = view.bottomAnchor;
     };
 
-    NSArray<UIButton *> *buttons = [self buttons:model];
+    NSArray<CMButton *> *buttons = [self buttons:model];
     if (buttons.count == 0) {
-        // TODO test this
         [constraints addObjectsFromArray:@[
             [buttonArea.heightAnchor constraintEqualToConstant:0],
         ]];
     } else {
-        // TODO layoutGuide
         NSLayoutYAxisAnchor *lastTop = buttonArea.topAnchor;
         for (UIButton *btn in buttons) {
             btn.translatesAutoresizingMaskIntoConstraints = NO;
@@ -240,8 +239,8 @@
     return bodyLabel;
 }
 
-- (NSArray<UIButton *> *)buttons:(DatamodelPage *)model {
-    NSMutableArray<UIButton *> *buttons = [[NSMutableArray alloc] init];
+- (NSArray<CMButton *> *)buttons:(DatamodelPage *)model {
+    NSMutableArray<CMButton *> *buttons = [[NSMutableArray alloc] init];
 
     // TODO: preventDefault
     // TODO: actionName
@@ -251,9 +250,15 @@
         if (!buttonModel)
             continue;
 
-        UIButton *button = [CMButton buttonWithWithDataModel:buttonModel andTheme:self.customTheme];
+        CMButton *button = [[CMButton alloc] initWithWithDataModel:buttonModel andTheme:self.customTheme];
         if (button) {
             [buttons addObject:button];
+            __weak CMPageView *weakSelf = self;
+            button.defaultAction = ^{
+              if (weakSelf.anyButtonDefaultAction) {
+                  weakSelf.anyButtonDefaultAction();
+              }
+            };
         }
     }
 

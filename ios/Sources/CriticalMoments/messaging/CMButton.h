@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMButton : UIButton
+@interface CMButton : UIView
 
 // TODO Private? Or confirm not exported?
 
@@ -23,7 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
 // TODO: actual CMButton that contains a UIButton? init method, callbacks, ... yeah.
 
 /// :nodoc:
-+ (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme;
+- (instancetype)initWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme;
+
+/// :nodoc:
+// the "default" action, which won't be called if the model has preventDefault=true
+@property(nonatomic, copy, nullable) void (^defaultAction)();
 
 @end
 

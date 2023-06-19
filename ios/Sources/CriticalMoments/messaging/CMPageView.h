@@ -26,6 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// The custom theme to use for the style of this page. Defaults to the default theme.
 @property(nonatomic, readwrite) CMTheme *customTheme;
 
+/// :nodoc:
+// the "default" action, which will be called after any button tap
+@property(nonatomic, copy, nullable) void (^anyButtonDefaultAction)();
+
 @end
 
 NS_ASSUME_NONNULL_END

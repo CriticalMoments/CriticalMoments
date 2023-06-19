@@ -11,7 +11,59 @@
 #define CM_OS_BUTTON_FONT_SIZE 17.0
 #define CM_SMALL_BUTTON_FONT_SIZE 15.0
 
+@interface CMButton ()
+
+@property(nonatomic, strong) CMTheme *customTheme;
+@property(nonatomic, strong) DatamodelButton *model;
+@property(nonatomic, strong) UIButton *buttonView;
+
+@end
+
 @implementation CMButton
+
+- (instancetype)initWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *)theme {
+    self = [super init];
+    if (self) {
+        _model = model;
+        _customTheme = theme;
+
+        self.buttonView = [CMButton buttonWithWithDataModel:self.model andTheme:self.customTheme];
+        [self addSubview:self.buttonView];
+
+        [self.buttonView addTarget:self
+                            action:@selector(buttonTapped:)
+                  forControlEvents:UIControlEventPrimaryActionTriggered];
+    }
+    return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.buttonView.frame = self.bounds;
+}
+
+- (CGSize)intrinsicContentSize {
+    return self.buttonView.intrinsicContentSize;
+}
+
+- (void)buttonTapped:(UIButton *)target {
+    // two actions fire:
+    // 1) the model's named action, if it exists
+    // 2) the system's default action, unless prevent default (eg: dismiss modal)
+
+    if (self.model.actionName.length > 0) {
+        // TODO: embedded browers not working overtop of sheets!! Common use case
+        NSError *error;
+        [AppcoreSharedAppcore() performNamedAction:self.model.actionName error:&error];
+        if (error) {
+            NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
+        }
+    }
+
+    if (!self.model.preventDefault && self.defaultAction) {
+        self.defaultAction();
+    }
+}
 
 + (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme {
     UIButton *button;
