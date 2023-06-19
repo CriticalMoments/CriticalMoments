@@ -26,10 +26,10 @@
 
 @implementation CMPageView
 
-- (instancetype)init {
+- (instancetype)initWithDatamodel:(DatamodelPage *)model {
     self = [super init];
     if (self) {
-        [self buildSubviews];
+        [self buildSubviewsFromModel:model];
     }
     return self;
 }
@@ -41,12 +41,7 @@
     return CMTheme.current;
 }
 
-- (void)buildSubviews {
-    // TODO case for layouts
-    [self buildSubviewsForSimpleLayout];
-}
-
-- (void)buildSubviewsForSimpleLayout {
+- (void)buildSubviewsFromModel:(DatamodelPage *)model {
     self.backgroundColor = self.theme.backgroundColor;
 
     UIScrollView *scrollView = [[UIScrollView alloc] init];
@@ -70,7 +65,7 @@
     shimView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:shimView];
 
-    CMPageStack *stack = self.simpleLayoutViewStack;
+    CMPageStack *stack = [self buildPageStack:model];
     if (stack.views.count == 0) {
         return;
     }
@@ -124,7 +119,7 @@
         lastTop = view.bottomAnchor;
     };
 
-    NSArray<UIButton *> *buttons = [self buttons];
+    NSArray<UIButton *> *buttons = [self buttons:model];
     if (buttons.count == 0) {
         // TODO test this
         [constraints addObjectsFromArray:@[
@@ -166,75 +161,103 @@
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
-- (CMPageStack *)simpleLayoutViewStack {
-    CMImageView *iv = [[CMImageView alloc] init];
+- (CMPageStack *)buildPageStack:(DatamodelPage *)model {
+    NSMutableArray<UIView *> *views = [[NSMutableArray alloc] init];
+    NSMutableArray<NSNumber *> *spaces = [[NSMutableArray alloc] init];
 
-    UILabel *titleView = [[UILabel alloc] init];
-    // TODO
-    titleView.text = @"Important Announcement!";
-    titleView.numberOfLines = 0; // no limit
-    titleView.textAlignment = NSTextAlignmentCenter;
-    titleView.textColor = self.theme.primaryTextColor;
-    titleView.font = [self.theme boldFontOfSize:self.theme.titleFontSize];
+    for (int i = 0; i < model.sectionCount; i++) {
+        DatamodelPageSection *section = [model sectionAtIndex:i];
+        if (!section)
+            continue;
 
-    UILabel *subtitle = [[UILabel alloc] init];
-    // TODO
-    subtitle.text = @"New pricing coming soon.";
-    subtitle.numberOfLines = 0; // no limit
-    subtitle.textAlignment = NSTextAlignmentCenter;
-    subtitle.textColor = self.theme.primaryTextColor;
-    subtitle.font = [self.theme boldFontOfSize:self.theme.subtitleFontSize];
+        UIView *sectionView = [self viewForSection:section];
+        if (!sectionView)
+            continue;
 
-    UILabel *bodyLabel = [[UILabel alloc] init];
-    // TODO
-    bodyLabel.text =
-        @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque "
-        @"sagittis, ultrices lacus. Praesent sed mattis odio, a feugiat risus. Aliquam erat volutpat. Quisque "
-        @"condimentum leo sapien, nec ullamcorper diam viverra sollicitudin. Nam id laoreet metus. Ut quis maximus "
-        @"lacus. Aliquam sodales dui quis leo ullamcorper porta. Sed sed varius enim. Vivamus viverra consectetur erat "
-        @"sit amet eleifend. Morbi facilisis, dolor a placerat rhoncus, lorem dolor egestas mauris, vel tincidunt sem "
-        @"nisi a ante. Donec eget elit rhoncus, ornare leo vel, pharetra ipsum. Maecenas at dolor non dolor feugiat "
-        @"condimentum. Suspendisse nec dignissim magna. Maecenas at sem eu ante egestas tempor. Duis enim enim, "
-        @"faucibus sed turpis sit amet, ultricies feugiat turpis. Quisque posuere sagittis mauris, et tempus diam "
-        @"maximus vel. Curabitur eget quam eu nisl elementum tincidunt faucibus in eros. Morbi suscipit lorem nisi, at "
-        @"dapibus mi elementum vitae. Suspendisse tempus maximus diam sed blandit. Fusce dignissim velit at dapibus "
-        @"rutrum. Vestibulum sollicitudin nec nunc at molestie. Mauris vel nisi tincidunt, efficitur velit a, congue "
-        @"odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque "
-        @"sagittis, ultrices lacus. Praesent sed mattis odio, a feugiat risus. Aliquam erat volutpat. Quisque "
-        @"condimentum leo sapien, nec ullamcorper diam viverra sollicitudin. Nam id laoreet metus. Ut quis maximus "
-        @"lacus. Aliquam sodales dui quis leo ullamcorper porta. Sed sed varius enim. Vivamus viverra consectetur erat "
-        @"sit amet eleifend. Morbi facilisis, dolor a placerat rhoncus, lorem dolor egestas mauris, vel tincidunt sem "
-        @"nisi a ante. Donec eget elit rhoncus, ornare leo vel, pharetra ipsum. Maecenas at dolor non dolor feugiat "
-        @"condimentum. Suspendisse nec dignissim magna. Maecenas at sem eu ante egestas tempor. Duis enim enim, "
-        @"faucibus sed turpis sit amet, ultricies feugiat turpis. Quisque posuere sagittis mauris, et tempus diam "
-        @"maximus vel. Curabitur eget quam eu nisl elementum tincidunt faucibus in eros. Morbi suscipit lorem nisi, at "
-        @"dapibus mi elementum vitae. Suspendisse tempus maximus diam sed blandit. Fusce dignissim velit at dapibus "
-        @"rutrum. Vestibulum sollicitudin nec nunc at molestie. Mauris vel nisi tincidunt, efficitur velit a, congue "
-        @"odio.";
-    // bodyLabel.text =
-    @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque ";
-    bodyLabel.numberOfLines = 0; // no limit
-    bodyLabel.textAlignment = NSTextAlignmentCenter;
-    bodyLabel.textColor = self.theme.secondaryTextColor;
-    bodyLabel.font = [self.theme fontOfSize:UIFont.systemFontSize];
+        [views addObject:sectionView];
+        [spaces addObject:@(section.topSpacingScale)];
+    }
 
     CMPageStack *stack = [[CMPageStack alloc] init];
-    stack.views = @[ iv, titleView, subtitle, bodyLabel ];
-    stack.spaceMultiplier = @[ @0, @1, @1.5, @4 ];
+    stack.views = views;
+    stack.spaceMultiplier = spaces;
     return stack;
 }
 
-- (NSArray<UIButton *> *)buttons {
-    UIButton *primary = [CMButton buttonWithWithDataModel:@"large" andTheme:self.theme];    // large fill
-    UIButton *secondary = [CMButton buttonWithWithDataModel:@"normal" andTheme:self.theme]; // fill
-    UIButton *third = [CMButton buttonWithWithDataModel:@"secondary" andTheme:self.theme];  // tinted
-    UIButton *forth = [CMButton buttonWithWithDataModel:@"tertiary" andTheme:self.theme];   // grey
-    UIButton *fifth = [CMButton buttonWithWithDataModel:@"info" andTheme:self.theme];       // text
-    UIButton *sixth = [CMButton buttonWithWithDataModel:@"info-small" andTheme:self.theme]; // text
+- (UIView *)viewForSection:(DatamodelPageSection *)section {
+    // Titles
+    if ([DatamodelSectionTypeEnumTitle isEqualToString:section.pageSectionType]) {
+        return [self buildTitleView:section.titleData];
+    }
 
-    return @[ primary ];
-    // return @[ secondary, sixth ];
-    return @[ primary, secondary, third, forth, fifth, sixth ];
+    // Body
+    if ([DatamodelSectionTypeEnumBodyText isEqualToString:section.pageSectionType]) {
+        return [self buildBodyView:section.bodyData];
+    }
+
+    return nil;
+}
+
+- (UIView *)buildTitleView:(DatamodelTitlePageSection *)titleData {
+    UILabel *titleView = [[UILabel alloc] init];
+
+    titleView.text = titleData.title;
+    titleView.numberOfLines = 0; // no limit
+    if (titleData.centerText) {
+        titleView.textAlignment = NSTextAlignmentCenter;
+    }
+    titleView.textColor = self.theme.primaryTextColor;
+
+    CGFloat fontSize = self.theme.titleFontSize * titleData.scaleFactor;
+    if (titleData.bold) {
+        titleView.font = [self.theme boldFontOfSize:fontSize];
+    } else {
+        titleView.font = [self.theme fontOfSize:fontSize];
+    }
+    return titleView;
+}
+
+- (UIView *)buildBodyView:(DatamodelBodyPageSection *)bodyData {
+    UILabel *bodyLabel = [[UILabel alloc] init];
+    bodyLabel.text = bodyData.bodyText;
+    bodyLabel.numberOfLines = 0; // no limit
+    if (bodyData.centerText) {
+        bodyLabel.textAlignment = NSTextAlignmentCenter;
+    }
+    if (bodyData.usePrimaryTextColor) {
+        bodyLabel.textColor = self.theme.primaryTextColor;
+    } else {
+        bodyLabel.textColor = self.theme.secondaryTextColor;
+    }
+
+    CGFloat fontSize = UIFont.systemFontSize * bodyData.scaleFactor;
+    if (bodyData.bold) {
+        bodyLabel.font = [self.theme boldFontOfSize:fontSize];
+    } else {
+        bodyLabel.font = [self.theme fontOfSize:fontSize];
+    }
+
+    return bodyLabel;
+}
+
+- (NSArray<UIButton *> *)buttons:(DatamodelPage *)model {
+    NSMutableArray<UIButton *> *buttons = [[NSMutableArray alloc] init];
+
+    // TODO: preventDefault
+    // TODO: actionName
+
+    for (int i = 0; i < model.buttonsCount; i++) {
+        DatamodelButton *buttonModel = [model buttonAtIndex:i];
+        if (!buttonModel)
+            continue;
+
+        UIButton *button = [CMButton buttonWithWithDataModel:buttonModel andTheme:self.customTheme];
+        if (button) {
+            [buttons addObject:button];
+        }
+    }
+
+    return buttons;
 }
 
 @end

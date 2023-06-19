@@ -29,17 +29,13 @@
     CMDemoAction *announceSheet = [[CMDemoAction alloc] init];
     announceSheet.title = @"Show Annoucement Sheet";
     announceSheet.subtitle = @"Display a sheet with announement/information for the user";
-    // announceSheet.actionCMActionName = @"show_notice_alert";
-    announceSheet.actionBlock = ^{
-      CMSheetViewController *sheetVc = [[CMSheetViewController alloc] init];
-      [Utils.keyWindow.rootViewController presentViewController:sheetVc animated:YES completion:nil];
-    };
+    announceSheet.actionCMActionName = @"simpleModalAction";
     [announceSheet addResetTestTarget:self action:@selector(dismissSheets)];
     [self addActionToRootSection:announceSheet];
 }
 
 - (void)dismissSheets {
-    [Utils.keyWindow.rootViewController.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    [Utils.keyWindow.rootViewController.presentedViewController dismissViewControllerAnimated:NO completion:nil];
 }
 
 @end

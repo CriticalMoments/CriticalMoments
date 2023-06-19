@@ -13,23 +13,21 @@
 
 @implementation CMButton
 
-+ (UIButton *)buttonWithWithDataModel:(NSObject *)o andTheme:(CMTheme *)theme {
++ (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme {
     UIButton *button;
 
     if (@available(iOS 15.0, *)) {
-        // TODO: real data model prop
-        NSString *buttonType = o;
         UIButtonConfiguration *c;
-        if ([@"large" isEqualToString:buttonType]) {
+        if ([@"large" isEqualToString:model.style]) {
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.buttonSize = UIButtonConfigurationSizeLarge;
-        } else if ([@"secondary" isEqualToString:buttonType]) {
+        } else if ([@"secondary" isEqualToString:model.style]) {
             c = UIButtonConfiguration.tintedButtonConfiguration;
-        } else if ([@"tertiary" isEqualToString:buttonType]) {
+        } else if ([@"tertiary" isEqualToString:model.style]) {
             c = UIButtonConfiguration.grayButtonConfiguration;
-        } else if ([@"info" isEqualToString:buttonType]) {
+        } else if ([@"info" isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
-        } else if ([@"info-small" isEqualToString:buttonType]) {
+        } else if ([@"info-small" isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
         } else {
             // normal and any other value
@@ -37,12 +35,11 @@
         }
 
         // custom font (font, and size for info-small)
-        NSLog(@"");
         c.titleTextAttributesTransformer = ^NSDictionary<NSAttributedStringKey, id> *_Nonnull(
             NSDictionary<NSAttributedStringKey, id> *_Nonnull incoming) {
             NSMutableDictionary<NSAttributedStringKey, id> *outgoing = [incoming mutableCopy];
             CGFloat fontSize =
-                [@"info-small" isEqualToString:buttonType] ? CM_SMALL_BUTTON_FONT_SIZE : CM_OS_BUTTON_FONT_SIZE;
+                [@"info-small" isEqualToString:model.style] ? CM_SMALL_BUTTON_FONT_SIZE : CM_OS_BUTTON_FONT_SIZE;
             outgoing[NSFontAttributeName] = [theme fontOfSize:fontSize];
             return outgoing;
         };
@@ -64,12 +61,10 @@
         UIColor *tintColor = [theme primaryColorForView:button];
         UIColor *backgroundColor = tintColor;
 
-        // TODO: real data model prop
-        NSString *buttonType = o;
         CGFloat fontSize = CM_OS_BUTTON_FONT_SIZE;
-        if ([@"large" isEqualToString:buttonType]) {
+        if ([@"large" isEqualToString:model.style]) {
             button.contentEdgeInsets = UIEdgeInsetsMake(14, 0, 14, 0);
-        } else if ([@"secondary" isEqualToString:buttonType]) {
+        } else if ([@"secondary" isEqualToString:model.style]) {
             // emulate iOS 15 tinted
             CGFloat h, s, b, a;
             [button setTitleColor:tintColor forState:UIControlStateNormal];
@@ -86,17 +81,17 @@
                                              brightness:MAX(MIN(b + 0.1, 1.0), 0.0)
                                                   alpha:1];
             }
-        } else if ([@"tertiary" isEqualToString:buttonType]) {
+        } else if ([@"tertiary" isEqualToString:model.style]) {
             [button setTitleColor:tintColor forState:UIControlStateNormal];
             if (@available(iOS 13.0, *)) {
                 backgroundColor = [UIColor systemGray5Color];
             } else {
                 backgroundColor = [UIColor colorWithRed:0.91 green:0.91 blue:0.91 alpha:1.0];
             }
-        } else if ([@"info" isEqualToString:buttonType]) {
+        } else if ([@"info" isEqualToString:model.style]) {
             backgroundColor = [UIColor clearColor];
             [button setTitleColor:tintColor forState:UIControlStateNormal];
-        } else if ([@"info-small" isEqualToString:buttonType]) {
+        } else if ([@"info-small" isEqualToString:model.style]) {
             backgroundColor = [UIColor clearColor];
             [button setTitleColor:tintColor forState:UIControlStateNormal];
             fontSize = CM_SMALL_BUTTON_FONT_SIZE;
@@ -108,8 +103,7 @@
         button.titleLabel.font = [theme fontOfSize:fontSize];
     }
 
-    // TODO: real value
-    [button setTitle:o forState:UIControlStateNormal];
+    [button setTitle:model.title forState:UIControlStateNormal];
 
     return button;
 }

@@ -9,12 +9,21 @@
 
 #import "../themes/CMTheme.h"
 
+@import Appcore;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CMButton : UIButton
 
-// TODO data model
-+ (UIButton *)buttonWithWithDataModel:(NSObject *)o andTheme:(CMTheme *_Nullable)theme;
+// TODO Private? Or confirm not exported?
+
+/// :nodoc:
+- (instancetype)init NS_UNAVAILABLE;
+
+// TODO: actual CMButton that contains a UIButton? init method, callbacks, ... yeah.
+
+/// :nodoc:
++ (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme;
 
 @end
 

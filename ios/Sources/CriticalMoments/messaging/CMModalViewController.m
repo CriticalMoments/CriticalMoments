@@ -5,22 +5,36 @@
 //  Created by Steve Cosman on 2023-06-14.
 //
 
-#import "CMSheetViewController.h"
+#import "CMModalViewController.h"
 
+#import "../themes/CMTheme_private.h"
 #import "CMPageView.h"
 
-@interface CMSheetViewController ()
+@interface CMModalViewController ()
 
+@property(nonnull, strong, readwrite) DatamodelModalAction *model;
 @property(nonnull, strong, readwrite) UIButton *closeButton;
+@property(nonatomic, readwrite) CMTheme *customTheme;
 
 @end
 
-@implementation CMSheetViewController
+@implementation CMModalViewController
 
-- (instancetype)init {
+- (instancetype)initWithDatamodel:(DatamodelModalAction *)model {
     self = [super init];
     if (self) {
-        self.showCloseButton = YES;
+        self.model = model;
+        if (model.customThemeName.length > 0) {
+            CMTheme *customTheme = [CMTheme namedThemeFromAppcore:model.customThemeName];
+            self.customTheme = customTheme;
+        }
+
+        // prevents swipe to dismiss
+        if (@available(iOS 13.0, *)) {
+            self.modalInPresentation = !model.showCloseButton;
+        } else {
+            // TODO P0 confirm: sheets are new in 13 so might be no-op
+        }
     }
     return self;
 }
@@ -36,7 +50,7 @@
     }
     self.view.backgroundColor = theme.backgroundColor;
 
-    CMPageView *pv = [[CMPageView alloc] init];
+    CMPageView *pv = [[CMPageView alloc] initWithDatamodel:self.model.content];
     if (self.customTheme) {
         pv.customTheme = self.customTheme;
     }
@@ -52,7 +66,7 @@
         [closeBtn setTitle:@"✕" forState:UIControlStateNormal];
         [closeBtn setTitleColor:theme.primaryTextColor forState:UIControlStateNormal];
     }
-    closeBtn.hidden = !_showCloseButton;
+    closeBtn.hidden = !self.model.showCloseButton;
     closeBtn.translatesAutoresizingMaskIntoConstraints = NO;
     [closeBtn addTarget:self
                   action:@selector(closeButtonTapped:)
@@ -72,18 +86,6 @@
         [pv.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
-}
-
-- (void)setShowCloseButton:(BOOL)allowDismissing {
-    _showCloseButton = allowDismissing;
-    if (@available(iOS 13.0, *)) {
-        self.modalInPresentation = !allowDismissing;
-    } else {
-        // TODO P0
-        // sheets are new in 13 so might be no-op
-    }
-
-    _closeButton.hidden = !_showCloseButton;
 }
 
 - (void)closeButtonTapped:(UIButton *)sender {

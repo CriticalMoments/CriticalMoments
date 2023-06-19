@@ -20,7 +20,7 @@ func TestModalValidation(t *testing.T) {
 		BodyText:    "body",
 	}
 	s.pageSectionData = s.BodyData
-	m.Content = Page{
+	m.Content = &Page{
 		Sections: []*PageSection{&s},
 	}
 	if !m.Validate() {

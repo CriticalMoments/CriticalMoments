@@ -155,6 +155,7 @@ type TitlePageSection struct {
 	Title       string
 	ScaleFactor float64
 	Bold        bool
+	CenterText  bool
 }
 
 func unpackTitleSection(data map[string]interface{}, s *PageSection) (pageSectionTypeInterface, error) {
@@ -172,11 +173,16 @@ func unpackTitleSection(data map[string]interface{}, s *PageSection) (pageSectio
 	if !ok {
 		bold = true
 	}
+	centerText, ok := data["centerText"].(bool)
+	if !ok {
+		centerText = true
+	}
 
 	td := TitlePageSection{
 		Title:       title,
 		ScaleFactor: scaleFactor,
 		Bold:        bold,
+		CenterText:  centerText,
 	}
 	s.TitleData = &td
 
@@ -246,4 +252,22 @@ func (t BodyPageSection) ValidateReturningUserReadableIssue() string {
 	}
 
 	return ""
+}
+
+// Enumerators because go mobile doesn't support arrays...
+
+func (p *Page) ButtonsCount() int {
+	return len(p.Buttons)
+}
+
+func (p *Page) ButtonAtIndex(i int) *Button {
+	return p.Buttons[i]
+}
+
+func (p *Page) SectionCount() int {
+	return len(p.Sections)
+}
+
+func (p *Page) SectionAtIndex(i int) *PageSection {
+	return p.Sections[i]
 }

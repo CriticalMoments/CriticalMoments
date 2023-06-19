@@ -260,6 +260,48 @@
             "reviewAction": {
                 "actionType": "review_prompt",
                 "actionData": {}
+            },
+            "simpleModalAction": {
+                "actionType": "modal",
+                "actionData": {
+                    "content": {
+                        "sections": [
+                            {
+                                "pageSectionType": "title",
+                                "pageSectionData": {
+                                    "title": "Important Announcement"
+                                }
+                            },
+                            {
+                                "pageSectionType": "title",
+                                "topSpacingScale": 1.5,
+                                "pageSectionData": {
+                                    "title": "New pricing coming soon.",
+                                    "scaleFactor": 0.64
+                                }
+                            },
+                            {
+                                "pageSectionType": "body",
+                                "topSpacingScale": 4,
+                                "pageSectionData": {
+                                    "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec eros imperdiet, ullamcorper neque."
+                                }
+                            }
+                        ],
+                        "buttons": [
+                            {
+                                "title": "Got it!",
+                                "preventDefault": true,
+                                "style": "large"
+                            },
+                            {
+                                "title": "More info",
+                                "preventDefault": true,
+                                "style": "info"
+                            }
+                        ]
+                    }
+                }
             }
         }
     },

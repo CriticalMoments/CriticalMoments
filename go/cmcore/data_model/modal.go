@@ -5,7 +5,7 @@ import (
 )
 
 type ModalAction struct {
-	Content         Page
+	Content         *Page
 	ShowCloseButton bool
 	CustomThemeName string
 }
@@ -31,6 +31,9 @@ func (m *ModalAction) Validate() bool {
 }
 
 func (m *ModalAction) ValidateReturningUserReadableIssue() string {
+	if m.Content == nil {
+		return "Modals must have content"
+	}
 	if contentErr := m.Content.ValidateReturningUserReadableIssue(); contentErr != "" {
 		return contentErr
 	}
@@ -51,7 +54,7 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 		showCloseButton = *jm.ShowCloseButton
 	}
 
-	m.Content = jm.Content
+	m.Content = &jm.Content
 	m.CustomThemeName = jm.CustomThemeName
 	m.ShowCloseButton = showCloseButton
 

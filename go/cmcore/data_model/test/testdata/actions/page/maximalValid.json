@@ -5,6 +5,7 @@
             "topSpacingScale": 1.1,
             "pageSectionData": {
                 "title": "title1",
+                "centerText": false,
                 "scaleFactor": 1.2,
                 "bold": false
             }
