@@ -109,3 +109,32 @@ func TestJsonParsingImages(t *testing.T) {
 		t.Fatal("Symbold defaults failed parse check")
 	}
 }
+
+func TestJsonParsingFutureImages(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/image/futureproof.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var i Image
+	err = json.Unmarshal(testFileData, &i)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if i.SymbolImageData.Mode != SystemSymbolModeEnumMono {
+		t.Fatal("Future mode didn't fallback for older client")
+	}
+	if i.SymbolImageData.Weight != SystemSymbolWeightEnumRegular {
+		t.Fatal("Future weight didn't fallback for older client")
+	}
+
+	// Strict mode should fail since we have an unknown types
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &i)
+	if err == nil {
+		t.Fatal("allowed unknown types in symbol")
+	}
+}

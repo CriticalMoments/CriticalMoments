@@ -63,12 +63,12 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := imageTypeRegistry[i.ImageType]
 	if !ok {
-		errString := fmt.Sprintf("CriticalMoments: Unsupported image type: \"%v\" found in config file. This image will be ignored. If unexpected, check the CM config file.\n", i.ImageType)
+		errString := fmt.Sprintf("Unsupported image type: \"%v\" found in config file.", i.ImageType)
 		if StrictDatamodelParsing {
 			return NewUserPresentableError(errString)
 		} else {
 			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
-			fmt.Println(errString)
+			fmt.Printf("CriticalMoments: %v This image will be ignored. If unexpected, check the CM config file.", errString)
 			i.imageData = UnknownImage{}
 		}
 	} else {
@@ -187,15 +187,21 @@ type SymbolImage struct {
 }
 
 func unpackSymbolImage(data map[string]interface{}, i *Image) (imageTypeInterface, error) {
-	symbolName, ok := data["symbolName"].(string)
-	if !ok || symbolName == "" {
-		return nil, NewUserPresentableError("Image of type sf_symbol require a symbolName.")
+	symbolName, _ := data["symbolName"].(string)
+	primaryColor, _ := data["primaryColor"].(string)
+	secondaryColor, _ := data["secondaryColor"].(string)
+
+	weight, _ := data["weight"].(string)
+	if !StrictDatamodelParsing && weight != "" && !slices.Contains(symbolWeights, weight) {
+		fmt.Printf("Unrecognized symbol weight \"%v\". Falling back to regular weight.", weight)
+		weight = SystemSymbolWeightEnumRegular
 	}
 
-	weight, ok := data["weight"].(string)
-	mode, ok := data["mode"].(string)
-	primaryColor, ok := data["primaryColor"].(string)
-	secondaryColor, ok := data["secondaryColor"].(string)
+	mode, _ := data["mode"].(string)
+	if !StrictDatamodelParsing && mode != "" && !slices.Contains(symbolModes, mode) {
+		fmt.Printf("Unrecognized symbol mode \"%v\". Falling back to monochromatic.", mode)
+		mode = SystemSymbolModeEnumMono
+	}
 
 	id := SymbolImage{
 		SymbolName:     symbolName,
@@ -239,7 +245,7 @@ func (si SymbolImage) ValidateReturningUserReadableIssue() string {
 	colors := []string{si.PrimaryColor, si.SecondaryColor}
 	for _, color := range colors {
 		if !stringColorIsValidAllowEmpty(color) {
-			return fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\"", color)
+			return fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\".", color)
 		}
 	}
 
