@@ -1,0 +1,13 @@
+{
+    "configVersion": "v1",
+    "actions": {
+        "namedActions": {
+            "unknownActionTypeFutureProof": {
+                "actionType": "unknown_future_type",
+                "actionData": {
+                    "unknownProp": 1234
+                }
+            }
+        }
+    }
+}

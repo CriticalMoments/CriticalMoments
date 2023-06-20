@@ -119,6 +119,33 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 }
 
+func TestFutureTypeStrictValidation(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/strictInvalidActionName.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pc PrimaryConfig
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ua := pc.ActionWithName("unknownActionTypeFutureProof")
+	_, ok := ua.actionData.(*UnknownAction)
+	if ua.ActionType != "unknown_future_type" || !ok {
+		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
+	}
+
+	// Strict mode should fail since we have an unknown section
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("Strict parsing allowed unknown action type")
+	}
+}
+
 func TestInvalidConfigVersionTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
