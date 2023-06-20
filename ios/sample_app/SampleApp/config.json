@@ -400,7 +400,6 @@
             "buttonsModalExample": {
                 "actionType": "modal",
                 "actionData": {
-                    "showCloseButton": false,
                     "content": {
                         "sections": [
                             {
