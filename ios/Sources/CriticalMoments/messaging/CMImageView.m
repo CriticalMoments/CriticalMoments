@@ -7,13 +7,24 @@
 
 #import "CMImageView.h"
 
-#define CM_SIMPLE_IMAGE_SIZE 40
+#import "../utils/CMUtils.h"
+
+#define CM_DEFAULT_IMAGE_SIZE 50
+
+@interface CMImageView ()
+
+@property(nonatomic, strong) DatamodelImage *model;
+@property(nonatomic) CGFloat height;
+
+@end
 
 @implementation CMImageView
 
-- (instancetype)init {
+- (nonnull instancetype)initWithDatamodel:(nonnull DatamodelImage *)model {
     self = [super init];
     if (self) {
+        _model = model;
+        _height = 0.0; // zero until valid image loaded
         [self buildSubviews];
     }
     return self;
@@ -26,28 +37,43 @@
     return CMTheme.current;
 }
 
-- (UIImage *)getImageFromDatamodel {
-    // TODO case for options in data model. V1: symbol, built in.
-    UIImage *image = [self imageForSymbolImage];
+- (UIImage *)getImageFromDatamodel:(DatamodelImage *)model {
+    UIImage *image;
 
-    if (!image) {
-        // TODO -- get fallback image
+    if ([DatamodelImageTypeEnumSFSymbol isEqualToString:model.imageType]) {
+        image = [self buildSymbolImage:model.symbolImageData];
     }
+
+    if ([DatamodelImageTypeEnumLocal isEqualToString:model.imageType]) {
+        image = [self buildLocalImage:model.localImageData];
+    }
+
+    if (image) {
+        self.height = model.height > 0 ? model.height : CM_DEFAULT_IMAGE_SIZE;
+    }
+
+    if (!image && model.fallback) {
+        image = [self getImageFromDatamodel:model.fallback];
+    }
+
     return image;
 }
 
+- (UIImage *)buildLocalImage:(DatamodelLocalImage *)model {
+    return [UIImage imageNamed:model.path];
+}
+
 - (CGSize)intrinsicContentSize {
-    // TODO: adapt based on data model size
-    return CGSizeMake(CM_SIMPLE_IMAGE_SIZE, CM_SIMPLE_IMAGE_SIZE);
+    // square
+    return CGSizeMake(self.height, self.height);
 }
 
 - (void)buildSubviews {
-    UIImage *image = [self getImageFromDatamodel];
+    UIImage *image = [self getImageFromDatamodel:self.model];
 
     // TODO size = 0 or return nil if can't create an image. Don't want empty space.
 
     UIImageView *iv = [[UIImageView alloc] initWithImage:image];
-    iv.tintColor = [self.theme primaryColorForView:self];
     iv.contentMode = UIViewContentModeScaleAspectFit;
     iv.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:iv];
@@ -59,35 +85,103 @@
         [iv.leftAnchor constraintEqualToAnchor:self.leftAnchor],
         [iv.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
         [iv.rightAnchor constraintEqualToAnchor:self.rightAnchor],
+        [iv.heightAnchor constraintLessThanOrEqualToConstant:self.height],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
-/*
-  - weight
-  - color mode
-    - default to primary color mono
-    - Hierarchical with optional color override (single color with tints)
-    - Palette: must provide colors
-    - Multicolor
-  - 1-3 colors (default to use primary)
-
- */
-
-- (UIImage *)imageForSymbolImage {
+- (UIImage *)buildSymbolImage:(DatamodelSymbolImage *)model {
     UIImage *image;
     if (@available(iOS 13.0, *)) {
         UIImageSymbolConfiguration *c = [UIImageSymbolConfiguration unspecifiedConfiguration];
 
-        // TODO -- check propertes mentioned above
-        // [UIImageSymbolConfiguration configurationWithPointSize:<#(CGFloat)#> weight:<#(UIImageSymbolWeight)#>
-        // scale:<#(UIImageSymbolScale)#>];
+        if (model.weight.length > 0) {
+            UIImageSymbolWeight w = [self weightForConfigString:model.weight];
+            c = [c configurationByApplyingConfiguration:[UIImageSymbolConfiguration configurationWithWeight:w]];
+        }
 
-        // TODO hardcode
-        image = [UIImage systemImageNamed:@"square.and.pencil" withConfiguration:c];
+        // Color priority: image data, custom theme, global theme, system tint, system default
+        UIColor *primaryColor = [CMUtils colorFromHexString:model.primaryColor];
+        if (!primaryColor) {
+            primaryColor = [self.theme primaryColorForView:self];
+        }
+        UIColor *secondaryColor = [CMUtils colorFromHexString:model.secondaryColor];
+
+        // Modes and color
+        bool hasiOS15 = NO;
+        bool isMono = NO;
+        if (@available(iOS 15.0, *)) {
+            hasiOS15 = YES;
+        }
+        if (hasiOS15 && [DatamodelSystemSymbolModeEnumHierarchical isEqualToString:model.mode]) {
+            // Hierarchical color
+            if (@available(iOS 15.0, *)) {
+                c = [c configurationByApplyingConfiguration:[UIImageSymbolConfiguration
+                                                                configurationWithHierarchicalColor:primaryColor]];
+            }
+        } else if (hasiOS15 && secondaryColor && [DatamodelSystemSymbolModeEnumPalette isEqualToString:model.mode]) {
+            // palette colors
+            if (@available(iOS 15.0, *)) {
+                c = [c
+                    configurationByApplyingConfiguration:[UIImageSymbolConfiguration configurationWithPaletteColors:@[
+                        primaryColor, secondaryColor
+                    ]]];
+            }
+        } else {
+            // Mono is default and fallback
+            isMono = YES;
+        }
+
+        image = [UIImage systemImageNamed:model.symbolName withConfiguration:c];
+
+        if (isMono) {
+            // apply primary as tint (for mono only)
+            image = [image imageWithTintColor:primaryColor renderingMode:UIImageRenderingModeAlwaysOriginal];
+        }
     }
 
     return image;
+}
+
+- (UIImageSymbolWeight)weightForConfigString:(NSString *)s API_AVAILABLE(ios(13.0)) {
+    if ([DatamodelSystemSymbolWeightEnumUltraLight isEqualToString:s]) {
+        return UIImageSymbolWeightUltraLight;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumThin isEqualToString:s]) {
+        return UIImageSymbolWeightThin;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumLight isEqualToString:s]) {
+        return UIImageSymbolWeightLight;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumRegular isEqualToString:s]) {
+        return UIImageSymbolWeightRegular;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumMedium isEqualToString:s]) {
+        return UIImageSymbolWeightMedium;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumSemiBold isEqualToString:s]) {
+        return UIImageSymbolWeightSemibold;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumBold isEqualToString:s]) {
+        return UIImageSymbolWeightBold;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumHeavy isEqualToString:s]) {
+        return UIImageSymbolWeightHeavy;
+    }
+
+    if ([DatamodelSystemSymbolWeightEnumBlack isEqualToString:s]) {
+        return UIImageSymbolWeightBlack;
+    }
+
+    NSLog(@"CriticalMoments: unrecognized symbol weight %@. Defaulting to regular weight.", s);
+    return UIImageSymbolWeightRegular;
 }
 
 @end

@@ -51,8 +51,8 @@
     linksAction.actionNextScreen = [[LinkDemoScreen alloc] init];
 
     CMDemoAction *sheetAction = [[CMDemoAction alloc] init];
-    sheetAction.title = @"Announcement / Sheet";
-    sheetAction.subtitle = @"UI to display announcement/information sheets.";
+    sheetAction.title = @"Modals";
+    sheetAction.subtitle = @"UI to display announcements or other information in sheets which overlay the entire app.";
     sheetAction.actionNextScreen = [[SheetDemoScreen alloc] init];
 
     [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction, sheetAction ]];

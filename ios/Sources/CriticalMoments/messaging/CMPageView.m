@@ -109,6 +109,7 @@
 
         [constraints addObjectsFromArray:@[
             [view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:topSpaceMultiplier],
+            // TODO: short non-centered text not working
             [view.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
             [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
                                                             constant:CM_PAGE_SIDE_PADDING],
@@ -194,6 +195,11 @@
         return [self buildBodyView:section.bodyData];
     }
 
+    // Image
+    if ([DatamodelSectionTypeEnumImage isEqualToString:section.pageSectionType]) {
+        return [self buildImageView:section.imageData];
+    }
+
     return nil;
 }
 
@@ -237,6 +243,11 @@
     }
 
     return bodyLabel;
+}
+
+- (UIView *)buildImageView:(DatamodelImage *)imageModel {
+    CMImageView *iv = [[CMImageView alloc] initWithDatamodel:imageModel];
+    return iv;
 }
 
 - (NSArray<CMButton *> *)buttons:(DatamodelPage *)model {

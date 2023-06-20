@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// TODO: need a "type" + "data" concept here. Can be more than just set of sections in future.
+// TODO: decide if "buttons" at top level or inside type? Top level prob best since they render over content.
 type Page struct {
 	Sections []*PageSection
 	Buttons  []*Button
@@ -55,6 +57,7 @@ func (p *Page) ValidateReturningUserReadableIssue() string {
 const (
 	SectionTypeEnumTitle    string = "title"
 	SectionTypeEnumBodyText string = "body"
+	SectionTypeEnumImage    string = "image"
 )
 
 type pageSectionTypeInterface interface {
@@ -62,9 +65,10 @@ type pageSectionTypeInterface interface {
 }
 
 var (
-	pageSectionTypeRegistry = map[string]func(map[string]interface{}, *PageSection) (pageSectionTypeInterface, error){
+	pageSectionTypeRegistry = map[string]func(json.RawMessage, *PageSection) (pageSectionTypeInterface, error){
 		SectionTypeEnumTitle:    unpackTitleSection,
 		SectionTypeEnumBodyText: unpackBodySection,
+		SectionTypeEnumImage:    unpackImageSection,
 	}
 )
 
@@ -75,6 +79,7 @@ type PageSection struct {
 	// Section types, stronly typed for easy consumption
 	TitleData *TitlePageSection
 	BodyData  *BodyPageSection
+	ImageData *Image
 
 	// generalized interface for functions we need for any section type.
 	// Typically a pointer to the one value above that is populated.
@@ -82,9 +87,9 @@ type PageSection struct {
 }
 
 type jsonPageSection struct {
-	PageSectionType string                 `json:"pageSectionType"`
-	TopSpacingScale *float64               `json:"topSpacingScale,omitempty"`
-	RawSectionData  map[string]interface{} `json:"pageSectionData,omitempty"`
+	PageSectionType string          `json:"pageSectionType"`
+	TopSpacingScale *float64        `json:"topSpacingScale,omitempty"`
+	RawSectionData  json.RawMessage `json:"pageSectionData,omitempty"`
 }
 
 func (s *PageSection) UnmarshalJSON(data []byte) error {
@@ -138,6 +143,8 @@ func (s *PageSection) ValidateReturningUserReadableIssue() string {
 		return verr
 	}
 
+	// TODO: validate type on strict. See image
+
 	return ""
 }
 
@@ -158,7 +165,13 @@ type TitlePageSection struct {
 	CenterText  bool
 }
 
-func unpackTitleSection(data map[string]interface{}, s *PageSection) (pageSectionTypeInterface, error) {
+func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
+	var data map[string]interface{}
+	err := json.Unmarshal(rawData, &data)
+	if err != nil {
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (title).", err)
+	}
+
 	title, ok := data["title"].(string)
 	if !ok || title == "" {
 		return nil, NewUserPresentableError("Page section of type title must have a title string.")
@@ -210,7 +223,13 @@ type BodyPageSection struct {
 	CenterText          bool
 }
 
-func unpackBodySection(data map[string]interface{}, s *PageSection) (pageSectionTypeInterface, error) {
+func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
+	var data map[string]interface{}
+	err := json.Unmarshal(rawData, &data)
+	if err != nil {
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (body).", err)
+	}
+
 	bodyText, ok := data["bodyText"].(string)
 	if !ok || bodyText == "" {
 		return nil, NewUserPresentableError("Page section of type body must have a bodyText string.")
@@ -252,6 +271,20 @@ func (t BodyPageSection) ValidateReturningUserReadableIssue() string {
 	}
 
 	return ""
+}
+
+// Image Section
+
+func unpackImageSection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
+	var i Image
+	err := json.Unmarshal(rawData, &i)
+	if err != nil {
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (image).", err)
+	}
+
+	s.ImageData = &i
+
+	return i, nil
 }
 
 // Enumerators because go mobile doesn't support arrays...

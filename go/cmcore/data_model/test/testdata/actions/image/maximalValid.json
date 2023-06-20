@@ -1,0 +1,23 @@
+{
+    "imageType": "local",
+    "height": 60.0,
+    "imageData": {
+        "path": "image.jpg"
+    },
+    "fallback": {
+        "imageType": "sf_symbol",
+        "imageData": {
+            "symbolName": "upload"
+        },
+        "fallback": {
+            "imageType": "sf_symbol",
+            "imageData": {
+                "symbolName": "download",
+                "weight": "light",
+                "mode": "palette",
+                "primaryColor": "#ff0000",
+                "secondaryColor": "#00ff00"
+            }
+        }
+    }
+}
