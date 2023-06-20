@@ -27,7 +27,7 @@
         _model = model;
         _customTheme = theme;
 
-        self.buttonView = [CMButton buttonWithWithDataModel:self.model andTheme:self.customTheme];
+        self.buttonView = [CMButton buttonWithWithDataModel:self.model andTheme:self.theme];
         [self addSubview:self.buttonView];
 
         [self.buttonView addTarget:self
@@ -35,6 +35,13 @@
                   forControlEvents:UIControlEventPrimaryActionTriggered];
     }
     return self;
+}
+
+- (CMTheme *)theme {
+    if (self.customTheme) {
+        return self.customTheme;
+    }
+    return CMTheme.current;
 }
 
 - (void)layoutSubviews {
@@ -67,19 +74,18 @@
 
 + (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme {
     UIButton *button;
-
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *c;
-        if ([@"large" isEqualToString:model.style]) {
+        if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.buttonSize = UIButtonConfigurationSizeLarge;
-        } else if ([@"secondary" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
             c = UIButtonConfiguration.tintedButtonConfiguration;
-        } else if ([@"tertiary" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {
             c = UIButtonConfiguration.grayButtonConfiguration;
-        } else if ([@"info" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumInfo isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
-        } else if ([@"info-small" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
         } else {
             // normal and any other value
@@ -90,19 +96,15 @@
         c.titleTextAttributesTransformer = ^NSDictionary<NSAttributedStringKey, id> *_Nonnull(
             NSDictionary<NSAttributedStringKey, id> *_Nonnull incoming) {
             NSMutableDictionary<NSAttributedStringKey, id> *outgoing = [incoming mutableCopy];
-            CGFloat fontSize =
-                [@"info-small" isEqualToString:model.style] ? CM_SMALL_BUTTON_FONT_SIZE : CM_OS_BUTTON_FONT_SIZE;
-            outgoing[NSFontAttributeName] = [theme fontOfSize:fontSize];
+            CGFloat fontSize = [DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]
+                                   ? CM_SMALL_BUTTON_FONT_SIZE
+                                   : CM_OS_BUTTON_FONT_SIZE;
+            UIFont *font = [theme fontOfSize:fontSize];
+            outgoing[NSFontAttributeName] = font;
             return outgoing;
         };
 
         button = [UIButton buttonWithConfiguration:c primaryAction:nil];
-
-        // TODO: font? System really fighting me on changing button fonts.
-        /*theme = [[CMTheme alloc] init];
-        theme.fontName = @"Avenir-Black";
-        button.titleLabel.font = [theme fontOfSize:UIFont.systemFontSize];
-        [button.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:39.0]];*/
     } else {
         // iOS 14 and earlier -- emulate iOS 15+ styles
         button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -114,9 +116,9 @@
         UIColor *backgroundColor = tintColor;
 
         CGFloat fontSize = CM_OS_BUTTON_FONT_SIZE;
-        if ([@"large" isEqualToString:model.style]) {
+        if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
             button.contentEdgeInsets = UIEdgeInsetsMake(14, 0, 14, 0);
-        } else if ([@"secondary" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
             // emulate iOS 15 tinted
             CGFloat h, s, b, a;
             [button setTitleColor:tintColor forState:UIControlStateNormal];
@@ -133,17 +135,18 @@
                                              brightness:MAX(MIN(b + 0.1, 1.0), 0.0)
                                                   alpha:1];
             }
-        } else if ([@"tertiary" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {
             [button setTitleColor:tintColor forState:UIControlStateNormal];
             if (@available(iOS 13.0, *)) {
                 backgroundColor = [UIColor systemGray5Color];
             } else {
                 backgroundColor = [UIColor colorWithRed:0.91 green:0.91 blue:0.91 alpha:1.0];
             }
-        } else if ([@"info" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumInfo isEqualToString:model.style]) {
             backgroundColor = [UIColor clearColor];
             [button setTitleColor:tintColor forState:UIControlStateNormal];
-        } else if ([@"info-small" isEqualToString:model.style]) {
+        } else if ([DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]) {
+            // TODO: not small
             backgroundColor = [UIColor clearColor];
             [button setTitleColor:tintColor forState:UIControlStateNormal];
             fontSize = CM_SMALL_BUTTON_FONT_SIZE;

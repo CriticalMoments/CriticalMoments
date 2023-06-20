@@ -27,8 +27,8 @@
     // Basics
 
     CMDemoAction *announceSheet = [[CMDemoAction alloc] init];
-    announceSheet.title = @"Annoucement";
-    announceSheet.subtitle = @"Display a sheet with an announcement for the user.";
+    announceSheet.title = @"Announcement";
+    announceSheet.subtitle = @"Display a sheet with an announcement for the user, including a custom action button.";
     announceSheet.actionCMActionName = @"simpleModalAction";
     [announceSheet addResetTestTarget:self action:@selector(dismissSheets)];
 
@@ -52,7 +52,13 @@
     typography.actionCMActionName = @"typographyModalExample";
     [typography addResetTestTarget:self action:@selector(dismissSheets)];
 
-    [self addSection:@"Style Options" withActions:@[ imageSheet, typography ]];
+    CMDemoAction *buttons = [[CMDemoAction alloc] init];
+    buttons.title = @"Button options";
+    buttons.subtitle = @"Show the buton styling options.";
+    buttons.actionCMActionName = @"buttonsModalExample";
+    [buttons addResetTestTarget:self action:@selector(dismissSheets)];
+
+    [self addSection:@"Style Options" withActions:@[ imageSheet, typography, buttons ]];
 }
 
 - (void)dismissSheets {

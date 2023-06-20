@@ -397,6 +397,49 @@
                     }
                 }
             },
+            "buttonsModalExample": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": false,
+                    "content": {
+                        "sections": [
+                            {
+                                "pageSectionType": "title",
+                                "topSpacingScale": 0,
+                                "pageSectionData": {
+                                    "title": "Button Styles"
+                                }
+                            }
+                        ],
+                        "buttons": [
+                            {
+                                "title": "Large Button",
+                                "style": "large"
+                            },
+                            {
+                                "title": "Normal Button",
+                                "style": "normal"
+                            },
+                            {
+                                "title": "Secondary Button",
+                                "style": "secondary"
+                            },
+                            {
+                                "title": "Tertiary Button",
+                                "style": "tertiary"
+                            },
+                            {
+                                "title": "Info Button",
+                                "style": "info"
+                            },
+                            {
+                                "title": "Small Info Button",
+                                "style": "info-small"
+                            }
+                        ]
+                    }
+                }
+            },
             "typographyModalExample": {
                 "actionType": "modal",
                 "actionData": {
