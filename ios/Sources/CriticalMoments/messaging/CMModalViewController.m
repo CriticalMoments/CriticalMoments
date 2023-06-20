@@ -50,10 +50,7 @@
     }
     self.view.backgroundColor = theme.backgroundColor;
 
-    CMPageView *pv = [[CMPageView alloc] initWithDatamodel:self.model.content];
-    if (self.customTheme) {
-        pv.customTheme = self.customTheme;
-    }
+    CMPageView *pv = [[CMPageView alloc] initWithDatamodel:self.model.content andTheme:theme];
     __weak CMModalViewController *weakSelf = self;
     pv.anyButtonDefaultAction = ^{
       [weakSelf dismissSheet];

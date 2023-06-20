@@ -18,13 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMPageView : UIView
 
 /// :nodoc:
-- (instancetype)initWithDatamodel:(DatamodelPage *)model;
+- (instancetype)initWithDatamodel:(DatamodelPage *)model andTheme:(CMTheme *)theme;
 
 /// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
-
-/// The custom theme to use for the style of this page. Defaults to the default theme.
-@property(nonatomic, readwrite) CMTheme *customTheme;
 
 /// :nodoc:
 // the "default" action, which will be called after any button tap

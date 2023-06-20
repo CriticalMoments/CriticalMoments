@@ -95,7 +95,7 @@ static CMTheme *currentTheme = nil;
     // colors
     theme.primaryColor = [CMUtils colorFromHexString:acTheme.primaryColor];
     theme.backgroundColor = [CMUtils colorFromHexString:acTheme.backgroundColor];
-    theme.primaryTextColor = [CMUtils colorFromHexString:acTheme.primaryColor];
+    theme.primaryTextColor = [CMUtils colorFromHexString:acTheme.primaryTextColor];
     theme.secondaryTextColor = [CMUtils colorFromHexString:acTheme.secondaryTextColor];
 
     // fonts

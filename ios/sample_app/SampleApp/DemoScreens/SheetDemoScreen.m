@@ -38,7 +38,13 @@
     tip.actionCMActionName = @"headphoneModalExample";
     [tip addResetTestTarget:self action:@selector(dismissSheets)];
 
-    [self addSection:@"Examples" withActions:@[ announceSheet, tip ]];
+    CMDemoAction *theme = [[CMDemoAction alloc] init];
+    theme.title = @"Themed Example";
+    theme.subtitle = @"Show an announcement with a custom theme.";
+    theme.actionCMActionName = @"themeModalExample";
+    [theme addResetTestTarget:self action:@selector(dismissSheets)];
+
+    [self addSection:@"Examples" withActions:@[ announceSheet, tip, theme ]];
 
     CMDemoAction *imageSheet = [[CMDemoAction alloc] init];
     imageSheet.title = @"Image style options";

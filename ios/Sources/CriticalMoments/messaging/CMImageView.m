@@ -15,15 +15,17 @@
 
 @property(nonatomic, strong) DatamodelImage *model;
 @property(nonatomic) CGFloat height;
+@property(nonatomic, readwrite) CMTheme *customTheme;
 
 @end
 
 @implementation CMImageView
 
-- (nonnull instancetype)initWithDatamodel:(nonnull DatamodelImage *)model {
+- (nonnull instancetype)initWithDatamodel:(nonnull DatamodelImage *)model andTheme:(CMTheme *)theme {
     self = [super init];
     if (self) {
         _model = model;
+        _customTheme = theme;
         _height = 0.0; // zero until valid image loaded
         [self buildSubviews];
     }

@@ -24,17 +24,23 @@
 @implementation CMPageStack
 @end
 
+@interface CMPageView ()
+
+@property(nonatomic, readwrite) CMTheme *customTheme;
+
+@end
+
 @implementation CMPageView
 
-- (instancetype)initWithDatamodel:(DatamodelPage *)model {
+- (instancetype)initWithDatamodel:(DatamodelPage *)model andTheme:(CMTheme *)theme {
     self = [super init];
     if (self) {
+        _customTheme = theme;
         [self buildSubviewsFromModel:model];
     }
     return self;
 }
 
-// TODO: if set after init, will this have any effect??
 - (CMTheme *)theme {
     if (self.customTheme) {
         return self.customTheme;
@@ -62,7 +68,7 @@
     [self addSubview:buttonArea];
 
     CMGradientView *shimView = [[CMGradientView alloc] init];
-    shimView.customTheme = self.customTheme;
+    shimView.customTheme = self.theme;
     shimView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:shimView];
 
@@ -246,7 +252,7 @@
 }
 
 - (UIView *)buildImageView:(DatamodelImage *)imageModel {
-    CMImageView *iv = [[CMImageView alloc] initWithDatamodel:imageModel];
+    CMImageView *iv = [[CMImageView alloc] initWithDatamodel:imageModel andTheme:self.theme];
     return iv;
 }
 
@@ -261,7 +267,7 @@
         if (!buttonModel)
             continue;
 
-        CMButton *button = [[CMButton alloc] initWithWithDataModel:buttonModel andTheme:self.customTheme];
+        CMButton *button = [[CMButton alloc] initWithWithDataModel:buttonModel andTheme:self.theme];
         if (button) {
             [buttons addObject:button];
             __weak CMPageView *weakSelf = self;

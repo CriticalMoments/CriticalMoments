@@ -27,7 +27,7 @@
         _model = model;
         _customTheme = theme;
 
-        self.buttonView = [CMButton buttonWithWithDataModel:self.model andTheme:self.theme];
+        self.buttonView = [self buttonWithWithDataModel:self.model];
         [self addSubview:self.buttonView];
 
         [self.buttonView addTarget:self
@@ -72,24 +72,31 @@
     }
 }
 
-+ (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model andTheme:(CMTheme *_Nullable)theme {
+- (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model {
     UIButton *button;
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *c;
         if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.buttonSize = UIButtonConfigurationSizeLarge;
+            c.baseBackgroundColor = [self.theme primaryColorForView:self];
         } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
             c = UIButtonConfiguration.tintedButtonConfiguration;
+            c.baseBackgroundColor = [self.theme primaryColorForView:self];
+            c.baseForegroundColor = [self.theme primaryColorForView:self];
         } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {
             c = UIButtonConfiguration.grayButtonConfiguration;
+            c.baseForegroundColor = [self.theme primaryColorForView:self];
         } else if ([DatamodelButtonStyleEnumInfo isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
+            c.baseForegroundColor = [self.theme primaryColorForView:self];
         } else if ([DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]) {
             c = UIButtonConfiguration.plainButtonConfiguration;
+            c.baseForegroundColor = [self.theme primaryColorForView:self];
         } else {
             // normal and any other value
             c = UIButtonConfiguration.filledButtonConfiguration;
+            c.baseBackgroundColor = [self.theme primaryColorForView:self];
         }
 
         // custom font (font, and size for info-small)
@@ -99,7 +106,7 @@
             CGFloat fontSize = [DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]
                                    ? CM_SMALL_BUTTON_FONT_SIZE
                                    : CM_OS_BUTTON_FONT_SIZE;
-            UIFont *font = [theme fontOfSize:fontSize];
+            UIFont *font = [self.theme fontOfSize:fontSize];
             outgoing[NSFontAttributeName] = font;
             return outgoing;
         };
@@ -112,7 +119,7 @@
         button.layer.masksToBounds = YES;
         button.contentEdgeInsets = UIEdgeInsetsMake(7, 0, 7, 0);
 
-        UIColor *tintColor = [theme primaryColorForView:button];
+        UIColor *tintColor = [self.theme primaryColorForView:self];
         UIColor *backgroundColor = tintColor;
 
         CGFloat fontSize = CM_OS_BUTTON_FONT_SIZE;
@@ -155,7 +162,7 @@
         }
 
         button.backgroundColor = backgroundColor;
-        button.titleLabel.font = [theme fontOfSize:fontSize];
+        button.titleLabel.font = [self.theme fontOfSize:fontSize];
     }
 
     [button setTitle:model.title forState:UIControlStateNormal];
