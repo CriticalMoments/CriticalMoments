@@ -127,8 +127,7 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	if ac.ActionType == "" {
 		return "Empty actionType not permitted"
 	}
-	// Check the type hasn't been changed to something unsupported
-	// TODO: test case this doesn't break forwards compatibility. Should be soft error.
+	// Check the type hasn't been changed to something unsupported.
 	_, ok := actionTypeRegistry[ac.ActionType]
 	if !ok {
 		_, ok := ac.actionData.(*UnknownAction)
