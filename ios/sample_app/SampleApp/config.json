@@ -273,92 +273,95 @@
                 "actionType": "modal",
                 "actionData": {
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 0,
-                                "pageSectionData": {
-                                    "title": "Image Samples"
-                                }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 5,
-                                "pageSectionData": {
-                                    "title": "SF Symbols",
-                                    "scaleFactor": 0.75
-                                }
-                            },
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "imageType": "sf_symbol",
-                                    "height": 40.0,
-                                    "imageData": {
-                                        "symbolName": "flag.fill",
-                                        "weight": "bold",
-                                        "mode": "mono",
-                                        "primaryColor": "#e62e00"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 0,
+                                    "pageSectionData": {
+                                        "title": "Image Samples"
                                     }
-                                }
-                            },
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "imageType": "sf_symbol",
-                                    "height": 65.0,
-                                    "imageData": {
-                                        "symbolName": "homekit",
-                                        "weight": "regular",
-                                        "mode": "hierarchical",
-                                        "primaryColor": "#ff9900"
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 5,
+                                    "pageSectionData": {
+                                        "title": "SF Symbols",
+                                        "scaleFactor": 0.75
                                     }
-                                }
-                            },
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "imageType": "sf_symbol",
-                                    "height": 80.0,
-                                    "imageData": {
-                                        "symbolName": "cloud.moon.bolt",
-                                        "weight": "light",
-                                        "mode": "palette",
-                                        "primaryColor": "#3366ff",
-                                        "secondaryColor": "#ffcc00"
+                                },
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 40.0,
+                                        "imageData": {
+                                            "symbolName": "flag.fill",
+                                            "weight": "bold",
+                                            "mode": "mono",
+                                            "primaryColor": "#e62e00"
+                                        }
                                     }
-                                }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 5,
-                                "pageSectionData": {
-                                    "title": "Local Image",
-                                    "scaleFactor": 0.75
-                                }
-                            },
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "imageType": "local",
-                                    "height": 140.0,
-                                    "imageData": {
-                                        "path": "does-not-exist-so-use-fallback.png"
-                                    },
-                                    "fallback": {
+                                },
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 65.0,
+                                        "imageData": {
+                                            "symbolName": "homekit",
+                                            "weight": "regular",
+                                            "mode": "hierarchical",
+                                            "primaryColor": "#ff9900"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "cloud.moon.bolt",
+                                            "weight": "light",
+                                            "mode": "palette",
+                                            "primaryColor": "#3366ff",
+                                            "secondaryColor": "#ffcc00"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 5,
+                                    "pageSectionData": {
+                                        "title": "Local Image",
+                                        "scaleFactor": 0.75
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
                                         "imageType": "local",
                                         "height": 140.0,
                                         "imageData": {
-                                            "path": "beats.png"
+                                            "path": "does-not-exist-so-use-fallback.png"
+                                        },
+                                        "fallback": {
+                                            "imageType": "local",
+                                            "height": 140.0,
+                                            "imageData": {
+                                                "path": "beats.png"
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             },
@@ -368,45 +371,48 @@
                     "themeName": "modalSampleTheme",
                     "showCloseButton": false,
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 3,
-                                "pageSectionData": {
-                                    "imageType": "sf_symbol",
-                                    "height": 80.0,
-                                    "imageData": {
-                                        "symbolName": "popcorn.circle",
-                                        "mode": "hierarchical"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "popcorn.circle",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "New Episodes!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "Three new episodes of Star Trek Lower Decks are available!",
+                                        "scaleFactor": 1.3
                                     }
                                 }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "title": "New Episodes!"
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Take me there",
+                                    "style": "large"
+                                },
+                                {
+                                    "title": "Now Now",
+                                    "style": "info"
                                 }
-                            },
-                            {
-                                "pageSectionType": "body",
-                                "topSpacingScale": 3,
-                                "pageSectionData": {
-                                    "bodyText": "Three new episodes of Star Trek Lower Decks are available!",
-                                    "scaleFactor": 1.3
-                                }
-                            }
-                        ],
-                        "buttons": [
-                            {
-                                "title": "Take me there",
-                                "style": "large"
-                            },
-                            {
-                                "title": "Now Now",
-                                "style": "info"
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             },
@@ -415,41 +421,44 @@
                 "actionData": {
                     "showCloseButton": false,
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 0,
-                                "pageSectionData": {
-                                    "title": "Headphone Suggested"
-                                }
-                            },
-                            {
-                                "pageSectionType": "image",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "imageType": "local",
-                                    "height": 200.0,
-                                    "imageData": {
-                                        "path": "beats.png"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 0,
+                                    "pageSectionData": {
+                                        "title": "Headphone Suggested"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "imageType": "local",
+                                        "height": 200.0,
+                                        "imageData": {
+                                            "path": "beats.png"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "title": "For the best gaming experience, we suggest headphones.",
+                                        "scaleFactor": 0.6,
+                                        "bold": false
                                     }
                                 }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 3,
-                                "pageSectionData": {
-                                    "title": "For the best gaming experience, we suggest headphones.",
-                                    "scaleFactor": 0.6,
-                                    "bold": false
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Got it!",
+                                    "style": "large"
                                 }
-                            }
-                        ],
-                        "buttons": [
-                            {
-                                "title": "Got it!",
-                                "style": "large"
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             },
@@ -457,41 +466,44 @@
                 "actionType": "modal",
                 "actionData": {
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 0,
-                                "pageSectionData": {
-                                    "title": "Button Styles"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 0,
+                                    "pageSectionData": {
+                                        "title": "Button Styles"
+                                    }
                                 }
-                            }
-                        ],
-                        "buttons": [
-                            {
-                                "title": "Large Button",
-                                "style": "large"
-                            },
-                            {
-                                "title": "Normal Button",
-                                "style": "normal"
-                            },
-                            {
-                                "title": "Secondary Button",
-                                "style": "secondary"
-                            },
-                            {
-                                "title": "Tertiary Button",
-                                "style": "tertiary"
-                            },
-                            {
-                                "title": "Info Button",
-                                "style": "info"
-                            },
-                            {
-                                "title": "Small Info Button",
-                                "style": "info-small"
-                            }
-                        ]
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Large Button",
+                                    "style": "large"
+                                },
+                                {
+                                    "title": "Normal Button",
+                                    "style": "normal"
+                                },
+                                {
+                                    "title": "Secondary Button",
+                                    "style": "secondary"
+                                },
+                                {
+                                    "title": "Tertiary Button",
+                                    "style": "tertiary"
+                                },
+                                {
+                                    "title": "Info Button",
+                                    "style": "info"
+                                },
+                                {
+                                    "title": "Small Info Button",
+                                    "style": "info-small"
+                                }
+                            ]
+                        }
                     }
                 }
             },
@@ -499,46 +511,49 @@
                 "actionType": "modal",
                 "actionData": {
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "title": "Title"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Title"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Scaled Title Example",
+                                        "scaleFactor": 0.7
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "bodyText": "Body text example."
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "bodyText": "Bold body text example.",
+                                        "bold": true
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "bodyText": "Example of non-centered text. Using the body section type, but also available for titles.",
+                                        "centerText": false
+                                    }
                                 }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "title": "Scaled Title Example",
-                                    "scaleFactor": 0.7
-                                }
-                            },
-                            {
-                                "pageSectionType": "body",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "bodyText": "Body text example."
-                                }
-                            },
-                            {
-                                "pageSectionType": "body",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "bodyText": "Bold body text example.",
-                                    "bold": true
-                                }
-                            },
-                            {
-                                "pageSectionType": "body",
-                                "topSpacingScale": 2,
-                                "pageSectionData": {
-                                    "bodyText": "Example of non-centered text. Using the body section type, but also available for titles.",
-                                    "centerText": false
-                                }
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             },
@@ -546,53 +561,56 @@
                 "actionType": "modal",
                 "actionData": {
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "image",
-                                "pageSectionData": {
-                                    "imageType": "sf_symbol",
-                                    "height": 60.0,
-                                    "imageData": {
-                                        "symbolName": "coloncurrencysign.square.fill",
-                                        "weight": "light",
-                                        "mode": "hierarchical"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 60.0,
+                                        "imageData": {
+                                            "symbolName": "coloncurrencysign.square.fill",
+                                            "weight": "light",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "pageSectionData": {
+                                        "title": "Important Announcement"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 1.5,
+                                    "pageSectionData": {
+                                        "title": "New pricing coming soon.",
+                                        "scaleFactor": 0.64
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
                                     }
                                 }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "pageSectionData": {
-                                    "title": "Important Announcement"
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Got it!",
+                                    "style": "large"
+                                },
+                                {
+                                    "title": "More info",
+                                    "preventDefault": true,
+                                    "style": "info",
+                                    "actionName": "web_link_action"
                                 }
-                            },
-                            {
-                                "pageSectionType": "title",
-                                "topSpacingScale": 1.5,
-                                "pageSectionData": {
-                                    "title": "New pricing coming soon.",
-                                    "scaleFactor": 0.64
-                                }
-                            },
-                            {
-                                "pageSectionType": "body",
-                                "topSpacingScale": 4,
-                                "pageSectionData": {
-                                    "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
-                                }
-                            }
-                        ],
-                        "buttons": [
-                            {
-                                "title": "Got it!",
-                                "style": "large"
-                            },
-                            {
-                                "title": "More info",
-                                "preventDefault": true,
-                                "style": "info",
-                                "actionName": "web_link_action"
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             }
