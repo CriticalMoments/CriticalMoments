@@ -13,7 +13,7 @@ type ModalAction struct {
 type jsonModalAction struct {
 	Content         Page   `json:"content"`
 	ShowCloseButton *bool  `json:"showCloseButton,omitempty"`
-	CustomThemeName string `json:"customThemeName,omitempty"`
+	CustomThemeName string `json:"themeName,omitempty"`
 }
 
 func unpackModalFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {

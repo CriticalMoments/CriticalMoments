@@ -61,7 +61,7 @@
                 "actionType": "banner",
                 "actionData": {
                     "body": "This banner has a custom theme+action set in config. Tap me!",
-                    "customThemeName": "blackAndWhiteTheme",
+                    "themeName": "blackAndWhiteTheme",
                     "tapActionName": "nested_alert"
                 }
             },
@@ -365,7 +365,7 @@
             "themeModalExample": {
                 "actionType": "modal",
                 "actionData": {
-                    "customThemeName": "modalSampleTheme",
+                    "themeName": "modalSampleTheme",
                     "showCloseButton": false,
                     "content": {
                         "sections": [

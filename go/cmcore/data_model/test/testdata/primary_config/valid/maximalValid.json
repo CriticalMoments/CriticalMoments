@@ -36,7 +36,7 @@
                     "body": "Hello world, but on a banner!",
                     "maxLineCount": 1,
                     "tapActionName": "bannerAction2",
-                    "customThemeName": "blueTheme",
+                    "themeName": "blueTheme",
                     "showDismissButton": false
                 }
             },

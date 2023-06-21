@@ -25,7 +25,7 @@ type jsonBannerAction struct {
 	ShowDismissButton *bool   `json:"showDismissButton,omitempty"`
 	MaxLineCount      *int    `json:"maxLineCount,omitempty"`
 	TapActionName     string  `json:"tapActionName,omitempty"`
-	CustomThemeName   string  `json:"customThemeName,omitempty"`
+	CustomThemeName   string  `json:"themeName,omitempty"`
 	PreferredPosition *string `json:"preferredPosition,omitempty"`
 }
 

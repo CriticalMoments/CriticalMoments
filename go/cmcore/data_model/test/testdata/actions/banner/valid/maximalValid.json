@@ -4,7 +4,7 @@
         "body": "Hello world, but on a banner!",
         "maxLineCount": 1,
         "tapActionName": "customAction",
-        "customThemeName": "navy",
+        "themeName": "navy",
         "showDismissButton": false,
         "preferredPosition": "top"
     }
