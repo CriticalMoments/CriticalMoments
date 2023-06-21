@@ -87,7 +87,6 @@
         [scrollView.topAnchor constraintEqualToAnchor:self.topAnchor],
         [scrollView.leftAnchor constraintEqualToAnchor:self.leftAnchor],
         [scrollView.rightAnchor constraintEqualToAnchor:self.rightAnchor],
-        // TODO
         [scrollView.bottomAnchor constraintEqualToAnchor:buttonArea.topAnchor],
 
         [topSpace.topAnchor constraintEqualToAnchor:scrollView.topAnchor],
@@ -188,18 +187,14 @@
 }
 
 - (UIView *)viewForSection:(DatamodelPageSection *)section {
-    // Titles
     if ([DatamodelSectionTypeEnumTitle isEqualToString:section.pageSectionType]) {
+        // Titles
         return [self buildTitleView:section.titleData];
-    }
-
-    // Body
-    if ([DatamodelSectionTypeEnumBodyText isEqualToString:section.pageSectionType]) {
+    } else if ([DatamodelSectionTypeEnumBodyText isEqualToString:section.pageSectionType]) {
+        // Body
         return [self buildBodyView:section.bodyData];
-    }
-
-    // Image
-    if ([DatamodelSectionTypeEnumImage isEqualToString:section.pageSectionType]) {
+    } else if ([DatamodelSectionTypeEnumImage isEqualToString:section.pageSectionType]) {
+        // Image
         return [self buildImageView:section.imageData];
     }
 
@@ -211,10 +206,16 @@
 
     titleView.text = titleData.title;
     titleView.numberOfLines = 0; // no limit
+
     if (titleData.centerText) {
         titleView.textAlignment = NSTextAlignmentCenter;
     }
-    titleView.textColor = self.theme.primaryTextColor;
+
+    if (titleData.usePrimaryTextColor) {
+        titleView.textColor = self.theme.primaryTextColor;
+    } else {
+        titleView.textColor = self.theme.secondaryTextColor;
+    }
 
     CGFloat fontSize = self.theme.titleFontSize * titleData.scaleFactor;
     if (titleData.bold) {
@@ -229,9 +230,11 @@
     UILabel *bodyLabel = [[UILabel alloc] init];
     bodyLabel.text = bodyData.bodyText;
     bodyLabel.numberOfLines = 0; // no limit
+
     if (bodyData.centerText) {
         bodyLabel.textAlignment = NSTextAlignmentCenter;
     }
+
     if (bodyData.usePrimaryTextColor) {
         bodyLabel.textColor = self.theme.primaryTextColor;
     } else {
@@ -255,9 +258,6 @@
 
 - (NSArray<CMButton *> *)buttons:(DatamodelPage *)model {
     NSMutableArray<CMButton *> *buttons = [[NSMutableArray alloc] init];
-
-    // TODO: preventDefault
-    // TODO: actionName
 
     for (int i = 0; i < model.buttonsCount; i++) {
         DatamodelButton *buttonModel = [model buttonAtIndex:i];

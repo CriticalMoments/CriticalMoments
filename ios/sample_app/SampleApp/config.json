@@ -525,7 +525,15 @@
                                     "pageSectionType": "title",
                                     "topSpacingScale": 2,
                                     "pageSectionData": {
-                                        "title": "Scaled Title Example",
+                                        "title": "Secondary Color Title",
+                                        "usePrimaryFontColor": false
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Scaled Title",
                                         "scaleFactor": 0.7
                                     }
                                 },
@@ -533,14 +541,14 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 4,
                                     "pageSectionData": {
-                                        "bodyText": "Body text example."
+                                        "bodyText": "Body text."
                                     }
                                 },
                                 {
                                     "pageSectionType": "body",
                                     "topSpacingScale": 4,
                                     "pageSectionData": {
-                                        "bodyText": "Bold body text example.",
+                                        "bodyText": "Bold body text.",
                                         "bold": true
                                     }
                                 },
@@ -548,7 +556,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 4,
                                     "pageSectionData": {
-                                        "bodyText": "Example of non-centered text. Option also available for titles.",
+                                        "bodyText": "Non-centered body text. Option also available for titles.",
                                         "centerText": false
                                     }
                                 },
@@ -556,7 +564,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 4,
                                     "pageSectionData": {
-                                        "bodyText": "Non-centered and primary color.",
+                                        "bodyText": "Non-centered and primary color body.",
                                         "centerText": false,
                                         "usePrimaryFontColor": true
                                     }

@@ -9,6 +9,7 @@
                     "title": "title1",
                     "centerText": false,
                     "scaleFactor": 1.2,
+                    "usePrimaryFontColor": false,
                     "bold": false
                 }
             },

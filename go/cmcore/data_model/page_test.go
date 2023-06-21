@@ -26,7 +26,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s1d := s1.TitleData
-	if s1d.Title != "title1" || s1d.ScaleFactor != 1.2 || s1d.Bold != false || s1d.CenterText {
+	if s1d.Title != "title1" || s1d.ScaleFactor != 1.2 || s1d.Bold != false || s1d.CenterText || s1d.UsePrimaryTextColor {
 		t.Fatal("Parsing page failed")
 	}
 
@@ -35,7 +35,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s2d := s2.TitleData
-	if s2d.Title != "title2" || s2d.ScaleFactor != 1 || s2d.Bold != true || !s2d.CenterText {
+	if s2d.Title != "title2" || s2d.ScaleFactor != 1 || s2d.Bold != true || !s2d.CenterText || !s2d.UsePrimaryTextColor {
 		t.Fatal("Parsing page failed")
 	}
 

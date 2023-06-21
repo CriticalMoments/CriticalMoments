@@ -185,10 +185,11 @@ func (u UnknownSection) ValidateReturningUserReadableIssue() string {
 // Title Section
 
 type TitlePageSection struct {
-	Title       string
-	ScaleFactor float64
-	Bold        bool
-	CenterText  bool
+	Title               string
+	ScaleFactor         float64
+	Bold                bool
+	UsePrimaryTextColor bool
+	CenterText          bool
 }
 
 func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
@@ -216,12 +217,17 @@ func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 	if !ok {
 		centerText = true
 	}
+	usePrimaryFontColor, ok := data["usePrimaryFontColor"].(bool)
+	if !ok {
+		usePrimaryFontColor = true
+	}
 
 	td := TitlePageSection{
-		Title:       title,
-		ScaleFactor: scaleFactor,
-		Bold:        bold,
-		CenterText:  centerText,
+		Title:               title,
+		ScaleFactor:         scaleFactor,
+		Bold:                bold,
+		CenterText:          centerText,
+		UsePrimaryTextColor: usePrimaryFontColor,
 	}
 	s.TitleData = &td
 
