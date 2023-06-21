@@ -607,7 +607,7 @@
                                     "title": "More info",
                                     "preventDefault": true,
                                     "style": "info",
-                                    "actionName": "web_link_action"
+                                    "actionName": "web_link_embedded_action"
                                 }
                             ]
                         }

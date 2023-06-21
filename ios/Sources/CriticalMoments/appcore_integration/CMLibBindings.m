@@ -143,10 +143,14 @@ static CMLibBindings *sharedInstance = nil;
 
     SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
     UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
-    if (!safariVc || !rootVc) {
+    UIViewController *topController = rootVc;
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    if (!safariVc || !topController) {
         return NO;
     }
-    [rootVc presentViewController:safariVc animated:YES completion:nil];
+    [topController presentViewController:safariVc animated:YES completion:nil];
     return YES;
 }
 
