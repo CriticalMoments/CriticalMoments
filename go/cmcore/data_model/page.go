@@ -3,6 +3,9 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 )
 
 // Model is specific to "Stack" page. Can add type/data here if we add more types, but unnecessary
@@ -164,7 +167,9 @@ func (s *PageSection) ValidateReturningUserReadableIssue() string {
 		return verr
 	}
 
-	// TODO: validate type on strict. See image
+	if StrictDatamodelParsing && !slices.Contains(maps.Keys(pageSectionTypeRegistry), s.PageSectionType) {
+		return fmt.Sprintf("Page section with unknown type: %v", s.PageSectionType)
+	}
 
 	return ""
 }

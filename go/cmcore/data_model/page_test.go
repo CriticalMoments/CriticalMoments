@@ -250,6 +250,21 @@ func TestBodyPageSectionValidation(t *testing.T) {
 	if s.ValidateReturningUserReadableIssue() == "" {
 		t.Fatal("Allowed section with negative scale")
 	}
+	s.BodyData.ScaleFactor = 1.0
+	s.PageSectionType = "futureType"
+	if s.ValidateReturningUserReadableIssue() != "" {
+		t.Fatal("future proof type causes breaking error")
+	}
+
+	// Strict mode should
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	if s.ValidateReturningUserReadableIssue() == "" {
+		t.Fatal("Strict passed validation on invalid type")
+	}
+
 }
 
 func TestPageParsingFutureProof(t *testing.T) {
