@@ -44,9 +44,7 @@
 
     if ([DatamodelImageTypeEnumSFSymbol isEqualToString:model.imageType]) {
         image = [self buildSymbolImage:model.symbolImageData];
-    }
-
-    if ([DatamodelImageTypeEnumLocal isEqualToString:model.imageType]) {
+    } else if ([DatamodelImageTypeEnumLocal isEqualToString:model.imageType]) {
         image = [self buildLocalImage:model.localImageData];
     }
 
@@ -72,8 +70,6 @@
 
 - (void)buildSubviews {
     UIImage *image = [self getImageFromDatamodel:self.model];
-
-    // TODO size = 0 or return nil if can't create an image. Don't want empty space.
 
     UIImageView *iv = [[UIImageView alloc] initWithImage:image];
     iv.contentMode = UIViewContentModeScaleAspectFit;

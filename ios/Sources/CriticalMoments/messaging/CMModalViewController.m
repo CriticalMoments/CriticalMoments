@@ -41,7 +41,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
 
     // Theme
     CMTheme *theme = self.customTheme;
@@ -97,8 +96,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       UIViewController *pvc = self.presentingViewController;
       [pvc dismissViewControllerAnimated:YES completion:nil];
-
-      // TODO dispatch event for "sheet dismissed" based on sheet name? if so need to get the swipe dismissal as well
     });
 }
 
