@@ -13,8 +13,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// TODO: confirm not importable in apps / is internal
-
 @interface CMPageView : UIView
 
 /// :nodoc:

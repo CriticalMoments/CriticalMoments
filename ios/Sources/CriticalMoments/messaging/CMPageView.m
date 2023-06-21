@@ -11,7 +11,7 @@
 #import "CMGradientView.h"
 #import "CMImageView.h"
 
-#define CM_PAGE_SIDE_PADDING 40
+#define CM_PAGE_SIDE_PADDING 25
 #define CM_MIN_BTN_WIDTH 280
 #define CM_SCROLL_SHIM_SIZE 20
 
@@ -115,13 +115,10 @@
 
         [constraints addObjectsFromArray:@[
             [view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:topSpaceMultiplier],
-            // TODO: short non-centered text not working
-            [view.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
-            [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
-                                                            constant:CM_PAGE_SIDE_PADDING],
-            [view.trailingAnchor constraintLessThanOrEqualToAnchor:scrollView.layoutMarginsGuide.trailingAnchor
-                                                          constant:-CM_PAGE_SIDE_PADDING],
-            [view.widthAnchor constraintLessThanOrEqualToConstant:CM_MAX_TEXT_WIDTH],
+            [view.leadingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
+                                               constant:CM_PAGE_SIDE_PADDING],
+            [view.trailingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.trailingAnchor
+                                                constant:-CM_PAGE_SIDE_PADDING],
         ]];
 
         lastTop = view.bottomAnchor;

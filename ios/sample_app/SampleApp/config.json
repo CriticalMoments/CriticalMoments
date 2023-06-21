@@ -299,7 +299,7 @@
                                         "height": 40.0,
                                         "imageData": {
                                             "symbolName": "flag.fill",
-                                            "weight": "bold",
+                                            "weight": "regular",
                                             "mode": "mono",
                                             "primaryColor": "#e62e00"
                                         }
@@ -531,14 +531,14 @@
                                 },
                                 {
                                     "pageSectionType": "body",
-                                    "topSpacingScale": 2,
+                                    "topSpacingScale": 4,
                                     "pageSectionData": {
                                         "bodyText": "Body text example."
                                     }
                                 },
                                 {
                                     "pageSectionType": "body",
-                                    "topSpacingScale": 2,
+                                    "topSpacingScale": 4,
                                     "pageSectionData": {
                                         "bodyText": "Bold body text example.",
                                         "bold": true
@@ -546,10 +546,19 @@
                                 },
                                 {
                                     "pageSectionType": "body",
-                                    "topSpacingScale": 2,
+                                    "topSpacingScale": 4,
                                     "pageSectionData": {
-                                        "bodyText": "Example of non-centered text. Using the body section type, but also available for titles.",
+                                        "bodyText": "Example of non-centered text. Option also available for titles.",
                                         "centerText": false
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "bodyText": "Non-centered and primary color.",
+                                        "centerText": false,
+                                        "usePrimaryFontColor": true
                                     }
                                 }
                             ]
