@@ -110,6 +110,7 @@
         UIColor *secondaryColor = [CMUtils colorFromHexString:model.secondaryColor];
 
         // Modes and color
+        // This nighmare of a code block brought to you by the UIImageSymbolConfiguration API.
         bool hasiOS15 = NO;
         bool isMono = NO;
         if (@available(iOS 15.0, *)) {
@@ -133,9 +134,7 @@
             // Mono is default and fallback
             isMono = YES;
         }
-
         image = [UIImage systemImageNamed:model.symbolName withConfiguration:c];
-
         if (isMono) {
             // apply primary as tint (for mono only)
             image = [image imageWithTintColor:primaryColor renderingMode:UIImageRenderingModeAlwaysOriginal];

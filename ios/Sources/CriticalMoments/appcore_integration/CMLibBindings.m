@@ -135,7 +135,7 @@ static CMLibBindings *sharedInstance = nil;
       [CMUtils.keyWindow.rootViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 
-    // TODO: no returns / errors
+    return NO;
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {

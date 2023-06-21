@@ -59,7 +59,6 @@
     // 2) the system's default action, unless prevent default (eg: dismiss modal)
 
     if (self.model.actionName.length > 0) {
-        // TODO: embedded browers not working overtop of sheets!! Common use case
         NSError *error;
         [AppcoreSharedAppcore() performNamedAction:self.model.actionName error:&error];
         if (error) {
@@ -73,7 +72,18 @@
 }
 
 - (UIButton *)buttonWithWithDataModel:(DatamodelButton *)model {
-    UIButton *button;
+    UIButton *button = [self buildNewStyleButtonWithDataModel:model];
+    if (!button) {
+        // earlier versions of iOS
+        button = [self buildOldStyleButtonWithDataModel:model];
+    }
+
+    [button setTitle:model.title forState:UIControlStateNormal];
+
+    return button;
+}
+
+- (UIButton *)buildNewStyleButtonWithDataModel:(DatamodelButton *)model {
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *c;
         if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
@@ -111,61 +121,62 @@
             return outgoing;
         };
 
-        button = [UIButton buttonWithConfiguration:c primaryAction:nil];
-    } else {
-        // iOS 14 and earlier -- emulate iOS 15+ styles
-        button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.layer.cornerRadius = 6.0;
-        button.layer.masksToBounds = YES;
-        button.contentEdgeInsets = UIEdgeInsetsMake(7, 0, 7, 0);
-
-        UIColor *tintColor = [self.theme primaryColorForView:self];
-        UIColor *backgroundColor = tintColor;
-
-        CGFloat fontSize = CM_OS_BUTTON_FONT_SIZE;
-        if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
-            button.contentEdgeInsets = UIEdgeInsetsMake(14, 0, 14, 0);
-        } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
-            // emulate iOS 15 tinted
-            CGFloat h, s, b, a;
-            [button setTitleColor:tintColor forState:UIControlStateNormal];
-            [tintColor getHue:&h saturation:&s brightness:&b alpha:&a];
-            // dark mode adjust tint for ios 13/14
-            if (button.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-                backgroundColor = [UIColor colorWithHue:h
-                                             saturation:MAX(MIN(s - 0.12, 1.0), 0.0)
-                                             brightness:MAX(MIN(b - 0.6, 1.0), 0.0)
-                                                  alpha:1];
-            } else {
-                backgroundColor = [UIColor colorWithHue:h
-                                             saturation:MAX(s - 0.52, 0.0)
-                                             brightness:MAX(MIN(b + 0.1, 1.0), 0.0)
-                                                  alpha:1];
-            }
-        } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {
-            [button setTitleColor:tintColor forState:UIControlStateNormal];
-            if (@available(iOS 13.0, *)) {
-                backgroundColor = [UIColor systemGray5Color];
-            } else {
-                backgroundColor = [UIColor colorWithRed:0.91 green:0.91 blue:0.91 alpha:1.0];
-            }
-        } else if ([DatamodelButtonStyleEnumInfo isEqualToString:model.style]) {
-            backgroundColor = [UIColor clearColor];
-            [button setTitleColor:tintColor forState:UIControlStateNormal];
-        } else if ([DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]) {
-            // TODO: not small
-            backgroundColor = [UIColor clearColor];
-            [button setTitleColor:tintColor forState:UIControlStateNormal];
-            fontSize = CM_SMALL_BUTTON_FONT_SIZE;
-        } else {
-            // normal and any other value
-        }
-
-        button.backgroundColor = backgroundColor;
-        button.titleLabel.font = [self.theme fontOfSize:fontSize];
+        return [UIButton buttonWithConfiguration:c primaryAction:nil];
     }
 
-    [button setTitle:model.title forState:UIControlStateNormal];
+    return nil;
+}
+
+- (UIButton *)buildOldStyleButtonWithDataModel:(DatamodelButton *)model {
+    // iOS 14 and earlier -- emulate iOS 15+ styles
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.layer.cornerRadius = 6.0;
+    button.layer.masksToBounds = YES;
+    button.contentEdgeInsets = UIEdgeInsetsMake(7, 0, 7, 0);
+
+    UIColor *tintColor = [self.theme primaryColorForView:self];
+    UIColor *backgroundColor = tintColor;
+
+    CGFloat fontSize = CM_OS_BUTTON_FONT_SIZE;
+    if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
+        button.contentEdgeInsets = UIEdgeInsetsMake(14, 0, 14, 0);
+    } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
+        // emulate iOS 15 tinted
+        CGFloat h, s, b, a;
+        [button setTitleColor:tintColor forState:UIControlStateNormal];
+        [tintColor getHue:&h saturation:&s brightness:&b alpha:&a];
+        // dark mode adjust tint for ios 13/14
+        if (button.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            backgroundColor = [UIColor colorWithHue:h
+                                         saturation:MAX(MIN(s - 0.12, 1.0), 0.0)
+                                         brightness:MAX(MIN(b - 0.6, 1.0), 0.0)
+                                              alpha:1];
+        } else {
+            backgroundColor = [UIColor colorWithHue:h
+                                         saturation:MAX(s - 0.52, 0.0)
+                                         brightness:MAX(MIN(b + 0.1, 1.0), 0.0)
+                                              alpha:1];
+        }
+    } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {
+        [button setTitleColor:tintColor forState:UIControlStateNormal];
+        if (@available(iOS 13.0, *)) {
+            backgroundColor = [UIColor systemGray5Color];
+        } else {
+            backgroundColor = [UIColor colorWithRed:0.91 green:0.91 blue:0.91 alpha:1.0];
+        }
+    } else if ([DatamodelButtonStyleEnumInfo isEqualToString:model.style]) {
+        backgroundColor = [UIColor clearColor];
+        [button setTitleColor:tintColor forState:UIControlStateNormal];
+    } else if ([DatamodelButtonStyleEnumInfoSmall isEqualToString:model.style]) {
+        backgroundColor = [UIColor clearColor];
+        [button setTitleColor:tintColor forState:UIControlStateNormal];
+        fontSize = CM_SMALL_BUTTON_FONT_SIZE;
+    } else {
+        // normal and any other value
+    }
+
+    button.backgroundColor = backgroundColor;
+    button.titleLabel.font = [self.theme fontOfSize:fontSize];
 
     return button;
 }
