@@ -1,0 +1,25 @@
+{
+    "showCloseButton": false,
+    "themeName": "theme1",
+    "content": {
+        "pageType": "stack",
+        "pageData": {
+            "sections": [
+                {
+                    "pageSectionType": "title",
+                    "pageSectionData": {
+                        "title": "title1"
+                    }
+                }
+            ],
+            "buttons": [
+                {
+                    "title": "button1",
+                    "preventDefault": true,
+                    "style": "large",
+                    "actionName": "action1"
+                }
+            ]
+        }
+    }
+}

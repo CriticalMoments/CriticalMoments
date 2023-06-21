@@ -1,0 +1,13 @@
+{
+    "pageType": "stack",
+    "pageData": {
+        "sections": [
+            {
+                "pageSectionType": "title",
+                "pageSectionData": {
+                    "title": "title1"
+                }
+            }
+        ]
+    }
+}

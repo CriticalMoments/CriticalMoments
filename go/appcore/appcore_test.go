@@ -44,6 +44,7 @@ type testLibBindings struct {
 	lastLinkAction   *datamodel.LinkAction
 	reviewCount      int
 	defaultTheme     *datamodel.Theme
+	lastModal        *datamodel.ModalAction
 }
 
 func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction) error {
@@ -64,6 +65,10 @@ func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
 }
 func (lb *testLibBindings) ShowReviewPrompt() error {
 	lb.reviewCount += 1
+	return nil
+}
+func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
+	lb.lastModal = modal
 	return nil
 }
 
@@ -199,6 +204,17 @@ func TestPerformingAction(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).reviewCount != 1 {
 		t.Fatal("review action didn't fire")
+	}
+
+	if ac.libBindings.(*testLibBindings).lastModal != nil {
+		t.Fatal("modal fired too soon")
+	}
+	err = ac.PerformNamedAction("modalAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastModal == nil {
+		t.Fatal("modal event didn't fire")
 	}
 }
 

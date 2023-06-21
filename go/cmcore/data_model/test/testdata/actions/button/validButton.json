@@ -1,0 +1,6 @@
+{
+    "title": "title",
+    "preventDefault": true,
+    "style": "large",
+    "actionName": "action1"
+}

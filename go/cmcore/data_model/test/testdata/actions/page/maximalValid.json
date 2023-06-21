@@ -1,0 +1,78 @@
+{
+    "pageType": "stack",
+    "pageData": {
+        "sections": [
+            {
+                "pageSectionType": "title",
+                "topSpacingScale": 1.1,
+                "pageSectionData": {
+                    "title": "title1",
+                    "centerText": false,
+                    "scaleFactor": 1.2,
+                    "usePrimaryFontColor": false,
+                    "bold": false
+                }
+            },
+            {
+                "pageSectionType": "title",
+                "pageSectionData": {
+                    "title": "title2"
+                }
+            },
+            {
+                "pageSectionType": "unknownFutureType",
+                "pageSectionData": {
+                    "someData": "someData"
+                }
+            },
+            {
+                "pageSectionType": "body",
+                "pageSectionData": {
+                    "bodyText": "body1"
+                }
+            },
+            {
+                "pageSectionType": "body",
+                "pageSectionData": {
+                    "bodyText": "body2",
+                    "scaleFactor": 1.1,
+                    "centerText": false,
+                    "bold": true,
+                    "usePrimaryFontColor": true
+                }
+            }
+        ],
+        "buttons": [
+            {
+                "title": "button1",
+                "preventDefault": true,
+                "style": "large",
+                "actionName": "action1"
+            },
+            {
+                "title": "button2",
+                "style": "normal",
+                "actionName": "action2"
+            },
+            {
+                "title": "button3"
+            },
+            {
+                "title": "button4",
+                "style": "secondary"
+            },
+            {
+                "title": "button5",
+                "style": "tertiary"
+            },
+            {
+                "title": "button6",
+                "style": "info"
+            },
+            {
+                "title": "button7",
+                "style": "info-small"
+            }
+        ]
+    }
+}

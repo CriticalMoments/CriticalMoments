@@ -23,6 +23,10 @@ func (ap *actionDispatcher) ShowReviewPrompt() error {
 	return ap.appcore.libBindings.ShowReviewPrompt()
 }
 
+func (ap *actionDispatcher) ShowModal(modal *datamodel.ModalAction) error {
+	return ap.appcore.libBindings.ShowModal(modal)
+}
+
 func (ap *actionDispatcher) PerformConditionalAction(ca *datamodel.ConditionalAction) error {
 	passed, err := ap.appcore.propertyRegistry.evaluateCondition(ca.Condition)
 	if err != nil {

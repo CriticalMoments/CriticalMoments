@@ -11,6 +11,12 @@
 
 @import Appcore;
 
+@interface CMTheme ()
+
+@property(nonatomic, readwrite) UIColor *primaryColor;
+
+@end
+
 @implementation CMTheme
 
 - (instancetype)init {
@@ -72,11 +78,6 @@ static CMTheme *currentTheme = nil;
 
 #pragma mark Built in themes
 
-+ (CMTheme *)elegantTheme {
-    DatamodelTheme *appcoreTheme = DatamodelElegantTheme();
-    return [CMTheme themeFromAppcoreTheme:appcoreTheme];
-}
-
 + (CMTheme *)testTheme {
     DatamodelTheme *appcoreTheme = DatamodelTestTheme();
     return [CMTheme themeFromAppcoreTheme:appcoreTheme];
@@ -90,6 +91,12 @@ static CMTheme *currentTheme = nil;
     // banners
     theme.bannerBackgroundColor = [CMUtils colorFromHexString:acTheme.bannerBackgroundColor];
     theme.bannerForegroundColor = [CMUtils colorFromHexString:acTheme.bannerForegroundColor];
+
+    // colors
+    theme.primaryColor = [CMUtils colorFromHexString:acTheme.primaryColor];
+    theme.backgroundColor = [CMUtils colorFromHexString:acTheme.backgroundColor];
+    theme.primaryTextColor = [CMUtils colorFromHexString:acTheme.primaryTextColor];
+    theme.secondaryTextColor = [CMUtils colorFromHexString:acTheme.secondaryTextColor];
 
     // fonts
     theme.fontName = acTheme.fontName.length > 0 ? acTheme.fontName : nil;
@@ -119,6 +126,58 @@ static CMTheme *currentTheme = nil;
         return _bannerForegroundColor;
     }
     return [UIColor blackColor];
+}
+
+#pragma mark Colors
+
+- (UIColor *)backgroundColor {
+    if (_backgroundColor) {
+        return _backgroundColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor systemBackgroundColor];
+    } else {
+        return [UIColor whiteColor];
+    }
+}
+
+- (UIColor *)primaryTextColor {
+    if (_primaryTextColor) {
+        return _primaryTextColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor labelColor];
+    } else {
+        return [UIColor blackColor];
+    }
+}
+
+- (UIColor *)secondaryTextColor {
+    if (_secondaryTextColor) {
+        return _secondaryTextColor;
+    }
+    if (@available(iOS 13.0, *)) {
+        return [UIColor secondaryLabelColor];
+    } else {
+        return [UIColor systemGrayColor];
+    }
+}
+
+- (void)setPrimaryColor:(UIColor *)color {
+    _primaryColor = color;
+}
+
+- (UIColor *)primaryColorForView:(UIView *)view {
+    if (_primaryColor) {
+        return _primaryColor;
+    }
+    if (@available(iOS 15.0, *)) {
+        return [UIColor tintColor];
+    } else if (view) {
+        return [view tintColor];
+    } else {
+        return [UIColor systemBlueColor];
+    }
 }
 
 #pragma mark Fonts
@@ -161,6 +220,14 @@ static CMTheme *currentTheme = nil;
     }
 
     return font;
+}
+
+- (CGFloat)titleFontSize {
+    return self.bodyFontSize * 2.2;
+}
+
+- (CGFloat)bodyFontSize {
+    return UIFont.systemFontSize;
 }
 
 @end

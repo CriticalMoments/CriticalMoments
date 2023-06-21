@@ -2,12 +2,19 @@ package datamodel
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type Theme struct {
 	// Banners
 	BannerBackgroundColor string // eg: "#ffffff"
 	BannerForegroundColor string // eg: "#000000"
+
+	// Colors
+	PrimaryColor       string // eg: "#ff0000"
+	BackgroundColor    string // eg: "#ffffff"
+	PrimaryTextColor   string // eg: "#000000"
+	SecondaryTextColor string // eg: "#222222"
 
 	// Fonts
 	FontName                   string
@@ -26,6 +33,12 @@ type jsonTheme struct {
 	BannerBackgroundColor string `json:"bannerBackgroundColor"` // "#ffffff"
 	BannerForegroundColor string `json:"bannerForegroundColor"` // "#000000"
 
+	// Colors
+	PrimaryColor       string `json:"primaryColor,omitempty"`
+	BackgroundColor    string `json:"backgroundColor,omitempty"`
+	PrimaryTextColor   string `json:"primaryTextColor,omitempty"`
+	SecondaryTextColor string `json:"secondaryTextColor,omitempty"`
+
 	// Fonts
 	FontName                   string   `json:"fontName,omitempty"`
 	BoldFontName               string   `json:"boldFontName,omitempty"`
@@ -36,14 +49,8 @@ type jsonTheme struct {
 	DarkModeTheme *Theme `json:"darkModeTheme,omitempty"`
 }
 
-// TODO Dark mode
 var (
-	elegantTheme = Theme{
-		BannerBackgroundColor: "#000000", // Black
-		BannerForegroundColor: "#ffffff", // White
-		FontScale:             1.0,
-	}
-	// Not pretty, but for e2e integration tests through to clients
+	// For integration tests through to clients
 	testTheme = Theme{
 		BannerBackgroundColor:      "#ff0000", // Red
 		BannerForegroundColor:      "#00ff00", // Green
@@ -51,16 +58,16 @@ var (
 		FontName:                   "Palatino-Roman",
 		BoldFontName:               "Palatino-Bold",
 		ScaleFontForUserPreference: false,
+		PrimaryColor:               "#ff0000",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#ff0000",
+		SecondaryTextColor:         "#00ff00",
 		DarkModeTheme: &Theme{
 			BannerBackgroundColor: "#00ff00", // Green
 			BannerForegroundColor: "#ff0000", // Red
 		},
 	}
 )
-
-func ElegantTheme() *Theme {
-	return &elegantTheme
-}
 
 func TestTheme() *Theme {
 	return &testTheme
@@ -95,6 +102,10 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	// Passthough values
 	t.BannerBackgroundColor = jt.BannerBackgroundColor
 	t.BannerForegroundColor = jt.BannerForegroundColor
+	t.PrimaryColor = jt.PrimaryColor
+	t.BackgroundColor = jt.BackgroundColor
+	t.PrimaryTextColor = jt.PrimaryTextColor
+	t.SecondaryTextColor = jt.SecondaryTextColor
 	t.FontName = jt.FontName
 	t.BoldFontName = jt.BoldFontName
 	t.DarkModeTheme = jt.DarkModeTheme
@@ -111,12 +122,12 @@ func (t Theme) Validate() bool {
 }
 
 func (t Theme) ValidateReturningUserReadableIssue() string {
-	// Banner colors requires, and non-optional
-	if !stringColorIsValid(t.BannerBackgroundColor) {
-		return "Banner background color isn't a valid color. Should be in format '#ffffff' (lower case only)"
-	}
-	if !stringColorIsValid(t.BannerForegroundColor) {
-		return "Banner foreground color isn't a valid color. Should be in format '#ffffff' (lower case only)"
+	// Check all colors are valid, but allow empty
+	colors := []string{t.BackgroundColor, t.BannerBackgroundColor, t.BannerForegroundColor, t.PrimaryColor, t.PrimaryTextColor, t.SecondaryTextColor}
+	for _, color := range colors {
+		if !stringColorIsValidAllowEmpty(color) {
+			return fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\"", color)
+		}
 	}
 
 	if t.FontScale < 0.5 || t.FontScale > 2.0 {

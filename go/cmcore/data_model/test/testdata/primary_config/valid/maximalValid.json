@@ -36,7 +36,7 @@
                     "body": "Hello world, but on a banner!",
                     "maxLineCount": 1,
                     "tapActionName": "bannerAction2",
-                    "customThemeName": "blueTheme",
+                    "themeName": "blueTheme",
                     "showDismissButton": false
                 }
             },
@@ -98,6 +98,26 @@
             },
             "reviewAction": {
                 "actionType": "review_prompt"
+            },
+            "modalAction": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": false,
+                    "customTheme": "theme1",
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "pageSectionData": {
+                                        "title": "title1"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             }
         }
     },

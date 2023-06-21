@@ -23,6 +23,7 @@ const (
 	ActionTypeEnumAlert       string = "alert"
 	ActionTypeEnumLink        string = "link"
 	ActionTypeEnumConditional string = "conditional_action"
+	ActionTypeEnumModal       string = "modal"
 	ActionTypeEnumReview      string = "review_prompt"
 )
 
@@ -39,6 +40,7 @@ type ActionContainer struct {
 	AlertAction       *AlertAction
 	LinkAction        *LinkAction
 	ConditionalAction *ConditionalAction
+	ModalAction       *ModalAction
 
 	// generalized interface for functions we need for any actions type.
 	// Typically a pointer to the one value above that is populated.
@@ -59,6 +61,7 @@ type ActionBindings interface {
 	ShowLink(link *LinkAction) error
 	PerformConditionalAction(conditionalAction *ConditionalAction) error
 	ShowReviewPrompt() error
+	ShowModal(modal *ModalAction) error
 }
 
 type ActionTypeInterface interface {
@@ -75,6 +78,7 @@ var (
 		ActionTypeEnumLink:        unpackLinkFromJson,
 		ActionTypeEnumConditional: unpackConditionalActionFromJson,
 		ActionTypeEnumReview:      unpackReviewFromJson,
+		ActionTypeEnumModal:       unpackModalFromJson,
 	}
 )
 
@@ -98,8 +102,13 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
 		}
 	} else {
-		fmt.Printf("CriticalMoments: Unsupported action type: \"%v\" found in config file. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", jac.ActionType)
-		actionData = &UnknownAction{ActionType: jac.ActionType}
+		typeErr := fmt.Sprintf("Unsupported action type: \"%v\" found in config file.", jac.ActionType)
+		if StrictDatamodelParsing {
+			return NewUserPresentableError(typeErr)
+		} else {
+			fmt.Printf("CriticalMoments: %v. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", typeErr)
+			actionData = &UnknownAction{ActionType: jac.ActionType}
+		}
 	}
 
 	if jac.Condition != "" {
@@ -116,9 +125,9 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 
 func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	if ac.ActionType == "" {
-		return "Empty actionType"
+		return "Empty actionType not permitted"
 	}
-	// Check the type hasn't been changed to something unsupported
+	// Check the type hasn't been changed to something unsupported.
 	_, ok := actionTypeRegistry[ac.ActionType]
 	if !ok {
 		_, ok := ac.actionData.(*UnknownAction)

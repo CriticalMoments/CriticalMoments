@@ -91,6 +91,7 @@ func (a *AlertAction) ValidateReturningUserReadableIssue() string {
 	if a.Title == "" && a.Message == "" {
 		return "Alerts must have a title and/or a message. Both can not be blank."
 	}
+	// TODO forwards compatibility: default don't error on new value
 	if a.Style != AlertActionStyleEnumDialog && a.Style != AlertActionStyleEnumLarge {
 		return "Alert style must be 'dialog' or 'large'"
 	}

@@ -29,10 +29,12 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// TODO pointer
 func (t Trigger) Validate() bool {
 	return t.ValidateReturningUserReadableIssue() == ""
 }
 
+// TODO pointer
 func (t Trigger) ValidateReturningUserReadableIssue() string {
 	if t.EventName == "" {
 		return "All triggers require an event"

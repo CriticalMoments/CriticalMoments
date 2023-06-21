@@ -14,4 +14,5 @@ type LibBindings interface {
 	ShowAlert(alert *datamodel.AlertAction) error
 	ShowLink(link *datamodel.LinkAction) error
 	ShowReviewPrompt() error
+	ShowModal(modal *datamodel.ModalAction) error
 }

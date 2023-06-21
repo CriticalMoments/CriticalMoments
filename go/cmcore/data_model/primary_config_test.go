@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 10 {
+	if len(pc.namedActions) != 11 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -100,6 +100,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if !ok {
 		t.Fatal("Review action failed to parse")
 	}
+	ma := pc.ActionWithName("modalAction")
+	if ma.ModalAction == nil || len(ma.ModalAction.Content.Sections) != 1 {
+		t.Fatal("failed to parse modal action")
+	}
 
 	// Triggers
 	if len(pc.namedTriggers) != 2 {
@@ -112,6 +116,33 @@ func TestPrimaryConfigJson(t *testing.T) {
 	trigger2 := pc.namedTriggers["trigger_alert"]
 	if trigger2.ActionName != "alertAction" || trigger2.EventName != "custom_event_alert" {
 		t.Fatal("Trigger 2 parsing failed")
+	}
+}
+
+func TestFutureTypeStrictValidation(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/strictInvalidActionName.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pc PrimaryConfig
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ua := pc.ActionWithName("unknownActionTypeFutureProof")
+	_, ok := ua.actionData.(*UnknownAction)
+	if ua.ActionType != "unknown_future_type" || !ok {
+		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
+	}
+
+	// Strict mode should fail since we have an unknown section
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("Strict parsing allowed unknown action type")
 	}
 }
 

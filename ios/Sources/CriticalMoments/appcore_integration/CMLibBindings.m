@@ -12,6 +12,7 @@
 #import "../messaging/CMBannerManager.h"
 #import "../messaging/CMBannerMessage.h"
 #import "../messaging/CMBannerMessage_private.h"
+#import "../messaging/CMModalViewController.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMUtils.h"
@@ -85,6 +86,8 @@ static CMLibBindings *sharedInstance = nil;
         *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
         return NO;
     }
+
+    // TODO no dispatch
     CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
     [alert showAlert];
     return YES;
@@ -105,6 +108,8 @@ static CMLibBindings *sharedInstance = nil;
         }
     }
 
+    // TODO no dispatch
+
     [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
     return YES;
 }
@@ -120,15 +125,32 @@ static CMLibBindings *sharedInstance = nil;
           [SKStoreReviewController requestReview];
       }
     });
+
+    // TODO no returns
+}
+
+- (BOOL)showModal:(DatamodelModalAction *_Nullable)modal error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      CMModalViewController *sheetVc = [[CMModalViewController alloc] initWithDatamodel:modal];
+      [CMUtils.keyWindow.rootViewController presentViewController:sheetVc animated:YES completion:nil];
+    });
+
+    return NO;
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
+    // TODO: not main thread
+
     SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
     UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
-    if (!safariVc || !rootVc) {
+    UIViewController *topController = rootVc;
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    if (!safariVc || !topController) {
         return NO;
     }
-    [rootVc presentViewController:safariVc animated:YES completion:nil];
+    [topController presentViewController:safariVc animated:YES completion:nil];
     return YES;
 }
 

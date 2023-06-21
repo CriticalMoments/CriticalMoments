@@ -78,7 +78,7 @@
     }
     UIColor *forgroundBannerColor = theme.bannerForegroundColor;
     UIColor *backgroundBannerColor = theme.bannerBackgroundColor;
-    UIFont *bannerFont = [theme boldFontOfSize:UIFont.systemFontSize];
+    UIFont *bannerFont = [theme boldFontOfSize:theme.bodyFontSize];
 
     self.backgroundColor = backgroundBannerColor;
 
@@ -109,8 +109,7 @@
         [_bodyLabel.leftAnchor constraintGreaterThanOrEqualToAnchor:self.layoutMarginsGuide.leftAnchor],
         [_bodyLabel.rightAnchor constraintLessThanOrEqualToAnchor:self.layoutMarginsGuide.rightAnchor],
         [_bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
-        // Max width for iPad, based on readableContentGuide from Apple
-        [_bodyLabel.widthAnchor constraintLessThanOrEqualToConstant:672],
+        [_bodyLabel.widthAnchor constraintLessThanOrEqualToConstant:CM_MAX_TEXT_WIDTH],
     ];
     [NSLayoutConstraint activateConstraints:constraints];
 

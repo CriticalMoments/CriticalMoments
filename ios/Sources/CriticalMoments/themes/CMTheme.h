@@ -11,6 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Max width for iPad, based on readableContentGuide from Apple
+#define CM_MAX_TEXT_WIDTH 672
+
 // clang-format off
 /**
  A class to control the theme/style of our UI controls.
@@ -36,19 +39,26 @@ NS_ASSUME_NONNULL_BEGIN
 /// Sets a theme as current/default
 + (void)setCurrentTheme:(CMTheme *)theme;
 
-#pragma mark Built in themes
-
-/// Built in elegant theme. Simple black and white.
-+ (CMTheme *)elegantTheme;
-/// :nodoc: Test Theme for e2e testing
-+ (CMTheme *)testTheme;
-
 #pragma mark Banners
 
 /// The background color of banner messages
 @property(nonatomic, readwrite) UIColor *bannerBackgroundColor;
 /// The foreground color of banner messages
 @property(nonatomic, readwrite) UIColor *bannerForegroundColor;
+
+#pragma mark Colors
+
+/// The background color for views
+@property(nonatomic, readwrite) UIColor *backgroundColor;
+/// Text color for primary content labels
+@property(nonatomic, readwrite) UIColor *primaryTextColor;
+/// Text color for secondary content labels
+@property(nonatomic, readwrite) UIColor *secondaryTextColor;
+
+/// The tint color to to apply to buttons, icons, links and more. Should be legible on backgroundColor. Provide the view
+/// this will be rendered in, so we can resolve at runtime from view heiarchy if not set explicity in theme.
+- (UIColor *)primaryColorForView:(UIView *)view;
+- (void)setPrimaryColor:(UIColor *)color;
 
 #pragma mark Fonts
 
@@ -90,6 +100,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param fontSize The font size to use. Will scale for dynamic type unless
 /// scaleFontForDynamicType is false.
 - (UIFont *)boldFontOfSize:(CGFloat)fontSize;
+
+/// The font size CM uses for titles in pages and sheets
+- (CGFloat)titleFontSize;
+/// The font size CM uses for body text
+- (CGFloat)bodyFontSize;
 
 @end
 

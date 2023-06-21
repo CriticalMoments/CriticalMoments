@@ -11,6 +11,7 @@
 #import "BannerDemoScreen.h"
 #import "ConditionsDemoScreen.h"
 #import "LinkDemoScreen.h"
+#import "SheetDemoScreen.h"
 #import "ThemeDemoScreen.h"
 
 @implementation MainDemoScreen
@@ -49,7 +50,12 @@
     linksAction.subtitle = @"Open web links or app deeplinks";
     linksAction.actionNextScreen = [[LinkDemoScreen alloc] init];
 
-    [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction ]];
+    CMDemoAction *sheetAction = [[CMDemoAction alloc] init];
+    sheetAction.title = @"Modals";
+    sheetAction.subtitle = @"UI to display announcements or other information in sheets which overlay the entire app.";
+    sheetAction.actionNextScreen = [[SheetDemoScreen alloc] init];
+
+    [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction, sheetAction ]];
 
     CMDemoAction *themeAction = [[CMDemoAction alloc] init];
     themeAction.title = @"Edit Theme";
