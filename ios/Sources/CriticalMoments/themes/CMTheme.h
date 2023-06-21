@@ -103,8 +103,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// The font size CM uses for titles in pages and sheets
 - (CGFloat)titleFontSize;
-/// The font size CM uses for subtitles in pages and sheets
-- (CGFloat)subtitleFontSize;
+/// The font size CM uses for body text
+- (CGFloat)bodyFontSize;
 
 @end
 

@@ -78,7 +78,7 @@
     }
     UIColor *forgroundBannerColor = theme.bannerForegroundColor;
     UIColor *backgroundBannerColor = theme.bannerBackgroundColor;
-    UIFont *bannerFont = [theme boldFontOfSize:UIFont.systemFontSize];
+    UIFont *bannerFont = [theme boldFontOfSize:theme.bodyFontSize];
 
     self.backgroundColor = backgroundBannerColor;
 

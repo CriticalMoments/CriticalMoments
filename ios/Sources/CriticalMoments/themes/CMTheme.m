@@ -223,11 +223,11 @@ static CMTheme *currentTheme = nil;
 }
 
 - (CGFloat)titleFontSize {
-    return UIFont.systemFontSize * 2.2;
+    return self.bodyFontSize * 2.2;
 }
 
-- (CGFloat)subtitleFontSize {
-    return UIFont.systemFontSize * 1.4;
+- (CGFloat)bodyFontSize {
+    return UIFont.systemFontSize;
 }
 
 @end

@@ -241,7 +241,7 @@
         bodyLabel.textColor = self.theme.secondaryTextColor;
     }
 
-    CGFloat fontSize = UIFont.systemFontSize * bodyData.scaleFactor;
+    CGFloat fontSize = self.theme.bodyFontSize * bodyData.scaleFactor;
     if (bodyData.bold) {
         bodyLabel.font = [self.theme boldFontOfSize:fontSize];
     } else {
