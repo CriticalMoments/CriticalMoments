@@ -5,14 +5,22 @@ import (
 	"fmt"
 )
 
-// TODO: need a "type" + "data" concept here. Can be more than just set of sections in future.
-// TODO: decide if "buttons" at top level or inside type? Top level prob best since they render over content.
+// Model is specific to "Stack" page. Can add type/data here if we add more types, but unnecessary
+// while there is only one.
 type Page struct {
 	Sections []*PageSection
 	Buttons  []*Button
 }
 
+const PageTypeEnumStack string = "stack"
+
+// Future proofing. Expect more page types in future so ensure the datamodel can be typed.
 type jsonPage struct {
+	PageType string         `json:"pageType"`
+	PageData *jsonStackPage `json:"pageData"`
+}
+
+type jsonStackPage struct {
 	Sections []*PageSection `json:"sections"`
 	Buttons  []*Button      `json:"buttons"`
 }
@@ -24,8 +32,17 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableErrorWSource("Unable to parse the json of a page.", err)
 	}
 
-	p.Sections = jp.Sections
-	p.Buttons = jp.Buttons
+	if jp.PageType == PageTypeEnumStack {
+		p.Sections = jp.PageData.Sections
+		p.Buttons = jp.PageData.Buttons
+	} else {
+		typeErr := "pageType must be 'stack'"
+		if StrictDatamodelParsing {
+			return NewUserPresentableError(typeErr)
+		} else {
+			fmt.Printf("CriticalMoments: %v. Ignoring, but if not expected check your config file.\n", typeErr)
+		}
+	}
 
 	if validationIssue := p.ValidateReturningUserReadableIssue(); validationIssue != "" {
 		return NewUserPresentableError(validationIssue)
@@ -36,7 +53,11 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 
 func (p *Page) ValidateReturningUserReadableIssue() string {
 	if len(p.Sections) == 0 {
-		return "Page with 0 sections is not valid"
+		if StrictDatamodelParsing {
+			return "Page with 0 sections is not valid"
+		} else {
+			fmt.Printf("CriticalMoments: page with 0 sections not valid. Ignoring but if unexpected check your config file.")
+		}
 	}
 
 	for _, section := range p.Sections {

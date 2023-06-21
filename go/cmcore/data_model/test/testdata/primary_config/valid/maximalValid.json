@@ -105,14 +105,17 @@
                     "showCloseButton": false,
                     "customTheme": "theme1",
                     "content": {
-                        "sections": [
-                            {
-                                "pageSectionType": "title",
-                                "pageSectionData": {
-                                    "title": "title1"
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "title",
+                                    "pageSectionData": {
+                                        "title": "title1"
+                                    }
                                 }
-                            }
-                        ]
+                            ]
+                        }
                     }
                 }
             }

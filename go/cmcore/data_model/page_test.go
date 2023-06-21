@@ -61,7 +61,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 
-	// Strict mode should fail since we have an unknown section at index=2
+	// Strict mode should fail
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
@@ -146,9 +146,18 @@ func TestPageParsingMinimal(t *testing.T) {
 
 func TestPageValidation(t *testing.T) {
 	p := Page{}
-	if p.ValidateReturningUserReadableIssue() == "" {
-		t.Fatal("Allowed page with no sections")
+	if p.ValidateReturningUserReadableIssue() != "" {
+		t.Fatal("should allow empty page when not strict for backwards compat")
 	}
+	// Strict mode should fail
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	if p.ValidateReturningUserReadableIssue() == "" {
+		t.Fatal("Allowed page with no sections in strict mode")
+	}
+	StrictDatamodelParsing = false
 
 	p.Sections = []*PageSection{
 		{
@@ -240,5 +249,27 @@ func TestBodyPageSectionValidation(t *testing.T) {
 	s.BodyData.ScaleFactor = -1.0
 	if s.ValidateReturningUserReadableIssue() == "" {
 		t.Fatal("Allowed section with negative scale")
+	}
+}
+
+func TestPageParsingFutureProof(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/page/futureproof.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var p Page
+	err = json.Unmarshal(testFileData, &p)
+	if err != nil || len(p.Sections) != 0 {
+		t.Fatal("failed to parse future type into empty")
+	}
+
+	// Strict mode should fail
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &p)
+	if err == nil {
+		t.Fatal("Failed to error on invalid type in strict mode")
 	}
 }

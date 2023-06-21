@@ -66,6 +66,7 @@ func TestJsonParsingModal(t *testing.T) {
 		t.Fatal("error parsing modal")
 	}
 }
+
 func TestJsonParsingMinModal(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/modal/minimalValid.json")
 	if err != nil {
@@ -89,7 +90,17 @@ func TestJsonParsingInvalidModal(t *testing.T) {
 	}
 	var m ModalAction
 	err = json.Unmarshal(testFileData, &m)
+	if err != nil {
+		t.Fatal("should allow unrecognized content for backwards compat when not strict")
+	}
+
+	// Strict mode should fail
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &m)
 	if err == nil {
-		t.Fatal("allowed invalid modal parsing")
+		t.Fatal("allowed invalid modal parsing in strict mode")
 	}
 }
