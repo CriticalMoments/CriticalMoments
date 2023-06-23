@@ -46,6 +46,17 @@
     return keyWindow;
 }
 
++ (UIViewController *)topViewController {
+    UIViewController *vc = [CMUtils keyWindow].rootViewController;
+
+    for (UIViewController *nextPresented = vc.presentedViewController; nextPresented;
+         nextPresented = vc.presentedViewController) {
+        vc = nextPresented;
+    }
+
+    return vc;
+}
+
 + (NSString *)uiKitLocalizedStringForKey:(NSString *)key {
     NSBundle *uikitBundle = [NSBundle bundleForClass:[UIButton class]];
     if (!uikitBundle) {

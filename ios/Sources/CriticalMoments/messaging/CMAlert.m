@@ -39,10 +39,10 @@
 }
 
 - (void)showAlert {
-    UIWindow *keyWindow = [CMUtils keyWindow];
-    UIViewController *rootVc = keyWindow.rootViewController;
-    if (!rootVc) {
-        NSLog(@"CriticalMoments: can't find root vc for presenting alert");
+    // TODO -- main thread
+    UIViewController *topController = CMUtils.topViewController;
+    if (!topController) {
+        NSLog(@"CriticalMoments: can't find top vc for presenting alert");
     }
 
     DatamodelAlertAction *dataModel = self.dataModel;
@@ -67,8 +67,9 @@
     // since we don't use action sheet look on iPad
     if (alert.popoverPresentationController) {
         alert.popoverPresentationController.permittedArrowDirections = 0;
-        alert.popoverPresentationController.sourceRect = CGRectMake(rootVc.view.center.x, rootVc.view.center.y, 0, 0);
-        alert.popoverPresentationController.sourceView = rootVc.view;
+        alert.popoverPresentationController.sourceRect =
+            CGRectMake(topController.view.center.x, topController.view.center.y, 0, 0);
+        alert.popoverPresentationController.sourceView = topController.view;
     }
 
     if (dataModel.showCancelButton) {
@@ -105,7 +106,7 @@
         }
     }
 
-    [keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+    [topController presentViewController:alert animated:YES completion:nil];
 }
 
 - (NSArray<CMCustomAlertButton *> *)customButtonActions {

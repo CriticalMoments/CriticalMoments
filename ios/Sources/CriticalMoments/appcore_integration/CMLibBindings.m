@@ -77,6 +77,8 @@ static CMLibBindings *sharedInstance = nil;
 
     // TODO: main thread?
     [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+
+    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -90,10 +92,14 @@ static CMLibBindings *sharedInstance = nil;
     // TODO no dispatch
     CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
     [alert showAlert];
+
+    // TODO: what is the bool return here?
     return YES;
 }
 
 - (BOOL)showLink:(DatamodelLinkAction *)link error:(NSError *_Nullable __autoreleasing *)error {
+    // TODO no dispatch to main
+
     NSURL *url = [NSURL URLWithString:link.urlString];
     if (!url || !url.scheme) {
         *error = [NSError errorWithDomain:@"CMIOS" code:72937634 userInfo:nil];
@@ -108,9 +114,8 @@ static CMLibBindings *sharedInstance = nil;
         }
     }
 
-    // TODO no dispatch
-
     [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -132,25 +137,20 @@ static CMLibBindings *sharedInstance = nil;
 - (BOOL)showModal:(DatamodelModalAction *_Nullable)modal error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     dispatch_async(dispatch_get_main_queue(), ^{
       CMModalViewController *sheetVc = [[CMModalViewController alloc] initWithDatamodel:modal];
-      [CMUtils.keyWindow.rootViewController presentViewController:sheetVc animated:YES completion:nil];
+      [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 
     return NO;
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
-    // TODO: not main thread
-
     SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
-    UIViewController *rootVc = CMUtils.keyWindow.rootViewController;
-    UIViewController *topController = rootVc;
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
+    UIViewController *topController = CMUtils.topViewController;
     if (!safariVc || !topController) {
         return NO;
     }
     [topController presentViewController:safariVc animated:YES completion:nil];
+
     return YES;
 }
 
