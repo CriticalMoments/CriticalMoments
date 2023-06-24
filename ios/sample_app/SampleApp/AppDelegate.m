@@ -40,4 +40,26 @@
     // return.
 }
 
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+    if ([@"critical-moments-sampleapp:main" isEqualToString:url.absoluteString]) {
+        // return to the main screen of the app
+        UIViewController *rootVC = Utils.keyWindow.rootViewController;
+        if ([rootVC isKindOfClass:[UITabBarController class]]) {
+            UITabBarController *tab = (UITabBarController *)rootVC;
+            rootVC = tab.selectedViewController;
+        }
+        UINavigationController *navController;
+        if ([rootVC isKindOfClass:[UINavigationController class]]) {
+            navController = (UINavigationController *)rootVC;
+        } else {
+            navController = rootVC.navigationController;
+        }
+        [navController popToRootViewControllerAnimated:YES];
+        return YES;
+    }
+    return NO;
+}
+
 @end

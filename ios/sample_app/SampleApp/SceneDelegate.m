@@ -60,21 +60,7 @@
 
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts API_AVAILABLE(ios(13.0)) {
     NSURL *url = URLContexts.allObjects.firstObject.URL;
-    if ([@"critical-moments-sampleapp:main" isEqualToString:url.absoluteString]) {
-        // return to the main screen of the app
-        UIViewController *rootVC = Utils.keyWindow.rootViewController;
-        if ([rootVC isKindOfClass:[UITabBarController class]]) {
-            UITabBarController *tab = (UITabBarController *)rootVC;
-            rootVC = tab.selectedViewController;
-        }
-        UINavigationController *navController;
-        if ([rootVC isKindOfClass:[UINavigationController class]]) {
-            navController = (UINavigationController *)rootVC;
-        } else {
-            navController = rootVC.navigationController;
-        }
-        [navController popToRootViewControllerAnimated:YES];
-    }
+    [UIApplication.sharedApplication.delegate application:UIApplication.sharedApplication openURL:url options:@{}];
 }
 
 @end
