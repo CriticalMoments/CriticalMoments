@@ -257,3 +257,66 @@ func TestJsonParsingInvalidAlert(t *testing.T) {
 		t.Fatal("invalid json should error")
 	}
 }
+
+func TestJsonParsingFuture(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/futureproof.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	a := ac.AlertAction
+	if a == nil || !a.Validate() {
+		t.Fatal()
+	}
+	if a.Title != "hello from the future" {
+		t.Fatal()
+	}
+	if a.Style != AlertActionStyleEnumDialog {
+		t.Fatal("didn't fall back on unrecognized style")
+	}
+
+	// Strict mode should fail
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil {
+		t.Fatal("Strict parsing allowed unknown style")
+	}
+}
+
+func TestJsonParsingFutureButton(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/alert/futureproofButtonStyle.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	a := ac.AlertAction
+	if a == nil || !a.Validate() {
+		t.Fatal()
+	}
+	if a.CustomButtons[0].Style != AlertActionButtonStyleEnumDefault {
+		t.Fatal("failed to fallback to default style")
+	}
+
+	// Strict mode should fail
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil {
+		t.Fatal("Strict parsing allowed unknown style")
+	}
+}

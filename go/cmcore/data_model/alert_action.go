@@ -3,6 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"golang.org/x/exp/slices"
 )
 
 /*
@@ -35,6 +37,8 @@ const (
 	AlertActionStyleEnumLarge  string = "large"
 )
 
+var alertStyles []string = []string{AlertActionStyleEnumDialog, AlertActionStyleEnumLarge}
+
 type AlertAction struct {
 	Title              string
 	Message            string
@@ -50,6 +54,8 @@ const (
 	AlertActionButtonStyleEnumDestructive string = "destructive"
 	AlertActionButtonStyleEnumPrimary     string = "primary"
 )
+
+var alertActionStyles []string = []string{AlertActionButtonStyleEnumDefault, AlertActionButtonStyleEnumDestructive, AlertActionButtonStyleEnumPrimary}
 
 type AlertActionCustomButton struct {
 	Label      string
@@ -91,8 +97,7 @@ func (a *AlertAction) ValidateReturningUserReadableIssue() string {
 	if a.Title == "" && a.Message == "" {
 		return "Alerts must have a title and/or a message. Both can not be blank."
 	}
-	// TODO forwards compatibility: default don't error on new value
-	if a.Style != AlertActionStyleEnumDialog && a.Style != AlertActionStyleEnumLarge {
+	if !slices.Contains(alertStyles, a.Style) {
 		return "Alert style must be 'dialog' or 'large'"
 	}
 	if !a.ShowOkButton && a.OkButtonActionName != "" {
@@ -118,9 +123,7 @@ func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
 	if b.Label == "" {
 		return "Custom alert buttons must have a label"
 	}
-	if b.Style != AlertActionButtonStyleEnumDefault &&
-		b.Style != AlertActionButtonStyleEnumPrimary &&
-		b.Style != AlertActionButtonStyleEnumDestructive {
+	if !slices.Contains(alertActionStyles, b.Style) {
 		return fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style)
 	}
 
@@ -145,7 +148,16 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	}
 	alertStyle := AlertActionStyleEnumDialog
 	if ja.Style != nil {
-		alertStyle = *ja.Style
+		if slices.Contains(alertStyles, *ja.Style) {
+			alertStyle = *ja.Style
+		} else {
+			styleErr := fmt.Sprintf("Invalid alert style \"%v\".", *ja.Style)
+			if StrictDatamodelParsing {
+				return NewUserPresentableError(styleErr)
+			} else {
+				fmt.Printf("CriticalMoments: %v Ignoring and Will default to dialog. If not expected, check your CM config file.\n", styleErr)
+			}
+		}
 	}
 
 	a.Title = ja.Title
@@ -158,7 +170,10 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	customButtons := make([]*AlertActionCustomButton, 0)
 	if ja.CustomButtons != nil {
 		for _, customButtonJson := range *ja.CustomButtons {
-			b := customButtonFromJson(&customButtonJson)
+			b, err := customButtonFromJson(&customButtonJson)
+			if err != nil {
+				return err
+			}
 			customButtons = append(customButtons, b)
 		}
 	}
@@ -171,17 +186,26 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func customButtonFromJson(jb *jsonAlertCustomButton) *AlertActionCustomButton {
+func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, error) {
 	buttonStyle := AlertActionButtonStyleEnumDefault
 	if jb.Style != nil {
-		buttonStyle = *jb.Style
+		if slices.Contains(alertActionStyles, *jb.Style) {
+			buttonStyle = *jb.Style
+		} else {
+			btnStyleErr := fmt.Sprintf("Alert action style \"%v\" is not a valid style.", *jb.Style)
+			if StrictDatamodelParsing {
+				return nil, NewUserPresentableError(btnStyleErr)
+			} else {
+				fmt.Printf("CriticalMoments: %v Ignoring and defaulting to default style. If this is not expected, check your CM config file.", btnStyleErr)
+			}
+		}
 	}
 
 	return &AlertActionCustomButton{
 		Label:      jb.Label,
 		ActionName: jb.ActionName,
 		Style:      buttonStyle,
-	}
+	}, nil
 }
 
 func (a *AlertAction) AllEmbeddedThemeNames() ([]string, error) {
