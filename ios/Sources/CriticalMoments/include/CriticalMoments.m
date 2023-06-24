@@ -10,8 +10,6 @@
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
 
-@import Appcore;
-
 @implementation CriticalMoments
 
 + (NSString *)objcPing {
