@@ -32,8 +32,6 @@
         // prevents swipe to dismiss
         if (@available(iOS 13.0, *)) {
             self.modalInPresentation = !model.showCloseButton;
-        } else {
-            // TODO P0 confirm: sheets are new in 13 so might be no-op
         }
     }
     return self;
