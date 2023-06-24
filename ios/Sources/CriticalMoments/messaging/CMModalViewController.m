@@ -57,11 +57,21 @@
     pv.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:pv];
 
-    UIButton *closeBtn;
-    if (@available(iOS 13.0, *)) {
-        closeBtn = [UIButton buttonWithType:UIButtonTypeClose];
+    UIButton *closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    if (@available(iOS 15.0, *)) {
+        // don't use UIButtonTypeClose -- might not render on custom bg color. Use secondaryTextColor for contrast.
+        UIImageSymbolConfiguration *sc =
+            [UIImageSymbolConfiguration configurationWithHierarchicalColor:theme.secondaryTextColor];
+
+        // Relative to systemFontSize to scale for accessbility.
+        sc = [sc configurationByApplyingConfiguration:[UIImageSymbolConfiguration
+                                                          configurationWithPointSize:UIFont.systemFontSize * 1.9]];
+
+        UIImage *closeImage = [UIImage systemImageNamed:@"xmark.circle.fill" withConfiguration:sc];
+
+        [closeBtn setImage:closeImage forState:UIControlStateNormal];
     } else {
-        closeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        // Primary font color here because symbol is visually lighter
         // TODO: check this unicode on earliest deployment target: ios 12
         [closeBtn setTitle:@"✕" forState:UIControlStateNormal];
         [closeBtn setTitleColor:theme.primaryTextColor forState:UIControlStateNormal];
@@ -79,6 +89,9 @@
     NSArray<NSLayoutConstraint *> *constraints = @[
         [closeBtn.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.view.topAnchor multiplier:2.0],
         [closeBtn.rightAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.rightAnchor],
+        // 44=HIG accessibility recommendation
+        [closeBtn.heightAnchor constraintGreaterThanOrEqualToConstant:44],
+        [closeBtn.widthAnchor constraintGreaterThanOrEqualToConstant:44],
 
         [pv.topAnchor constraintEqualToAnchor:self.view.topAnchor],
         [pv.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
