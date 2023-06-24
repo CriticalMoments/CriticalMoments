@@ -29,7 +29,11 @@
     [super viewDidLoad];
 
     self.navigationItem.title = self.screen.title;
-    self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
+    } else {
+        self.view.backgroundColor = [UIColor colorWithRed:0.945 green:0.945 blue:0.945 alpha:1.0];
+    }
 }
 
 - (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
