@@ -120,15 +120,28 @@ static CMTheme *staticCustomTheme = nil;
 }
 
 - (void)colorPickerForColor:(UIColor *)color withCallback:(void (^)(UIColor *))callback {
-    UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
-    colorPicker.supportsAlpha = false;
-    colorPicker.selectedColor = color;
-    self.currentColorCallback = callback;
-    colorPicker.delegate = self;
-    [Utils.keyWindow.rootViewController presentViewController:colorPicker animated:YES completion:nil];
+    if (@available(iOS 14.0, *)) {
+        UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
+        colorPicker.supportsAlpha = false;
+        colorPicker.selectedColor = color;
+        self.currentColorCallback = callback;
+        colorPicker.delegate = self;
+        [Utils.keyWindow.rootViewController presentViewController:colorPicker animated:YES completion:nil];
+    } else {
+        UIAlertController *alert =
+            [UIAlertController alertControllerWithTitle:@"Theme colors demo not available"
+                                                message:@"Try this part of the sample app on iOS 14 or newer."
+                                         preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *action){
+                                                              }];
+        [alert addAction:defaultAction];
+        [Utils.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+    }
 }
 
-- (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
+- (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController API_AVAILABLE(ios(14.0)) {
     if (self.currentColorCallback) {
         self.currentColorCallback(viewController.selectedColor);
     }

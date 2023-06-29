@@ -148,13 +148,13 @@
         // dark mode adjust tint for ios 13/14
         if (button.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
             backgroundColor = [UIColor colorWithHue:h
-                                         saturation:MAX(MIN(s - 0.12, 1.0), 0.0)
-                                         brightness:MAX(MIN(b - 0.6, 1.0), 0.0)
+                                         saturation:MAX(MIN(s * 0.84375, 1.0), 0.0)
+                                         brightness:MAX(MIN(b * 0.3, 1.0), 0.0)
                                               alpha:1];
         } else {
             backgroundColor = [UIColor colorWithHue:h
-                                         saturation:MAX(s - 0.52, 0.0)
-                                         brightness:MAX(MIN(b + 0.1, 1.0), 0.0)
+                                         saturation:MAX(MIN(s * 0.10, 1.0), 0.0)
+                                         brightness:MAX(MIN(b * 1.18, 1.0), 0.0)
                                               alpha:1];
         }
     } else if ([DatamodelButtonStyleEnumTertiary isEqualToString:model.style]) {

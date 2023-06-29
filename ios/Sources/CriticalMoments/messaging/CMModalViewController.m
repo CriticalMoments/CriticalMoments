@@ -32,8 +32,6 @@
         // prevents swipe to dismiss
         if (@available(iOS 13.0, *)) {
             self.modalInPresentation = !model.showCloseButton;
-        } else {
-            // TODO P0 confirm: sheets are new in 13 so might be no-op
         }
     }
     return self;
@@ -63,7 +61,7 @@
         UIImageSymbolConfiguration *sc =
             [UIImageSymbolConfiguration configurationWithHierarchicalColor:theme.secondaryTextColor];
 
-        // Relative to systemFontSize to scale for accessbility.
+        // Size relative to systemFontSize to scale for accessbility.
         sc = [sc configurationByApplyingConfiguration:[UIImageSymbolConfiguration
                                                           configurationWithPointSize:UIFont.systemFontSize * 1.9]];
 
@@ -72,9 +70,10 @@
         [closeBtn setImage:closeImage forState:UIControlStateNormal];
     } else {
         // Primary font color here because symbol is visually lighter
-        // TODO: check this unicode on earliest deployment target: ios 12
         [closeBtn setTitle:@"✕" forState:UIControlStateNormal];
         [closeBtn setTitleColor:theme.primaryTextColor forState:UIControlStateNormal];
+        // Size relative to systemFontSize to scale for accessbility.
+        closeBtn.titleLabel.font = [UIFont systemFontOfSize:UIFont.systemFontSize * 1.6];
     }
     closeBtn.hidden = !self.model.showCloseButton;
     closeBtn.translatesAutoresizingMaskIntoConstraints = NO;

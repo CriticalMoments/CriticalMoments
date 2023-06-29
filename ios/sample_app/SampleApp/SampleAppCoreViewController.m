@@ -31,10 +31,15 @@
     UINavigationController *mainTabNav = [[UINavigationController alloc] initWithRootViewController:mainTabRoot];
     mainTabNav.navigationBar.prefersLargeTitles = YES;
 
-    UIImageConfiguration *largeImageConfig =
-        [UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge];
-    UIImage *mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays" withConfiguration:largeImageConfig];
-    UITabBarItem *mainTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Demo" image:mainTabIconImage tag:0];
+    UITabBarItem *mainTabBarItem;
+    if (@available(iOS 13.0, *)) {
+        UIImageConfiguration *largeImageConfig =
+            [UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge];
+        UIImage *mainTabIconImage = [UIImage systemImageNamed:@"wand.and.rays" withConfiguration:largeImageConfig];
+        mainTabBarItem = [[UITabBarItem alloc] initWithTitle:@"Demo" image:mainTabIconImage tag:0];
+    } else {
+        mainTabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemFeatured tag:0];
+    }
     mainTabNav.tabBarItem = mainTabBarItem;
     self.viewControllers = @[ mainTabNav ];
 

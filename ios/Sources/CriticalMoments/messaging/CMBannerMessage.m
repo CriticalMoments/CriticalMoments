@@ -120,7 +120,6 @@
                                                       renderingMode:UIImageRenderingModeAlwaysOriginal];
         [_dismissButton setImage:dismissImage forState:UIControlStateNormal];
     } else {
-        // TODO: check this unicode on earliest deployment target: ios 11
         [_dismissButton setTitle:@"✕" forState:UIControlStateNormal];
         [_dismissButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
     }
@@ -132,7 +131,6 @@
 
     // Create "ᐊᐅ" button for next message
     _nextButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    // TODO: check this unicode on earliest deployment target: ios 11
     [_nextButton setTitle:@"ᐊᐅ" forState:UIControlStateNormal];
     [_nextButton setTitleColor:forgroundBannerColor forState:UIControlStateNormal];
     [_nextButton addTarget:self
