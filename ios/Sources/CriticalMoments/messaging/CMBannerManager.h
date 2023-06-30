@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
  multiple banners.
  @param message the CMBannerMessage to present
  */
-- (void)showAppWideMessage:(CMBannerMessage *)message;
+- (void)showAppWideMessage:(CMBannerMessage *)message API_AVAILABLE(ios(13));
 
 /**
 Removes a previously presented banner message.

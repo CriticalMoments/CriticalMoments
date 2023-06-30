@@ -73,10 +73,15 @@ static CMLibBindings *sharedInstance = nil;
         return NO;
     }
 
-    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
-
-    // TODO: main thread?
-    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    if (@available(iOS 13, *)) {
+        // TODO: main thread?
+        CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
+        [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    } else {
+        NSLog(@"CriticalMoments: Banner messages are only supported on iOS 13 or newer.");
+        *error = [NSError errorWithDomain:@"CMIOS: Banner not supported on iOS version" code:87155467 userInfo:nil];
+        return NO;
+    }
 
     // TODO: what is the bool return here?
     return YES;

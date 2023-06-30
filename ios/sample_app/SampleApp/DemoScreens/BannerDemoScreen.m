@@ -142,17 +142,16 @@
     NSString *messageStingWithCount = [NSString stringWithFormat:@"(%ld) %@", (long)self.counter, messageString];
     CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithBody:messageStingWithCount];
     bannerMessage.actionDelegate = self;
-    [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    if (@available(iOS 13, *)) {
+        [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+    } else {
+        [self showAlertWithTitle:@"Not Supported" andBody:@"Banners are not supported on iOS 12 or earlier."];
+    }
 }
 
-#pragma mark CMBannerActionDelegate
-
-- (void)messageAction:(CMBannerMessage *)message {
-    NSString *alertMessage = [NSString stringWithFormat:@"Assign an actionDelegate to make this do whatever "
-                                                        @"you want!\n\nThe banner you tapped said:\"%@\"",
-                                                        message.body];
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Banner Tapped"
-                                                                   message:alertMessage
+- (void)showAlertWithTitle:(NSString *)title andBody:(NSString *)body {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
+                                                                   message:body
                                                             preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
                                                             style:UIAlertActionStyleDefault
@@ -162,6 +161,15 @@
 
     UIViewController *rootVC = Utils.keyWindow.rootViewController;
     [rootVC presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark CMBannerActionDelegate
+
+- (void)messageAction:(CMBannerMessage *)message {
+    NSString *alertMessage = [NSString stringWithFormat:@"Assign an actionDelegate to make this do whatever "
+                                                        @"you want!\n\nThe banner you tapped said:\"%@\"",
+                                                        message.body];
+    [self showAlertWithTitle:@"Banner Tapped" andBody:alertMessage];
 }
 
 @end
