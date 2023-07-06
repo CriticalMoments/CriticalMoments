@@ -231,12 +231,12 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("Failed to eval false condition with property")
 	}
 
-	result, err = pr.evaluateCondition("1 + 2 + 3")
+	_, err = pr.evaluateCondition("1 + 2 + 3")
 	if err == nil {
 		t.Fatal("Allowed condition with non bool result")
 	}
 
-	result, err = pr.evaluateCondition("a_val ^#$%")
+	_, err = pr.evaluateCondition("a_val ^#$%")
 	if err == nil {
 		t.Fatal("Allowed invalid condition")
 	}

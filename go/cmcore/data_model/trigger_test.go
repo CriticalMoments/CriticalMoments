@@ -27,6 +27,9 @@ func TestTriggerJsonValidation(t *testing.T) {
 
 func TestTriggerParsingValidTrigger(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/triggers/valid/validTrigger.json")
+	if err != nil {
+		t.Fatal()
+	}
 	var trigger Trigger
 	err = json.Unmarshal(testFileData, &trigger)
 	if err != nil {

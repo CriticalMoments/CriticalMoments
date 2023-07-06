@@ -73,6 +73,9 @@ func TestJsonParsingMinimalFieldsBanner(t *testing.T) {
 	}
 	var ac datamodel.ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal()
+	}
 
 	if ac.ActionType != datamodel.ActionTypeEnumBanner {
 		t.Fatal()
@@ -105,6 +108,9 @@ func TestJsonParsingAllFieldsBanner(t *testing.T) {
 	}
 	var ac datamodel.ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
+	if err != nil {
+		t.Fatal()
+	}
 
 	if ac.ActionType != datamodel.ActionTypeEnumBanner {
 		t.Fatal()
