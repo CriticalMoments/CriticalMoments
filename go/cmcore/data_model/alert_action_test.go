@@ -79,7 +79,7 @@ func TestCustomButtonValidation(t *testing.T) {
 	}
 	b.Style = ""
 	if b.Validate() {
-		t.Fatal("Emtpy button style should not validate")
+		t.Fatal("Empty button style should not validate")
 	}
 	b.Style = "adsf"
 	if b.Validate() {

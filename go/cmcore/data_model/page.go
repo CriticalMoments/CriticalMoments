@@ -239,7 +239,7 @@ func (t TitlePageSection) ValidateReturningUserReadableIssue() string {
 		return "Page section of type title must have a title string."
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type title must have a postive scaleFactor"
+		return "Page section of type title must have a positive scaleFactor"
 	}
 
 	return ""
@@ -299,7 +299,7 @@ func (t BodyPageSection) ValidateReturningUserReadableIssue() string {
 		return "Page section of type body must have a bodyText."
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type body must have a postive scaleFactor"
+		return "Page section of type body must have a positive scaleFactor"
 	}
 
 	return ""

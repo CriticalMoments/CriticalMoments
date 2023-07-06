@@ -60,7 +60,7 @@ func (c *cache) verifyOrFetchRemoteConfigFile(rawUrl string, configFileName stri
 	newCached, err := c.fetchAndCache(url, configFileName)
 	if err != nil {
 		if priorCached != "" {
-			fmt.Printf("CriticalMoments: Unable to update CM config file. This may be a temporarly a network issue (ie, you're offline). For now, CM will use a cached config file. Please verify url is valid if you're online and expect this to work: %v\n", url)
+			fmt.Printf("CriticalMoments: Unable to update CM config file. This may be a temporarily a network issue (ie, you're offline). For now, CM will use a cached config file. Please verify url is valid if you're online and expect this to work: %v\n", url)
 			return priorCached, nil
 		}
 		return "", nil
