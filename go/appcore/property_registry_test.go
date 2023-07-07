@@ -145,13 +145,13 @@ func TestPropertyRegistryVersionNumber(t *testing.T) {
 }
 
 type testPropertyProvider struct {
-	val int
+	val int64
 }
 
 func (p *testPropertyProvider) Type() int {
 	return LibPropertyProviderTypeInt
 }
-func (p *testPropertyProvider) IntValue() int {
+func (p *testPropertyProvider) IntValue() int64 {
 	p.val = p.val + 1
 	return p.val
 }
@@ -172,13 +172,13 @@ func TestDynamicProperties(t *testing.T) {
 
 	dp := testPropertyProvider{}
 	pr.registerLibPropertyProvider("a", &dp)
-	if pr.propertyValue("a") != 1 {
+	if pr.propertyValue("a").(int64) != 1 {
 		t.Fatal("dynamic property doesn't work")
 	}
-	if pr.propertyValue("a") != 2 {
+	if pr.propertyValue("a").(int64) != 2 {
 		t.Fatal("dynamic property not dynamic")
 	}
-	if pr.propertyValue("a") != 3 {
+	if pr.propertyValue("a").(int64) != 3 {
 		t.Fatal("dynamic property not dynamic")
 	}
 }

@@ -19,7 +19,7 @@
     return 0;
 }
 
-- (long)intValue {
+- (int64_t)intValue {
     return 0;
 }
 

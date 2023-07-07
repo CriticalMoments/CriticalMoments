@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIViewController *)topViewController;
 + (UIWindow *)keyWindow;
 + (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
++ (long long)cmTimestampFromDate:(NSDate *)date;
 
 @end
 

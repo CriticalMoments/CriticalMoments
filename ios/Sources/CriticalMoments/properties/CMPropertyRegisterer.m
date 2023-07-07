@@ -10,6 +10,7 @@
 #import "../utils/CMUtils.h"
 #import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
+#import "CMMiscPropertyProviders.h"
 #import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
 
@@ -159,6 +160,10 @@
     CMAudioPlayingPropertyProvider *audioPlayingProvider = [[CMAudioPlayingPropertyProvider alloc] init];
     bool audio = [audioPlayingProvider boolValue];
     [self registerLibPropertyProvider:@"other_audio_playing" value:audioPlayingProvider];
+
+    // Misc
+    CMAppInstallDatePropertyProviders *appInstallProvider = [[CMAppInstallDatePropertyProviders alloc] init];
+    [self registerLibPropertyProvider:@"app_install_date" value:appInstallProvider];
 }
 
 - (void)setUserInterfaceIdiom {

@@ -65,4 +65,9 @@
     return [uikitBundle localizedStringForKey:key value:key table:nil];
 }
 
++ (long long)cmTimestampFromDate:(NSDate *)date {
+    NSTimeInterval unixTime = [date timeIntervalSince1970];
+    return unixTime * 1000;
+}
+
 @end

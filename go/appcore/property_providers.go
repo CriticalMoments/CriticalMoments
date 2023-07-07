@@ -27,7 +27,7 @@ func (s *staticPropertyProvider) Kind() reflect.Kind {
 // Not ideal interface in go, but gomobile won't map interface{}, reflect.Kind, or enum types
 type LibPropertyProvider interface {
 	Type() int
-	IntValue() int
+	IntValue() int64
 	StringValue() string
 	FloatValue() float64
 	BoolValue() bool

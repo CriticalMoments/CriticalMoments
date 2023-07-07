@@ -41,6 +41,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"cm_version":              reflect.String,
 		"app_state":               reflect.String,
 		"foreground":              reflect.Bool,
+		"app_install_date":        reflect.Int,
 	}
 }
 
