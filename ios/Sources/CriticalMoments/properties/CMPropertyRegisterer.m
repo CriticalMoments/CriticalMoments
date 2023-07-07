@@ -10,6 +10,7 @@
 #import "../utils/CMUtils.h"
 #import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
+#import "CMCallPropertyProvider.h"
 #import "CMMiscPropertyProviders.h"
 #import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
@@ -160,6 +161,10 @@
     CMAudioPlayingPropertyProvider *audioPlayingProvider = [[CMAudioPlayingPropertyProvider alloc] init];
     bool audio = [audioPlayingProvider boolValue];
     [self registerLibPropertyProvider:@"other_audio_playing" value:audioPlayingProvider];
+
+    // Calls
+    CMCallPropertyProvider *callsPP = [[CMCallPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"on_call" value:callsPP];
 
     // Misc
     CMAppInstallDatePropertyProviders *appInstallProvider = [[CMAppInstallDatePropertyProviders alloc] init];
