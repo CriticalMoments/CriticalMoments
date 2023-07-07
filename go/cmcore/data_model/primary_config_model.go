@@ -149,6 +149,10 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	}
 
 	// Run nested validations
+	return pc.validateNestedReturningUserReadableIssue()
+}
+
+func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	if pc.DefaultTheme != nil {
 		if defaultThemeIssue := pc.DefaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
 			return defaultThemeIssue
