@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define CM_LIB_VERSION_NUMBER_STRING @"0.1.4-beta"
+
 @import UIKit;
 
 NS_ASSUME_NONNULL_BEGIN

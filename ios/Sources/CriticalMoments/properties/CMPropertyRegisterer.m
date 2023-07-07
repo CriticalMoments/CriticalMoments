@@ -7,6 +7,7 @@
 
 #import "CMPropertyRegisterer.h"
 
+#import "../utils/CMUtils.h"
 #import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
 #import "CMNetworkingPropertyProvider.h"
@@ -88,6 +89,9 @@
     // App Version
     NSString *appVersion = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     [self registerStaticStringProperty:@"app_version" value:appVersion];
+
+    // Library Version
+    [self registerStaticStringProperty:@"cm_version" value:CM_LIB_VERSION_NUMBER_STRING];
 
     // Screen size / scale
     CGSize screenSize = UIScreen.mainScreen.bounds.size;
