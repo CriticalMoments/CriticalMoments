@@ -12,4 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMAppInstallDatePropertyProviders : CMBaseDynamicPropertyProvider
 @end
 
+@interface CMHasWatchPropertyProviders : CMBaseDynamicPropertyProvider
+@end
+
 NS_ASSUME_NONNULL_END
