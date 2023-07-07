@@ -18,4 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMDarkModePropertyProvider : CMBaseDynamicPropertyProvider
 @end
 
+@interface CMAppStatePropertyProvider : CMBaseDynamicPropertyProvider
+@end
+
+@interface CMForegroundProvider : CMBaseDynamicPropertyProvider
+@end
+
 NS_ASSUME_NONNULL_END

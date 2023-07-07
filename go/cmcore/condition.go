@@ -39,6 +39,8 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"has_active_network":      reflect.Bool,
 		"other_audio_playing":     reflect.Bool,
 		"cm_version":              reflect.String,
+		"app_state":               reflect.String,
+		"foreground":              reflect.Bool,
 	}
 }
 

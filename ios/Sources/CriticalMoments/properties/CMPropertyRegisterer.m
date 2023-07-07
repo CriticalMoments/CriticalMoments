@@ -123,6 +123,10 @@
     [self registerLibPropertyProvider:@"interface_orientation" value:uiOrientationProvider];
     CMDarkModePropertyProvider *darkModeProvider = [[CMDarkModePropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"dark_mode" value:darkModeProvider];
+    CMAppStatePropertyProvider *appStateProvider = [[CMAppStatePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"app_state" value:appStateProvider];
+    CMForegroundProvider *foregroundProvider = [[CMForegroundProvider alloc] init];
+    [self registerLibPropertyProvider:@"foreground" value:foregroundProvider];
 
     // Networking
 

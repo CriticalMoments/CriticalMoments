@@ -68,3 +68,38 @@
 }
 
 @end
+
+@implementation CMAppStatePropertyProvider
+
+- (NSString *)stringValue {
+    UIApplicationState state = UIApplication.sharedApplication.applicationState;
+    switch (state) {
+    case UIApplicationStateActive:
+        return @"active";
+    case UIApplicationStateInactive:
+        return @"inactive";
+    case UIApplicationStateBackground:
+        return @"background";
+    }
+
+    return @"unknown";
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMForegroundProvider
+
+- (BOOL)boolValue {
+    UIApplicationState state = UIApplication.sharedApplication.applicationState;
+    return state != UIApplicationStateBackground;
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeBool;
+}
+
+@end
