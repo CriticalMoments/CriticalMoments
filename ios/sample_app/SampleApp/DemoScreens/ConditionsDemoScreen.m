@@ -55,8 +55,15 @@
     chargingCondition.actionCMActionName = @"conditional_charging";
     [chargingCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
+    CMDemoAction *dateCondition = [[CMDemoAction alloc] init];
+    dateCondition.title = @"Installed app in last hour";
+    dateCondition.subtitle =
+        @"Condition is true if this app was installed in last hour.\n\napp_install_date > now() - hours(1)";
+    dateCondition.actionCMActionName = @"conditional_installed_recently";
+    [dateCondition addResetTestTarget:self action:@selector(dismissAlerts)];
+
     [self addSection:@"Simple conditions"
-         withActions:@[ horizontalCondition, flatCondition, wifiConditon, chargingCondition ]];
+         withActions:@[ horizontalCondition, flatCondition, wifiConditon, chargingCondition, dateCondition ]];
 
     CMDemoAction *compoundCondition = [[CMDemoAction alloc] init];
     compoundCondition.title = @"Combining conditions";

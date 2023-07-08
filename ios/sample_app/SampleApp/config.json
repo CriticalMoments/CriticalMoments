@@ -217,6 +217,14 @@
                     "failedActionName": "conditional_false_alert"
                 }
             },
+            "conditional_installed_recently": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "app_install_date > now() - hours(1)",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
             "conditional_flat": {
                 "actionType": "conditional_action",
                 "actionData": {
