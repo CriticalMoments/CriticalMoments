@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 /*
@@ -112,7 +112,7 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	}
 
 	if jac.Condition != "" {
-		if err = cmcore.ValidateCondition(jac.Condition); err != nil {
+		if err = conditions.ValidateCondition(jac.Condition); err != nil {
 			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", jac.Condition), err)
 		}
 	}

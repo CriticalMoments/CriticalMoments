@@ -266,3 +266,48 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("missing condition should be differentiateable from false bool")
 	}
 }
+
+func TestDateFunctionsInConditions(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+
+	// time library created
+	result, err := pr.evaluateCondition("now() < 1688764455000")
+	if err != nil || result {
+		t.Fatal("back to the future isn't real: now() gave incorrect time")
+	}
+	// time in 2050
+	result, err = pr.evaluateCondition("now() > 2540841255000")
+	if err != nil || result {
+		t.Fatal("back to the future 2 isn't real: now() gave incorrect time")
+	}
+
+	verifyDurationCondition := `
+		(seconds(1) == 1000) && 
+		(seconds(9) == 9000) &&
+		(minutes(1) == seconds(60)) &&
+		(minutes(2) == 120000) &&
+		(hours(1) == minutes(60)) &&
+		(hours(2) == 7200000) &&
+		(days(1) == hours(24)) &&
+		(days(2) == 172800000)
+	`
+	result, err = pr.evaluateCondition(verifyDurationCondition)
+	if err != nil || !result {
+		t.Fatal("Duration functions failed e2e test")
+	}
+
+	// Verify parseDate function is wired up properly. Actual testing of the
+	// function is in date_functions_test.go
+	result, err = pr.evaluateCondition("parseDate('2006-01-02T15:04:05.9997+07:00') == 1136189045999")
+	if err != nil || !result {
+		t.Fatal("parseDate did not work inside a condition")
+	}
+
+	// Check invalid returns errors though the stack
+	result, err = pr.evaluateCondition("parseDate('invalid') == 1136189045999")
+	if err == nil || result {
+		t.Fatal("invalid date didn't error", err)
+	}
+}

@@ -1,4 +1,4 @@
-package cmcore
+package conditions
 
 import (
 	"errors"
@@ -63,6 +63,12 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 func ConditionEnvWithHelpers() map[string]interface{} {
 	return map[string]interface{}{
 		"versionNumberComponent": versionNumberComponent,
+		"now":                    now,
+		"seconds":                seconds,
+		"minutes":                minutes,
+		"hours":                  hours,
+		"days":                   days,
+		"parseDate":              parseDatetime,
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 	"github.com/antonmedv/expr"
 	"golang.org/x/exp/slices"
 )
@@ -19,8 +19,8 @@ type propertyRegistry struct {
 func newPropertyRegistry() *propertyRegistry {
 	return &propertyRegistry{
 		providers:              make(map[string]propertyProvider),
-		requiredPropertyTypes:  cmcore.RequiredPropertyTypes(),
-		wellKnownPropertyTypes: cmcore.WellKnownPropertyTypes(),
+		requiredPropertyTypes:  conditions.RequiredPropertyTypes(),
+		wellKnownPropertyTypes: conditions.WellKnownPropertyTypes(),
 	}
 }
 
@@ -81,13 +81,13 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 }
 
 func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
-	variables, err := cmcore.ExtractVariablesFromCondition(condition)
+	variables, err := conditions.ExtractVariablesFromCondition(condition)
 	if err != nil {
 		return false, err
 	}
 
 	// Build env with helper functions and vars from props
-	env := cmcore.ConditionEnvWithHelpers()
+	env := conditions.ConditionEnvWithHelpers()
 	for _, v := range variables {
 		if _, ok := env[v]; !ok {
 			env[v] = p.propertyValue(v)

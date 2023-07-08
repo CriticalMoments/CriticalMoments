@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 type ConditionalAction struct {
@@ -37,7 +37,7 @@ func (c *ConditionalAction) ValidateReturningUserReadableIssue() string {
 	if c.Condition == "" {
 		return "Conditional actions must have a condition"
 	}
-	if err := cmcore.ValidateCondition(c.Condition); err != nil {
+	if err := conditions.ValidateCondition(c.Condition); err != nil {
 		return fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition)
 	}
 	if c.PassedActionName == "" {

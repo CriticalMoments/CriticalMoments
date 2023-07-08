@@ -1,4 +1,4 @@
-package cmcore
+package conditions
 
 import (
 	"testing"
