@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -62,6 +63,12 @@ func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
 
 	ac.cache = cache
 	return nil
+}
+
+func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
+	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
+	tz := time.FixedZone(tzName, gmtOffset)
+	time.Local = tz
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {

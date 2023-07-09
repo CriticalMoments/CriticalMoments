@@ -50,6 +50,10 @@
     // Register the action dispatcher and properties
     [CMLibBindings registerWithAppcore];
 
+    // Fix the timezone -- golang doesn't know local offset by default
+    NSTimeZone *tz = NSTimeZone.localTimeZone;
+    [AppcoreSharedAppcore() setTimezoneGMTOffset:tz.secondsFromGMT];
+
     CMPropertyRegisterer *propertryRegisterer = [[CMPropertyRegisterer alloc] init];
     [propertryRegisterer registerDefaultPropertiesToAppcore];
 
