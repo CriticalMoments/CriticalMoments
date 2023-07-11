@@ -104,7 +104,30 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 	}
 }
 
-func TestPropertyRegistryVersionNumber(t *testing.T) {
+func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+
+	versionConditions := `
+		(versionGreaterThan('invalid', '1.0') == false) && 
+		(versionGreaterThan('1.1', '1.0') == true) && 
+		(versionGreaterThan('1.0', '1.0') == false) && 
+		(versionGreaterThan('1.0', '2.0') == false) && 
+		(versionLessThan('invalid', '1.0') == false) && 
+		(versionLessThan('1.1', '1.0') == false) && 
+		(versionLessThan('1.0', '1.0') == false) && 
+		(versionLessThan('1.0', '2.0') == true) && 
+		(versionEqual('invalid', '1') == false) && 
+		(versionEqual('v1.2.3', '1.2.3') == true) && 
+		(versionEqual('v2', 'v1') == false) 
+	`
+	if r, err := pr.evaluateCondition(versionConditions); err != nil || !r {
+		t.Fatalf("Version helpers failed: %v", err)
+	}
+}
+
+func TestPropertyRegistryVersionNumberComponent(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"c_version": reflect.String, "a_version": reflect.String}

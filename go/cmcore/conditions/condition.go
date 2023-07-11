@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 
 	"github.com/antonmedv/expr/ast"
 	"github.com/antonmedv/expr/checker"
@@ -63,6 +61,9 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 func ConditionEnvWithHelpers() map[string]interface{} {
 	return map[string]interface{}{
 		"versionNumberComponent": versionNumberComponent,
+		"versionGreaterThan":     versionGreaterThan,
+		"versionLessThan":        versionLessThan,
+		"versionEqual":           versionEqual,
 		"now":                    now,
 		"seconds":                seconds,
 		"minutes":                minutes,
@@ -70,25 +71,6 @@ func ConditionEnvWithHelpers() map[string]interface{} {
 		"days":                   days,
 		"parseDate":              parseDatetime,
 	}
-}
-
-func versionNumberComponent(versionString string, index int) interface{} {
-	// Parse string in format "16.4.1" to get a specific component
-	components := strings.Split(versionString, ".")
-	intComponents := make([]int, len(components))
-	for i, component := range components {
-		intComponent, err := strconv.Atoi(component)
-		if err != nil {
-			fmt.Printf("CriticalMoments: Invalid version number format: \"%v\"\n", versionString)
-			return nil
-		}
-		intComponents[i] = intComponent
-	}
-
-	if index >= len(intComponents) {
-		return nil
-	}
-	return intComponents[index]
 }
 
 // An AST walker we use to analyize code, to see if it's compatible with CM
