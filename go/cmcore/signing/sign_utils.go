@@ -1,9 +1,8 @@
 package signing
 
 import (
-	"crypto"
+	"crypto/ecdsa"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
@@ -13,9 +12,11 @@ import (
 	"sync"
 )
 
+const privateKeyEnvVarName = "PRIVATE_CM_EC_KEY"
+
 type SignUtil struct {
-	publicKey  *rsa.PublicKey
-	privateKey *rsa.PrivateKey
+	publicKey  *ecdsa.PublicKey
+	privateKey *ecdsa.PrivateKey
 }
 
 func NewSignUtilWithSerializedPrivateKey(privateKeyString string) (*SignUtil, error) {
@@ -23,7 +24,7 @@ func NewSignUtilWithSerializedPrivateKey(privateKeyString string) (*SignUtil, er
 	if err != nil {
 		return nil, err
 	}
-	key, err := x509.ParsePKCS1PrivateKey([]byte(privateKeyBytes))
+	key, err := x509.ParseECPrivateKey(privateKeyBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -39,9 +40,13 @@ func NewSignUtilWithSerializedPublicKey(publicKeyString string) (*SignUtil, erro
 	if err != nil {
 		return nil, err
 	}
-	key, err := x509.ParsePKCS1PublicKey(publicKeyBytes)
+	keyI, err := x509.ParsePKIXPublicKey(publicKeyBytes)
 	if err != nil {
 		return nil, err
+	}
+	key, ok := keyI.(*ecdsa.PublicKey)
+	if !ok {
+		return nil, errors.New("incorrect key type")
 	}
 	u := SignUtil{
 		publicKey: key,
@@ -49,14 +54,14 @@ func NewSignUtilWithSerializedPublicKey(publicKeyString string) (*SignUtil, erro
 	return &u, nil
 }
 
-const cmPublicKey = `MIIBCgKCAQEA5Is8dkh83sAp4kfSxV9DEzxNF4VYwUUpRQ6E+uKsE44UbB6oDGRW7+xxvStGNrHT7+KiKVAEp8793iLqthOUfOcF8GEN+9sKSovZM7Fvdv3ZR7YB8U/sLv1gUo9Mi8xYHov7VuseWA1+XChlfCNv58hNtip/9Qz8Y6ViifiEA5KCSbo4wjUa7ULbWYdG3/PQouvDVb2OKY5+T0oxDRGzHkkq9GRqjxC5FuqLo/wWgUJnGrylCqvAmC5i0s7Cr4uH6bNINl8PuGIwWwl352sOZVCpEDJ2+j4ilp/iwgw+EHj/4nr+u5lLtPLQK1vbVnTGZCz+1+2CQAkbRUAJglS6ywIDAQAB`
+const cmPublicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESz8KF+TKa1t02O+nx+tKqfT5Nx5GIb6UDjpCtFiQ6Pz5nbmAl5fDfgDjAcTl9Fh2CWSL9KjNanUEMxlYoLELWg=="
 
 var sharedSignUtil *SignUtil
 var privateKeyOnce sync.Once
 
 func SharedSignUtil() *SignUtil {
 	privateKeyOnce.Do(func() {
-		envPrivKey := os.Getenv("PRIVATE_CM_SIGN_KEY")
+		envPrivKey := os.Getenv(privateKeyEnvVarName)
 		if envPrivKey != "" {
 			privateSignUtil, err := NewSignUtilWithSerializedPrivateKey(envPrivKey)
 			if err != nil {
@@ -95,7 +100,7 @@ func (u *SignUtil) SignMessage(msg []byte) (string, error) {
 		return "", err
 	}
 
-	signature, err := rsa.SignPSS(rand.Reader, u.privateKey, crypto.SHA256, msgHashRaw, nil)
+	signature, err := ecdsa.SignASN1(rand.Reader, u.privateKey, msgHashRaw)
 	if err != nil {
 		return "", err
 	}
@@ -104,16 +109,16 @@ func (u *SignUtil) SignMessage(msg []byte) (string, error) {
 	return stringSignature, nil
 }
 
-func (u *SignUtil) VerifyMessage(msg []byte, signatureString string) error {
+func (u *SignUtil) VerifyMessage(msg []byte, signatureString string) (bool, error) {
 	signature, err := base64.StdEncoding.DecodeString(signatureString)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	msgHashRaw, err := msgHash(msg)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return rsa.VerifyPSS(u.publicKey, crypto.SHA256, msgHashRaw, signature, nil)
+	return ecdsa.VerifyASN1(u.publicKey, msgHashRaw, signature), nil
 }
