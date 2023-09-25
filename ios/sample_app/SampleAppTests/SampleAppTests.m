@@ -61,4 +61,29 @@
                                  }];
 }
 
+- (void)testApiKeyValidation {
+    NSError *error;
+
+    [CriticalMoments setApiKey:@"" error:&error];
+    XCTAssert(error != nil, @"Empty API key passed validation");
+
+    error = nil;
+    [CriticalMoments setApiKey:@"invalid" error:&error];
+    XCTAssert(error != nil, @"Invalid API key passed validation");
+
+    error = nil;
+    [CriticalMoments
+        setApiKey:@"CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-"
+                  @"MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY="
+            error:&error];
+    XCTAssert(error != nil, @"API key from another app passed validation");
+
+    // This key is only valid for this sample app
+    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuU2FtcGxlQXBw-MEYCIQCOd0JTuuUtgTJkDUsQH0EQMhJ+"
+                       @"kKysBBfjdxZKqgTBDAIhAMo/OGSysVA0iOscz+mKDqY8UizldA8sZj2a3/mAZIzB";
+    error = nil;
+    [CriticalMoments setApiKey:apiKey error:&error];
+    XCTAssert(error == nil, @"API key failed validation");
+}
+
 @end

@@ -55,9 +55,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Text color for secondary content labels
 @property(nonatomic, readwrite) UIColor *secondaryTextColor;
 
-/// The tint color to to apply to buttons, icons, links and more. Should be legible on backgroundColor. Provide the view
-/// this will be rendered in, so we can resolve at runtime from view heiarchy if not set explicity in theme.
+/// Fetches a tint color to to apply to buttons, icons, links and more.
+/// You must provide the view this will be rendered in, so we can resolve system colors at runtime from view heiarchy if
+/// a color is not set explicity in the theme.
 - (UIColor *)primaryColorForView:(UIView *)view;
+/// Set the primary color for your brand. This is used on buttons, icons, links and more.
+/// Should be legible on backgroundColor.
 - (void)setPrimaryColor:(UIColor *)color;
 
 #pragma mark Fonts

@@ -55,6 +55,11 @@
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
 
+    // This key is only valid for this sample app
+    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuU2FtcGxlQXBw-MEYCIQCOd0JTuuUtgTJkDUsQH0EQMhJ+"
+                       @"kKysBBfjdxZKqgTBDAIhAMo/OGSysVA0iOscz+mKDqY8UizldA8sZj2a3/mAZIzB";
+    [CriticalMoments setApiKey:apiKey error:nil];
+
     NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
     [CriticalMoments setConfigUrl:localConfigUrl.absoluteString];
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
 func GoPing() string {
@@ -19,6 +20,9 @@ func GoPing() string {
 type Appcore struct {
 	// Library binding/delegate
 	libBindings LibBindings
+
+	// API Key
+	apiKey *signing.ApiKey
 
 	// Primary configuration
 	configUrlString string
@@ -55,6 +59,21 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	return nil
 }
 
+func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
+	key, err := signing.ParseApiKey(apiKey)
+	if err != nil {
+		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+	}
+	if v, err := key.Valid(); err != nil || !v {
+		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+	}
+	if key.BundleId() != bundleID {
+		return errors.New(fmt.Sprintf("This API key isn't valid for this app. API key is for %s, but this app has bundle ID %s", key.BundleId(), bundleID))
+	}
+	ac.apiKey = key
+	return nil
+}
+
 func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
 	cache, err := newCacheWithBaseDir(cacheDirPath)
 	if err != nil {
@@ -77,6 +96,9 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 
 // TODO: guard against double start call
 func (ac *Appcore) Start() error {
+	if ac.apiKey == nil {
+		return errors.New("An API Key must be provided before starting critical moments")
+	}
 	if ac.configUrlString == "" {
 		return errors.New("A config URL must be provided before starting critical moments")
 	}

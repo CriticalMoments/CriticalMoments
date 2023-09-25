@@ -60,8 +60,8 @@
     // Set the cache directory to applicationSupport/CriticalMomentsData
     NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
                                                                  inDomains:NSUserDomainMask] lastObject];
-    NSURL *criticalMomentsCacheDir = [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
     NSError *error;
+    NSURL *criticalMomentsCacheDir = [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsCacheDir
                            withIntermediateDirectories:YES
                                             attributes:nil
@@ -79,6 +79,28 @@
         return error;
     }
     return nil;
+}
+
++ (void)setApiKey:(NSString *)apiKey error:(NSError **)returnError {
+    // Set API Key
+    NSError *error;
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    [AppcoreSharedAppcore() setApiKey:apiKey bundleID:bundleIdentifier error:&error];
+    if (error) {
+        if (returnError) {
+            *returnError = error;
+        }
+        NSLog(@"ERROR: CriticalMoments -- [Invalid API Key]: %@", error);
+#if DEBUG
+        if (!returnError) {
+            NSLog(@"CriticalMoments: throwing a NSInternalInconsistencyException "
+                  @"to help find this issue. Exceptions are only thrown in debug "
+                  @"mode and when you don't pass and error to detect/handle the issue. "
+                  @"This will not crash apps built for release.");
+            @throw NSInternalInconsistencyException;
+        }
+#endif
+    }
 }
 
 + (void)setConfigUrl:(NSString *)urlString {
