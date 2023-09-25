@@ -91,6 +91,9 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
+
+	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
+
 	// Clear required properties, for easier setup
 	ac.propertyRegistry = newPropertyRegistry()
 	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
