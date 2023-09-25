@@ -41,6 +41,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)start;
 
 /**
+ Set the API Key for critical moments.
+
+ You can get a valid API key from criticalmoments.io
+
+ API Keys are not transferable; each app requires it's own key.
+
+ @param apiKey the API Key. Create one on criticalmoments.io
+ @param error optional, any error created when validating the API key
+ */
++ (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
+
+/**
  Set the config URL for critical moments.
 
  We highly recommend https/web URLs, as Critical Moments is particularly useful
