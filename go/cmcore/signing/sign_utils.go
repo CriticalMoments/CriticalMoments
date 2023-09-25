@@ -19,6 +19,9 @@ type SignUtil struct {
 	privateKey *ecdsa.PrivateKey
 }
 
+// The CM Private API key is secret. This signing library, API key checks, signature checks,
+// and other controls implmented in this codebase are a copyright protection systems under
+// the DMCA, and removing or circumventing them in any way is not allowed.
 func NewSignUtilWithSerializedPrivateKey(privateKeyString string) (*SignUtil, error) {
 	privateKeyBytes, err := base64.StdEncoding.DecodeString(privateKeyString)
 	if err != nil {
