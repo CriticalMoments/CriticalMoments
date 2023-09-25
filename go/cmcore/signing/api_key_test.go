@@ -96,7 +96,7 @@ func TestApiKeyParsing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Valid key (with test signature)
+	// Valid/typical V1 key (with test signature)
 	// Never remove this. Future libraries need to continue to support older formats
 	k, err = ParseApiKey("CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MD0CHQDzGgtQb5nmadLEmE4OFSg3LHiCBkRFTgjQhz6ZAhx4OTuVnYWmdrFx5D3ysT2d+6QfzIsGzBsXrI+T")
 	if err != nil {
@@ -106,13 +106,53 @@ func TestApiKeyParsing(t *testing.T) {
 		t.Fatal(issue)
 	}
 
-	// normal
-	// unsigned
-	// missing bundle ID (but valid props)
-	// unknown version number (future)
-	// valiod format but missing b: key
-	// No verion number / no prefix / no dashes / one dash etc
-	// future ones: higher version number / more properties unrecognized
+	// unsigned key
+	k, err = ParseApiKey("CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==")
+	if err == nil {
+		t.Fatal(err)
+	}
+
+	// future API version should be okay
+	k, err = ParseApiKey("CM999-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MDwCHCy2eURhq3oIpK5VY99l5/dZF30vwiLm31kar68CHCQD1ftBhPhxcNl6sys+obIooH5K/r/2dOzMoqc=")
+	if err != nil || k.version != 999 || k.BundleId() != testBundleId {
+		t.Fatal("API Key with future version not parsed")
+	}
+
+	// missing bundle ID (but another valid prop)
+	k, err = ParseApiKey("CM1-eDppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MD0CHQDSQjQuYPtfG9xRn1KvVQOI3zMRJu/YCZ1XoaLVAhwEzgxjn8ysier97gZjW0+JR9g9yGbiSVPNxcUY")
+	if err == nil {
+		t.Fatal("API Key missing bundle ID passed")
+	}
+
+	// no props
+	k, err = ParseApiKey("CM1-Yjo=-MD0CHQC/sbrxCs5VI/NL86juc1SJpyJkZrhuCAOXn/ObAhwocvTYZF84qu/0rBu0+y1fJFkOfsEpM1YiDmQj")
+	if err == nil {
+		t.Fatal("API Key missing all props")
+	}
+
+	// future proof: includes properties this library version doesn't recognize
+	k, err = ParseApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MDwCHCcUOxCOKtnH8OfXYEJSS/Wt6ieDUe1FzJK+EDkCHG6g5F1rV+5n+dqfnoPYvbkLCwtRYRtDCw+cUJc=")
+	if err != nil || k.version != 1 || k.BundleId() != testBundleId || k.props["hello"] != "world" {
+		t.Fatal("API Key missing all props")
+	}
+
+	// empty key
+	k, err = ParseApiKey("")
+	if err == nil {
+		t.Fatal("Empty key passes")
+	}
 }
 
-// TODO test real key with built in public Key
+func TestKeySignedWithPublicKey(t *testing.T) {
+	// Real API key signed with built in Public Key
+	k, err := ParseApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if k.BundleId() != testBundleId || k.version != 1 {
+		t.Fatal("Failed to parse public key api key")
+	}
+	if v, err := k.Valid(); err != nil || !v {
+		t.Fatal("API Key with public key failed signature")
+	}
+}

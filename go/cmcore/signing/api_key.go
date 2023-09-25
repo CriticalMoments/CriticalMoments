@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 type ApiKey struct {

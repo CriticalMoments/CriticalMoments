@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"os"
 	"sync"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 const privateKeyEnvVarName = "PRIVATE_CM_EC_KEY"
@@ -81,6 +83,7 @@ func buildSharedSignUtil() {
 		return
 	}
 
+	cmcore.LoadEnv()
 	envPrivKey := os.Getenv(privateKeyEnvVarName)
 	if envPrivKey != "" {
 		privateSignUtil, err := NewSignUtilWithSerializedPrivateKey(envPrivKey)
