@@ -89,14 +89,14 @@ func ParseApiKey(s string) (*ApiKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	if (*props)[propKeyBundleId] == "" {
+	if props[propKeyBundleId] == "" {
 		return nil, errors.New("API key must have bundle ID property")
 	}
 
 	k := ApiKey{
 		version:   v,
 		signature: sig,
-		props:     *props,
+		props:     props,
 	}
 
 	return &k, nil
@@ -107,7 +107,7 @@ func parseVersionNumber(s string) (int, error) {
 		return -1, errors.New("All API keys should start with CM")
 	}
 	i := strings.Index(s, apiSeparator)
-	if i < 3 {
+	if i < len(apiPrefix)+1 {
 		return -1, errors.New("No version number or invalid format")
 	}
 	versionString := s[len(apiPrefix):i]
@@ -127,15 +127,15 @@ func parseSignature(s string) (string, error) {
 	return signature, nil
 }
 
-func parseProperties(s string) (*map[string]string, error) {
-	i := strings.Index(s, "-")
-	i2 := strings.LastIndex(s, apiSeparator)
-	if i <= 0 || i2 <= i {
+func parseProperties(s string) (map[string]string, error) {
+	propStart := strings.Index(s, apiSeparator)
+	propEnd := strings.LastIndex(s, apiSeparator)
+	if propStart <= 0 || propEnd <= propStart {
 		return nil, errors.New("Invalid API key format")
 	}
 
 	values := map[string]string{}
-	propsSection := s[i+1 : i2]
+	propsSection := s[propStart+1 : propEnd]
 	for _, rawProp := range strings.Split(propsSection, apiSeparator) {
 		propBytes, err := base64.StdEncoding.DecodeString(rawProp)
 		if err != nil {
@@ -154,11 +154,15 @@ func parseProperties(s string) (*map[string]string, error) {
 		values[key] = value
 	}
 
-	return &values, nil
+	return values, nil
 }
 
-// Stringer
+// Stringer interface
 func (k *ApiKey) String() string {
+	if k.raw != "" {
+		return k.raw
+	}
+
 	return fmt.Sprintf("%s%s%s", k.signedPortion(), apiSeparator, k.signature)
 }
 

@@ -88,7 +88,7 @@ func buildSharedSignUtil() {
 	if envPrivKey != "" {
 		privateSignUtil, err := NewSignUtilWithSerializedPrivateKey(envPrivKey)
 		if err != nil {
-			fmt.Println("WARNING: a PRIVATE_CM_SIGN_KEY env var was was, but wasn't parseable. Signing and validation will fail.")
+			fmt.Println("WARNING: a PRIVATE_CM_SIGN_KEY env var was present, but wasn't parseable. Signing and validation will use the CM public key.")
 		} else {
 			sharedSignUtil = privateSignUtil
 		}
