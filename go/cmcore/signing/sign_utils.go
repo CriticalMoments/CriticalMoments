@@ -57,28 +57,43 @@ func NewSignUtilWithSerializedPublicKey(publicKeyString string) (*SignUtil, erro
 const cmPublicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESz8KF+TKa1t02O+nx+tKqfT5Nx5GIb6UDjpCtFiQ6Pz5nbmAl5fDfgDjAcTl9Fh2CWSL9KjNanUEMxlYoLELWg=="
 
 var sharedSignUtil *SignUtil
-var privateKeyOnce sync.Once
+var sharedSignLock sync.Mutex
 
 func SharedSignUtil() *SignUtil {
-	privateKeyOnce.Do(func() {
-		envPrivKey := os.Getenv(privateKeyEnvVarName)
-		if envPrivKey != "" {
-			privateSignUtil, err := NewSignUtilWithSerializedPrivateKey(envPrivKey)
-			if err != nil {
-				fmt.Println("WARNING: a PRIVATE_CM_SIGN_KEY env var was was, but wasn't parseable. Signing and validation will fail.")
-			} else {
-				sharedSignUtil = privateSignUtil
-			}
-		}
-		if sharedSignUtil == nil {
-			publicSignKey, err := NewSignUtilWithSerializedPublicKey(cmPublicKey)
-			if err != nil {
-				panic("Hardcoded key is not parsable. We have serious issue.")
-			}
-			sharedSignUtil = publicSignKey
-		}
-	})
+	ssu := sharedSignUtil
+	if ssu != nil {
+		return ssu
+	}
+
+	buildSharedSignUtil()
 	return sharedSignUtil
+}
+
+func buildSharedSignUtil() {
+	defer sharedSignLock.Unlock()
+	sharedSignLock.Lock()
+
+	// There might have been a race
+	if sharedSignUtil != nil {
+		return
+	}
+
+	envPrivKey := os.Getenv(privateKeyEnvVarName)
+	if envPrivKey != "" {
+		privateSignUtil, err := NewSignUtilWithSerializedPrivateKey(envPrivKey)
+		if err != nil {
+			fmt.Println("WARNING: a PRIVATE_CM_SIGN_KEY env var was was, but wasn't parseable. Signing and validation will fail.")
+		} else {
+			sharedSignUtil = privateSignUtil
+		}
+	}
+	if sharedSignUtil == nil {
+		publicSignKey, err := NewSignUtilWithSerializedPublicKey(cmPublicKey)
+		if err != nil {
+			panic("Hardcoded key is not parsable. We have serious issue.")
+		}
+		sharedSignUtil = publicSignKey
+	}
 }
 
 func msgHash(msg []byte) ([]byte, error) {

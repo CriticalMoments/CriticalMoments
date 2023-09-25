@@ -6,8 +6,6 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/base64"
-	"os"
-	"sync"
 	"testing"
 )
 
@@ -104,27 +102,21 @@ func TestSignAndVerifyMessage(t *testing.T) {
 }
 
 func TestLoadPrivKeyFromEnv(t *testing.T) {
-	origEnv := os.Getenv(privateKeyEnvVarName)
 	// defer cleanup critical for cleanup -- once we clear the env var, let singleton re-run
 	defer func() {
-		t.Setenv(privateKeyEnvVarName, origEnv)
 		sharedSignUtil = nil
-		privateKeyOnce = sync.Once{}
 	}()
 
 	t.Setenv(privateKeyEnvVarName, "")
 	// allow our singleton to repopulate
 	sharedSignUtil = nil
-	privateKeyOnce = sync.Once{}
 	if SharedSignUtil().privateKey != nil {
 		t.Fatal("PrivKey populated when it shouldn't be from env")
 	}
 	t.Setenv(privateKeyEnvVarName, testPrivKey)
 	// allow our singleton to repopulate
 	sharedSignUtil = nil
-	privateKeyOnce = sync.Once{}
 	if SharedSignUtil().privateKey == nil {
 		t.Fatal("Failed to load PrivKey from env")
 	}
-
 }
