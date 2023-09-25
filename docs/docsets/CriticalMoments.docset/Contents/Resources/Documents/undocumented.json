@@ -1,12 +1,6 @@
 {
   "warnings": [
-    {
-      "file": "/Users/scosman/Dropbox/workspace/criticalmoments/ios/Sources/CriticalMoments/include/../themes/CMTheme.h",
-      "line": 61,
-      "symbol": "CMTheme.-setPrimaryColor:",
-      "symbol_kind": "sourcekitten.source.lang.objc.decl.method.instance",
-      "warning": "undocumented"
-    }
+
   ],
   "source_directory": "/Users/scosman/Dropbox/workspace/criticalmoments"
 }
