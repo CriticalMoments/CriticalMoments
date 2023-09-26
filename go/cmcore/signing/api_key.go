@@ -4,15 +4,20 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
 
 type ApiKey struct {
-	raw       string // Only populated if parsed
-	version   int
-	props     map[string]string
-	signature string
+	// Raw strings making up the API Key.
+	// Don't manipulate outside of Parse/New
+	signedPortion string
+	signature     string
+
+	// Parsed Properties
+	version int
+	props   map[string]string
 }
 
 func (k *ApiKey) Version() int {
@@ -28,7 +33,7 @@ func (k *ApiKey) Valid() (bool, error) {
 }
 
 func (k *ApiKey) ValidWithSigner(u *SignUtil) (bool, error) {
-	return u.VerifyMessage([]byte(k.signedPortion()), k.signature)
+	return u.VerifyMessage([]byte(k.signedPortion), k.signature)
 }
 
 /*
@@ -66,8 +71,11 @@ func NewSignedApiKeyWithSigner(bundleId string, u *SignUtil) (*ApiKey, error) {
 		},
 	}
 
-	p := key.signedPortion()
-	sig, err := u.SignMessage([]byte(p))
+	// save exact signedPortion string to it doesn't mutate
+	sp := key.buildNewKeySignedPortion()
+	key.signedPortion = sp
+
+	sig, err := u.SignMessage([]byte(key.signedPortion))
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +101,18 @@ func ParseApiKey(s string) (*ApiKey, error) {
 		return nil, errors.New("API key must have bundle ID property")
 	}
 
+	// Signed Portion is everything before last separator
+	i := strings.LastIndex(s, apiSeparator)
+	if i <= 0 {
+		return nil, errors.New("Invalid API Key")
+	}
+	sp := s[:i]
+
 	k := ApiKey{
-		version:   v,
-		signature: sig,
-		props:     props,
+		version:       v,
+		signature:     sig,
+		props:         props,
+		signedPortion: sp,
 	}
 
 	return &k, nil
@@ -159,27 +175,21 @@ func parseProperties(s string) (map[string]string, error) {
 
 // Stringer interface
 func (k *ApiKey) String() string {
-	if k.raw != "" {
-		return k.raw
-	}
-
-	return fmt.Sprintf("%s%s%s", k.signedPortion(), apiSeparator, k.signature)
+	return fmt.Sprintf("%s%s%s", k.signedPortion, apiSeparator, k.signature)
 }
 
-func (k *ApiKey) signedPortion() string {
-	if k.raw != "" {
-		// Use the real string from the raw key if this was parsed.
-		// Signature will include it for back compat, so can't skip this
-		i := strings.LastIndex(k.raw, apiSeparator)
-		if i <= 0 {
-			return ""
-		}
-		return k.raw[:i-1]
+func (k *ApiKey) buildNewKeySignedPortion() string {
+	// Make prop order deterministic.
+	// Doesn't tecnhically need to be, but will save confusion
+	propKeys := make([]string, 0)
+	for k, _ := range k.props {
+		propKeys = append(propKeys, k)
 	}
+	sort.Strings(propKeys)
 
-	// No raw string. This is new key. Build it.
 	propsSections := []string{}
-	for propKey, propVal := range k.props {
+	for _, propKey := range propKeys {
+		propVal := k.props[propKey]
 		propString := fmt.Sprintf("%s%s%s", propKey, propertyKeyDelimiter, propVal)
 		b64 := base64.StdEncoding.EncodeToString([]byte(propString))
 		propsSections = append(propsSections, b64)
