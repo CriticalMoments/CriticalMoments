@@ -34,6 +34,9 @@ type Appcore struct {
 
 	// Properties
 	propertyRegistry *propertyRegistry
+
+	// Dev Mode namedCondition conflict check
+	seenNamedConditions map[string]string
 }
 
 var sharedAppcore Appcore = newAppcore()
@@ -43,7 +46,8 @@ func SharedAppcore() *Appcore {
 }
 func newAppcore() Appcore {
 	return Appcore{
-		propertyRegistry: newPropertyRegistry(),
+		propertyRegistry:    newPropertyRegistry(),
+		seenNamedConditions: map[string]string{},
 	}
 }
 
@@ -91,8 +95,24 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	time.Local = tz
 }
 
-// TODO: check for collisions in developer mode
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+// First error is real error, second specifc to dev mode
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string, devMode bool) (bool, error, error) {
+	if name == "" {
+		return false, errors.New("CheckNamedCondition requires a non-empty name"), nil
+	}
+
+	// in Dev Mode, track each built-in condition we see, and make sure the developer isn't reusing names
+	// If they use the same name twice for different things, they won't be able to override in the future
+	var devModeError error
+	if devMode {
+		priorSeen := ac.seenNamedConditions[name]
+		if priorSeen == "" {
+			ac.seenNamedConditions[name] = conditionString
+		} else if priorSeen != conditionString {
+			devModeError = errors.New(fmt.Sprintf("CRITICAL MOMENTS: WARNING (This message only appears when debugging, not user facing)\nThe named condition %v is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+		}
+	}
+
 	// lookup name for override, prefering the condition from the config when available
 	condition := ac.config.ConditionWithName(name)
 
@@ -100,12 +120,13 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (boo
 		// Use provided condition, since config doesn't have an override
 		pCond, err := conditions.NewCondition(conditionString)
 		if err != nil {
-			return false, err
+			return false, err, devModeError
 		}
 		condition = pCond
 	}
 
-	return ac.propertyRegistry.evaluateCondition(condition)
+	r, err := ac.propertyRegistry.evaluateCondition(condition)
+	return r, err, devModeError
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
