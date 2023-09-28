@@ -309,45 +309,45 @@ func TestNamedConditions(t *testing.T) {
 	}
 
 	// conditions without overrides should use provided condition
-	r, err, dmerr := ac.CheckNamedCondition("newCondition1", "false", false)
+	r, err := ac.CheckNamedCondition("newCondition1", "false")
 	if err != nil || r {
 		t.Fatal("false conditions failed")
 	}
-	r, err, dmerr = ac.CheckNamedCondition("newCondition2", "true", false)
+	r, err = ac.CheckNamedCondition("newCondition2", "true")
 	if err != nil || !r {
 		t.Fatal("false conditions failed")
 	}
 
 	// falseCondition should override provided string
-	r, err, dmerr = ac.CheckNamedCondition("falseCondition", "true", false)
+	r, err = ac.CheckNamedCondition("falseCondition", "true")
 	if err != nil || r {
 		t.Fatal("false conditions failed")
 	}
 
 	// trueCondition should override provided string
-	r, err, dmerr = ac.CheckNamedCondition("trueCondition", "false", false)
+	r, err = ac.CheckNamedCondition("trueCondition", "false")
 	if err != nil || !r {
 		t.Fatal("false conditions failed")
 	}
 
 	// Check name check
-	r, err, dmerr = ac.CheckNamedCondition("", "false", false)
+	r, err = ac.CheckNamedCondition("", "false")
 	if err == nil {
 		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
 	}
 
-	// Check dev mode
-	r, err, dmerr = ac.CheckNamedCondition("uniqueName", "false", true)
-	if err != nil || dmerr != nil || r {
+	// Check debug mode checker
+	dmerr := ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
 		t.Fatal("dev mode condition failed")
 	}
-	r, err, dmerr = ac.CheckNamedCondition("uniqueName", "false", true)
-	if err != nil || dmerr != nil || r {
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
 		t.Fatal("dev mode condition second time errored, but should pass with same condition")
 	}
-	r, err, dmerr = ac.CheckNamedCondition("uniqueName", "true", true)
-	if err != nil || dmerr == nil || !r {
-		t.Fatal("unque condition with new value should return the new value, but return dev warning")
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "true")
+	if dmerr == nil {
+		t.Fatal("unque condition with new value should return a dev warning")
 	}
 
 }

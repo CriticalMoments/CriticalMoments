@@ -95,22 +95,24 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	time.Local = tz
 }
 
-// First error is real error, second specifc to dev mode
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string, devMode bool) (bool, error, error) {
+func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
 	if name == "" {
-		return false, errors.New("CheckNamedCondition requires a non-empty name"), nil
+		return nil
 	}
-
-	// in Dev Mode, track each built-in condition we see, and make sure the developer isn't reusing names
+	// in debug mode, track each built-in condition we see, and make sure the developer isn't reusing names
 	// If they use the same name twice for different things, they won't be able to override in the future
-	var devModeError error
-	if devMode {
-		priorSeen := ac.seenNamedConditions[name]
-		if priorSeen == "" {
-			ac.seenNamedConditions[name] = conditionString
-		} else if priorSeen != conditionString {
-			devModeError = errors.New(fmt.Sprintf("CRITICAL MOMENTS: WARNING (This message only appears when debugging, not user facing)\nThe named condition %v is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
-		}
+	priorSeen := ac.seenNamedConditions[name]
+	if priorSeen == "" {
+		ac.seenNamedConditions[name] = conditionString
+	} else if priorSeen != conditionString {
+		return errors.New(fmt.Sprintf("(This message only appears when debugging, not user facing)\nThe named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+	}
+	return nil
+}
+
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+	if name == "" {
+		return false, errors.New("CheckNamedCondition requires a non-empty name")
 	}
 
 	// lookup name for override, prefering the condition from the config when available
@@ -120,13 +122,12 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string, devM
 		// Use provided condition, since config doesn't have an override
 		pCond, err := conditions.NewCondition(conditionString)
 		if err != nil {
-			return false, err, devModeError
+			return false, err
 		}
 		condition = pCond
 	}
 
-	r, err := ac.propertyRegistry.evaluateCondition(condition)
-	return r, err, devModeError
+	return ac.propertyRegistry.evaluateCondition(condition)
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
