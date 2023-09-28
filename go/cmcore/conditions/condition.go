@@ -177,7 +177,7 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 	if c.conditionString != "" {
 		if err := c.Validate(); err != nil {
 			c.conditionString = ""
-			return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", c.conditionString), err)
+			return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
 		}
 	}
 

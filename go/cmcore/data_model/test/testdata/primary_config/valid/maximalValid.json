@@ -132,5 +132,12 @@
                 "actionName": "alertAction"
             }
         }
+    },
+    "conditions": {
+      "namedConditions": {
+        "falseCondition": "false",
+        "trueCondition": "true",
+        "complexCondition": "4 > 3 && os_version =='123'"
+      }
     }
 }

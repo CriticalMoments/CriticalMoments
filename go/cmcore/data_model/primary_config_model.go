@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -25,6 +26,9 @@ type PrimaryConfig struct {
 
 	// Triggers
 	namedTriggers map[string]Trigger
+
+	// Conditions
+	namedConditions map[string]*conditions.Condition
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
@@ -39,6 +43,14 @@ func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
 		return &action
+	}
+	return nil
+}
+
+func (pc *PrimaryConfig) ConditionWithName(name string) *conditions.Condition {
+	c, ok := pc.namedConditions[name]
+	if ok {
+		return c
 	}
 	return nil
 }
@@ -69,6 +81,9 @@ type jsonPrimaryConfig struct {
 
 	// Triggers
 	TriggerConfig *jsonTriggersSection `json:"triggers"`
+
+	// Conditions
+	ConditionsConfig *jsonConditionsSection `json:"conditions"`
 }
 
 type jsonThemesSection struct {
@@ -82,6 +97,10 @@ type jsonActionsSection struct {
 
 type jsonTriggersSection struct {
 	NamedTriggers map[string]Trigger `json:"namedTriggers"`
+}
+
+type jsonConditionsSection struct {
+	NamedConditions map[string]*conditions.Condition `json:"namedConditions"`
 }
 
 func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
@@ -118,6 +137,13 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
 	} else {
 		pc.namedTriggers = make(map[string]Trigger)
+	}
+
+	// Conditions
+	if jpc.ConditionsConfig != nil && jpc.ConditionsConfig.NamedConditions != nil {
+		pc.namedConditions = jpc.ConditionsConfig.NamedConditions
+	} else {
+		pc.namedConditions = make(map[string]*conditions.Condition)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {

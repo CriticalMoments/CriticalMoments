@@ -297,3 +297,36 @@ func TestSetDefaultTheme(t *testing.T) {
 		t.Fatal("Default theme not set after start")
 	}
 }
+
+func TestNamedConditions(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// conditions without overrides should use provided condition
+	r, err := ac.CheckNamedCondition("newCondition1", "false")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+	r, err = ac.CheckNamedCondition("newCondition2", "true")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+
+	// falseCondition should override provided string
+	r, err = ac.CheckNamedCondition("falseCondition", "true")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+
+	// trueCondition should override provided string
+	r, err = ac.CheckNamedCondition("trueCondition", "false")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+}

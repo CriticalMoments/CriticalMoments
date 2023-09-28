@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
@@ -88,6 +89,23 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
 	tz := time.FixedZone(tzName, gmtOffset)
 	time.Local = tz
+}
+
+// TODO: check for collisions in developer mode
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+	// lookup name for override, prefering the condition from the config when available
+	condition := ac.config.ConditionWithName(name)
+
+	if condition == nil {
+		// Use provided condition, since config doesn't have an override
+		pCond, err := conditions.NewCondition(conditionString)
+		if err != nil {
+			return false, err
+		}
+		condition = pCond
+	}
+
+	return ac.propertyRegistry.evaluateCondition(condition)
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
