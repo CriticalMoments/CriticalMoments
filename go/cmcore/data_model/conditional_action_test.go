@@ -66,8 +66,20 @@ func TestJsonParsingValidConditional(t *testing.T) {
 	}
 }
 
-func TestJsonParsingInvalidCondiationalAction(t *testing.T) {
+func TestJsonParsingInvalidConditionalAction(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/conditional_actions/invalid.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil || ac.ActionType == ActionTypeEnumConditional {
+		t.Fatal("Invalid conditionals should not parse")
+	}
+}
+
+func TestJsonParsingInvalidConditionalActionCondition(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/conditional_actions/invalid_condition.json")
 	if err != nil {
 		t.Fatal()
 	}

@@ -13,7 +13,8 @@ func arraysEqualOrderInsensitive(a []string, b []string) bool {
 }
 
 func TestConditionVariableExtraction(t *testing.T) {
-	code := "(a > 5555) && b && 'constantString' == c && 2 in [d, 3, 4]"
+	var code Condition
+	code = "(a > 5555) && b && 'constantString' == c && 2 in [d, 3, 4]"
 	variables, err := ExtractVariablesFromCondition(code)
 	if err != nil {
 		t.Fatal(err)

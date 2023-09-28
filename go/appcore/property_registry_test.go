@@ -3,6 +3,8 @@ package appcore
 import (
 	"reflect"
 	"testing"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 func TestPropertyRegistrySetGet(t *testing.T) {
@@ -109,7 +111,8 @@ func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
 	pr.requiredPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
-	versionConditions := `
+	var versionConditions conditions.Condition
+	versionConditions = `
 		(versionGreaterThan('invalid', '1.0') == false) && 
 		(versionGreaterThan('1.1', '1.0') == true) && 
 		(versionGreaterThan('1.0', '1.0') == false) && 
@@ -306,7 +309,8 @@ func TestDateFunctionsInConditions(t *testing.T) {
 		t.Fatal("back to the future 2 isn't real: now() gave incorrect time")
 	}
 
-	verifyDurationCondition := `
+	var verifyDurationCondition conditions.Condition
+	verifyDurationCondition = `
 		(seconds(1) == 1000) && 
 		(seconds(9) == 9000) &&
 		(minutes(1) == seconds(60)) &&

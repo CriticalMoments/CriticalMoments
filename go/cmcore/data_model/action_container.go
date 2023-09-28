@@ -32,7 +32,7 @@ const (
 type ActionContainer struct {
 	ActionType string
 
-	Condition string
+	Condition conditions.Condition
 
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
@@ -111,15 +111,16 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if jac.Condition != "" {
-		if err = conditions.ValidateCondition(jac.Condition); err != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", jac.Condition), err)
+	condition := conditions.Condition(jac.Condition)
+	if condition != "" {
+		if err = conditions.ValidateCondition(condition); err != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", condition), err)
 		}
 	}
 
 	ac.actionData = actionData
 	ac.ActionType = jac.ActionType
-	ac.Condition = jac.Condition
+	ac.Condition = condition
 	return nil
 }
 

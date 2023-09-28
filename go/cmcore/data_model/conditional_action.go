@@ -8,7 +8,7 @@ import (
 )
 
 type ConditionalAction struct {
-	Condition        string
+	Condition        conditions.Condition
 	PassedActionName string
 	FailedActionName string
 }
@@ -53,7 +53,7 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=conditional_action. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
-	c.Condition = jc.Condition
+	c.Condition = conditions.Condition(jc.Condition)
 	c.PassedActionName = jc.PassedActionName
 	c.FailedActionName = jc.FailedActionName
 

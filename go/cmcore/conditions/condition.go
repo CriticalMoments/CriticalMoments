@@ -13,6 +13,8 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+type Condition string
+
 func RequiredPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
 		"platform":                reflect.String,
@@ -88,8 +90,8 @@ func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
 	}
 }
 
-func ExtractVariablesFromCondition(code string) ([]string, error) {
-	tree, err := parser.Parse(code)
+func ExtractVariablesFromCondition(condition Condition) ([]string, error) {
+	tree, err := parser.Parse(string(condition))
 	if err != nil {
 		return nil, err
 	}
@@ -112,8 +114,8 @@ func ExtractVariablesFromCondition(code string) ([]string, error) {
 	return maps.Keys(visitor.variables), nil
 }
 
-func ValidateCondition(code string) error {
-	variables, err := ExtractVariablesFromCondition(code)
+func ValidateCondition(condition Condition) error {
+	variables, err := ExtractVariablesFromCondition(condition)
 	if err != nil {
 		return err
 	}
