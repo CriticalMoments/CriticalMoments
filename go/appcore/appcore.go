@@ -184,7 +184,7 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 }
 
 func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
-	if action.Condition != "" {
+	if action.Condition != nil {
 		conditionResult, err := ac.propertyRegistry.evaluateCondition(action.Condition)
 		if err != nil {
 			return err

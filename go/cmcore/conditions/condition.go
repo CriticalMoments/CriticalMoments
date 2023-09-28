@@ -1,19 +1,45 @@
 package conditions
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"reflect"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/ast"
 	"github.com/antonmedv/expr/checker"
 	"github.com/antonmedv/expr/conf"
 	"github.com/antonmedv/expr/optimizer"
 	"github.com/antonmedv/expr/parser"
+	"github.com/antonmedv/expr/vm"
 	"golang.org/x/exp/maps"
 )
 
-type Condition string
+type Condition struct {
+	conditionString string
+}
+
+func NewCondition(s string) (*Condition, error) {
+	if s == "" {
+		return nil, cmcore.NewUserPresentableError("Empty condition string not allowed")
+	}
+
+	c := Condition{
+		conditionString: s,
+	}
+
+	if err := c.Validate(); err != nil {
+		return nil, err
+	}
+
+	return &c, nil
+}
+
+// Stringer Interface
+func (c *Condition) String() string {
+	return c.conditionString
+}
 
 func RequiredPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
@@ -90,8 +116,8 @@ func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
 	}
 }
 
-func ExtractVariablesFromCondition(condition Condition) ([]string, error) {
-	tree, err := parser.Parse(string(condition))
+func (c *Condition) ExtractVariables() ([]string, error) {
+	tree, err := parser.Parse(c.conditionString)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +140,12 @@ func ExtractVariablesFromCondition(condition Condition) ([]string, error) {
 	return maps.Keys(visitor.variables), nil
 }
 
-func ValidateCondition(condition Condition) error {
-	variables, err := ExtractVariablesFromCondition(condition)
+func (c *Condition) Validate() error {
+	if c.conditionString == "" {
+		return cmcore.NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
+	}
+
+	variables, err := c.ExtractVariables()
 	if err != nil {
 		return err
 	}
@@ -126,8 +156,30 @@ func ValidateCondition(condition Condition) error {
 
 	for _, varName := range variables {
 		if _, ok := allValidVariables[varName]; !ok {
-			return errors.New(fmt.Sprintf("Variable included in expression which isn't recognized: %v", varName))
+			return cmcore.NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
 		}
 	}
+	return nil
+}
+
+func (c *Condition) CompileWithEnv(env expr.Option) (*vm.Program, error) {
+	return expr.Compile(c.conditionString, env, expr.AllowUndefinedVariables(), expr.AsBool())
+}
+
+func (c *Condition) UnmarshalJSON(data []byte) error {
+	var conditionString *string
+	err := json.Unmarshal(data, &conditionString)
+	if err != nil {
+		return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition String [[ %s ]]", string(data)), err)
+	}
+	c.conditionString = *conditionString
+
+	if c.conditionString != "" {
+		if err := c.Validate(); err != nil {
+			c.conditionString = ""
+			return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", c.conditionString), err)
+		}
+	}
+
 	return nil
 }

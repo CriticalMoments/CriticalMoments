@@ -1,4 +1,4 @@
-package datamodel
+package cmcore
 
 import "fmt"
 

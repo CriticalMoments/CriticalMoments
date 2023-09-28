@@ -3,15 +3,27 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"reflect"
 	"testing"
+	"unsafe"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
+
+func testHelperNewCondition(s string, t *testing.T) *conditions.Condition {
+	c, err := conditions.NewCondition(s)
+	if err != nil {
+		t.Fatal("Condition in test invalid", err)
+	}
+	return c
+}
 
 func TestConditionalActionValidators(t *testing.T) {
 	c := ConditionalAction{}
 	if c.Validate() {
 		t.Fatal("Conditional actions require a condition")
 	}
-	c.Condition = "(network_connection_type == 'wifi')"
+	c.Condition = testHelperNewCondition("(network_connection_type == 'wifi')", t)
 	if c.Validate() {
 		t.Fatal("Conditional actions require a passed action")
 	}
@@ -23,15 +35,19 @@ func TestConditionalActionValidators(t *testing.T) {
 	if err != nil && len(an) != 1 && an[0] != "pass_action" {
 		t.Fatal("Failed to return action name for pass action")
 	}
-	c.Condition = "not_a_valid_var > 5"
+	// Check it calls nested validators. Can't construct a problematic condition without reflection
+	v := reflect.ValueOf(c.Condition).Elem()
+	cf := v.FieldByName("conditionString")
+	cf = reflect.NewAt(cf.Type(), unsafe.Pointer(cf.UnsafeAddr())).Elem()
+	cf.SetString("not_a_valid_var > 5")
 	if c.Validate() {
-		t.Fatal("Conditional action should validate expression validity")
+		t.Fatal("Conditional action should validate condition validity")
 	}
-	c.Condition = ""
+	c.Condition = nil
 	if c.Validate() {
 		t.Fatal("Conditional action require condition")
 	}
-	c.Condition = "true"
+	c.Condition = testHelperNewCondition("true", t)
 	if !c.Validate() {
 		t.Fatal("Conditional action should be valid")
 	}
@@ -58,7 +74,7 @@ func TestJsonParsingValidConditional(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumConditional {
 		t.Fatal("Failed to parse valid conditional action")
 	}
-	if ac.ConditionalAction.Condition != "(device_battery_state == 'charging' || device_battery_state == 'full')" {
+	if ac.ConditionalAction.Condition.String() != "(device_battery_state == 'charging' || device_battery_state == 'full')" {
 		t.Fatal("Failed to parse condition")
 	}
 	if ac.ConditionalAction.PassedActionName != "conditional_true" || ac.ConditionalAction.FailedActionName != "conditional_false" {

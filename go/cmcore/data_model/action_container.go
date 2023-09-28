@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
@@ -32,7 +33,7 @@ const (
 type ActionContainer struct {
 	ActionType string
 
-	Condition conditions.Condition
+	Condition *conditions.Condition
 
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
@@ -48,9 +49,9 @@ type ActionContainer struct {
 }
 
 type jsonActionContainer struct {
-	ActionType    string          `json:"actionType"`
-	Condition     string          `json:"condition"`
-	RawActionData json.RawMessage `json:"actionData"`
+	ActionType    string                `json:"actionType"`
+	Condition     *conditions.Condition `json:"condition"`
+	RawActionData json.RawMessage       `json:"actionData"`
 }
 
 // To be implemented by client libaray (eg: iOS SDK or Appcore)
@@ -99,28 +100,21 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	if ok && unpacker != nil {
 		actionData, err = unpacker(jac.RawActionData, ac)
 		if err != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+			return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
 		}
 	} else {
 		typeErr := fmt.Sprintf("Unsupported action type: \"%v\" found in config file.", jac.ActionType)
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(typeErr)
+			return cmcore.NewUserPresentableError(typeErr)
 		} else {
 			fmt.Printf("CriticalMoments: %v. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", typeErr)
 			actionData = &UnknownAction{ActionType: jac.ActionType}
 		}
 	}
 
-	condition := conditions.Condition(jac.Condition)
-	if condition != "" {
-		if err = conditions.ValidateCondition(condition); err != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition: [[ %v ]]", condition), err)
-		}
-	}
-
 	ac.actionData = actionData
 	ac.ActionType = jac.ActionType
-	ac.Condition = condition
+	ac.Condition = jac.Condition
 	return nil
 }
 

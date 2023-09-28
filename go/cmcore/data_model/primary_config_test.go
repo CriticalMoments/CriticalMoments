@@ -75,15 +75,15 @@ func TestPrimaryConfigJson(t *testing.T) {
 		t.Fatal("Didn't parse link action")
 	}
 	failConditionAction := pc.ActionWithName("alertActionWithFailingCondition")
-	if failConditionAction == nil || failConditionAction.Condition != "1 > 2" {
+	if failConditionAction == nil || failConditionAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse alert action with failing condition")
 	}
 	ca1 := pc.ActionWithName("conditionalWithTrueCondition")
-	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition != "2 > 1" {
+	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition.String() != "2 > 1" {
 		t.Fatal("Didn't parse conditional action 1")
 	}
 	ca2 := pc.ActionWithName("conditionalWithFalseCondition")
-	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition != "1 > 2" {
+	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse conditional action 2")
 	}
 	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")

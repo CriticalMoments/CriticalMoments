@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
@@ -54,7 +55,7 @@ func TestJsonParsingInvalidBanners(t *testing.T) {
 			t.Fatalf("Parsed action when invalid: %v", file.Name())
 		}
 		// All errors should be user readable! We want to be able to tell user what was wrong
-		_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+		_, ok := interface{}(err).(cmcore.UserPresentableErrorI)
 		if !ok {
 			t.Fatalf("Banner parsing issue didn't return user presentable error: %v", file.Name())
 		}

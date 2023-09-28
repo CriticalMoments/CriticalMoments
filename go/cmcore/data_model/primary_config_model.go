@@ -3,6 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -86,7 +88,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	var jpc jsonPrimaryConfig
 	err := json.Unmarshal(data, &jpc)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
@@ -119,7 +121,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil

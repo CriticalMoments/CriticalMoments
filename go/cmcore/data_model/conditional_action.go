@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 type ConditionalAction struct {
-	Condition        conditions.Condition
+	Condition        *conditions.Condition
 	PassedActionName string
 	FailedActionName string
 }
 
 type jsonConditionalAction struct {
-	Condition        string `json:"condition"`
-	PassedActionName string `json:"passedActionName"`
-	FailedActionName string `json:"failedActionName,omitempty"`
+	Condition        *conditions.Condition `json:"condition"`
+	PassedActionName string                `json:"passedActionName"`
+	FailedActionName string                `json:"failedActionName,omitempty"`
 }
 
 func unpackConditionalActionFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
@@ -34,10 +35,10 @@ func (c *ConditionalAction) Validate() bool {
 }
 
 func (c *ConditionalAction) ValidateReturningUserReadableIssue() string {
-	if c.Condition == "" {
+	if c.Condition == nil {
 		return "Conditional actions must have a condition"
 	}
-	if err := conditions.ValidateCondition(c.Condition); err != nil {
+	if err := c.Condition.Validate(); err != nil {
 		return fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition)
 	}
 	if c.PassedActionName == "" {
@@ -50,15 +51,15 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	var jc jsonConditionalAction
 	err := json.Unmarshal(data, &jc)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=conditional_action. Check the format, variable names, and types (eg float vs int).", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=conditional_action. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
-	c.Condition = conditions.Condition(jc.Condition)
+	c.Condition = jc.Condition
 	c.PassedActionName = jc.PassedActionName
 	c.FailedActionName = jc.FailedActionName
 
 	if validationIssue := c.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil
