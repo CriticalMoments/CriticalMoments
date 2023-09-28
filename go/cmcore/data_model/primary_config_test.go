@@ -142,7 +142,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 
 func TestFutureConditionStrictValidation(t *testing.T) {
 	// TODO WIP
-	/*testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/invalidCondition.json")
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/invalidCondition.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,6 @@ func TestFutureConditionStrictValidation(t *testing.T) {
 	}
 
 	if pc.ConditionWithName("trueCondition").String() != "true" ||
-		pc.ConditionWithName("nonBoolCondition").String() != "false" ||
 		pc.ConditionWithName("backCompatCondition").String() != "false" {
 		t.Fatal("Failed to parse failing conditions into 'false' condition")
 	}
@@ -162,7 +161,11 @@ func TestFutureConditionStrictValidation(t *testing.T) {
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
-	}()*/
+	}()
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("failed to error with invalid conditionand strict mode on")
+	}
 }
 
 func TestFutureTypeStrictValidation(t *testing.T) {
