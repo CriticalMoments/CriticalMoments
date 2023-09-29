@@ -21,10 +21,6 @@ type Condition struct {
 }
 
 func NewCondition(s string) (*Condition, error) {
-	if s == "" {
-		return nil, cmcore.NewUserPresentableError("Empty condition string not allowed")
-	}
-
 	c := Condition{
 		conditionString: s,
 	}
