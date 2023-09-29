@@ -13,7 +13,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// :nodoc:
+/**
+ The primary interface into Critical Moments. See out getting started docs for usage instructions:
+ https://docs.criticalmoments.io/get-started
+ */
 @interface CriticalMoments : NSObject
 
 // Simple "ping" method for testing end to end integrations
