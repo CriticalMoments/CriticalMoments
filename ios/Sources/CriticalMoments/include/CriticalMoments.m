@@ -142,10 +142,7 @@
 
     NSError *error;
     BOOL result;
-    BOOL callResult = [AppcoreSharedAppcore() checkNamedCondition:name
-                                                  conditionString:condition
-                                                            ret0_:&result
-                                                            error:returnError];
+    [AppcoreSharedAppcore() checkNamedCondition:name conditionString:condition ret0_:&result error:returnError];
 
     if (returnError) {
         NSLog(@"ERROR: CriticalMoments -- error in checkNamedCondition: %@", (*returnError).localizedDescription);
