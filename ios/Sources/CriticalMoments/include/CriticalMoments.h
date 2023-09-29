@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param name A name for this condition. Must be provided and can not be an empty string.
  The name allows you to override the hardcoded condition string remotely from the cloud-hosted
- CM config file later, if your business needs change
+ CM config file later if needed.
  @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
 options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
  @param error Any errors returned from evaluating the condition.
