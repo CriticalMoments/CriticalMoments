@@ -28,7 +28,7 @@
       [CriticalMoments setConfigUrl:url.absoluteString];
       [CriticalMoments start];
 
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [expectation fulfill];
       });
     });
@@ -40,11 +40,15 @@
 }
 
 - (void)testBasicIntegration {
-    NSString *pongResponse = [CriticalMoments objcPing];
-    XCTAssert([@"objcPong" isEqualToString:pongResponse], @"CM integration broken");
+    [self waitForExpectationsWithTimeout:10.0
+                                 handler:^(NSError *herr) {
+                                   NSString *pongResponse = [CriticalMoments objcPing];
+                                   XCTAssert([@"objcPong" isEqualToString:pongResponse], @"CM integration broken");
 
-    NSString *goPongResponse = [CriticalMoments goPing];
-    XCTAssert([@"AppcorePong->PongCmCore" isEqualToString:goPongResponse], @"CM Go integration broken");
+                                   NSString *goPongResponse = [CriticalMoments goPing];
+                                   XCTAssert([@"AppcorePong->PongCmCore" isEqualToString:goPongResponse],
+                                             @"CM Go integration broken");
+                                 }];
 }
 
 - (void)testDefaultTheme {
@@ -62,28 +66,34 @@
 }
 
 - (void)testApiKeyValidation {
-    NSError *error;
+    [self waitForExpectationsWithTimeout:10.0
+                                 handler:^(NSError *herr) {
+                                   NSError *error;
 
-    [CriticalMoments setApiKey:@"" error:&error];
-    XCTAssert(error != nil, @"Empty API key passed validation");
+                                   // TODO: this would be a lot better on non-global CM object
+                                   [CriticalMoments setApiKey:@"" error:&error];
+                                   XCTAssert(error != nil, @"Empty API key passed validation");
 
-    error = nil;
-    [CriticalMoments setApiKey:@"invalid" error:&error];
-    XCTAssert(error != nil, @"Invalid API key passed validation");
+                                   error = nil;
+                                   [CriticalMoments setApiKey:@"invalid" error:&error];
+                                   XCTAssert(error != nil, @"Invalid API key passed validation");
 
-    error = nil;
-    [CriticalMoments
-        setApiKey:@"CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-"
-                  @"MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY="
-            error:&error];
-    XCTAssert(error != nil, @"API key from another app passed validation");
+                                   error = nil;
+                                   [CriticalMoments
+                                       setApiKey:@"CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-"
+                                                 @"MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0Hbpn"
+                                                 @"Xlnpj/f+VXtjRTqNNz9L/AOt4GY="
+                                           error:&error];
+                                   XCTAssert(error != nil, @"API key from another app passed validation");
 
-    // This key is only valid for this sample app
-    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuU2FtcGxlQXBw-MEYCIQCOd0JTuuUtgTJkDUsQH0EQMhJ+"
-                       @"kKysBBfjdxZKqgTBDAIhAMo/OGSysVA0iOscz+mKDqY8UizldA8sZj2a3/mAZIzB";
-    error = nil;
-    [CriticalMoments setApiKey:apiKey error:&error];
-    XCTAssert(error == nil, @"API key failed validation");
+                                   // This key is only valid for this sample app
+                                   NSString *apiKey =
+                                       @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuU2FtcGxlQXBw-MEYCIQCOd0JTuuUtgTJkDUsQH0EQMhJ+"
+                                       @"kKysBBfjdxZKqgTBDAIhAMo/OGSysVA0iOscz+mKDqY8UizldA8sZj2a3/mAZIzB";
+                                   error = nil;
+                                   [CriticalMoments setApiKey:apiKey error:&error];
+                                   XCTAssert(error == nil, @"API key failed validation");
+                                 }];
 }
 
 - (void)testNamedCondition {
