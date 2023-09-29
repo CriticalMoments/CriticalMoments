@@ -80,8 +80,8 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 	return v.Value()
 }
 
-func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
-	variables, err := conditions.ExtractVariablesFromCondition(condition)
+func (p *propertyRegistry) evaluateCondition(condition *conditions.Condition) (bool, error) {
+	variables, err := condition.ExtractVariables()
 	if err != nil {
 		return false, err
 	}
@@ -95,7 +95,7 @@ func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
 	}
 
 	// TODO functions not bound here. bind to cmExprEnv if we add function support
-	program, err := expr.Compile(condition, expr.Env(env), expr.AllowUndefinedVariables(), expr.AsBool())
+	program, err := condition.CompileWithEnv(expr.Env(env))
 	if err != nil {
 		return false, err
 	}

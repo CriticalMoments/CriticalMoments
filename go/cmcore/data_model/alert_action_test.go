@@ -113,7 +113,7 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumAlert {
 		t.Fatal()
 	}
-	if ac.Condition != "platform == 'iOS'" {
+	if ac.Condition.String() != "platform == 'iOS'" {
 		t.Fatal()
 	}
 	a := ac.AlertAction
@@ -183,7 +183,7 @@ func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumAlert {
 		t.Fatal()
 	}
-	if ac.Condition != "" {
+	if ac.Condition != nil {
 		t.Fatal()
 	}
 	a := ac.AlertAction

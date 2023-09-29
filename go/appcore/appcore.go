@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
@@ -33,6 +34,9 @@ type Appcore struct {
 
 	// Properties
 	propertyRegistry *propertyRegistry
+
+	// Dev Mode namedCondition conflict check
+	seenNamedConditions map[string]string
 }
 
 var sharedAppcore Appcore = newAppcore()
@@ -42,7 +46,8 @@ func SharedAppcore() *Appcore {
 }
 func newAppcore() Appcore {
 	return Appcore{
-		propertyRegistry: newPropertyRegistry(),
+		propertyRegistry:    newPropertyRegistry(),
+		seenNamedConditions: map[string]string{},
 	}
 }
 
@@ -88,6 +93,41 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
 	tz := time.FixedZone(tzName, gmtOffset)
 	time.Local = tz
+}
+
+func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
+	if name == "" {
+		return nil
+	}
+	// in debug mode, track each built-in condition we see, and make sure the developer isn't reusing names
+	// If they use the same name twice for different things, they won't be able to override in the future
+	priorSeen := ac.seenNamedConditions[name]
+	if priorSeen == "" {
+		ac.seenNamedConditions[name] = conditionString
+	} else if priorSeen != conditionString {
+		return errors.New(fmt.Sprintf("The named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+	}
+	return nil
+}
+
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+	if name == "" {
+		return false, errors.New("CheckNamedCondition requires a non-empty name")
+	}
+
+	// lookup name for override, prefering the condition from the config when available
+	condition := ac.config.ConditionWithName(name)
+
+	if condition == nil {
+		// Use provided condition, since config doesn't have an override
+		pCond, err := conditions.NewCondition(conditionString)
+		if err != nil {
+			return false, err
+		}
+		condition = pCond
+	}
+
+	return ac.propertyRegistry.evaluateCondition(condition)
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
@@ -184,7 +224,7 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 }
 
 func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
-	if action.Condition != "" {
+	if action.Condition != nil {
 		conditionResult, err := ac.propertyRegistry.evaluateCondition(action.Condition)
 		if err != nil {
 			return err

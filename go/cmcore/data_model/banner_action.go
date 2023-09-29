@@ -3,6 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 const BannerMaxLineCountSystemDefault = -1
@@ -63,7 +65,7 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	var ja jsonBannerAction
 	err := json.Unmarshal(data, &ja)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=banner. Check the format, variable names, and types (eg float vs int).", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=banner. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	// Default Values for nullable options
@@ -88,7 +90,7 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.PreferredPosition = preferredPosition
 
 	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil

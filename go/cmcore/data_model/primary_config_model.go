@@ -3,6 +3,9 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -23,6 +26,9 @@ type PrimaryConfig struct {
 
 	// Triggers
 	namedTriggers map[string]Trigger
+
+	// Conditions
+	namedConditions map[string]*conditions.Condition
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
@@ -37,6 +43,14 @@ func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
 		return &action
+	}
+	return nil
+}
+
+func (pc *PrimaryConfig) ConditionWithName(name string) *conditions.Condition {
+	c, ok := pc.namedConditions[name]
+	if ok {
+		return c
 	}
 	return nil
 }
@@ -67,6 +81,9 @@ type jsonPrimaryConfig struct {
 
 	// Triggers
 	TriggerConfig *jsonTriggersSection `json:"triggers"`
+
+	// Conditions
+	ConditionsConfig *jsonConditionsSection `json:"conditions"`
 }
 
 type jsonThemesSection struct {
@@ -82,11 +99,15 @@ type jsonTriggersSection struct {
 	NamedTriggers map[string]Trigger `json:"namedTriggers"`
 }
 
+type jsonConditionsSection struct {
+	NamedConditions map[string]string `json:"namedConditions"`
+}
+
 func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	var jpc jsonPrimaryConfig
 	err := json.Unmarshal(data, &jpc)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
@@ -118,8 +139,23 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.namedTriggers = make(map[string]Trigger)
 	}
 
+	// Conditions
+	pc.namedConditions = make(map[string]*conditions.Condition)
+	if jpc.ConditionsConfig != nil && jpc.ConditionsConfig.NamedConditions != nil {
+		for name, conditionString := range jpc.ConditionsConfig.NamedConditions {
+			condition, err := conditions.NewCondition(conditionString)
+			if err != nil && StrictDatamodelParsing {
+				return err
+			} else if err != nil {
+				// Fallback to conditions that always evaluates to false.
+				condition, _ = conditions.NewCondition("false")
+			}
+			pc.namedConditions[name] = condition
+		}
+	}
+
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil

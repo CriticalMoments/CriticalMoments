@@ -119,10 +119,36 @@
 
 + (void)sendEvent:(NSString *)eventName {
     NSError *error;
+    // TODO: check we've started. Will crash otherwise
     [AppcoreSharedAppcore() sendEvent:eventName error:&error];
     if (error) {
         NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
     }
+}
+
++ (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)returnError {
+    // TODO: check we've started. Will crash otherwise
+#if DEBUG
+    NSError *collisionError;
+    bool colResult = [AppcoreSharedAppcore() checkNamedConditionCollision:name
+                                                          conditionString:condition
+                                                                    error:&collisionError];
+    if (collisionError != nil) {
+        NSLog(@"\nWARNING: CriticalMoments\nWARNING: CriticalMoments\nIssue with checkNamedCondition usage. Note: this "
+              @"error log is only shown when debugger attached.\n%@\n\n",
+              collisionError.localizedDescription);
+    }
+#endif
+
+    NSError *error;
+    BOOL result;
+    [AppcoreSharedAppcore() checkNamedCondition:name conditionString:condition ret0_:&result error:returnError];
+
+    if (returnError) {
+        NSLog(@"ERROR: CriticalMoments -- error in checkNamedCondition: %@", (*returnError).localizedDescription);
+    }
+
+    return result;
 }
 
 @end

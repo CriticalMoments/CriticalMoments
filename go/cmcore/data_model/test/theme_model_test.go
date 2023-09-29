@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
@@ -172,7 +173,7 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 				t.Fatalf("Parsed theme when invalid: %v", file.Name())
 			}
 			// All errors should be user readable! We want to be able to tell user what was wrong
-			_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+			_, ok := interface{}(err).(cmcore.UserPresentableErrorI)
 			if !ok {
 				t.Fatalf("Theme parsing issue didn't return user presentable error: %v", file.Name())
 			}
@@ -284,11 +285,11 @@ func TestJsonParsingInvalidNestedTheme(t *testing.T) {
 	if err == nil {
 		t.Fatal()
 	}
-	uerr, ok := err.(*datamodel.UserPresentableError)
+	uerr, ok := err.(*cmcore.UserPresentableError)
 	if !ok || uerr.SourceError == nil {
 		t.Fatal("nested error not returned")
 	}
-	_, uok := uerr.SourceError.(*datamodel.UserPresentableError)
+	_, uok := uerr.SourceError.(*cmcore.UserPresentableError)
 	if !uok {
 		t.Fatal("Nested error not user presentable")
 	}

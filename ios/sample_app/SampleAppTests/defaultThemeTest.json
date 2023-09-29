@@ -9,5 +9,10 @@
             "boldFontName": "AvenirNext-Bold",
             "scaleFontForUserPreference": false
         }
+    },
+    "conditions": {
+        "namedConditions": {
+            "overrideToTrue": "true"
+        }
     }
 }

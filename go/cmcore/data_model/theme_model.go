@@ -3,6 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 type Theme struct {
@@ -77,7 +79,7 @@ func (t *Theme) UnmarshalJSON(data []byte) error {
 	var jt jsonTheme
 	err := json.Unmarshal(data, &jt)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a theme. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	uperr := parseThemeFromJsonTheme(t, &jt)
@@ -88,7 +90,7 @@ func (t *Theme) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
+func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *cmcore.UserPresentableError {
 	// Default Values for nullable options
 	t.ScaleFontForUserPreference = true
 	if jt.ScaleFontForUserPreference != nil {
@@ -111,7 +113,7 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	t.DarkModeTheme = jt.DarkModeTheme
 
 	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil

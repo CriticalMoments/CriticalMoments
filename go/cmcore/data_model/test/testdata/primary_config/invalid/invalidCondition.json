@@ -1,0 +1,9 @@
+{
+    "configVersion": "v1",
+    "conditions": {
+      "namedConditions": {
+        "trueCondition": "true",
+        "backCompatCondition": "future_feature > 3"
+      }
+    }
+}

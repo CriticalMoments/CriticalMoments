@@ -73,7 +73,7 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
-	ac := Appcore{}
+	ac := newAppcore()
 	configPath, err := filepath.Abs("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json")
 	if err != nil {
 		t.Fatal(err)
@@ -296,4 +296,58 @@ func TestSetDefaultTheme(t *testing.T) {
 	if defaultTheme == nil && defaultTheme.BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not set after start")
 	}
+}
+
+func TestNamedConditions(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// conditions without overrides should use provided condition
+	r, err := ac.CheckNamedCondition("newCondition1", "false")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+	r, err = ac.CheckNamedCondition("newCondition2", "true")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+
+	// falseCondition should override provided string
+	r, err = ac.CheckNamedCondition("falseCondition", "true")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+
+	// trueCondition should override provided string
+	r, err = ac.CheckNamedCondition("trueCondition", "false")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+
+	// Check name check
+	r, err = ac.CheckNamedCondition("", "false")
+	if err == nil {
+		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
+	}
+
+	// Check debug mode checker
+	dmerr := ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
+		t.Fatal("dev mode condition failed")
+	}
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
+		t.Fatal("dev mode condition second time errored, but should pass with same condition")
+	}
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "true")
+	if dmerr == nil {
+		t.Fatal("unque condition with new value should return a dev warning")
+	}
+
 }

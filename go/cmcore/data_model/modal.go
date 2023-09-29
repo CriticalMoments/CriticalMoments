@@ -2,6 +2,8 @@ package datamodel
 
 import (
 	"encoding/json"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 type ModalAction struct {
@@ -45,7 +47,7 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 	var jm jsonModalAction
 	err := json.Unmarshal(data, &jm)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=modal. Check the format, variable names, and types.", err)
+		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=modal. Check the format, variable names, and types.", err)
 	}
 
 	// Defaults
@@ -59,7 +61,7 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 	m.ShowCloseButton = showCloseButton
 
 	if validationIssue := m.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		return cmcore.NewUserPresentableError(validationIssue)
 	}
 
 	return nil
