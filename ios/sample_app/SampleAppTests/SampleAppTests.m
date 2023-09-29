@@ -18,6 +18,20 @@
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each
     // test method in the class.
+
+    // Ugly wait to wait for startup of CM which is async
+    XCTestExpectation *expectation = [self expectationWithDescription:@"CM startup done"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      // Ensure a default theme from config is loaded into app
+      NSBundle *testBundle = [NSBundle bundleForClass:self.class];
+      NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
+      [CriticalMoments setConfigUrl:url.absoluteString];
+      [CriticalMoments start];
+
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [expectation fulfill];
+      });
+    });
 }
 
 - (void)tearDown {
@@ -36,20 +50,6 @@
 - (void)testDefaultTheme {
     // TOOD: this test isn't robust. Race condition with app config,
     // and edits global state impacting other tests/app.
-
-    // Ugly wait to wait for startup of CM which is async
-    XCTestExpectation *expectation = [self expectationWithDescription:@"CM startup done"];
-    dispatch_async(dispatch_get_main_queue(), ^{
-      // Ensure a default theme from config is loaded into app
-      NSBundle *testBundle = [NSBundle bundleForClass:self.class];
-      NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
-      [CriticalMoments setConfigUrl:url.absoluteString];
-      [CriticalMoments start];
-
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-      });
-    });
 
     [self waitForExpectationsWithTimeout:10.0
                                  handler:^(NSError *error) {
@@ -84,6 +84,49 @@
     error = nil;
     [CriticalMoments setApiKey:apiKey error:&error];
     XCTAssert(error == nil, @"API key failed validation");
+}
+
+- (void)testNamedCondition {
+    [self waitForExpectationsWithTimeout:10.0
+                                 handler:^(NSError *herr) {
+                                   NSError *error;
+                                   bool result = [CriticalMoments checkNamedCondition:@"trueCondition"
+                                                                            condition:@"true"
+                                                                                error:&error];
+                                   XCTAssert(result, @"result should be true");
+                                   XCTAssert(error == nil, @"error should be nil");
+
+                                   error = nil;
+                                   result = [CriticalMoments checkNamedCondition:@"falseCondition"
+                                                                       condition:@"false"
+                                                                           error:&error];
+                                   XCTAssert(!result, @"result should be false");
+                                   XCTAssert(error == nil, @"error should be nil");
+
+                                   error = nil;
+                                   result = [CriticalMoments checkNamedCondition:@"invalidCondition"
+                                                                       condition:@"fake_var > 6"
+                                                                           error:&error];
+                                   XCTAssert(!result, @"result should be false");
+                                   XCTAssert(error != nil, @"error should not be nil");
+
+                                   // Override this by name the test json config file, should return true.
+                                   error = nil;
+                                   result = [CriticalMoments checkNamedCondition:@"overrideToTrue"
+                                                                       condition:@"false"
+                                                                           error:&error];
+                                   XCTAssert(result, @"result should be true");
+                                   XCTAssert(error == nil, @"error should be nil");
+
+                                   // This should show a warning in debug mode, but should pass
+                                   // "falseCondition" name conflict with early use and different condition
+                                   error = nil;
+                                   result = [CriticalMoments checkNamedCondition:@"falseCondition"
+                                                                       condition:@"true"
+                                                                           error:&error];
+                                   XCTAssert(result, @"result should be true");
+                                   XCTAssert(error == nil, @"error should be nil");
+                                 }];
 }
 
 @end

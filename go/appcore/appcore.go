@@ -105,7 +105,7 @@ func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString str
 	if priorSeen == "" {
 		ac.seenNamedConditions[name] = conditionString
 	} else if priorSeen != conditionString {
-		return errors.New(fmt.Sprintf("(This message only appears when debugging, not user facing)\nThe named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+		return errors.New(fmt.Sprintf("The named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
 	}
 	return nil
 }

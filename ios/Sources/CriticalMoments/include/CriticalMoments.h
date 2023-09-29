@@ -80,6 +80,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)sendEvent:(NSString *)eventName;
 
+/**
+ Check a  condition string, returning the result of evaluating it.
+
+ A name is provided so that you can remotely override the condition string using a cloud based config file.
+
+ @param name A name for this condition. Must be provided and can not be an empty string.
+ The name allows you to override the hardcoded condition string remotely from the cloud-hosted
+ CM config file later, if your business needs change
+ @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
+options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
+ @param error Any errors returned from evaluating the condition.
+ @return The result of evaluating the condition. Always false for an error.
+
+ */
++ (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)error;
+
 @end
 
 NS_ASSUME_NONNULL_END
