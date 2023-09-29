@@ -141,7 +141,6 @@ func TestPrimaryConfigJson(t *testing.T) {
 }
 
 func TestFutureConditionStrictValidation(t *testing.T) {
-	// TODO WIP
 	testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/invalidCondition.json")
 	if err != nil {
 		t.Fatal(err)
@@ -152,12 +151,14 @@ func TestFutureConditionStrictValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// TODO: should actually return nil when Strict=false. Entire expression to false
+	// limits what you can do too much
 	if pc.ConditionWithName("trueCondition").String() != "true" ||
 		pc.ConditionWithName("backCompatCondition").String() != "false" {
 		t.Fatal("Failed to parse failing conditions into 'false' condition")
 	}
 
-	// Strict mode should fail since we have an unknown section
+	// Strict mode should fail since we have an unknown var
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
