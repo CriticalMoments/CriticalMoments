@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
@@ -120,7 +119,7 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (boo
 
 	if condition == nil {
 		// Use provided condition, since config doesn't have an override
-		pCond, err := conditions.NewCondition(conditionString)
+		pCond, err := datamodel.NewCondition(conditionString)
 		if err != nil {
 			return false, err
 		}

@@ -59,10 +59,10 @@ func TestVersionParsing(t *testing.T) {
 
 func TestGetComponent(t *testing.T) {
 	s := "1.2.3"
-	r1 := versionNumberComponent(s, 0)
-	r2 := versionNumberComponent(s, 1)
-	r3 := versionNumberComponent(s, 2)
-	r4 := versionNumberComponent(s, 3)
+	r1 := VersionNumberComponent(s, 0)
+	r2 := VersionNumberComponent(s, 1)
+	r3 := VersionNumberComponent(s, 2)
+	r4 := VersionNumberComponent(s, 3)
 	if r1 != 1 || r2 != 2 || r3 != 3 || r4 != nil {
 		t.Fatal("Failed to extract version number components")
 	}
@@ -72,16 +72,16 @@ func TestVersionComparisonHelpers(t *testing.T) {
 	s := "v1"
 	l := "v2"
 
-	if versionGreaterThan(l, s) != true || versionGreaterThan(s, l) != false {
+	if VersionGreaterThan(l, s) != true || VersionGreaterThan(s, l) != false {
 		t.Fatal("Version Greater Than fails")
 	}
-	if versionLessThan(s, l) != true || versionLessThan(l, s) != false {
+	if VersionLessThan(s, l) != true || VersionLessThan(l, s) != false {
 		t.Fatal("Version Less Than fails")
 	}
-	if versionEqual(s, s) != true || versionEqual(s, l) != false {
+	if VersionEqual(s, s) != true || VersionEqual(s, l) != false {
 		t.Fatal("Version Greater Than fails")
 	}
-	if versionGreaterThan("", "") || versionEqual("", "") || versionLessThan("", "") {
+	if VersionGreaterThan("", "") || VersionEqual("", "") || VersionLessThan("", "") {
 		t.Fatal("Invalid version not returning false")
 	}
 }

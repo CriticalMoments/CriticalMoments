@@ -49,7 +49,7 @@ func versionFromVersionString(s string) (*versionNumber, error) {
 	return &version, nil
 }
 
-func versionNumberComponent(versionString string, index int) interface{} {
+func VersionNumberComponent(versionString string, index int) interface{} {
 	// Parse string in format "16.4.1" to get a specific component
 	v, err := versionFromVersionString(versionString)
 	if err != nil || v == nil {
@@ -63,15 +63,15 @@ func versionNumberComponent(versionString string, index int) interface{} {
 	return v.components[index]
 }
 
-func versionGreaterThan(a string, b string) bool {
+func VersionGreaterThan(a string, b string) bool {
 	return versionCompareExpecting(a, b, 1)
 }
 
-func versionLessThan(a string, b string) bool {
+func VersionLessThan(a string, b string) bool {
 	return versionCompareExpecting(a, b, -1)
 }
 
-func versionEqual(a string, b string) bool {
+func VersionEqual(a string, b string) bool {
 	return versionCompareExpecting(a, b, 0)
 }
 

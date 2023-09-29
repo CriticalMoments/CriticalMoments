@@ -6,7 +6,7 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
 func TestPropertyRegistrySetGet(t *testing.T) {
@@ -108,8 +108,8 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 	}
 }
 
-func testHelperNewCondition(s string, t *testing.T) *conditions.Condition {
-	c, err := conditions.NewCondition(s)
+func testHelperNewCondition(s string, t *testing.T) *datamodel.Condition {
+	c, err := datamodel.NewCondition(s)
 	if err != nil {
 		t.Fatal(fmt.Sprintf("Condition in test is not valid %v", s))
 	}
@@ -277,7 +277,7 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("Allowed condition with non bool result")
 	}
 
-	_, err = conditions.NewCondition("app_version ^#$%")
+	_, err = datamodel.NewCondition("app_version ^#$%")
 	if err == nil {
 		t.Fatal("Allowed invalid condition")
 	}

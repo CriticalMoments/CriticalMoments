@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -28,7 +27,7 @@ type PrimaryConfig struct {
 	namedTriggers map[string]Trigger
 
 	// Conditions
-	namedConditions map[string]*conditions.Condition
+	namedConditions map[string]*Condition
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
@@ -47,7 +46,7 @@ func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	return nil
 }
 
-func (pc *PrimaryConfig) ConditionWithName(name string) *conditions.Condition {
+func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	c, ok := pc.namedConditions[name]
 	if ok {
 		return c
@@ -140,15 +139,15 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	// Conditions
-	pc.namedConditions = make(map[string]*conditions.Condition)
+	pc.namedConditions = make(map[string]*Condition)
 	if jpc.ConditionsConfig != nil && jpc.ConditionsConfig.NamedConditions != nil {
 		for name, conditionString := range jpc.ConditionsConfig.NamedConditions {
-			condition, err := conditions.NewCondition(conditionString)
+			condition, err := NewCondition(conditionString)
 			if err != nil && StrictDatamodelParsing {
 				return err
 			} else if err != nil {
 				// Fallback to conditions that always evaluates to false.
-				condition, _ = conditions.NewCondition("false")
+				condition, _ = NewCondition("false")
 			}
 			pc.namedConditions[name] = condition
 		}

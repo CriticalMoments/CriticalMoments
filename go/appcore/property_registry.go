@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
 	"golang.org/x/exp/slices"
 )
@@ -19,8 +19,8 @@ type propertyRegistry struct {
 func newPropertyRegistry() *propertyRegistry {
 	return &propertyRegistry{
 		providers:              make(map[string]propertyProvider),
-		requiredPropertyTypes:  conditions.RequiredPropertyTypes(),
-		wellKnownPropertyTypes: conditions.WellKnownPropertyTypes(),
+		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
+		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
 	}
 }
 
@@ -80,14 +80,14 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 	return v.Value()
 }
 
-func (p *propertyRegistry) evaluateCondition(condition *conditions.Condition) (bool, error) {
+func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (bool, error) {
 	variables, err := condition.ExtractVariables()
 	if err != nil {
 		return false, err
 	}
 
 	// Build env with helper functions and vars from props
-	env := conditions.ConditionEnvWithHelpers()
+	env := datamodel.ConditionEnvWithHelpers()
 	for _, v := range variables {
 		if _, ok := env[v]; !ok {
 			env[v] = p.propertyValue(v)

@@ -6,12 +6,10 @@ import (
 	"reflect"
 	"testing"
 	"unsafe"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
-func testHelperNewCondition(s string, t *testing.T) *conditions.Condition {
-	c, err := conditions.NewCondition(s)
+func testHelperNewCondition(s string, t *testing.T) *Condition {
+	c, err := NewCondition(s)
 	if err != nil {
 		t.Fatal("Condition in test invalid", err)
 	}

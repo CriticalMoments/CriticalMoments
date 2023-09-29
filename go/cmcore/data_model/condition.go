@@ -1,4 +1,4 @@
-package conditions
+package datamodel
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/ast"
 	"github.com/antonmedv/expr/checker"
@@ -84,16 +85,16 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 
 func ConditionEnvWithHelpers() map[string]interface{} {
 	return map[string]interface{}{
-		"versionNumberComponent": versionNumberComponent,
-		"versionGreaterThan":     versionGreaterThan,
-		"versionLessThan":        versionLessThan,
-		"versionEqual":           versionEqual,
-		"now":                    now,
-		"seconds":                seconds,
-		"minutes":                minutes,
-		"hours":                  hours,
-		"days":                   days,
-		"parseDate":              parseDatetime,
+		"versionNumberComponent": conditions.VersionNumberComponent,
+		"versionGreaterThan":     conditions.VersionGreaterThan,
+		"versionLessThan":        conditions.VersionLessThan,
+		"versionEqual":           conditions.VersionEqual,
+		"now":                    conditions.Now,
+		"seconds":                conditions.Seconds,
+		"minutes":                conditions.Minutes,
+		"hours":                  conditions.Hours,
+		"days":                   conditions.Days,
+		"parseDate":              conditions.ParseDatetime,
 	}
 }
 

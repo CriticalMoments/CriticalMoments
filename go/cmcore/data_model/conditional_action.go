@@ -5,19 +5,18 @@ import (
 	"fmt"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 type ConditionalAction struct {
-	Condition        *conditions.Condition
+	Condition        *Condition
 	PassedActionName string
 	FailedActionName string
 }
 
 type jsonConditionalAction struct {
-	Condition        *conditions.Condition `json:"condition"`
-	PassedActionName string                `json:"passedActionName"`
-	FailedActionName string                `json:"failedActionName,omitempty"`
+	Condition        *Condition `json:"condition"`
+	PassedActionName string     `json:"passedActionName"`
+	FailedActionName string     `json:"failedActionName,omitempty"`
 }
 
 func unpackConditionalActionFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {

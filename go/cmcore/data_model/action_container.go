@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
 
 /*
@@ -33,7 +32,7 @@ const (
 type ActionContainer struct {
 	ActionType string
 
-	Condition *conditions.Condition
+	Condition *Condition
 
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
@@ -49,9 +48,9 @@ type ActionContainer struct {
 }
 
 type jsonActionContainer struct {
-	ActionType    string                `json:"actionType"`
-	Condition     *conditions.Condition `json:"condition"`
-	RawActionData json.RawMessage       `json:"actionData"`
+	ActionType    string          `json:"actionType"`
+	Condition     *Condition      `json:"condition"`
+	RawActionData json.RawMessage `json:"actionData"`
 }
 
 // To be implemented by client libaray (eg: iOS SDK or Appcore)

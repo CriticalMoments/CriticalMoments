@@ -9,28 +9,28 @@ import (
 // This is a set of helpers we expose as functions in
 // our condition system to make working with milliseconds easy.
 
-func now() int64 {
+func Now() int64 {
 	return time.Now().UnixMilli()
 }
 
-func days(c int64) int64 {
+func Days(c int64) int64 {
 	// 24 hours == day is simplified concept, will document
 	return c * 24 * time.Hour.Milliseconds()
 }
 
-func hours(c int64) int64 {
+func Hours(c int64) int64 {
 	return c * time.Hour.Milliseconds()
 }
 
-func minutes(c int64) int64 {
+func Minutes(c int64) int64 {
 	return c * time.Minute.Milliseconds()
 }
 
-func seconds(c int64) int64 {
+func Seconds(c int64) int64 {
 	return c * time.Second.Milliseconds()
 }
 
-func parseDatetime(s string) (int64, error) {
+func ParseDatetime(s string) (int64, error) {
 	// RFC3339
 	t, err := time.Parse(time.RFC3339Nano, s)
 	if err == nil {

@@ -1,4 +1,4 @@
-package conditions
+package datamodel
 
 import (
 	"testing"
