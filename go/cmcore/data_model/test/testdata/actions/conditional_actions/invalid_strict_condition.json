@@ -1,7 +1,7 @@
 {
     "actionType": "conditional_action",
     "actionData": {
-        "condition": "nil > 5",
+        "condition": "(fake_var == 'charging' || device_battery_state == 'full')",
         "passedActionName": "conditional_true",
         "failedActionName": "conditional_false"
     }

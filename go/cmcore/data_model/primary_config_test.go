@@ -151,11 +151,10 @@ func TestFutureConditionStrictValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// TODO: should actually return nil when Strict=false. Entire expression to false
-	// limits what you can do too much
 	if pc.ConditionWithName("trueCondition").String() != "true" ||
-		pc.ConditionWithName("backCompatCondition").String() != "false" {
-		t.Fatal("Failed to parse failing conditions into 'false' condition")
+		pc.ConditionWithName("invalidCondition").String() != "" || // non strict parses to empty, which later evals false
+		pc.ConditionWithName("backCompatCondition").String() != "future_feature > 3" {
+		t.Fatal("Failed to allow unrecognized variable when not in strict mode")
 	}
 
 	// Strict mode should fail since we have an unknown var

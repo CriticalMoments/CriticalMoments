@@ -1,6 +1,8 @@
 package datamodel
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -27,13 +29,23 @@ func TestConditionConstructor(t *testing.T) {
 	}
 
 	c, err = NewCondition("bad_var > 2")
-	if err == nil || c != nil {
-		t.Fatal("Unknown var not valid conditions")
+	if err != nil || c.String() != "bad_var > 2" {
+		t.Fatal("Unknown var not allowed in Strict=false")
 	}
 
 	c, err = NewCondition("true")
 	if err != nil || c.String() != "true" {
 		t.Fatal("Valid condition failed")
+	}
+
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
+	c, err = NewCondition("bad_var > 2")
+	if err == nil || c != nil {
+		t.Fatal("Unknown var not valid conditions")
 	}
 }
 
@@ -104,13 +116,14 @@ func TestValidateProps(t *testing.T) {
 	}
 
 	err = validateTestHelper("not_a_supported_prop > 1")
-	if err == nil {
-		t.Fatal("Invalid prop passed validation")
+	if err != nil {
+		t.Fatal("Invalid prop didn't pass non strict validation")
 	}
 
+	// TODO: test this returns nil
 	err = validateTestHelper("AddTwo(1) > 1")
-	if err == nil {
-		t.Fatal("Unrecognized method passed validation")
+	if err != nil {
+		t.Fatal("Unrecognized method failed non-strict validation")
 	}
 
 	err = validateTestHelper("versionNumberComponent('1.2.3', 1) == 1")
@@ -131,5 +144,122 @@ func TestValidateProps(t *testing.T) {
 	err = validateTestHelper("app_version == 'iPhone13,3' && versionNumberComponent(os_version, 1) >= 15")
 	if err != nil {
 		t.Fatal("Valid version strings failed validation")
+	}
+
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = validateTestHelper("not_a_supported_prop > 1")
+	if err == nil {
+		t.Fatal("Invalid prop passed strict validation")
+	}
+	err = validateTestHelper("AddTwo(1) > 1")
+	if err == nil {
+		t.Fatal("Unrecognized method passed validation")
+	}
+}
+
+func TestParseCondtion(t *testing.T) {
+	var c Condition
+
+	s := "true"
+	err := json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != s {
+		t.Fatal("Parse condition failed", err)
+	}
+	s = "true && false"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != s {
+		t.Fatal("Parse condition failed", err)
+	}
+
+	s = "true && false || 5 > 9"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != s {
+		t.Fatal("Parse condition failed", err)
+	}
+
+	// Unknown vars allowed in non-strict mode
+	s = "unknown_var > 6"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != s {
+		t.Fatal("Parse condition failed", err)
+	}
+
+	// invalid conditions should fallback to false if not in strict mode
+	c = Condition{}
+	s = "'qwert' > 3"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != "" {
+		t.Fatal("Parse bad condition did not err")
+	}
+	c = Condition{}
+	s = "app_version ^#$%"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != "" {
+		t.Fatal("Parse bad condition did not err")
+	}
+	c = Condition{}
+	s = ""
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != "" {
+		t.Fatal("Parse allowed non JSON formated string")
+	}
+
+	c = Condition{}
+	// invalid json errors
+	err = json.Unmarshal([]byte(""), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Parse allowed non JSON formated string")
+	}
+
+	// Unknown vars allowed in non-strict mode
+	c = Condition{}
+	s = "unknown_var > 6"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err != nil || c.String() != s {
+		t.Fatal("Parse condition failed", err)
+	}
+
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
+	// Unknown vars not allowed in strict mode
+	c = Condition{}
+	s = "unknown_var > 6"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Strict mode ignored unknown var", err)
+	}
+
+	// invalid conditions should fail in strict mode
+	c = Condition{}
+	s = "'qwert' > 3"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Parse bad condition did not err")
+	}
+
+	c = Condition{}
+	s = "app_version ^#$%"
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Parse bad condition did not err")
+	}
+
+	c = Condition{}
+	s = ""
+	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Parse allowed non JSON formated string")
+	}
+
+	c = Condition{}
+	err = json.Unmarshal([]byte(""), &c)
+	if err == nil || c.String() != "" {
+		t.Fatal("Parse allowed non JSON formated string")
 	}
 }

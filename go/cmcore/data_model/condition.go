@@ -141,20 +141,25 @@ func (c *Condition) Validate() error {
 		return NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
 	}
 
+	// Run this even if not strict. It checking the format of the condition as well
 	variables, err := c.ExtractVariables()
 	if err != nil {
 		return err
 	}
 
-	allValidVariables := make(map[string]reflect.Kind)
-	maps.Copy(allValidVariables, RequiredPropertyTypes())
-	maps.Copy(allValidVariables, WellKnownPropertyTypes())
+	// Check we support all variables used if strict parsing
+	if StrictDatamodelParsing {
+		allValidVariables := make(map[string]reflect.Kind)
+		maps.Copy(allValidVariables, RequiredPropertyTypes())
+		maps.Copy(allValidVariables, WellKnownPropertyTypes())
 
-	for _, varName := range variables {
-		if _, ok := allValidVariables[varName]; !ok {
-			return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
+		for _, varName := range variables {
+			if _, ok := allValidVariables[varName]; !ok {
+				return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
+			}
 		}
 	}
+
 	return nil
 }
 
@@ -171,8 +176,12 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 	c.conditionString = *conditionString
 
 	if err := c.Validate(); err != nil {
+		// Fallback to returning empty on non-strict clients. Don't want entire config file to fail
+		// Downstream during eval we return false and error
 		c.conditionString = ""
-		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
+		if StrictDatamodelParsing {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
+		}
 	}
 
 	return nil

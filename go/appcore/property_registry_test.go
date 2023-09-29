@@ -236,18 +236,12 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("property not set")
 	}
 
-	// Need relections to make an invalid condition, but want to keep test case
-	badCondition := testHelperNewCondition("true", t)
-	v := reflect.ValueOf(badCondition).Elem()
-	cf := v.FieldByName("conditionString")
-	cf = reflect.NewAt(cf.Type(), unsafe.Pointer(cf.UnsafeAddr())).Elem()
-	cf.SetString("a > 2")
-	_, err := pr.evaluateCondition(badCondition)
-	if err == nil {
+	result, err := pr.evaluateCondition(testHelperNewCondition("a > 2", t))
+	if err == nil || result {
 		t.Fatal("Allowed invalid conditions: nil > 2")
 	}
 
-	result, err := pr.evaluateCondition(testHelperNewCondition("3 > 2", t))
+	result, err = pr.evaluateCondition(testHelperNewCondition("3 > 2", t))
 	if err != nil || !result {
 		t.Fatal("Failed to eval simple true condition")
 	}
@@ -272,13 +266,25 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("Failed to eval false condition with property")
 	}
 
-	_, err = pr.evaluateCondition(testHelperNewCondition("1 + 2 + 3", t))
-	if err == nil {
+	result, err = pr.evaluateCondition(testHelperNewCondition("1 + 2 + 3", t))
+	if err == nil || result {
 		t.Fatal("Allowed condition with non bool result")
 	}
 
-	_, err = datamodel.NewCondition("app_version ^#$%")
-	if err == nil {
+	// Need reflection to created these invalid cases.
+	// Empty strings may exist in non-strict mode parsing so really important case that it returns false and err
+	con := &datamodel.Condition{}
+	v := reflect.ValueOf(con).Elem()
+	cf := v.FieldByName("conditionString")
+	cf = reflect.NewAt(cf.Type(), unsafe.Pointer(cf.UnsafeAddr())).Elem()
+	cf.SetString("")
+	result, e := pr.evaluateCondition(con)
+	if e == nil || result {
+		t.Fatal("Allowed empty condition")
+	}
+	cf.SetString("app_version ^#$%")
+	result, e = pr.evaluateCondition(con)
+	if err == nil || result {
 		t.Fatal("Allowed invalid condition")
 	}
 
@@ -350,5 +356,36 @@ func TestDateFunctionsInConditions(t *testing.T) {
 	result, err = pr.evaluateCondition(testHelperNewCondition("parseDate('invalid') == 1136189045999", t))
 	if err == nil || result {
 		t.Fatal("invalid date didn't error", err)
+	}
+}
+
+func TestUnknownVarsInConditions(t *testing.T) {
+	c, err := datamodel.NewCondition("unknown_var == nil")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pr := newPropertyRegistry()
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+
+	result, err := pr.evaluateCondition(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result != true {
+		t.Fatal("failed to return nil for unknown var")
+	}
+
+	c, err = datamodel.NewCondition("unknown_var > 6")
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err = pr.evaluateCondition(c)
+	if err == nil {
+		t.Fatal(err)
+	}
+	if result != false {
+		t.Fatal("failed to return false for error")
 	}
 }

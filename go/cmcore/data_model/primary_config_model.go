@@ -97,7 +97,7 @@ type jsonTriggersSection struct {
 }
 
 type jsonConditionsSection struct {
-	NamedConditions map[string]string `json:"namedConditions"`
+	NamedConditions map[string]*Condition `json:"namedConditions"`
 }
 
 func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
@@ -137,18 +137,10 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	// Conditions
-	pc.namedConditions = make(map[string]*Condition)
 	if jpc.ConditionsConfig != nil && jpc.ConditionsConfig.NamedConditions != nil {
-		for name, conditionString := range jpc.ConditionsConfig.NamedConditions {
-			condition, err := NewCondition(conditionString)
-			if err != nil && StrictDatamodelParsing {
-				return err
-			} else if err != nil {
-				// Fallback to conditions that always evaluates to false.
-				condition, _ = NewCondition("false")
-			}
-			pc.namedConditions[name] = condition
-		}
+		pc.namedConditions = jpc.ConditionsConfig.NamedConditions
+	} else {
+		pc.namedConditions = make(map[string]*Condition)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {

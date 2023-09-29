@@ -3,7 +3,8 @@
     "conditions": {
       "namedConditions": {
         "trueCondition": "true",
-        "backCompatCondition": "future_feature > 3"
+        "backCompatCondition": "future_feature > 3",
+        "invalidCondition": "'asdf' > 3"
       }
     }
 }

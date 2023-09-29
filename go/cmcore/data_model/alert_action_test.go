@@ -238,6 +238,10 @@ func TestParsingInvalidConditionAlert(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
 	var ac ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil {
