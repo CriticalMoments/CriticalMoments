@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"golang.org/x/exp/slices"
 )
 
@@ -135,7 +134,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	var ja jsonAlertAction
 	err := json.Unmarshal(data, &ja)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=alert. Check the format, variable names, and types (eg float vs int).", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=alert. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	// Default Values for nullable options
@@ -154,7 +153,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		} else {
 			styleErr := fmt.Sprintf("Invalid alert style \"%v\".", *ja.Style)
 			if StrictDatamodelParsing {
-				return cmcore.NewUserPresentableError(styleErr)
+				return NewUserPresentableError(styleErr)
 			} else {
 				fmt.Printf("CriticalMoments: %v Ignoring and Will default to dialog. If not expected, check your CM config file.\n", styleErr)
 			}
@@ -181,7 +180,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	a.CustomButtons = customButtons
 
 	if validationIssue := a.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil
@@ -195,7 +194,7 @@ func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, 
 		} else {
 			btnStyleErr := fmt.Sprintf("Alert action style \"%v\" is not a valid style.", *jb.Style)
 			if StrictDatamodelParsing {
-				return nil, cmcore.NewUserPresentableError(btnStyleErr)
+				return nil, NewUserPresentableError(btnStyleErr)
 			} else {
 				fmt.Printf("CriticalMoments: %v Ignoring and defaulting to default style. If this is not expected, check your CM config file.", btnStyleErr)
 			}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/ast"
@@ -139,7 +138,7 @@ func (c *Condition) ExtractVariables() ([]string, error) {
 
 func (c *Condition) Validate() error {
 	if c.conditionString == "" {
-		return cmcore.NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
+		return NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
 	}
 
 	variables, err := c.ExtractVariables()
@@ -153,7 +152,7 @@ func (c *Condition) Validate() error {
 
 	for _, varName := range variables {
 		if _, ok := allValidVariables[varName]; !ok {
-			return cmcore.NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
+			return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
 		}
 	}
 	return nil
@@ -167,13 +166,13 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 	var conditionString *string
 	err := json.Unmarshal(data, &conditionString)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition String [[ %s ]]", string(data)), err)
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition String [[ %s ]]", string(data)), err)
 	}
 	c.conditionString = *conditionString
 
 	if err := c.Validate(); err != nil {
 		c.conditionString = ""
-		return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
 	}
 
 	return nil

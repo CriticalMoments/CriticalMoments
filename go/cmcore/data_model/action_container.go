@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 /*
@@ -99,12 +97,12 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	if ok && unpacker != nil {
 		actionData, err = unpacker(jac.RawActionData, ac)
 		if err != nil {
-			return cmcore.NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
 		}
 	} else {
 		typeErr := fmt.Sprintf("Unsupported action type: \"%v\" found in config file.", jac.ActionType)
 		if StrictDatamodelParsing {
-			return cmcore.NewUserPresentableError(typeErr)
+			return NewUserPresentableError(typeErr)
 		} else {
 			fmt.Printf("CriticalMoments: %v. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", typeErr)
 			actionData = &UnknownAction{ActionType: jac.ActionType}

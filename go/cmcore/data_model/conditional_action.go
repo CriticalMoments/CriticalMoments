@@ -3,8 +3,6 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 type ConditionalAction struct {
@@ -50,7 +48,7 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	var jc jsonConditionalAction
 	err := json.Unmarshal(data, &jc)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=conditional_action. Check the format, variable names, and types (eg float vs int).", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=conditional_action. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	c.Condition = jc.Condition
@@ -58,7 +56,7 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	c.FailedActionName = jc.FailedActionName
 
 	if validationIssue := c.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil

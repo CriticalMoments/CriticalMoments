@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 type LinkAction struct {
@@ -56,7 +54,7 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 	var jl jsonLinkAction
 	err := json.Unmarshal(data, &jl)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an action with type=link. Check the format, variable names, and types (eg float vs int).", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of an action with type=link. Check the format, variable names, and types (eg float vs int).", err)
 	}
 
 	// Defaults
@@ -69,7 +67,7 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 	l.UseEmbeddedBrowser = useEmbeddedBrowser
 
 	if validationIssue := l.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
@@ -33,7 +32,7 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 	var jp jsonPage
 	err := json.Unmarshal(data, &jp)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a page.", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of a page.", err)
 	}
 
 	if jp.PageType == PageTypeEnumStack {
@@ -42,14 +41,14 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 	} else {
 		typeErr := "pageType must be 'stack'"
 		if StrictDatamodelParsing {
-			return cmcore.NewUserPresentableError(typeErr)
+			return NewUserPresentableError(typeErr)
 		} else {
 			fmt.Printf("CriticalMoments: %v. Ignoring, but if not expected check your config file.\n", typeErr)
 		}
 	}
 
 	if validationIssue := p.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil
@@ -121,7 +120,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	var js jsonPageSection
 	err := json.Unmarshal(data, &js)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a page.", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of a page.", err)
 	}
 
 	s.PageSectionType = js.PageSectionType
@@ -135,7 +134,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	if !ok {
 		errString := fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file. This section will be ignored. If unexpected, check the CM config file.\n", s.PageSectionType)
 		if StrictDatamodelParsing {
-			return cmcore.NewUserPresentableError(errString)
+			return NewUserPresentableError(errString)
 		} else {
 			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
 			fmt.Println(errString)
@@ -150,7 +149,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	}
 
 	if validationIssue := s.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil
@@ -197,12 +196,12 @@ func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 	var data map[string]interface{}
 	err := json.Unmarshal(rawData, &data)
 	if err != nil {
-		return nil, cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a page section (title).", err)
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (title).", err)
 	}
 
 	title, ok := data["title"].(string)
 	if !ok || title == "" {
-		return nil, cmcore.NewUserPresentableError("Page section of type title must have a title string.")
+		return nil, NewUserPresentableError("Page section of type title must have a title string.")
 	}
 
 	scaleFactor, ok := data["scaleFactor"].(float64)
@@ -260,12 +259,12 @@ func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionType
 	var data map[string]interface{}
 	err := json.Unmarshal(rawData, &data)
 	if err != nil {
-		return nil, cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a page section (body).", err)
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (body).", err)
 	}
 
 	bodyText, ok := data["bodyText"].(string)
 	if !ok || bodyText == "" {
-		return nil, cmcore.NewUserPresentableError("Page section of type body must have a bodyText string.")
+		return nil, NewUserPresentableError("Page section of type body must have a bodyText string.")
 	}
 
 	scaleFactor, ok := data["scaleFactor"].(float64)
@@ -312,7 +311,7 @@ func unpackImageSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 	var i Image
 	err := json.Unmarshal(rawData, &i)
 	if err != nil {
-		return nil, cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a page section (image).", err)
+		return nil, NewUserPresentableErrorWSource("Unable to parse the json of a page section (image).", err)
 	}
 
 	s.ImageData = &i

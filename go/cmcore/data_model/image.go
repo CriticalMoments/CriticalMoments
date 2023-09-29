@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
@@ -50,7 +49,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	var ji jsonImage
 	err := json.Unmarshal(data, &ji)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of an image.", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of an image.", err)
 	}
 
 	i.ImageType = ji.ImageType
@@ -66,7 +65,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	if !ok {
 		errString := fmt.Sprintf("Unsupported image type: \"%v\" found in config file.", i.ImageType)
 		if StrictDatamodelParsing {
-			return cmcore.NewUserPresentableError(errString)
+			return NewUserPresentableError(errString)
 		} else {
 			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
 			fmt.Printf("CriticalMoments: %v This image will be ignored. If unexpected, check the CM config file.", errString)
@@ -75,13 +74,13 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	} else {
 		imageData, err := unpacker(ji.RawSectionData, i)
 		if err != nil {
-			return cmcore.NewUserPresentableErrorWSource("Issue parsing image section.", err)
+			return NewUserPresentableErrorWSource("Issue parsing image section.", err)
 		}
 		i.imageData = imageData
 	}
 
 	if validationIssue := i.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil
@@ -123,7 +122,7 @@ type LocalImage struct {
 func unpackLocalImage(data map[string]interface{}, i *Image) (imageTypeInterface, error) {
 	path, ok := data["path"].(string)
 	if !ok || path == "" {
-		return nil, cmcore.NewUserPresentableError("Image of type local require a path.")
+		return nil, NewUserPresentableError("Image of type local require a path.")
 	}
 
 	id := LocalImage{
@@ -213,7 +212,7 @@ func unpackSymbolImage(data map[string]interface{}, i *Image) (imageTypeInterfac
 	}
 
 	if errString := id.ValidateReturningUserReadableIssue(); errString != "" {
-		return nil, cmcore.NewUserPresentableError(errString)
+		return nil, NewUserPresentableError(errString)
 	}
 
 	i.SymbolImageData = &id

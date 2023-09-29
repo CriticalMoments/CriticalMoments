@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	"golang.org/x/exp/slices"
 )
 
@@ -44,7 +43,7 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 	var jb jsonButton
 	err := json.Unmarshal(data, &jb)
 	if err != nil {
-		return cmcore.NewUserPresentableErrorWSource("Unable to parse the json of a button.", err)
+		return NewUserPresentableErrorWSource("Unable to parse the json of a button.", err)
 	}
 
 	b.Title = jb.Title
@@ -59,7 +58,7 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 	if !slices.Contains(buttonStyles, b.Style) {
 		errString := fmt.Sprintf("Invalid button style: \"%v\"", b.Style)
 		if StrictDatamodelParsing {
-			return cmcore.NewUserPresentableError(errString)
+			return NewUserPresentableError(errString)
 		} else {
 			fmt.Printf("CriticalMoments: %v. Will fallback to normal style.\n", errString)
 			b.Style = ButtonStyleEnumNormal
@@ -67,7 +66,7 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 	}
 
 	if validationIssue := b.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return cmcore.NewUserPresentableError(validationIssue)
+		return NewUserPresentableError(validationIssue)
 	}
 
 	return nil
