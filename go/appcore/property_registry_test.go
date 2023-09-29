@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"unsafe"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/conditions"
 )
@@ -235,7 +236,13 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("property not set")
 	}
 
-	_, err := conditions.NewCondition("a > 2")
+	// Need relections to make an invalid condition, but want to keep test case
+	badCondition := testHelperNewCondition("true", t)
+	v := reflect.ValueOf(badCondition).Elem()
+	cf := v.FieldByName("conditionString")
+	cf = reflect.NewAt(cf.Type(), unsafe.Pointer(cf.UnsafeAddr())).Elem()
+	cf.SetString("a > 2")
+	_, err := pr.evaluateCondition(badCondition)
 	if err == nil {
 		t.Fatal("Allowed invalid conditions: nil > 2")
 	}
