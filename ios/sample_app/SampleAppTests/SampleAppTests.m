@@ -16,10 +16,8 @@
 @implementation SampleAppTests
 
 - (void)setUp {
-    // Put setup code here. This method is called before the invocation of each
-    // test method in the class.
-
-    // Ugly wait to wait for startup of CM which is async
+    // Wait to wait for startup of CM which is async
+    // TODO P2: send a NSNotifification and set expectation after that instead of 0.2s
     XCTestExpectation *expectation = [self expectationWithDescription:@"CM startup done"];
     dispatch_async(dispatch_get_main_queue(), ^{
       // Ensure a default theme from config is loaded into app
