@@ -14,7 +14,7 @@
 		E0446E732A0DBF450069E5BD /* iOSSnapshotTestCase in Frameworks */ = {isa = PBXBuildFile; productRef = E0446E722A0DBF450069E5BD /* iOSSnapshotTestCase */; };
 		E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E742A0DC0170069E5BD /* SnapshotTests.m */; };
 		E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */; };
-		E05AB4E52A0E9CF70034A9CA /* defaultThemeTest.json in Resources */ = {isa = PBXBuildFile; fileRef = E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */; };
+		E05AB4E52A0E9CF70034A9CA /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E05AB4E42A0E9CF70034A9CA /* testConfig.json */; };
 		E069BFB12A217A9E00A4B65E /* ConditionsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */; };
 		E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774A29F9B202001521F4 /* CMDemoScreen.m */; };
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
@@ -56,7 +56,7 @@
 		E0446E742A0DC0170069E5BD /* SnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SnapshotTests.m; sourceTree = "<group>"; };
 		E0446E762A0DC2430069E5BD /* SampleAppCoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleAppCoreViewController.h; sourceTree = "<group>"; };
 		E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAppCoreViewController.m; sourceTree = "<group>"; };
-		E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = defaultThemeTest.json; sourceTree = "<group>"; };
+		E05AB4E42A0E9CF70034A9CA /* testConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = testConfig.json; sourceTree = "<group>"; };
 		E069BFAF2A217A9E00A4B65E /* ConditionsDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConditionsDemoScreen.h; sourceTree = "<group>"; };
 		E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConditionsDemoScreen.m; sourceTree = "<group>"; };
 		E07B774929F9B202001521F4 /* CMDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMDemoScreen.h; sourceTree = "<group>"; };
@@ -180,7 +180,7 @@
 			children = (
 				E0B5460829F407C3002A25A8 /* SampleAppTests.m */,
 				E0446E742A0DC0170069E5BD /* SnapshotTests.m */,
-				E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */,
+				E05AB4E42A0E9CF70034A9CA /* testConfig.json */,
 			);
 			path = SampleAppTests;
 			sourceTree = "<group>";
@@ -301,7 +301,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E05AB4E52A0E9CF70034A9CA /* defaultThemeTest.json in Resources */,
+				E05AB4E52A0E9CF70034A9CA /* testConfig.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,7 +22,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       // Ensure a default theme from config is loaded into app
       NSBundle *testBundle = [NSBundle bundleForClass:self.class];
-      NSURL *url = [testBundle URLForResource:@"defaultThemeTest" withExtension:@"json"];
+      NSURL *url = [testBundle URLForResource:@"testConfig" withExtension:@"json"];
       [CriticalMoments setConfigUrl:url.absoluteString];
       [CriticalMoments start];
 
