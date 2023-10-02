@@ -10,17 +10,51 @@
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
 
+@interface CriticalMoments ()
+@property(nonatomic, strong) AppcoreAppcore *appcore;
+@property(nonatomic, strong) CMLibBindings *bindings;
+@end
+
 @implementation CriticalMoments
 
-+ (NSString *)objcPing {
+- (id)initInternal {
+    self = [super init];
+    if (self) {
+        _appcore = AppcoreNewAppcore();
+    }
+    return self;
+}
+
+static CriticalMoments *sharedInstance = nil;
+
++ (CriticalMoments *)sharedInstance {
+    // avoid lock if we can
+    if (sharedInstance) {
+        return sharedInstance;
+    }
+
+    @synchronized(CriticalMoments.class) {
+        if (!sharedInstance) {
+            sharedInstance = [[self alloc] initInternal];
+        }
+
+        return sharedInstance;
+    }
+}
+
+- (NSString *)objcPing {
     return @"objcPong";
 }
 
-+ (NSString *)goPing {
+- (NSString *)goPing {
     return AppcoreGoPing();
 }
 
-+ (void)start {
+- (AppcoreAppcore *)appcore {
+    return _appcore;
+}
+
+- (void)start {
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -28,7 +62,7 @@
     // after core app setup.
     dispatch_async(dispatch_get_main_queue(), ^{
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error = [CriticalMoments startReturningError];
+        NSError *error = [self startReturningError];
         if (error) {
             NSLog(@"CriticalMoments: Critical Moments was unable to start! "
                   @"%@",
@@ -46,15 +80,18 @@
     });
 }
 
-+ (NSError *)startReturningError {
+- (NSError *)startReturningError {
     // Register the action dispatcher and properties
-    [CMLibBindings registerWithAppcore];
+    if (!self.bindings) {
+        self.bindings = [[CMLibBindings alloc] init];
+    }
+    [_appcore registerLibraryBindings:_bindings];
 
     // Fix the timezone -- golang doesn't know local offset by default
     NSTimeZone *tz = NSTimeZone.localTimeZone;
-    [AppcoreSharedAppcore() setTimezoneGMTOffset:tz.secondsFromGMT];
+    [_appcore setTimezoneGMTOffset:tz.secondsFromGMT];
 
-    CMPropertyRegisterer *propertryRegisterer = [[CMPropertyRegisterer alloc] init];
+    CMPropertyRegisterer *propertryRegisterer = [[CMPropertyRegisterer alloc] initWithAppcore:_appcore];
     [propertryRegisterer registerDefaultPropertiesToAppcore];
 
     // Set the cache directory to applicationSupport/CriticalMomentsData
@@ -69,23 +106,23 @@
     if (error) {
         return error;
     }
-    [AppcoreSharedAppcore() setCacheDirPath:[criticalMomentsCacheDir path] error:&error];
+    [_appcore setCacheDirPath:[criticalMomentsCacheDir path] error:&error];
     if (error) {
         return error;
     }
 
-    [AppcoreSharedAppcore() start:&error];
+    [_appcore start:&error];
     if (error) {
         return error;
     }
     return nil;
 }
 
-+ (void)setApiKey:(NSString *)apiKey error:(NSError **)returnError {
+- (void)setApiKey:(NSString *)apiKey error:(NSError **)returnError {
     // Set API Key
     NSError *error;
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    [AppcoreSharedAppcore() setApiKey:apiKey bundleID:bundleIdentifier error:&error];
+    [_appcore setApiKey:apiKey bundleID:bundleIdentifier error:&error];
     if (error) {
         if (returnError) {
             *returnError = error;
@@ -103,9 +140,9 @@
     }
 }
 
-+ (void)setConfigUrl:(NSString *)urlString {
+- (void)setConfigUrl:(NSString *)urlString {
     NSError *error;
-    [AppcoreSharedAppcore() setConfigUrl:urlString error:&error];
+    [_appcore setConfigUrl:urlString error:&error];
     if (error != nil) {
         NSLog(@"ERROR: CriticalMoments -- invalid remote config url: %@", error);
 #if DEBUG
@@ -117,22 +154,20 @@
     }
 }
 
-+ (void)sendEvent:(NSString *)eventName {
+- (void)sendEvent:(NSString *)eventName {
     NSError *error;
     // TODO: check we've started. Will crash otherwise
-    [AppcoreSharedAppcore() sendEvent:eventName error:&error];
+    [_appcore sendEvent:eventName error:&error];
     if (error) {
         NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
     }
 }
 
-+ (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)returnError {
+- (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)returnError {
     // TODO: check we've started. Will crash otherwise
 #if DEBUG
     NSError *collisionError;
-    bool colResult = [AppcoreSharedAppcore() checkNamedConditionCollision:name
-                                                          conditionString:condition
-                                                                    error:&collisionError];
+    bool colResult = [_appcore checkNamedConditionCollision:name conditionString:condition error:&collisionError];
     if (collisionError != nil) {
         NSLog(@"\nWARNING: CriticalMoments\nWARNING: CriticalMoments\nIssue with checkNamedCondition usage. Note: this "
               @"error log is only shown when debugger attached.\n%@\n\n",
@@ -142,13 +177,22 @@
 
     NSError *error;
     BOOL result;
-    [AppcoreSharedAppcore() checkNamedCondition:name conditionString:condition ret0_:&result error:returnError];
+    [_appcore checkNamedCondition:name conditionString:condition ret0_:&result error:returnError];
 
     if (returnError) {
         NSLog(@"ERROR: CriticalMoments -- error in checkNamedCondition: %@", (*returnError).localizedDescription);
     }
 
     return result;
+}
+
+// TODO: expose this for real?
+- (void)performNamedAction:(NSString *)name error:(NSError **)error {
+    [_appcore performNamedAction:name error:error];
+}
+
+- (DatamodelTheme *)themeFromConfigByName:(NSString *)name {
+    return [_appcore themeForName:name];
 }
 
 @end

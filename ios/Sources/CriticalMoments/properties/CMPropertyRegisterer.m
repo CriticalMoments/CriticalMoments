@@ -7,6 +7,7 @@
 
 #import "CMPropertyRegisterer.h"
 
+#import "../CriticalMoments_private.h"
 #import "../utils/CMUtils.h"
 #import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
@@ -19,7 +20,21 @@
 
 @import UIKit;
 
+@interface CMPropertyRegisterer ()
+
+@property(nonatomic, strong) AppcoreAppcore *appcore;
+
+@end
+
 @implementation CMPropertyRegisterer
+
+- (instancetype)initWithAppcore:(AppcoreAppcore *)ac {
+    self = [super init];
+    if (self) {
+        _appcore = ac;
+    }
+    return self;
+}
 
 - (void)processError:(NSError *)error {
     if (!error) {
@@ -38,31 +53,31 @@
 
 - (void)registerStaticStringProperty:(NSString *)key value:(NSString *)value {
     NSError *error;
-    [AppcoreSharedAppcore() registerStaticStringProperty:key value:value error:&error];
+    [_appcore registerStaticStringProperty:key value:value error:&error];
     [self processError:error];
 }
 
 - (void)registerStaticIntProperty:(NSString *)key value:(long)value {
     NSError *error;
-    [AppcoreSharedAppcore() registerStaticIntProperty:key value:value error:&error];
+    [_appcore registerStaticIntProperty:key value:value error:&error];
     [self processError:error];
 }
 
 - (void)registerStaticFloatProperty:(NSString *)key value:(double)value {
     NSError *error;
-    [AppcoreSharedAppcore() registerStaticFloatProperty:key value:value error:&error];
+    [_appcore registerStaticFloatProperty:key value:value error:&error];
     [self processError:error];
 }
 
 - (void)registerStaticBoolProperty:(NSString *)key value:(bool)value {
     NSError *error;
-    [AppcoreSharedAppcore() registerStaticBoolProperty:key value:value error:&error];
+    [_appcore registerStaticBoolProperty:key value:value error:&error];
     [self processError:error];
 }
 
 - (void)registerLibPropertyProvider:(NSString *)key value:(id<AppcoreLibPropertyProvider>)value {
     NSError *error;
-    [AppcoreSharedAppcore() registerLibPropertyProvider:key dpp:value error:&error];
+    [_appcore registerLibPropertyProvider:key dpp:value error:&error];
     [self processError:error];
 }
 

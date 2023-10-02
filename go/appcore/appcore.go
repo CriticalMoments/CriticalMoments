@@ -38,13 +38,8 @@ type Appcore struct {
 	seenNamedConditions map[string]string
 }
 
-var sharedAppcore Appcore = newAppcore()
-
-func SharedAppcore() *Appcore {
-	return &sharedAppcore
-}
-func newAppcore() Appcore {
-	return Appcore{
+func NewAppcore() *Appcore {
+	return &Appcore{
 		propertyRegistry:    newPropertyRegistry(),
 		seenNamedConditions: map[string]string{},
 	}

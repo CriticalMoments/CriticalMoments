@@ -19,13 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CriticalMoments : NSObject
 
-// Simple "ping" method for testing end to end integrations
-/// :nodoc:
-+ (NSString *)objcPing;
+- (instancetype)init NS_UNAVAILABLE;
 
-// Golang "ping" method for testing end to end integrations
-/// :nodoc:
-+ (NSString *)goPing;
+/**
+ The default instance of critical moments. You should always use this instance
+ */
++ (CriticalMoments *)sharedInstance;
 
 /**
  Start should be called once you've performed all needed initialization for
@@ -41,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  - Setup a default theme from code (optional). Can also be done through config
  or not at all.
  */
-+ (void)start;
+- (void)start;
 
 /**
  Set the API Key for critical moments.
@@ -53,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param apiKey the API Key. Create one on criticalmoments.io
  @param error optional, any error created when validating the API key
  */
-+ (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
+- (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
 /**
  Set the config URL for critical moments.
@@ -69,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  file can present messages directly to your users, and you should treat security
  seriously, as you would your app update release process or webpage.
  */
-+ (void)setConfigUrl:(NSString *)urlString;
+- (void)setConfigUrl:(NSString *)urlString;
 
 // TODO: improve docs
 // TODO: enforce naming limits (ascii, no spaces)?
@@ -81,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param eventName a string describing the event. Example:
  `user_updated_profile_photo`
  */
-+ (void)sendEvent:(NSString *)eventName;
+- (void)sendEvent:(NSString *)eventName;
 
 /**
  Check a  condition string, returning the result of evaluating it.
@@ -97,7 +96,18 @@ options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-con
  @return The result of evaluating the condition. Always false for an error.
 
  */
-+ (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)error;
+- (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)error;
+
+// TODO: expose? If so document. If not... use events or nodoc.
+- (void)performNamedAction:(NSString *)name error:(NSError **)error;
+
+// Simple "ping" method for testing end to end integrations
+/// :nodoc:
+- (NSString *)objcPing;
+
+// Golang "ping" method for testing end to end integrations
+/// :nodoc:
+- (NSString *)goPing;
 
 @end
 

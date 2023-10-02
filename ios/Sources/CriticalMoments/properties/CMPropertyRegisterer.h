@@ -13,6 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMPropertyRegisterer : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
+- (instancetype)initWithAppcore:(AppcoreAppcore *)ac;
+
 - (void)registerDefaultPropertiesToAppcore;
 
 @end
