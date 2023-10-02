@@ -40,9 +40,7 @@
         *error = [NSError errorWithDomain:@"CMIOS" code:81263223 userInfo:nil];
         return NO;
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [CMTheme setCurrentTheme:theme];
-    });
+    [CMTheme setCurrentTheme:theme];
 
     return YES;
 }
