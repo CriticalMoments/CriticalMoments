@@ -7,24 +7,11 @@
 
 #import <Foundation/Foundation.h>
 
+@import Appcore;
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMLibBindings : NSObject
-
-#pragma mark Shared Instance
-
-/**
- :nodoc:
- A shared instance reference.
- @return a shared instance of CMActionDispatcher
- */
-+ (CMLibBindings *)shared;
-
-/**
- :nodoc:
- Register the shared instance with appcore
- */
-+ (void)registerWithAppcore;
+@interface CMLibBindings : NSObject <AppcoreLibBindings>
 
 @end
 

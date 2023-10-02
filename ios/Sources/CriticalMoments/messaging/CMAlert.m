@@ -10,6 +10,7 @@
 
 @import UIKit;
 
+#import "../include/CriticalMoments.h"
 #import "../utils/CMUtils.h"
 
 // Wrapper for our custom data
@@ -142,7 +143,7 @@
 
 - (void)performAction:(NSString *)actionName {
     NSError *error;
-    [AppcoreSharedAppcore() performNamedAction:actionName error:&error];
+    [CriticalMoments.sharedInstance performNamedAction:actionName error:&error];
     if (error) {
         NSLog(@"CriticalMoments: Alert tap unknown issue: %@", error);
     }

@@ -34,6 +34,9 @@ let package = Package(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
             path: "ios/Tests/CriticalMomentsTests",
+            resources: [
+                .copy("TestResources")
+            ],
             cSettings: [
                 .headerSearchPath("../../Sources/CriticalMoments"),
             ]

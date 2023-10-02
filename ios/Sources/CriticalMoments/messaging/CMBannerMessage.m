@@ -6,6 +6,7 @@
 //
 
 #import "CMBannerMessage.h"
+#import "../include/CriticalMoments.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
 #import "CMBannerMessage_private.h"
@@ -216,7 +217,7 @@
     }
 
     NSError *error;
-    [AppcoreSharedAppcore() performNamedAction:self.appcoreTapActionName error:&error];
+    [CriticalMoments.sharedInstance performNamedAction:self.appcoreTapActionName error:&error];
     if (error) {
         NSLog(@"CriticalMoments: Banner tap unknown issue: %@", error);
     }

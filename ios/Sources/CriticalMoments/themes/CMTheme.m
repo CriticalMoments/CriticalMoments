@@ -7,6 +7,7 @@
 
 #import "CMTheme.h"
 
+#import "../CriticalMoments_private.h"
 #import "../utils/CMUtils.h"
 
 @import Appcore;
@@ -68,7 +69,7 @@ static CMTheme *currentTheme = nil;
 #pragma mark Named Themes From Appcore
 
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
-    DatamodelTheme *appcoreTheme = [AppcoreSharedAppcore() themeForName:themeName];
+    DatamodelTheme *appcoreTheme = [CriticalMoments.sharedInstance themeFromConfigByName:themeName];
     if (appcoreTheme) {
         CMTheme *theme = [CMTheme themeFromAppcoreTheme:appcoreTheme];
         return [CMTheme themeAdaptedForDarkModeFromTheme:theme];

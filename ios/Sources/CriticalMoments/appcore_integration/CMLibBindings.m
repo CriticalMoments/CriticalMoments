@@ -22,31 +22,10 @@
 @import SafariServices;
 @import StoreKit;
 
-@interface CMLibBindings () <AppcoreLibBindings>
+@interface CMLibBindings ()
 @end
 
 @implementation CMLibBindings
-
-static CMLibBindings *sharedInstance = nil;
-
-+ (CMLibBindings *)shared {
-    // avoid lock if we can
-    if (sharedInstance) {
-        return sharedInstance;
-    }
-
-    @synchronized(CMLibBindings.class) {
-        if (!sharedInstance) {
-            sharedInstance = [[self alloc] init];
-        }
-
-        return sharedInstance;
-    }
-}
-
-+ (void)registerWithAppcore {
-    [AppcoreSharedAppcore() registerLibraryBindings:[CMLibBindings shared]];
-}
 
 #pragma mark AppcoreLibBindings
 
@@ -66,7 +45,6 @@ static CMLibBindings *sharedInstance = nil;
     return YES;
 }
 
-// TODO test case
 - (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];

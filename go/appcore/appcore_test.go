@@ -73,7 +73,7 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
-	ac := newAppcore()
+	ac := NewAppcore()
 	configPath, err := filepath.Abs("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json")
 	if err != nil {
 		t.Fatal(err)
@@ -97,7 +97,7 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	// Clear required properties, for easier setup
 	ac.propertyRegistry = newPropertyRegistry()
 	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
-	return &ac, nil
+	return ac, nil
 }
 
 func TestAppcoreStart(t *testing.T) {
