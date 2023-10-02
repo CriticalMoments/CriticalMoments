@@ -105,8 +105,8 @@ each usage independently from remote configuration. Reused names will log warnin
                   condition:(NSString *_Nonnull)condition
                     handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
 
-/// :nodoc: TBD if this is a public API or not.
-- (void)performNamedAction:(NSString *)name error:(NSError **)error;
+/// :nodoc: TBD if this is a public API or not. For now, it's not.
+- (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:

@@ -142,11 +142,12 @@
 }
 
 - (void)performAction:(NSString *)actionName {
-    NSError *error;
-    [CriticalMoments.sharedInstance performNamedAction:actionName error:&error];
-    if (error) {
-        NSLog(@"CriticalMoments: Alert tap unknown issue: %@", error);
-    }
+    [CriticalMoments.sharedInstance performNamedAction:actionName
+                                               handler:^(NSError *_Nullable error) {
+                                                 if (error) {
+                                                     NSLog(@"CriticalMoments: Alert tap unknown issue: %@", error);
+                                                 }
+                                               }];
 }
 
 @end

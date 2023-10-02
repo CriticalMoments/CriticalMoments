@@ -61,10 +61,12 @@
 
     if (self.model.actionName.length > 0) {
         NSError *error;
-        [CriticalMoments.sharedInstance performNamedAction:self.model.actionName error:&error];
-        if (error) {
-            NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
-        }
+        [CriticalMoments.sharedInstance performNamedAction:self.model.actionName
+                                                   handler:^(NSError *_Nullable error) {
+                                                     if (error) {
+                                                         NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
+                                                     }
+                                                   }];
     }
 
     if (!self.model.preventDefault && self.defaultAction) {

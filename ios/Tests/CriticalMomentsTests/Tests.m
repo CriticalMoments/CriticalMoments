@@ -201,20 +201,53 @@
 - (void)testPerformActionBeforeStart {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
 
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    // Inverted means we check that we don't run before we start, and queue works
+    XCTestExpectation *expectationNotRun = [[XCTestExpectation alloc] init];
+    expectationNotRun.inverted = true;
+
+    // tracks that perform works after we start
+    XCTestExpectation *expectationSuccess1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess1];
+
     // should run async after start, and not crash
-    NSError *error;
-    [cm performNamedAction:@"reviewAction" error:&error];
-    // TODO: fails now, but should work once we make this API async
-    XCTAssert(error, @"perform action before start errored");
+    [cm performNamedAction:@"reviewAction"
+                   handler:^(NSError *_Nullable error) {
+                     [expectationNotRun fulfill];
+                     if (!error) {
+                         [expectationSuccess1 fulfill];
+                     }
+                   }];
+
+    // Shouldn't run yet, even if we wait 1s
+    [self waitForExpectations:@[ expectationNotRun ] timeout:1.0];
 
     [self startCMForTest:cm];
 
     // should run async and not crash
-    error = nil;
-    [cm performNamedAction:@"reviewAction" error:&error];
-    XCTAssert(!error, @"condition after start errored");
+    XCTestExpectation *expectationSuccess2 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess2];
+    [cm performNamedAction:@"reviewAction"
+                   handler:^(NSError *_Nullable error) {
+                     if (!error) {
+                         [expectationSuccess2 fulfill];
+                     }
+                   }];
 
-    // TODO both should process, in right order
+    // should run async, and we expect error since action name not in config
+    XCTestExpectation *expectationFail3 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationFail3];
+    [cm performNamedAction:@"actionWhichDoesNotExist"
+                   handler:^(NSError *_Nullable error) {
+                     if (error) {
+                         // Fulfill on error because this action name *should* error
+                         [expectationFail3 fulfill];
+                     }
+                   }];
+
+    // confirm all are run after we start
+    [self waitForExpectations:expectations timeout:5.0];
 }
 
 - (void)testCheckConditionBeforeStart {
@@ -223,8 +256,8 @@
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     // Inverted means we check that we don't run before we start, and queue works
-    XCTestExpectation *expectationRun = [[XCTestExpectation alloc] init];
-    expectationRun.inverted = true;
+    XCTestExpectation *expectationNotRun = [[XCTestExpectation alloc] init];
+    expectationNotRun.inverted = true;
 
     // tracks that condition works after start
     XCTestExpectation *expectationSuccess1 = [[XCTestExpectation alloc] init];
@@ -234,14 +267,14 @@
     [cm checkNamedCondition:@"nonName"
                   condition:@"true"
                     handler:^(bool result, NSError *_Nullable error) {
-                      [expectationRun fulfill];
+                      [expectationNotRun fulfill];
                       if (result && !error) {
                           [expectationSuccess1 fulfill];
                       }
                     }];
 
     // Shouldn't run yet, even if we wait 1s
-    [self waitForExpectations:@[ expectationRun ] timeout:1.0];
+    [self waitForExpectations:@[ expectationNotRun ] timeout:1.0];
 
     [self startCMForTest:cm];
 

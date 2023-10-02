@@ -229,8 +229,16 @@ static CriticalMoments *sharedInstance = nil;
     });
 }
 
-- (void)performNamedAction:(NSString *)name error:(NSError **)error {
-    [_appcore performNamedAction:name error:error];
+- (void)performNamedAction:(NSString *)name handler:(void (^)(NSError *_Nullable))handler {
+    __block void (^blockHandler)(NSError *_Nullable error) = handler;
+    __block NSString *blockName = name;
+    dispatch_async(_actionQueue, ^{
+      NSError *error;
+      [_appcore performNamedAction:name error:&error];
+      if (blockHandler) {
+          blockHandler(error);
+      }
+    });
 }
 
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name {
