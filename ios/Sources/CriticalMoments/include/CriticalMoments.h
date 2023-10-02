@@ -98,7 +98,7 @@ options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-con
  */
 - (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)error;
 
-// TODO: expose? If so document. If not... use events or nodoc.
+/// :nodoc: TBD if this is a public API or not.
 - (void)performNamedAction:(NSString *)name error:(NSError **)error;
 
 // Simple "ping" method for testing end to end integrations

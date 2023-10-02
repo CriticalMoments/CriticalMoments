@@ -15,8 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 // _private header prevents exposing these to public SDK.
 
-// Internal tests only
+// Internal only -- use sharedSingleton in product
 - (id)initInternal;
+
+// Internal only -- use start in product
 - (NSError *)startReturningError;
 
 /// :nodoc: access named themes

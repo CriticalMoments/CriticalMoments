@@ -186,7 +186,6 @@ static CriticalMoments *sharedInstance = nil;
     return result;
 }
 
-// TODO: expose this for real?
 - (void)performNamedAction:(NSString *)name error:(NSError **)error {
     [_appcore performNamedAction:name error:error];
 }
