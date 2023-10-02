@@ -216,11 +216,12 @@
         return;
     }
 
-    NSError *error;
-    [CriticalMoments.sharedInstance performNamedAction:self.appcoreTapActionName error:&error];
-    if (error) {
-        NSLog(@"CriticalMoments: Banner tap unknown issue: %@", error);
-    }
+    [CriticalMoments.sharedInstance performNamedAction:self.appcoreTapActionName
+                                               handler:^(NSError *_Nullable error) {
+                                                 if (error) {
+                                                     NSLog(@"CriticalMoments: Banner tap unknown issue: %@", error);
+                                                 }
+                                               }];
 }
 
 @end

@@ -14,5 +14,18 @@
         "namedConditions": {
             "overrideToTrue": "true"
         }
+    },
+    "actions": {
+        "namedActions": {
+            "alertAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Alert title"
+                }
+            },
+            "reviewAction": {
+                "actionType": "review_prompt"
+            }
+        }
     }
 }

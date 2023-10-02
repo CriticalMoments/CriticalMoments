@@ -18,6 +18,8 @@ func GoPing() string {
 }
 
 type Appcore struct {
+	started bool
+
 	// Library binding/delegate
 	libBindings LibBindings
 
@@ -105,6 +107,9 @@ func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString str
 }
 
 func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+	if !ac.started {
+		return false, errors.New("Appcore not started")
+	}
 	if name == "" {
 		return false, errors.New("CheckNamedCondition requires a non-empty name")
 	}
@@ -128,8 +133,11 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	ac.libBindings = lb
 }
 
-// TODO: guard against double start call
 func (ac *Appcore) Start() error {
+	if ac.started {
+		return errors.New("Appcore already started. Start should only be called once")
+	}
+
 	if ac.apiKey == nil {
 		return errors.New("An API Key must be provided before starting critical moments")
 	}
@@ -177,6 +185,7 @@ func (ac *Appcore) Start() error {
 		return err
 	}
 
+	ac.started = true
 	return nil
 }
 
@@ -192,24 +201,35 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-// TODO: events should be queued during setup, and run after postConfigSetup
-func (ac *Appcore) SendEvent(e string) error {
-	actions := ac.config.ActionsForEvent(e)
-	if len(actions) == 0 {
-		return errors.New(fmt.Sprintf("Event not found: %v", e))
+func (ac *Appcore) SendEvent(name string) error {
+	if !ac.started {
+		return errors.New("Appcore not started")
 	}
+
+	_, err := datamodel.NewEventWithName(name)
+	if err != nil {
+		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
+	}
+
+	// TODO: save this event
+
+	// Perform any actions for this event
+	actions := ac.config.ActionsForEvent(name)
 	var lastErr error
 	for _, action := range actions {
 		err := ac.PerformAction(&action)
 		if err != nil {
-			// return an error, but don't stop sending
-			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err))
+			// return an error, but don't stop processing
+			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", name, err))
 		}
 	}
 	return lastErr
 }
 
 func (ac *Appcore) PerformNamedAction(actionName string) error {
+	if !ac.started {
+		return errors.New("Appcore not started")
+	}
 	action := ac.config.ActionWithName(actionName)
 	if action == nil {
 		return errors.New(fmt.Sprintf("No action found named %v", actionName))
@@ -218,6 +238,9 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 }
 
 func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
+	if !ac.started {
+		return errors.New("Appcore not started")
+	}
 	if action.Condition != nil {
 		conditionResult, err := ac.propertyRegistry.evaluateCondition(action.Condition)
 		if err != nil {
@@ -235,6 +258,9 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
 }
 
 func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
+	if !ac.started {
+		return nil
+	}
 	return ac.config.ThemeWithName(themeName)
 }
 
