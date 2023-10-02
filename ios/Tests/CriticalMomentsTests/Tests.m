@@ -185,17 +185,57 @@
 - (void)testSendEventBeforeStart {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
 
-    // should run async after start, and not crash
-    [cm sendEvent:@"eventName"];
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
-    [NSThread sleepForTimeInterval:5.0];
+    // Inverted means we check that we don't run before we start, and queue works
+    XCTestExpectation *expectationNotRun = [[XCTestExpectation alloc] init];
+    expectationNotRun.inverted = true;
+
+    // tracks that sends event after we start
+    XCTestExpectation *expectationSuccess1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess1];
+
+    // Check order of run is order of is in order called
+    NSLock *lock = [[NSLock alloc] init];
+    NSMutableArray<NSNumber *> *orderRan = [[NSMutableArray alloc] init];
+
+    // should run async after start, and not crash
+    [cm sendEvent:DatamodelAppStartBuiltInEvent
+          handler:^(NSError *_Nullable error) {
+            [lock lock];
+            [orderRan addObject:@1];
+            [lock unlock];
+            [expectationNotRun fulfill];
+            if (!error) {
+                [expectationSuccess1 fulfill];
+            }
+          }];
+
+    // Shouldn't run yet, even if we wait 1s
+    [self waitForExpectations:@[ expectationNotRun ] timeout:1.0];
 
     [self startCMForTest:cm];
 
     // should run async and not crash
-    [cm sendEvent:@"eventName2"];
+    // tracks that sends event after we start
+    XCTestExpectation *expectationSuccess2 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess2];
+    [cm sendEvent:DatamodelSignedInEvent
+          handler:^(NSError *_Nullable error) {
+            [lock lock];
+            [orderRan addObject:@2];
+            [lock unlock];
+            if (!error) {
+                [expectationSuccess2 fulfill];
+            }
+          }];
 
-    // TODO both should process, in right order
+    // both should process
+    [self waitForExpectations:expectations timeout:5.0];
+    // Should process in order
+    XCTAssert(orderRan.count == 2, @"both did not run");
+    XCTAssert([@1 isEqualToNumber:orderRan.firstObject], @"ran out of order");
+    XCTAssert([@2 isEqualToNumber:orderRan.lastObject], @"ran out of order");
 }
 
 - (void)testPerformActionBeforeStart {

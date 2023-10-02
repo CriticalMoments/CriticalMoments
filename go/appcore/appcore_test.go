@@ -160,6 +160,34 @@ func TestAppcoreStartBadConfig(t *testing.T) {
 	}
 }
 
+func TestSendEvent(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// invalid events should error
+	err = ac.SendEvent("io.criticalmoments.events.built_in.invalid")
+	if err == nil {
+		t.Fatal("invalid build in event did not error")
+	}
+	err = ac.SendEvent("io.criticalmoments.events.well_known.invalid")
+	if err == nil {
+		t.Fatal("invalid well known event did not error")
+	}
+
+	// custom events with no actions should work
+	err = ac.SendEvent("net.scosman.asdf")
+	if err != nil {
+		t.Fatal("valid custom event errored", err)
+	}
+
+}
+
 func TestPerformingAction(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {

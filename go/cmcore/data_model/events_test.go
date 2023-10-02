@@ -20,18 +20,18 @@ func TestInvalidBuiltInEvents(t *testing.T) {
 		t.Fatal()
 	}
 	// well known != built in
-	e, err = NewBuiltInEventWithName(SignedInEventAppStart)
+	e, err = NewBuiltInEventWithName(SignedInEvent)
 	if err == nil || e != nil {
 		t.Fatal()
 	}
 }
 
 func TestWellKnownEvent(t *testing.T) {
-	e, err := NewWellKnownEventWithName(SignedInEventAppStart)
+	e, err := NewWellKnownEventWithName(SignedInEvent)
 	if err != nil {
 		t.Fatal()
 	}
-	if e.Name != string(SignedInEventAppStart) || e.eventType != eventTypeWellKnown {
+	if e.Name != string(SignedInEvent) || e.eventType != eventTypeWellKnown {
 		t.Fatal()
 	}
 }
@@ -65,7 +65,7 @@ func TestInvalidCustomEvents(t *testing.T) {
 		t.Fatal()
 	}
 	// Well known shouldn't work in custom
-	e, err = NewCustomEventWithName(SignedInEventAppStart)
+	e, err = NewCustomEventWithName(SignedInEvent)
 	if err == nil || e != nil {
 		t.Fatal()
 	}
@@ -77,5 +77,22 @@ func TestInvalidCustomEvents(t *testing.T) {
 	e, err = NewCustomEventWithName("io.criticalmoments.events.well_known.custom")
 	if err == nil || e != nil {
 		t.Fatal()
+	}
+}
+
+func TestSharedConstructor(t *testing.T) {
+	e, err := NewEventWithName(AppStartBuiltInEvent)
+	if err != nil || e.eventType != eventTypeBuiltIn || e.Name != AppStartBuiltInEvent {
+		t.Fatal("Failed to parse build in event")
+	}
+
+	e, err = NewEventWithName(SignedInEvent)
+	if err != nil || e.eventType != eventTypeWellKnown || e.Name != SignedInEvent {
+		t.Fatal("Failed to parse well known event")
+	}
+
+	e, err = NewEventWithName("net.scosman.hello")
+	if err != nil || e.eventType != eventTypeCustom || e.Name != "net.scosman.hello" {
+		t.Fatal("Failed to parse custom event")
 	}
 }

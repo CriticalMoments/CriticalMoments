@@ -201,20 +201,26 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-func (ac *Appcore) SendEvent(e string) error {
+func (ac *Appcore) SendEvent(name string) error {
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
-	actions := ac.config.ActionsForEvent(e)
-	if len(actions) == 0 {
-		return errors.New(fmt.Sprintf("Event not found: %v", e))
+
+	_, err := datamodel.NewEventWithName(name)
+	if err != nil {
+		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
 	}
+
+	// TODO: save this event
+
+	// Perform any actions for this event
+	actions := ac.config.ActionsForEvent(name)
 	var lastErr error
 	for _, action := range actions {
 		err := ac.PerformAction(&action)
 		if err != nil {
-			// return an error, but don't stop sending
-			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err))
+			// return an error, but don't stop processing
+			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", name, err))
 		}
 	}
 	return lastErr

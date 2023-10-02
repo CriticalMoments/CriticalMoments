@@ -192,12 +192,18 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)sendEvent:(NSString *)eventName {
+    [self sendEvent:eventName handler:nil];
+}
+
+- (void)sendEvent:(NSString *)eventName handler:(void (^)(NSError *_Nullable error))handler {
+    __block void (^blockHandler)(NSError *_Nullable error) = handler;
+    __block NSString *blockEventName = eventName;
     dispatch_async(_eventQueue, ^{
       NSError *error;
       [_appcore sendEvent:eventName error:&error];
 
-      if (error) {
-          NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
+      if (blockHandler) {
+          blockHandler(error);
       }
     });
 }

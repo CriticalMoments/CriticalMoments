@@ -35,12 +35,12 @@ var (
 
 // Enum type would be nice, but doesn't play well with gomobile exports
 const (
-	SignedInEventAppStart string = wellKnownEventNamespace + "signed_in"
+	SignedInEvent string = wellKnownEventNamespace + "signed_in"
 )
 
 var (
 	allWellKnownEventTypes = map[string]bool{
-		SignedInEventAppStart: true,
+		SignedInEvent: true,
 	}
 )
 
@@ -49,6 +49,16 @@ type Event struct {
 
 	// Event type is internal to cmcore
 	eventType eventTypeEnum
+}
+
+func NewEventWithName(name string) (*Event, error) {
+	if strings.HasPrefix(name, buildInEventNamespace) {
+		return NewBuiltInEventWithName(name)
+	}
+	if strings.HasPrefix(name, wellKnownEventNamespace) {
+		return NewWellKnownEventWithName(name)
+	}
+	return NewCustomEventWithName(name)
 }
 
 func NewBuiltInEventWithName(name string) (*Event, error) {
