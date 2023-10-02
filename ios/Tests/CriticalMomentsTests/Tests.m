@@ -230,12 +230,27 @@
             }
           }];
 
+    // should run async and not crash
+    // should error because this event name is not allowed
+    XCTestExpectation *expectationFail3 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationFail3];
+    [cm sendEvent:@"io.criticalmoments.events.built_in.invalid_built_in"
+          handler:^(NSError *_Nullable error) {
+            [lock lock];
+            [orderRan addObject:@3];
+            [lock unlock];
+            if (error) {
+                [expectationFail3 fulfill];
+            }
+          }];
+
     // both should process
     [self waitForExpectations:expectations timeout:5.0];
     // Should process in order
-    XCTAssert(orderRan.count == 2, @"both did not run");
+    XCTAssert(orderRan.count == 3, @"all did not run");
     XCTAssert([@1 isEqualToNumber:orderRan.firstObject], @"ran out of order");
-    XCTAssert([@2 isEqualToNumber:orderRan.lastObject], @"ran out of order");
+    XCTAssert([@2 isEqualToNumber:orderRan[1]], @"ran out of order");
+    XCTAssert([@3 isEqualToNumber:orderRan[2]], @"ran out of order");
 }
 
 - (void)testPerformActionBeforeStart {
