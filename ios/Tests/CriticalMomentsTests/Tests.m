@@ -81,7 +81,11 @@
 
 - (CriticalMoments *)buildAndStartCMForTest {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    [self startCMForTest:cm];
+    return cm;
+}
 
+- (void)startCMForTest:(CriticalMoments *)cm {
     NSBundle *testBundle = [NSBundle bundleForClass:self.class];
     NSURL *resourceBundleId =
         [testBundle.bundleURL URLByAppendingPathComponent:@"CriticalMoments_CriticalMomentsTests.bundle"];
@@ -104,36 +108,66 @@
 }
 
 - (void)testNamedCondition {
-    NSError *error;
     CriticalMoments *cm = [self buildAndStartCMForTest];
     XCTAssert(cm, @"Startup issue");
 
-    bool result = [cm checkNamedCondition:@"trueCondition" condition:@"true" error:&error];
-    XCTAssert(result, @"result should be true");
-    XCTAssert(error == nil, @"error should be nil");
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
-    error = nil;
-    result = [cm checkNamedCondition:@"falseCondition" condition:@"false" error:&error];
-    XCTAssert(!result, @"result should be false");
-    XCTAssert(error == nil, @"error should be nil");
+    XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation1];
+    [cm checkNamedCondition:@"trueCondition"
+                  condition:@"true"
+                    handler:^(bool result, NSError *error) {
+                      if (result && !error) {
+                          [expectation1 fulfill];
+                      }
+                    }];
 
-    error = nil;
-    result = [cm checkNamedCondition:@"invalidCondition" condition:@"fake_var > 6" error:&error];
-    XCTAssert(!result, @"result should be false");
-    XCTAssert(error != nil, @"error should not be nil");
+    XCTestExpectation *expectation2 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation2];
+    [cm checkNamedCondition:@"falseCondition"
+                  condition:@"false"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (!result && !error) {
+                          [expectation2 fulfill];
+                      }
+                    }];
+
+    // check errors return errors
+    XCTestExpectation *expectation3 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation3];
+    [cm checkNamedCondition:@"invalidCondition"
+                  condition:@"fake_var > 6"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (!result && error) {
+                          [expectation3 fulfill];
+                      }
+                    }];
 
     // Override this by name the test json config file, should return true.
-    error = nil;
-    result = [cm checkNamedCondition:@"overrideToTrue" condition:@"false" error:&error];
-    XCTAssert(result, @"result should be true");
-    XCTAssert(error == nil, @"error should be nil");
+    XCTestExpectation *expectation4 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation4];
+    [cm checkNamedCondition:@"overrideToTrue"
+                  condition:@"false"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (result && !error) {
+                          [expectation4 fulfill];
+                      }
+                    }];
 
     // This should show a warning in debug mode, but should pass
     // "falseCondition" name conflict with early use and different condition
-    error = nil;
-    result = [cm checkNamedCondition:@"falseCondition" condition:@"true" error:&error];
-    XCTAssert(result, @"result should be true");
-    XCTAssert(error == nil, @"error should be nil");
+    XCTestExpectation *expectation5 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation5];
+    [cm checkNamedCondition:@"falseCondition"
+                  condition:@"true"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (result && !error) {
+                          [expectation5 fulfill];
+                      }
+                    }];
+
+    [self waitForExpectations:expectations timeout:5.0];
 }
 
 - (void)testDefaultTheme {
@@ -148,4 +182,82 @@
               @"Default theme should have loaded fg from config");
 }
 
+- (void)testSendEventBeforeStart {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+
+    // should run async after start, and not crash
+    [cm sendEvent:@"eventName"];
+
+    [NSThread sleepForTimeInterval:5.0];
+
+    [self startCMForTest:cm];
+
+    // should run async and not crash
+    [cm sendEvent:@"eventName2"];
+
+    // TODO both should process, in right order
+}
+
+- (void)testPerformActionBeforeStart {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+
+    // should run async after start, and not crash
+    NSError *error;
+    [cm performNamedAction:@"reviewAction" error:&error];
+    // TODO: fails now, but should work once we make this API async
+    XCTAssert(error, @"perform action before start errored");
+
+    [self startCMForTest:cm];
+
+    // should run async and not crash
+    error = nil;
+    [cm performNamedAction:@"reviewAction" error:&error];
+    XCTAssert(!error, @"condition after start errored");
+
+    // TODO both should process, in right order
+}
+
+- (void)testCheckConditionBeforeStart {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    // Inverted means we check that we don't run before we start, and queue works
+    XCTestExpectation *expectationRun = [[XCTestExpectation alloc] init];
+    expectationRun.inverted = true;
+
+    // tracks that condition works after start
+    XCTestExpectation *expectationSuccess1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess1];
+
+    // should run async after start, and not crash
+    [cm checkNamedCondition:@"nonName"
+                  condition:@"true"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      [expectationRun fulfill];
+                      if (result && !error) {
+                          [expectationSuccess1 fulfill];
+                      }
+                    }];
+
+    // Shouldn't run yet, even if we wait 1s
+    [self waitForExpectations:@[ expectationRun ] timeout:1.0];
+
+    [self startCMForTest:cm];
+
+    XCTestExpectation *expectationSuccess2 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess2];
+
+    // should run async and not crash
+    [cm checkNamedCondition:@"nonName2"
+                  condition:@"false"
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (!error && !result) {
+                          [expectationSuccess2 fulfill];
+                      }
+                    }];
+
+    // Both should have run, and returned correct results
+    [self waitForExpectations:expectations timeout:5.0];
+}
 @end

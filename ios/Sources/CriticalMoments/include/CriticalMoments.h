@@ -83,20 +83,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendEvent:(NSString *)eventName;
 
 /**
- Check a  condition string, returning the result of evaluating it.
+ Checks a condition string, returning the result of evaluating it.
 
  A name is provided so that you can remotely override the condition string using a cloud based config file.
+
+ The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
+can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
 
  @param name A name for this condition. Must be provided and can not be an empty string.
  The name allows you to override the hardcoded condition string remotely from the cloud-hosted
  CM config file later if needed.
  @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
 options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
- @param error Any errors returned from evaluating the condition.
- @return The result of evaluating the condition. Always false for an error.
-
+ @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
+returns any errors occured evaluating the condition. The boolean value is false for any error.
+ @warning Be sure to provide a unique name to each condition you use. Reusing names will make it impossible to override
+each usage independently from remote configuration. Reused names will log warnings in the debug console.
  */
-- (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)error;
+- (void)checkNamedCondition:(NSString *_Nonnull)name
+                  condition:(NSString *_Nonnull)condition
+                    handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
 
 /// :nodoc: TBD if this is a public API or not.
 - (void)performNamedAction:(NSString *)name error:(NSError **)error;

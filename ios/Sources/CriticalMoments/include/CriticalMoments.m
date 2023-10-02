@@ -11,8 +11,11 @@
 #import "../properties/CMPropertyRegisterer.h"
 
 @interface CriticalMoments ()
+@property(nonatomic) BOOL queuesStarted;
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
+@property(nonatomic, strong) dispatch_queue_t actionQueue;
+@property(nonatomic, strong) dispatch_queue_t eventQueue;
 @end
 
 @implementation CriticalMoments
@@ -21,8 +24,28 @@
     self = [super init];
     if (self) {
         _appcore = AppcoreNewAppcore();
+
+        // Event queue is serial to preserve event order
+        dispatch_queue_attr_t eventQueueAttr =
+            dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_DEFAULT, 0);
+        _eventQueue = dispatch_queue_create("io.criticalmoments.event_queue", eventQueueAttr);
+
+        // action queue is concurrent
+        dispatch_queue_attr_t actionQueueAttr =
+            dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_DEFAULT, 0);
+        _actionQueue = dispatch_queue_create("io.criticalmoments.action_queue", actionQueueAttr);
+
+        // action and event queues suspended until we start (not just called start,
+        // but fully started)
+        dispatch_suspend(_eventQueue);
+        dispatch_suspend(_actionQueue);
     }
     return self;
+}
+
+- (void)dealloc {
+    // Can't deallocate suspended queues. Typically no-op but in tests is needed.
+    [self startQueues];
 }
 
 static CriticalMoments *sharedInstance = nil;
@@ -115,7 +138,21 @@ static CriticalMoments *sharedInstance = nil;
     if (error) {
         return error;
     }
+
+    // We've started now. Can resume the two worker queues.
+    [self startQueues];
+
     return nil;
+}
+
+- (void)startQueues {
+    @synchronized(self) {
+        if (!_queuesStarted) {
+            _queuesStarted = true;
+            dispatch_resume(_eventQueue);
+            dispatch_resume(_actionQueue);
+        }
+    }
 }
 
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)returnError {
@@ -155,19 +192,22 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)sendEvent:(NSString *)eventName {
-    NSError *error;
-    // TODO: check we've started. Will crash otherwise
-    [_appcore sendEvent:eventName error:&error];
-    if (error) {
-        NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
-    }
+    dispatch_async(_eventQueue, ^{
+      NSError *error;
+      [_appcore sendEvent:eventName error:&error];
+
+      if (error) {
+          NSLog(@"WARN: CriticalMoments -- error sending event: %@", error);
+      }
+    });
 }
 
-- (bool)checkNamedCondition:(NSString *)name condition:(NSString *)condition error:(NSError **)returnError {
-    // TODO: check we've started. Will crash otherwise
+- (void)checkNamedCondition:(NSString *)name
+                  condition:(NSString *)condition
+                    handler:(void (^)(bool, NSError *_Nullable))handler {
 #if DEBUG
     NSError *collisionError;
-    bool colResult = [_appcore checkNamedConditionCollision:name conditionString:condition error:&collisionError];
+    [_appcore checkNamedConditionCollision:name conditionString:condition error:&collisionError];
     if (collisionError != nil) {
         NSLog(@"\nWARNING: CriticalMoments\nWARNING: CriticalMoments\nIssue with checkNamedCondition usage. Note: this "
               @"error log is only shown when debugger attached.\n%@\n\n",
@@ -175,15 +215,18 @@ static CriticalMoments *sharedInstance = nil;
     }
 #endif
 
-    NSError *error;
-    BOOL result;
-    [_appcore checkNamedCondition:name conditionString:condition ret0_:&result error:returnError];
+    __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
+    __block NSString *blockName = name;
+    __block NSString *blockCondition = condition;
+    dispatch_async(_actionQueue, ^{
+      NSError *error;
+      BOOL result;
+      [_appcore checkNamedCondition:blockName conditionString:blockCondition ret0_:&result error:&error];
 
-    if (returnError) {
-        NSLog(@"ERROR: CriticalMoments -- error in checkNamedCondition: %@", (*returnError).localizedDescription);
-    }
-
-    return result;
+      if (blockHandler) {
+          blockHandler(result, error);
+      }
+    });
 }
 
 - (void)performNamedAction:(NSString *)name error:(NSError **)error {
