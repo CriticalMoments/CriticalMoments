@@ -12,9 +12,6 @@
 @import CriticalMoments;
 
 @interface BannerDemoScreen () <CMBannerActionDelegate>
-
-@property(nonatomic) NSInteger counter;
-
 @end
 
 @implementation BannerDemoScreen
@@ -75,7 +72,6 @@
     topBanner.title = @"Top Banner";
     topBanner.subtitle = @"Display a banner on the top of the app, in the default theme";
     topBanner.actionCMActionName = @"top_banner";
-    [topBanner addResetTestTarget:self action:@selector(dismissBanners)];
 
     CMDemoAction *swapPosition = [[CMDemoAction alloc] init];
     swapPosition.title = @"Swap banner position";
@@ -139,9 +135,7 @@
 - (void)showMessageFromCode {
     NSString *messageString = @"This banner is created in code instead of config. The same options "
                               @"are available in code if you need them.";
-    self.counter += 1;
-    NSString *messageStingWithCount = [NSString stringWithFormat:@"(%ld) %@", (long)self.counter, messageString];
-    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithBody:messageStingWithCount];
+    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithBody:messageString];
     bannerMessage.actionDelegate = self;
     if (@available(iOS 13, *)) {
         [[CMBannerManager shared] showAppWideMessage:bannerMessage];
