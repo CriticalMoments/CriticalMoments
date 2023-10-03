@@ -13,7 +13,6 @@ xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS S
 xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=13.7,name=iPhone 11' '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test
 
 # iPhone 6s, 15.5
-# Erroring, but in signing. P2
 xcodebuild -scheme SampleApp -target SampleAppTests -destination 'platform=iOS Simulator,OS=15.5,name=iPhone 6s' '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test
 
 echo "Manually: Run this suite on iPhone 14 pro HW as well"
