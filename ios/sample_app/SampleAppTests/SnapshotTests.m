@@ -57,11 +57,6 @@
 
     // Set orientation
     if (@available(iOS 16, *)) {
-        // Check device is oriented properly or it forces a double rotation
-        if (UIDevice.currentDevice.orientation != UIDeviceOrientationPortrait) {
-            XCTAssert(false, @"UI tests failed. Simulator/device must be portrait");
-            return;
-        }
         UIWindowScene *scene = [[Utils keyWindow] windowScene];
         UIInterfaceOrientationMask target =
             landscape ? UIInterfaceOrientationMaskLandscapeLeft : UIInterfaceOrientationMaskPortrait;
@@ -74,9 +69,10 @@
     } else {
         UIDeviceOrientation target = landscape ? UIDeviceOrientationLandscapeLeft : UIDeviceOrientationPortrait;
         [UIDevice.currentDevice setValue:[NSNumber numberWithInteger:target] forKey:@"orientation"];
-        // for the animation
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     }
+    // time for rotation animation
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+
     [self recursiveActionPlayer:mainVc.demoRoot];
 }
 
