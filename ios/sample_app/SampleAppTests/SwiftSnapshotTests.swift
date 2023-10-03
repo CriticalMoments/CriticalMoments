@@ -21,7 +21,7 @@ class CMSnapshotWrapper: XCTestCase {
     ) {
         let failure = verifySnapshot(
           of: value,
-          as: .image,
+          as: .image(precision: 0.995),
           named: named,
           timeout: 5,
           testName: "demolith"

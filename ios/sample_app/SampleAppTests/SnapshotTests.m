@@ -31,11 +31,13 @@
 }
 
 - (void)testScreenshotAllSampleAppFeatures {
-    [self testAllFeaturesDarkMode:false];
-    [self testAllFeaturesDarkMode:true];
+    [self testAllFeaturesWithDarkMode:false withLandscape:false];
+    [self testAllFeaturesWithDarkMode:true withLandscape:false];
+    [self testAllFeaturesWithDarkMode:false withLandscape:true];
+    [self testAllFeaturesWithDarkMode:true withLandscape:true];
 }
 
-- (void)testAllFeaturesDarkMode:(bool)darkMode {
+- (void)testAllFeaturesWithDarkMode:(bool)darkMode withLandscape:(bool)landscape {
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     SampleAppCoreViewController *mainVc;
     UIWindow *window = [Utils keyWindow];
@@ -53,6 +55,28 @@
     // set dark mode
     window.overrideUserInterfaceStyle = darkMode ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
 
+    // Set orientation
+    if (@available(iOS 16, *)) {
+        // Check device is oriented properly or it forces a double rotation
+        if (UIDevice.currentDevice.orientation != UIDeviceOrientationPortrait) {
+            XCTAssert(false, @"UI tests failed. Simulator/device must be portrait");
+            return;
+        }
+        UIWindowScene *scene = [[Utils keyWindow] windowScene];
+        UIInterfaceOrientationMask target =
+            landscape ? UIInterfaceOrientationMaskLandscapeLeft : UIInterfaceOrientationMaskPortrait;
+        UIWindowSceneGeometryPreferencesIOS *wsgp =
+            [[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:target];
+        [scene requestGeometryUpdateWithPreferences:wsgp
+                                       errorHandler:^(NSError *_Nonnull error) {
+                                         XCTAssert(false, @"error setting interface orientation");
+                                       }];
+    } else {
+        UIDeviceOrientation target = landscape ? UIDeviceOrientationLandscapeLeft : UIDeviceOrientationPortrait;
+        [UIDevice.currentDevice setValue:[NSNumber numberWithInteger:target] forKey:@"orientation"];
+        // for the animation
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    }
     [self recursiveActionPlayer:mainVc.demoRoot];
 }
 
