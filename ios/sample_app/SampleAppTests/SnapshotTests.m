@@ -10,12 +10,18 @@
 @import iOSSnapshotTestCase;
 @import iOSSnapshotTestCaseCore;
 
+#import "SampleAppTests-Swift.h"
+
 #import "SampleAppCoreViewController.h"
 #import "Utils.h"
 
 @interface SnapshotTests : FBSnapshotTestCase
 
 @end
+
+//#define FB_REFERENCE_IMAGE_DIR                                                                                         \
+    "/Users/scosman/Dropbox/workspace/criticalmoments/ios/sample_app/SnapshotTests/ReferenceImages"
+// #define IMAGE_DIFF_DIR "/Users/scosman/Dropbox/workspace/criticalmoments/ios/sample_app/SnapshotTests/FailureDiffs"
 
 @implementation SnapshotTests
 
@@ -88,14 +94,32 @@
                 [navController popViewControllerAnimated:NO];
             } else {
                 // Snapshot test!
-                FBSnapshotVerifyView([Utils keyWindow], action.title);
+                // FBSnapshotVerifyView([Utils keyWindow], action.title);
+
+                UIImage *screenshot = [self screenshotWindow:[Utils keyWindow]];
+                CMSnapshotWrapper *w = [[CMSnapshotWrapper alloc] init];
+                [w assertSnapshotImageOf:screenshot named:action.title];
+                //[w assertSnapshotVCOf:[Utils keyWindow].rootViewController named:action.title];
+                //[w assertSnapshotOf:[Utils keyWindow]];
+                //[w assertSnapshotOf:[Utils keyWindow] named:action.title];
             }
 
             // reset state for next test, and give it time to render
             [action resetForTests];
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
         }
     }
+}
+
+- (UIImage *)screenshotWindow:(UIWindow *)window {
+    // TODO hardcoded 3.0
+    UIGraphicsBeginImageContextWithOptions(window.bounds.size, NO, 3.0f);
+    [window drawViewHierarchyInRect:window.bounds afterScreenUpdates:YES];
+
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
 }
 
 @end
