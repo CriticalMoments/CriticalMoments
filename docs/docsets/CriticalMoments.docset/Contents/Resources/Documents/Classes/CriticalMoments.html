@@ -96,7 +96,8 @@
 
                 </div>
               </div>
-            <p>The primary interface into Critical Moments. See out getting started docs for usage instructions: <a href="https://docs.criticalmoments.io/get-started">https://docs.criticalmoments.io/get-started</a></p>
+            <p>The primary interface into Critical Moments. See out getting started docs for usage instructions:
+<a href="https://docs.criticalmoments.io/get-started">https://docs.criticalmoments.io/get-started</a></p>
 
           </div>
         </section>
@@ -108,9 +109,72 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)start"></a>
-                    <a name="//apple_ref/objc/Method/+start" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)start">+start</a>
+                    <a name="/c:objc(cs)CriticalMoments(im)init"></a>
+                    <a name="//apple_ref/objc/Method/-init" class="dashAnchor"></a>
+                    <a class="token discouraged" href="#/c:objc(cs)CriticalMoments(im)init">-init</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="aside aside-unavailable">
+                        <p class="aside-title">Unavailable</p>
+                        
+                      </div>
+                      <div class="abstract">
+                        <p>Init is not available. Use sharedInstance for all use cases.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">instancetype</span><span class="p">)</span><span class="n">init</span><span class="p">;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CriticalMoments(cm)sharedInstance"></a>
+                    <a name="//apple_ref/objc/Method/+sharedInstance" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)sharedInstance">+sharedInstance</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The default instance of critical moments. You should always use this instance</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">CriticalMoments</span> <span class="o">*</span><span class="p">)</span><span class="n">sharedInstance</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">sharedInstance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">CriticalMoments</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CriticalMoments(im)start"></a>
+                    <a name="//apple_ref/objc/Method/-start" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)start">-start</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -138,12 +202,12 @@ or not at all.</li>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">start</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">start</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">start</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">start</span><span class="p">()</span></code></pre>
 
                         </div>
                       </div>
@@ -153,9 +217,9 @@ or not at all.</li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)setApiKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/+setApiKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)setApiKey:error:">+setApiKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setApiKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setApiKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setApiKey:error:">-setApiKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -174,13 +238,13 @@ or not at all.</li>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setApiKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">apiKey</span>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setApiKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">apiKey</span>
             <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">setApiKey</span><span class="p">(</span><span class="n">_</span> <span class="nv">apiKey</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setApiKey</span><span class="p">(</span><span class="n">_</span> <span class="nv">apiKey</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -221,9 +285,9 @@ or not at all.</li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)setConfigUrl:"></a>
-                    <a name="//apple_ref/objc/Method/+setConfigUrl:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)setConfigUrl:">+setConfigUrl:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setConfigUrl:"></a>
+                    <a name="//apple_ref/objc/Method/-setConfigUrl:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setConfigUrl:">-setConfigUrl:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -250,12 +314,12 @@ seriously, as you would your app update release process or webpage.
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setConfigUrl</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">urlString</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setConfigUrl</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">urlString</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">setConfigUrl</span><span class="p">(</span><span class="n">_</span> <span class="nv">urlString</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setConfigUrl</span><span class="p">(</span><span class="n">_</span> <span class="nv">urlString</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -285,9 +349,9 @@ seriously, as you would your app update release process or webpage.
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)sendEvent:"></a>
-                    <a name="//apple_ref/objc/Method/+sendEvent:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)sendEvent:">+sendEvent:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)sendEvent:"></a>
+                    <a name="//apple_ref/objc/Method/-sendEvent:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)sendEvent:">-sendEvent:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -304,12 +368,12 @@ in conditions.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sendEvent</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">eventName</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sendEvent</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">eventName</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">sendEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">eventName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">sendEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">eventName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -339,9 +403,9 @@ in conditions.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)checkNamedCondition:condition:error:"></a>
-                    <a name="//apple_ref/objc/Method/+checkNamedCondition:condition:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)checkNamedCondition:condition:error:">+checkNamedCondition:<wbr>condition:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)checkNamedCondition:condition:handler:"></a>
+                    <a name="//apple_ref/objc/Method/-checkNamedCondition:condition:handler:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)checkNamedCondition:condition:handler:">-checkNamedCondition:<wbr>condition:<wbr>handler:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -349,23 +413,34 @@ in conditions.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Check a  condition string, returning the result of evaluating it.</p>
+                        <p>Checks a condition string, returning the result of evaluating it.</p>
 
 <p>A name is provided so that you can remotely override the condition string using a cloud based config file.</p>
+
+<p>The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
+can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+the main thread, so be sure to dispatch to the main thread if calling into UI libraries.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Be sure to provide a unique name to each condition you use. Reusing names will make it impossible to override
+each usage independently from remote configuration. Reused names will log warnings in the debug console.
+
+</div>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="kt">_Bool</span><span class="p">)</span><span class="nf">checkNamedCondition</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                   <span class="nf">condition</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">condition</span>
-                       <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">checkNamedCondition</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">_Nonnull</span><span class="p">)</span><span class="nv">name</span>
+                  <span class="nf">condition</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">_Nonnull</span><span class="p">)</span><span class="nv">condition</span>
+                    <span class="nf">handler</span><span class="p">:</span>
+                        <span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">_Nonnull</span><span class="p">)(</span><span class="kt">_Bool</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">))</span><span class="nv">handler</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">condition</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">condition</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Bool</span><span class="p">,</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -383,7 +458,7 @@ in conditions.</p>
                                 <div>
                                   <p>A name for this condition. Must be provided and can not be an empty string.
 The name allows you to override the hardcoded condition string remotely from the cloud-hosted
-CM config file later, if your business needs change</p>
+CM config file later if needed.</p>
                                 </div>
                               </td>
                             </tr>
@@ -403,21 +478,18 @@ options here: <a href="https://docs.criticalmoments.io/conditional-targeting/int
                             <tr>
                               <td>
                                 <code>
-                                <em>error</em>
+                                <em>handler</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Any errors returned from evaluating the condition.</p>
+                                  <p>A callback block which will be called async with the boolean result of the condition evaluation. It also
+returns any errors occured evaluating the condition. The boolean value is false for any error.</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>The result of evaluating the condition. Always false for an error.</p>
                       </div>
                     </section>
                   </div>
@@ -430,7 +502,7 @@ options here: <a href="https://docs.criticalmoments.io/conditional-targeting/int
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2023 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2023-09-28)</p>
+      <p>&copy; 2023 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2023-10-02)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CriticalMoments : NSObject
 
+/// init is not available. Use sharedInstance for all use cases.
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
