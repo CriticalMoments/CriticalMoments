@@ -31,6 +31,11 @@
 }
 
 - (void)testScreenshotAllSampleAppFeatures {
+    [self testAllFeaturesDarkMode:false];
+    [self testAllFeaturesDarkMode:true];
+}
+
+- (void)testAllFeaturesDarkMode:(bool)darkMode {
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     SampleAppCoreViewController *mainVc;
     UIWindow *window = [Utils keyWindow];
@@ -44,6 +49,9 @@
 
     // make animations super fast (20x)
     [Utils keyWindow].layer.speed = 20.0;
+
+    // set dark mode
+    window.overrideUserInterfaceStyle = darkMode ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
 
     [self recursiveActionPlayer:mainVc.demoRoot];
 }
@@ -114,7 +122,12 @@
         systemOsName = @"iPadOS";
     }
 
-    return [NSString stringWithFormat:@"%@-%dx%d@%.02f-%@--%@", deviceModel, (int)window.bounds.size.width,
+    NSString *darkMode = @"";
+    if (window.rootViewController.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+        darkMode = @"[darkmode]";
+    }
+
+    return [NSString stringWithFormat:@"%@%@-%dx%d@%.02f-%@--%@", deviceModel, darkMode, (int)window.bounds.size.width,
                                       (int)window.bounds.size.height, window.screen.scale, systemOsName, actionName];
 }
 
