@@ -31,7 +31,7 @@ runTest()
   else
     # Show error in output
     cat /tmp/critical_moments_test_log.latest
-    echo "\033[0;31mFailed\033[0m\n"
+    echo "\033[0;31mFailed\033[0m\nEither fix the bug and re-run, or if change is desired run test suite script after setting up test to record in code\n"
     exit 99
   fi
 }
