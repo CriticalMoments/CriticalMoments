@@ -10,21 +10,26 @@ spinner()
     while true
     do
       i=$(( (i+1) %13 ))
-      printf "\r${spin:$i:1}"
+      printf "\r${spin:$i:1}${spin:$i:1}${spin:$i:1}${spin:$i:1}${spin:$i:1}${spin:$i:1}${spin:$i:1}${spin:$i:1}"
       sleep .05
     done
 }
 
-runTest() {
+runTest()
+{
   echo "Running UI Tests for $1"
   spinner & spinnerPid=$!
-  xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test &> /dev/null
+  xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test &> /tmp/critical_moments_test_log.latest
   RESULT=$?
-  kill $spinnerPid &> /dev/null
+  kill $spinnerPid 
+  wait $spinnerPid 2>/dev/null
+  printf "\r                 \r"
   if [ $RESULT -eq 0 ]; then
-    echo "\b\033[0;32mPassed\033[0m\n"
+    echo "\033[0;32mPassed\033[0m\n"
   else
-    echo "\b\033[0;31mFailed\033[0m\n"
+    # Show error in output
+    cat /tmp/critical_moments_test_log.latest
+    echo "\033[0;31mFailed\033[0m\n"
     exit 99
   fi
 }
