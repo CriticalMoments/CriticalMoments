@@ -23,6 +23,7 @@ class CMSnapshotWrapper: XCTestCase {
           of: value,
           as: .image(precision: 0.995),
           named: named,
+          record: false, // Modify to record new tests/fixes
           timeout: 5,
           testName: "demolith"
         )
