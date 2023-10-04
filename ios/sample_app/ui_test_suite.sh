@@ -24,7 +24,9 @@ runTest()
   kill $spinnerPid 
   wait $spinnerPid 2>/dev/null
   printf "\r                 \r"
-  if [ $RESULT -eq 0 ]; then
+  if [[ "$RECORDING" == "true" ]]; then
+    echo "Recording. Continuing\n\n"
+  elif [ $RESULT -eq 0 ]; then
     echo "\033[0;32mPassed\033[0m\n"
   else
     # Show error in output
