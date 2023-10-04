@@ -70,4 +70,8 @@
     return unixTime * 1000;
 }
 
++ (bool)isiPad {
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
+}
+
 @end

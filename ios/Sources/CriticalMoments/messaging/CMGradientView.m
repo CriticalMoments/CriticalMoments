@@ -32,6 +32,11 @@
     return CMTheme.current;
 }
 
+- (void)setCustomTheme:(CMTheme *)customTheme {
+    _customTheme = customTheme;
+    [self setGradientColorsForTraits];
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.gradient.frame = self.bounds;

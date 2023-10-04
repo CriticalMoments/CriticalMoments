@@ -52,7 +52,11 @@ static CMTheme *currentTheme = nil;
     }
 
     if (@available(iOS 12.0, *)) {
-        UITraitCollection *tc = UIScreen.mainScreen.traitCollection;
+        // Prefer window traits if available. Fallback to screen's.
+        UITraitCollection *tc = [CMUtils keyWindow].traitCollection;
+        if (!tc || tc.userInterfaceStyle == UIUserInterfaceStyleUnspecified) {
+            tc = UIScreen.mainScreen.traitCollection;
+        }
         if (tc.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return theme.darkModeTheme;
         }
