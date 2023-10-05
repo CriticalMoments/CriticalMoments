@@ -19,6 +19,8 @@ runTest()
 {
   echo "Running UI Tests for $1"
   spinner & spinnerPid=$!
+  # Clean optional
+  # xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' clean &> /tmp/critical_moments_clean_log.latest
   xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test &> /tmp/critical_moments_test_log.latest
   RESULT=$?
   kill $spinnerPid 
@@ -31,6 +33,7 @@ runTest()
   else
     # Show error in output
     cat /tmp/critical_moments_test_log.latest
+    echo "Issue when running UI tests for $1"
     echo "\033[0;31mFailed\033[0m\nEither fix the bug and re-run, or if change is desired run test suite script after setting up test to record in code and running with RECORDING=true\n"
     exit 99
   fi
