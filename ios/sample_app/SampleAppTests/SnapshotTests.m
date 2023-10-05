@@ -24,10 +24,12 @@
     [super setUp];
 
     self.continueAfterFailure = true;
+    [UIView setAnimationsEnabled:false];
 }
 
 - (void)tearDown {
     [super tearDown];
+    [UIView setAnimationsEnabled:true];
 }
 
 - (void)testScreenshotAllSampleAppFeatures {
@@ -49,8 +51,10 @@
         XCTAssertTrue(false, @"Could not get root vc");
     }
 
+    // Disabled, broken on iOS 17 https://developer.apple.com/forums/thread/735344
+    // Using setAnimationsEnabled instead
     // make animations super fast (20x)
-    [Utils keyWindow].layer.speed = 20.0;
+    // [Utils keyWindow].layer.speed = 20.0;
 
     // set dark mode
     window.overrideUserInterfaceStyle = darkMode ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;

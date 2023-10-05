@@ -36,6 +36,9 @@ runTest()
   fi
 }
 
+# iPhone 15 Plus, iOS 17.0
+runTest 'platform=iOS Simulator,OS=17.0,name=iPhone 15 Plus'
+
 # iPhone 14 Pro, 16.4
 runTest 'platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro'
 
@@ -52,7 +55,4 @@ runTest 'platform=iOS Simulator,OS=15.5,name=iPhone 6s Plus'
 runTest 'platform=iOS Simulator,OS=14.5,name=iPad (8th generation)'
 
 echo "All Simulator Tests Passed! But you arn't done yet!"
-echo " - Manually: Run the snapshot test suite on iPhone 14 Pro HW using xcode"
 echo " - Manually: Run manual sanity check on iPhone 6 hardware, running iOS 12. No automation because snapshot test library does not compile to ios 12" 
-
-
