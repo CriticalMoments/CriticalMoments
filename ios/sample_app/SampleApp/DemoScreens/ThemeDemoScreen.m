@@ -52,12 +52,14 @@ static CMTheme *staticCustomTheme = nil;
     resetThemeAction.title = @"Reset theme to default";
     resetThemeAction.subtitle = @"Clear all theme changes, restoring default";
     [resetThemeAction addTarget:self action:@selector(resetTheme)];
+    resetThemeAction.skipInUiTesting = true;
 
     CMDemoAction *cannedTheme = [[CMDemoAction alloc] init];
     cannedTheme.title = @"Try demo theme";
     cannedTheme.subtitle = @"Set default theme to a new look. After selecting, try the 'Show UI with default theme' "
                            @"section below to visualize the impact.";
     [cannedTheme addTarget:self action:@selector(cannedTheme)];
+    [cannedTheme addResetTestTarget:self action:@selector(resetCannedTheme)];
 
     [self addSection:@"General" withActions:@[ resetThemeAction, cannedTheme ]];
 
@@ -67,21 +69,25 @@ static CMTheme *staticCustomTheme = nil;
     pcAction.title = @"Change primary color";
     pcAction.subtitle = @"Change the primary color used for icons and buttons. Typically a brand color.";
     [pcAction addTarget:self action:@selector(changePrimaryColor)];
+    pcAction.skipInUiTesting = true;
 
     CMDemoAction *pctAction = [[CMDemoAction alloc] init];
     pctAction.title = @"Change primary text color";
     pctAction.subtitle = @"Change the color used for primary text.";
     [pctAction addTarget:self action:@selector(changePrimaryTextColor)];
+    pctAction.skipInUiTesting = true;
 
     CMDemoAction *stAction = [[CMDemoAction alloc] init];
     stAction.title = @"Change secondary text color";
     stAction.subtitle = @"Change the color used for secondary text.";
     [stAction addTarget:self action:@selector(changeSecondaryTextColor)];
+    stAction.skipInUiTesting = true;
 
     CMDemoAction *bgcAction = [[CMDemoAction alloc] init];
     bgcAction.title = @"Change background color";
     bgcAction.subtitle = @"Change the color used for backgrounds.";
     [bgcAction addTarget:self action:@selector(changeBackgroundtColor)];
+    bgcAction.skipInUiTesting = true;
 
     [self addSection:@"Colors" withActions:@[ pcAction, pctAction, stAction, bgcAction ]];
 
@@ -91,16 +97,19 @@ static CMTheme *staticCustomTheme = nil;
     fontNameAction.title = @"Change font";
     fontNameAction.subtitle = @"Change the font used by UI controls";
     [fontNameAction addTarget:self action:@selector(changeFontName)];
+    fontNameAction.skipInUiTesting = true;
 
     CMDemoAction *boldFontNameAction = [[CMDemoAction alloc] init];
     boldFontNameAction.title = @"Change bold font";
     boldFontNameAction.subtitle = @"Change the bold font used by UI controls";
     [boldFontNameAction addTarget:self action:@selector(changeBoldFontName)];
+    boldFontNameAction.skipInUiTesting = true;
 
     CMDemoAction *fontScaleAction = [[CMDemoAction alloc] init];
     fontScaleAction.title = @"Change font scale";
     fontScaleAction.subtitle = @"Scale the font larger or smaller across all UI";
     [fontScaleAction addTarget:self action:@selector(changeFontScale)];
+    fontScaleAction.skipInUiTesting = true;
 
     [self addSection:@"Fonts" withActions:@[ fontNameAction, boldFontNameAction, fontScaleAction ]];
 
@@ -110,11 +119,13 @@ static CMTheme *staticCustomTheme = nil;
     bannerFgColorAction.title = @"Banner foreground color";
     bannerFgColorAction.subtitle = @"Change the banner foreground color";
     [bannerFgColorAction addTarget:self action:@selector(changeBannerFg)];
+    bannerFgColorAction.skipInUiTesting = true;
 
     CMDemoAction *banneBgColorAction = [[CMDemoAction alloc] init];
     banneBgColorAction.title = @"Banner background color";
     banneBgColorAction.subtitle = @"Change the banner background color";
     [banneBgColorAction addTarget:self action:@selector(changeBannerBg)];
+    banneBgColorAction.skipInUiTesting = true;
 
     [self addSection:@"Banner Message Style" withActions:@[ bannerFgColorAction, banneBgColorAction ]];
 
@@ -123,11 +134,13 @@ static CMTheme *staticCustomTheme = nil;
     announceSheet.subtitle = @"Display a sheet using the current theme, to visualize edits made above.";
     announceSheet.actionCMActionName = @"simpleModalAction";
     [announceSheet addResetTestTarget:self action:@selector(dismissSheets)];
+    announceSheet.skipInUiTesting = true;
 
     CMDemoAction *longBannerAction = [[CMDemoAction alloc] init];
     longBannerAction.title = @"Show banner";
     longBannerAction.subtitle = @"Display a banner using the current theme, to visualize edits made above.";
     longBannerAction.actionCMActionName = @"short_banner";
+    longBannerAction.skipInUiTesting = true;
 
     [self addSection:@"Show UI with current theme" withActions:@[ announceSheet, longBannerAction ]];
 }
@@ -319,6 +332,18 @@ static CMTheme *staticCustomTheme = nil;
     [CMBannerManager.shared removeAllAppWideMessages];
 }
 
+- (void)resetCannedTheme {
+    // reset theme
+    staticCustomTheme = [[CMTheme alloc] init];
+    [CMTheme setCurrentTheme:staticCustomTheme];
+
+    // dismiss the sheets
+    [Utils.keyWindow.rootViewController.presentedViewController dismissViewControllerAnimated:NO completion:nil];
+
+    // dismiss the alert
+    [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
+}
+
 - (void)cannedTheme {
     CMTheme *customTheme = [[CMTheme alloc] init];
     customTheme.boldFontName = @"AmericanTypewriter-Bold";
@@ -328,11 +353,28 @@ static CMTheme *staticCustomTheme = nil;
     customTheme.bannerForegroundColor = [UIColor whiteColor];
     customTheme.primaryTextColor = [UIColor whiteColor];
     customTheme.backgroundColor = [UIColor colorWithRed:0.06 green:0.06 blue:0.06 alpha:1.0];
-    [customTheme setPrimaryColor:[UIColor colorWithRed:0.7890625 green:0.1640625 blue:0.1640625 alpha:1.0]];
+    [customTheme setPrimaryColor:[UIColor colorWithRed:0.37 green:0.72 blue:0.4 alpha:1.0]];
     customTheme.secondaryTextColor = [UIColor colorWithRed:0.86328125 green:0.86328125 blue:0.86328125 alpha:1.0];
 
     [CMTheme setCurrentTheme:customTheme];
     [CMBannerManager.shared removeAllAppWideMessages];
+
+    // Pop a modal so the user can see the theme
+    [CriticalMoments.sharedInstance performNamedAction:@"headphoneModalExample" handler:nil];
+
+    UIAlertController *alert = [UIAlertController
+        alertControllerWithTitle:@"Theme Set"
+                         message:@"A theme with custom colors and fonts is now set. This theme will be used across the "
+                                 @"sample app until you select 'Reset theme to default'."
+                  preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *action){
+                                                          }];
+    [alert addAction:defaultAction];
+
+    UIViewController *rootVC = Utils.keyWindow.rootViewController;
+    [rootVC presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)dismissSheets {

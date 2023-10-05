@@ -61,7 +61,6 @@
     themeAction.title = @"Edit Theme";
     themeAction.subtitle = @"Modify the colors, font and style of UI elements.";
     themeAction.actionNextScreen = [[ThemeDemoScreen alloc] init];
-    themeAction.skipInUiTesting = true;
 
     [self addSection:@"Themes / Style" withActions:@[ themeAction ]];
 }
