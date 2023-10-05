@@ -31,19 +31,8 @@
 
 #pragma mark Default Theme
 
-static CMTheme *currentTheme = nil;
-
 + (CMTheme *)current {
-    // avoid lock if we can
-    if (!currentTheme) {
-        @synchronized(CMTheme.class) {
-            if (!currentTheme) {
-                currentTheme = [[self alloc] init];
-            }
-        }
-    }
-
-    return [CMTheme themeAdaptedForDarkModeFromTheme:currentTheme];
+    return CriticalMoments.sharedInstance.currentTheme;
 }
 
 + (CMTheme *)themeAdaptedForDarkModeFromTheme:(CMTheme *)theme {
@@ -62,12 +51,6 @@ static CMTheme *currentTheme = nil;
         }
     }
     return theme;
-}
-
-+ (void)setCurrentTheme:(CMTheme *)theme {
-    @synchronized(CMTheme.class) {
-        currentTheme = theme;
-    }
 }
 
 #pragma mark Named Themes From Appcore

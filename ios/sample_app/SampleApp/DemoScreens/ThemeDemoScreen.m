@@ -151,7 +151,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    [customTheme setPrimaryColor:color];
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                  }];
 }
 
@@ -161,7 +161,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.primaryTextColor = color;
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                  }];
 }
 
@@ -171,7 +171,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.secondaryTextColor = color;
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                  }];
 }
 
@@ -181,7 +181,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.backgroundColor = color;
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                  }];
 }
 
@@ -191,7 +191,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.bannerForegroundColor = color;
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                    [CMBannerManager.shared removeAllAppWideMessages];
                  }];
 }
@@ -202,7 +202,7 @@ static CMTheme *staticCustomTheme = nil;
                  withCallback:^(UIColor *color) {
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.bannerBackgroundColor = color;
-                   [CMTheme setCurrentTheme:customTheme];
+                   [CriticalMoments.sharedInstance setTheme:customTheme];
                    [CMBannerManager.shared removeAllAppWideMessages];
                  }];
 }
@@ -257,7 +257,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             }
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.fontName = newFontName;
-                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CriticalMoments.sharedInstance setTheme:customTheme];
                                                             [CMBannerManager.shared removeAllAppWideMessages];
                                                           }];
     [alert addAction:defaultAction];
@@ -288,7 +288,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             }
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.boldFontName = newBoldFontName;
-                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CriticalMoments.sharedInstance setTheme:customTheme];
                                                             [CMBannerManager.shared removeAllAppWideMessages];
                                                           }];
     [alert addAction:defaultAction];
@@ -318,7 +318,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             }
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.fontScale = scale;
-                                                            [CMTheme setCurrentTheme:customTheme];
+                                                            [CriticalMoments.sharedInstance setTheme:customTheme];
                                                             [CMBannerManager.shared removeAllAppWideMessages];
                                                           }];
     [alert addAction:defaultAction];
@@ -328,14 +328,14 @@ static CMTheme *staticCustomTheme = nil;
 
 - (void)resetTheme {
     staticCustomTheme = [[CMTheme alloc] init];
-    [CMTheme setCurrentTheme:staticCustomTheme];
+    [CriticalMoments.sharedInstance setTheme:staticCustomTheme];
     [CMBannerManager.shared removeAllAppWideMessages];
 }
 
 - (void)resetCannedTheme {
     // reset theme
     staticCustomTheme = [[CMTheme alloc] init];
-    [CMTheme setCurrentTheme:staticCustomTheme];
+    [CriticalMoments.sharedInstance setTheme:staticCustomTheme];
 
     // dismiss the sheets
     [Utils.keyWindow.rootViewController.presentedViewController dismissViewControllerAnimated:NO completion:nil];
@@ -356,7 +356,7 @@ static CMTheme *staticCustomTheme = nil;
     [customTheme setPrimaryColor:[UIColor colorWithRed:0.37 green:0.72 blue:0.4 alpha:1.0]];
     customTheme.secondaryTextColor = [UIColor colorWithRed:0.86328125 green:0.86328125 blue:0.86328125 alpha:1.0];
 
-    [CMTheme setCurrentTheme:customTheme];
+    [CriticalMoments.sharedInstance setTheme:customTheme];
     [CMBannerManager.shared removeAllAppWideMessages];
 
     // Pop a modal so the user can see the theme

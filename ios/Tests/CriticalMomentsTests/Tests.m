@@ -176,12 +176,14 @@
     CriticalMoments *cm = [self buildAndStartCMForTest];
     XCTAssert(cm, @"Startup issue");
 
-    // Not ideal that starting any CM instance will set gloabal default theme,
-    // but only CM.sharedInstance is exposed in public API so P2.
-    XCTAssert([UIColor.redColor isEqual:CMTheme.current.bannerBackgroundColor],
+    // Check theme loaded from config
+    XCTAssert([UIColor.redColor isEqual:cm.currentTheme.bannerBackgroundColor],
               @"Default theme should have loaded bg from config");
-    XCTAssert([UIColor.greenColor isEqual:CMTheme.current.bannerForegroundColor],
+    XCTAssert([UIColor.greenColor isEqual:cm.currentTheme.bannerForegroundColor],
               @"Default theme should have loaded fg from config");
+
+    // Check the global sharedInstance != this instance
+    XCTAssert(cm.currentTheme != CMTheme.current, @"CM instance impacted sharedInstance");
 }
 
 - (void)testSendEventBeforeStart {

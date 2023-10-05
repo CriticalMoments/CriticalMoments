@@ -23,11 +23,20 @@
 @import StoreKit;
 
 @interface CMLibBindings ()
+@property(nonatomic, weak) CriticalMoments *cm; // weak to avoid circular reference
 @end
 
 @implementation CMLibBindings
 
 #pragma mark AppcoreLibBindings
+
+- (instancetype)initWithCM:(CriticalMoments *)cm {
+    self = [super init];
+    if (self) {
+        _cm = cm;
+    }
+    return self;
+}
 
 - (BOOL)setDefaultTheme:(DatamodelTheme *_Nullable)actheme error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!actheme) {
@@ -40,7 +49,7 @@
         *error = [NSError errorWithDomain:@"CMIOS" code:81263223 userInfo:nil];
         return NO;
     }
-    [CMTheme setCurrentTheme:theme];
+    [self.cm setTheme:theme];
 
     return YES;
 }

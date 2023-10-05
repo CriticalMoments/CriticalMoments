@@ -109,6 +109,13 @@ each usage independently from remote configuration. Reused names will log warnin
 /// :nodoc: TBD if this is a public API or not. For now, it's not.
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
+#pragma mark Themes
+
+/// Fetch the current theme for this CM instance
+- (CMTheme *)currentTheme;
+/// Set the current theme for this CM instance
+- (void)setTheme:(CMTheme *)theme;
+
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)objcPing;

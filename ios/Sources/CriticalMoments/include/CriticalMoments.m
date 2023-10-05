@@ -14,6 +14,7 @@
 @property(nonatomic) BOOL queuesStarted;
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
+@property(nonatomic, strong) CMTheme *currentTheme;
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @end
@@ -106,7 +107,7 @@ static CriticalMoments *sharedInstance = nil;
 - (NSError *)startReturningError {
     // Register the action dispatcher and properties
     if (!self.bindings) {
-        self.bindings = [[CMLibBindings alloc] init];
+        self.bindings = [[CMLibBindings alloc] initWithCM:self];
     }
     [_appcore registerLibraryBindings:_bindings];
 
@@ -249,6 +250,26 @@ static CriticalMoments *sharedInstance = nil;
 
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name {
     return [_appcore themeForName:name];
+}
+
+#pragma mark Current Theme
+
+- (CMTheme *)currentTheme {
+    // avoid lock if we can
+    if (!_currentTheme) {
+        @synchronized(self) {
+            if (!_currentTheme) {
+                _currentTheme = [[CMTheme alloc] init];
+            }
+        }
+    }
+    return _currentTheme;
+}
+
+- (void)setTheme:(CMTheme *)theme {
+    @synchronized(self) {
+        _currentTheme = theme;
+    }
 }
 
 @end
