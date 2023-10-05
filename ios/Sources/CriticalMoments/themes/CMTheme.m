@@ -32,7 +32,7 @@
 #pragma mark Default Theme
 
 + (CMTheme *)current {
-    return CriticalMoments.sharedInstance.currentTheme;
+    return [CMTheme themeAdaptedForDarkModeFromTheme:CriticalMoments.sharedInstance.currentTheme];
 }
 
 + (CMTheme *)themeAdaptedForDarkModeFromTheme:(CMTheme *)theme {
