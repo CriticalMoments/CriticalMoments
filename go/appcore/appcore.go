@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/events"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
@@ -32,6 +33,9 @@ type Appcore struct {
 
 	// Cache
 	cache *cache
+
+	// Event handler
+	eventHandler *events.EventManager
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -82,6 +86,15 @@ func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
 	}
 
 	ac.cache = cache
+	return nil
+}
+
+func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
+	eventHandler, err := events.NewEventManager(dataDirPath)
+	if err != nil {
+		return err
+	}
+	ac.eventHandler = eventHandler
 	return nil
 }
 
