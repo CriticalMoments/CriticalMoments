@@ -46,7 +46,7 @@ func TestConstructor(t *testing.T) {
 
 	os.MkdirAll(dataPath, os.ModePerm)
 	em, err = NewEventManager(dataPath)
-	expectedPath := fmt.Sprintf("%s/critical_moments_db.db", dataPath)
+	expectedPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataPath)
 	if err != nil || em.db.databasePath != expectedPath {
 		t.Fatal("Failed to set data path")
 	}

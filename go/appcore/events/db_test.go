@@ -22,11 +22,21 @@ func testBuildTestDb(t *testing.T) *DB {
 
 func TestTestDB(t *testing.T) {
 	db := testBuildTestDb(t)
-	r, err := db.testDB()
+	defer db.Close()
+
+	r, err := db.sqldb.Query("SELECT 99")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if r != 99 {
+	defer r.Close()
+	r.Next()
+	var v int
+	err = r.Scan(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if v != 99 {
 		t.Fatal("DB test failed")
 	}
 }

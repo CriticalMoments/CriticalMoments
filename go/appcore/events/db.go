@@ -11,6 +11,7 @@ import (
 
 type DB struct {
 	databasePath string
+	sqldb        *sql.DB
 }
 
 func NewDB(dataDir string) (*DB, error) {
@@ -18,30 +19,19 @@ func NewDB(dataDir string) (*DB, error) {
 		return nil, errors.New("CriticalMoments: Data directory path does not exist")
 	}
 
-	dbPath := fmt.Sprintf("%s/critical_moments_db.db", dataDir)
+	dbPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataDir)
+
+	sqldb, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DB{
 		databasePath: dbPath,
+		sqldb:        sqldb,
 	}, nil
 }
 
-func (db *DB) testDB() (int, error) {
-	conn, err := sql.Open("sqlite3", db.databasePath)
-	if err != nil {
-		return 0, err
-	}
-	defer conn.Close()
-
-	r, err := conn.Query("SELECT 99")
-	if err != nil {
-		return 0, err
-	}
-	defer r.Close()
-	r.Next()
-	var v int
-	err = r.Scan(&v)
-	if err != nil {
-		return 0, err
-	}
-
-	return v, nil
+func (db *DB) Close() error {
+	return db.sqldb.Close()
 }
