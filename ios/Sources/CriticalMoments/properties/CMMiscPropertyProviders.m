@@ -65,7 +65,6 @@
             }
         }
 
-        // TODO: being called on main is a problem. This should be solved for all property fetching.
         dispatch_group_wait(self.waitGroup, dispatch_time(DISPATCH_TIME_NOW, 2.0 * NSEC_PER_SEC));
     }
 
