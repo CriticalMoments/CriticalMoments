@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIWindow *)keyWindow;
 + (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
 + (long long)cmTimestampFromDate:(NSDate *)date;
++ (bool)isiPad;
 
 @end
 

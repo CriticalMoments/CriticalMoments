@@ -7,6 +7,7 @@
 
 #import "CMTheme.h"
 
+#import "../CriticalMoments_private.h"
 #import "../utils/CMUtils.h"
 
 @import Appcore;
@@ -30,19 +31,8 @@
 
 #pragma mark Default Theme
 
-static CMTheme *currentTheme = nil;
-
 + (CMTheme *)current {
-    // avoid lock if we can
-    if (!currentTheme) {
-        @synchronized(CMTheme.class) {
-            if (!currentTheme) {
-                currentTheme = [[self alloc] init];
-            }
-        }
-    }
-
-    return [CMTheme themeAdaptedForDarkModeFromTheme:currentTheme];
+    return [CMTheme themeAdaptedForDarkModeFromTheme:CriticalMoments.sharedInstance.currentTheme];
 }
 
 + (CMTheme *)themeAdaptedForDarkModeFromTheme:(CMTheme *)theme {
@@ -51,7 +41,11 @@ static CMTheme *currentTheme = nil;
     }
 
     if (@available(iOS 12.0, *)) {
-        UITraitCollection *tc = UIScreen.mainScreen.traitCollection;
+        // Prefer window traits if available. Fallback to screen's.
+        UITraitCollection *tc = [CMUtils keyWindow].traitCollection;
+        if (!tc || tc.userInterfaceStyle == UIUserInterfaceStyleUnspecified) {
+            tc = UIScreen.mainScreen.traitCollection;
+        }
         if (tc.userInterfaceStyle == UIUserInterfaceStyleDark) {
             return theme.darkModeTheme;
         }
@@ -59,16 +53,10 @@ static CMTheme *currentTheme = nil;
     return theme;
 }
 
-+ (void)setCurrentTheme:(CMTheme *)theme {
-    @synchronized(CMTheme.class) {
-        currentTheme = theme;
-    }
-}
-
 #pragma mark Named Themes From Appcore
 
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
-    DatamodelTheme *appcoreTheme = [AppcoreSharedAppcore() themeForName:themeName];
+    DatamodelTheme *appcoreTheme = [CriticalMoments.sharedInstance themeFromConfigByName:themeName];
     if (appcoreTheme) {
         CMTheme *theme = [CMTheme themeFromAppcoreTheme:appcoreTheme];
         return [CMTheme themeAdaptedForDarkModeFromTheme:theme];

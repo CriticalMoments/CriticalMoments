@@ -22,33 +22,21 @@
 @import SafariServices;
 @import StoreKit;
 
-@interface CMLibBindings () <AppcoreLibBindings>
+@interface CMLibBindings ()
+@property(nonatomic, weak) CriticalMoments *cm; // weak to avoid circular reference
 @end
 
 @implementation CMLibBindings
 
-static CMLibBindings *sharedInstance = nil;
-
-+ (CMLibBindings *)shared {
-    // avoid lock if we can
-    if (sharedInstance) {
-        return sharedInstance;
-    }
-
-    @synchronized(CMLibBindings.class) {
-        if (!sharedInstance) {
-            sharedInstance = [[self alloc] init];
-        }
-
-        return sharedInstance;
-    }
-}
-
-+ (void)registerWithAppcore {
-    [AppcoreSharedAppcore() registerLibraryBindings:[CMLibBindings shared]];
-}
-
 #pragma mark AppcoreLibBindings
+
+- (instancetype)initWithCM:(CriticalMoments *)cm {
+    self = [super init];
+    if (self) {
+        _cm = cm;
+    }
+    return self;
+}
 
 - (BOOL)setDefaultTheme:(DatamodelTheme *_Nullable)actheme error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!actheme) {
@@ -61,12 +49,11 @@ static CMLibBindings *sharedInstance = nil;
         *error = [NSError errorWithDomain:@"CMIOS" code:81263223 userInfo:nil];
         return NO;
     }
-    [CMTheme setCurrentTheme:theme];
+    [self.cm setTheme:theme];
 
     return YES;
 }
 
-// TODO test case
 - (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner error:(NSError *_Nullable __autoreleasing *_Nullable)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
@@ -74,9 +61,10 @@ static CMLibBindings *sharedInstance = nil;
     }
 
     if (@available(iOS 13, *)) {
-        // TODO: main thread?
-        CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
-        [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
+          [[CMBannerManager shared] showAppWideMessage:bannerMessage];
+        });
     } else {
         NSLog(@"CriticalMoments: Banner messages are only supported on iOS 13 or newer.");
         *error = [NSError errorWithDomain:@"CMIOS: Banner not supported on iOS version" code:87155467 userInfo:nil];
@@ -94,32 +82,30 @@ static CMLibBindings *sharedInstance = nil;
         return NO;
     }
 
-    // TODO no dispatch
-    CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
-    [alert showAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
+      [alert showAlert];
+    });
 
     // TODO: what is the bool return here?
     return YES;
 }
 
 - (BOOL)showLink:(DatamodelLinkAction *)link error:(NSError *_Nullable __autoreleasing *)error {
-    // TODO no dispatch to main
-
     NSURL *url = [NSURL URLWithString:link.urlString];
     if (!url || !url.scheme) {
         *error = [NSError errorWithDomain:@"CMIOS" code:72937634 userInfo:nil];
         return NO;
     }
 
-    BOOL isWebLink = [@"http" isEqualToString:url.scheme] || [@"https" isEqualToString:url.scheme];
-    if (link.useEmbeddedBrowser && isWebLink) {
-        BOOL success = [self openLinkInEmbeddedBrowser:url];
-        if (success) {
-            return YES;
-        }
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+      BOOL isWebLink = [@"http" isEqualToString:url.scheme] || [@"https" isEqualToString:url.scheme];
+      if (link.useEmbeddedBrowser && isWebLink) {
+          BOOL success = [self openLinkInEmbeddedBrowser:url];
+      }
 
-    [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+      [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+    });
     // TODO: what is the bool return here?
     return YES;
 }
@@ -136,7 +122,8 @@ static CMLibBindings *sharedInstance = nil;
       }
     });
 
-    // TODO no returns
+    // TODO: what is the bool return here?
+    return YES;
 }
 
 - (BOOL)showModal:(DatamodelModalAction *_Nullable)modal error:(NSError *_Nullable __autoreleasing *_Nullable)error {
@@ -149,13 +136,16 @@ static CMLibBindings *sharedInstance = nil;
 }
 
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
-    SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
-    UIViewController *topController = CMUtils.topViewController;
-    if (!safariVc || !topController) {
-        return NO;
-    }
-    [topController presentViewController:safariVc animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
+      UIViewController *topController = CMUtils.topViewController;
+      if (!safariVc || !topController) {
+          return;
+      }
+      [topController presentViewController:safariVc animated:YES completion:nil];
+    });
 
+    // TODO: what is the bool return here?
     return YES;
 }
 

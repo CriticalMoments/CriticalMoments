@@ -75,15 +75,15 @@ func TestPrimaryConfigJson(t *testing.T) {
 		t.Fatal("Didn't parse link action")
 	}
 	failConditionAction := pc.ActionWithName("alertActionWithFailingCondition")
-	if failConditionAction == nil || failConditionAction.Condition != "1 > 2" {
+	if failConditionAction == nil || failConditionAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse alert action with failing condition")
 	}
 	ca1 := pc.ActionWithName("conditionalWithTrueCondition")
-	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition != "2 > 1" {
+	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition.String() != "2 > 1" {
 		t.Fatal("Didn't parse conditional action 1")
 	}
 	ca2 := pc.ActionWithName("conditionalWithFalseCondition")
-	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition != "1 > 2" {
+	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse conditional action 2")
 	}
 	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")
@@ -116,6 +116,55 @@ func TestPrimaryConfigJson(t *testing.T) {
 	trigger2 := pc.namedTriggers["trigger_alert"]
 	if trigger2.ActionName != "alertAction" || trigger2.EventName != "custom_event_alert" {
 		t.Fatal("Trigger 2 parsing failed")
+	}
+
+	// Conditions
+	if len(pc.namedConditions) != 3 {
+		t.Fatal("Wrong condition count")
+	}
+	c1 := pc.ConditionWithName("trueCondition")
+	if c1 == nil || c1.String() != "true" {
+		t.Fatal("Issue with true condition")
+	}
+	c2 := pc.ConditionWithName("falseCondition")
+	if c2 == nil || c2.String() != "false" {
+		t.Fatal("Issue with true condition")
+	}
+	c3 := pc.ConditionWithName("complexCondition")
+	if c3 == nil || c3.String() != "4 > 3 && os_version =='123'" {
+		t.Fatal("complex condition failed")
+	}
+	c3Var, err := c3.ExtractVariables()
+	if err != nil || len(c3Var) != 1 || c3Var[0] != "os_version" {
+		t.Fatal("complex condition failed to parse")
+	}
+}
+
+func TestFutureConditionStrictValidation(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/invalidCondition.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var pc PrimaryConfig
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pc.ConditionWithName("trueCondition").String() != "true" ||
+		pc.ConditionWithName("invalidCondition").String() != "" || // non strict parses to empty, which later evals false
+		pc.ConditionWithName("backCompatCondition").String() != "future_feature > 3" {
+		t.Fatal("Failed to allow unrecognized variable when not in strict mode")
+	}
+
+	// Strict mode should fail since we have an unknown var
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("failed to error with invalid conditionand strict mode on")
 	}
 }
 

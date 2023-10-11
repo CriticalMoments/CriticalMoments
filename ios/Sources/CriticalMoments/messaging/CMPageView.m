@@ -7,6 +7,7 @@
 
 #import "CMPageView.h"
 
+#import "../utils/CMUtils.h"
 #import "CMButton.h"
 #import "CMGradientView.h"
 #import "CMImageView.h"
@@ -148,7 +149,7 @@
         }
 
         // button above guide, and area
-        CGFloat belowButtonPadding = buttons.count > 1 ? 0.0 : 30.0;
+        CGFloat belowButtonPadding = buttons.count == 1 || [CMUtils isiPad] ? 30.0 : 0.0;
         [constraints addObjectsFromArray:@[
             // Last button up into layout margin guide. If only 1 button, move it up to more tapable position since we
             // have space

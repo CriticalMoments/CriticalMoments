@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
 func GoPing() string {
@@ -16,8 +18,13 @@ func GoPing() string {
 }
 
 type Appcore struct {
+	started bool
+
 	// Library binding/delegate
 	libBindings LibBindings
+
+	// API Key
+	apiKey *signing.ApiKey
 
 	// Primary configuration
 	configUrlString string
@@ -28,16 +35,15 @@ type Appcore struct {
 
 	// Properties
 	propertyRegistry *propertyRegistry
+
+	// Dev Mode namedCondition conflict check
+	seenNamedConditions map[string]string
 }
 
-var sharedAppcore Appcore = newAppcore()
-
-func SharedAppcore() *Appcore {
-	return &sharedAppcore
-}
-func newAppcore() Appcore {
-	return Appcore{
-		propertyRegistry: newPropertyRegistry(),
+func NewAppcore() *Appcore {
+	return &Appcore{
+		propertyRegistry:    newPropertyRegistry(),
+		seenNamedConditions: map[string]string{},
 	}
 }
 
@@ -54,6 +60,21 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	return nil
 }
 
+func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
+	key, err := signing.ParseApiKey(apiKey)
+	if err != nil {
+		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+	}
+	if v, err := key.Valid(); err != nil || !v {
+		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+	}
+	if key.BundleId() != bundleID {
+		return errors.New(fmt.Sprintf("This API key isn't valid for this app. API key is for %s, but this app has bundle ID %s", key.BundleId(), bundleID))
+	}
+	ac.apiKey = key
+	return nil
+}
+
 func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
 	cache, err := newCacheWithBaseDir(cacheDirPath)
 	if err != nil {
@@ -64,12 +85,62 @@ func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
 	return nil
 }
 
+func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
+	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
+	tz := time.FixedZone(tzName, gmtOffset)
+	time.Local = tz
+}
+
+func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
+	if name == "" {
+		return nil
+	}
+	// in debug mode, track each built-in condition we see, and make sure the developer isn't reusing names
+	// If they use the same name twice for different things, they won't be able to override in the future
+	priorSeen := ac.seenNamedConditions[name]
+	if priorSeen == "" {
+		ac.seenNamedConditions[name] = conditionString
+	} else if priorSeen != conditionString {
+		return errors.New(fmt.Sprintf("The named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+	}
+	return nil
+}
+
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+	if !ac.started {
+		return false, errors.New("Appcore not started")
+	}
+	if name == "" {
+		return false, errors.New("CheckNamedCondition requires a non-empty name")
+	}
+
+	// lookup name for override, prefering the condition from the config when available
+	condition := ac.config.ConditionWithName(name)
+
+	if condition == nil {
+		// Use provided condition, since config doesn't have an override
+		pCond, err := datamodel.NewCondition(conditionString)
+		if err != nil {
+			return false, err
+		}
+		condition = pCond
+	}
+
+	return ac.propertyRegistry.evaluateCondition(condition)
+}
+
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	ac.libBindings = lb
 }
 
-// TODO: guard against double start call
 func (ac *Appcore) Start() error {
+	if ac.started {
+		return errors.New("Appcore already started. Start should only be called once")
+	}
+
+	if ac.apiKey == nil {
+		return errors.New("An API Key must be provided before starting critical moments")
+	}
 	if ac.configUrlString == "" {
 		return errors.New("A config URL must be provided before starting critical moments")
 	}
@@ -114,6 +185,7 @@ func (ac *Appcore) Start() error {
 		return err
 	}
 
+	ac.started = true
 	return nil
 }
 
@@ -129,24 +201,35 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-// TODO: events should be queued during setup, and run after postConfigSetup
-func (ac *Appcore) SendEvent(e string) error {
-	actions := ac.config.ActionsForEvent(e)
-	if len(actions) == 0 {
-		return errors.New(fmt.Sprintf("Event not found: %v", e))
+func (ac *Appcore) SendEvent(name string) error {
+	if !ac.started {
+		return errors.New("Appcore not started")
 	}
+
+	_, err := datamodel.NewEventWithName(name)
+	if err != nil {
+		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
+	}
+
+	// TODO: save this event
+
+	// Perform any actions for this event
+	actions := ac.config.ActionsForEvent(name)
 	var lastErr error
 	for _, action := range actions {
 		err := ac.PerformAction(&action)
 		if err != nil {
-			// return an error, but don't stop sending
-			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", e, err))
+			// return an error, but don't stop processing
+			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", name, err))
 		}
 	}
 	return lastErr
 }
 
 func (ac *Appcore) PerformNamedAction(actionName string) error {
+	if !ac.started {
+		return errors.New("Appcore not started")
+	}
 	action := ac.config.ActionWithName(actionName)
 	if action == nil {
 		return errors.New(fmt.Sprintf("No action found named %v", actionName))
@@ -155,7 +238,10 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 }
 
 func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
-	if action.Condition != "" {
+	if !ac.started {
+		return errors.New("Appcore not started")
+	}
+	if action.Condition != nil {
 		conditionResult, err := ac.propertyRegistry.evaluateCondition(action.Condition)
 		if err != nil {
 			return err
@@ -172,6 +258,9 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
 }
 
 func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
+	if !ac.started {
+		return nil
+	}
 	return ac.config.ThemeWithName(themeName)
 }
 

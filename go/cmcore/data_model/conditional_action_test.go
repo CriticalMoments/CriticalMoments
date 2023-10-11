@@ -6,12 +6,20 @@ import (
 	"testing"
 )
 
+func testHelperNewCondition(s string, t *testing.T) *Condition {
+	c, err := NewCondition(s)
+	if err != nil {
+		t.Fatal("Condition in test invalid", err)
+	}
+	return c
+}
+
 func TestConditionalActionValidators(t *testing.T) {
 	c := ConditionalAction{}
 	if c.Validate() {
 		t.Fatal("Conditional actions require a condition")
 	}
-	c.Condition = "(network_connection_type == 'wifi')"
+	c.Condition = testHelperNewCondition("(network_connection_type == 'wifi')", t)
 	if c.Validate() {
 		t.Fatal("Conditional actions require a passed action")
 	}
@@ -23,15 +31,15 @@ func TestConditionalActionValidators(t *testing.T) {
 	if err != nil && len(an) != 1 && an[0] != "pass_action" {
 		t.Fatal("Failed to return action name for pass action")
 	}
-	c.Condition = "not_a_valid_var > 5"
-	if c.Validate() {
-		t.Fatal("Conditional action should validate expression validity")
+	c.Condition.conditionString = "not_a_valid_var > 5"
+	if !c.Validate() {
+		t.Fatal("Conditional action should validate condition validity but non-strict okay")
 	}
-	c.Condition = ""
+	c.Condition = nil
 	if c.Validate() {
 		t.Fatal("Conditional action require condition")
 	}
-	c.Condition = "true"
+	c.Condition = testHelperNewCondition("true", t)
 	if !c.Validate() {
 		t.Fatal("Conditional action should be valid")
 	}
@@ -42,6 +50,16 @@ func TestConditionalActionValidators(t *testing.T) {
 	an, err = c.AllEmbeddedActionNames()
 	if err != nil && len(an) != 2 && an[0] != "pass_action" && an[1] != "fail_action" {
 		t.Fatal("Failed to return action name for pass action")
+	}
+
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	// Check it calls nested validators. Can't construct a problematic condition without reflection
+	c.Condition.conditionString = "not_a_valid_var > 5"
+	if c.Validate() {
+		t.Fatal("Conditional action should validate condition validity")
 	}
 }
 
@@ -58,7 +76,7 @@ func TestJsonParsingValidConditional(t *testing.T) {
 	if ac.ActionType != ActionTypeEnumConditional {
 		t.Fatal("Failed to parse valid conditional action")
 	}
-	if ac.ConditionalAction.Condition != "(device_battery_state == 'charging' || device_battery_state == 'full')" {
+	if ac.ConditionalAction.Condition.String() != "(device_battery_state == 'charging' || device_battery_state == 'full')" {
 		t.Fatal("Failed to parse condition")
 	}
 	if ac.ConditionalAction.PassedActionName != "conditional_true" || ac.ConditionalAction.FailedActionName != "conditional_false" {
@@ -66,7 +84,7 @@ func TestJsonParsingValidConditional(t *testing.T) {
 	}
 }
 
-func TestJsonParsingInvalidCondiationalAction(t *testing.T) {
+func TestJsonParsingInvalidConditionalAction(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/conditional_actions/invalid.json")
 	if err != nil {
 		t.Fatal()
@@ -75,5 +93,37 @@ func TestJsonParsingInvalidCondiationalAction(t *testing.T) {
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil || ac.ActionType == ActionTypeEnumConditional {
 		t.Fatal("Invalid conditionals should not parse")
+	}
+}
+
+func TestJsonParsingInvalidConditionalActionCondition(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/conditional_actions/invalid_condition.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil || ac.ActionType == ActionTypeEnumConditional {
+		t.Fatal("Invalid conditionals should not parse")
+	}
+}
+
+func TestJsonParsingInvalidStrictConditionalActionCondition(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/actions/conditional_actions/invalid_strict_condition.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var ac ActionContainer
+	err = json.Unmarshal(testFileData, &ac)
+	if err != nil || ac.ConditionalAction.Condition.String() != "(fake_var == 'charging' || device_battery_state == 'full')" {
+		t.Fatal("should pass non strict validation")
+	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	err = json.Unmarshal(testFileData, &ac)
+	if err == nil {
+		t.Fatal("should not pass strict validation")
 	}
 }

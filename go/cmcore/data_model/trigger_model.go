@@ -1,6 +1,8 @@
 package datamodel
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Trigger struct {
 	EventName  string

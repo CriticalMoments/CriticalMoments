@@ -1,0 +1,31 @@
+{
+    "configVersion": "v1",
+    "themes": {
+        "defaultTheme": {
+            "bannerBackgroundColor": "#ff0000",
+            "bannerForegroundColor": "#00ff00",
+            "fontScale": 1.1,
+            "fontName": "AvenirNext-Regular",
+            "boldFontName": "AvenirNext-Bold",
+            "scaleFontForUserPreference": false
+        }
+    },
+    "conditions": {
+        "namedConditions": {
+            "overrideToTrue": "true"
+        }
+    },
+    "actions": {
+        "namedActions": {
+            "alertAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Alert title"
+                }
+            },
+            "reviewAction": {
+                "actionType": "review_prompt"
+            }
+        }
+    }
+}

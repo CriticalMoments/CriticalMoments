@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
 	"golang.org/x/exp/slices"
 )
@@ -19,8 +19,8 @@ type propertyRegistry struct {
 func newPropertyRegistry() *propertyRegistry {
 	return &propertyRegistry{
 		providers:              make(map[string]propertyProvider),
-		requiredPropertyTypes:  cmcore.RequiredPropertyTypes(),
-		wellKnownPropertyTypes: cmcore.WellKnownPropertyTypes(),
+		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
+		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
 	}
 }
 
@@ -80,14 +80,14 @@ func (p *propertyRegistry) propertyValue(key string) interface{} {
 	return v.Value()
 }
 
-func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
-	variables, err := cmcore.ExtractVariablesFromCondition(condition)
+func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (bool, error) {
+	variables, err := condition.ExtractVariables()
 	if err != nil {
 		return false, err
 	}
 
 	// Build env with helper functions and vars from props
-	env := cmcore.ConditionEnvWithHelpers()
+	env := datamodel.ConditionEnvWithHelpers()
 	for _, v := range variables {
 		if _, ok := env[v]; !ok {
 			env[v] = p.propertyValue(v)
@@ -95,7 +95,7 @@ func (p *propertyRegistry) evaluateCondition(condition string) (bool, error) {
 	}
 
 	// TODO functions not bound here. bind to cmExprEnv if we add function support
-	program, err := expr.Compile(condition, expr.Env(env), expr.AllowUndefinedVariables(), expr.AsBool())
+	program, err := condition.CompileWithEnv(expr.Env(env))
 	if err != nil {
 		return false, err
 	}

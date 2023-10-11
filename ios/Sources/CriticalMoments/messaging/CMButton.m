@@ -6,6 +6,7 @@
 //
 
 #import "CMButton.h"
+#import "../CriticalMoments_private.h"
 
 // Align to default and size=small OS buttons
 #define CM_OS_BUTTON_FONT_SIZE 17.0
@@ -60,10 +61,12 @@
 
     if (self.model.actionName.length > 0) {
         NSError *error;
-        [AppcoreSharedAppcore() performNamedAction:self.model.actionName error:&error];
-        if (error) {
-            NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
-        }
+        [CriticalMoments.sharedInstance performNamedAction:self.model.actionName
+                                                   handler:^(NSError *_Nullable error) {
+                                                     if (error) {
+                                                         NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
+                                                     }
+                                                   }];
     }
 
     if (!self.model.preventDefault && self.defaultAction) {

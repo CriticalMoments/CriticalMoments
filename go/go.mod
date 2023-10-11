@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/joho/godotenv v1.5.1
 	golang.org/x/mobile v0.0.0-20230427221453-e8d11dd0ba41 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect

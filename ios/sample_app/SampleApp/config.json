@@ -84,7 +84,7 @@
             "single_line_banner": {
                 "actionType": "banner",
                 "actionData": {
-                    "body": "This message will truncate after the first line, unlike the default of 4 lines.",
+                    "body": "This message will truncate after the first line, unlike the default of 4 lines. This message is also very very very long so the truncation is visible on iPads, which can be wide, and require run-on sentences.",
                     "maxLineCount": 1,
                     "tapActionName": "nested_alert"
                 }
@@ -213,6 +213,14 @@
                 "actionType": "conditional_action",
                 "actionData": {
                     "condition": "(interface_orientation == 'landscape')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_installed_recently": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "app_install_date > now() - hours(1)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }

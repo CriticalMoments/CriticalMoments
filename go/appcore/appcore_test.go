@@ -73,7 +73,7 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
-	ac := Appcore{}
+	ac := NewAppcore()
 	configPath, err := filepath.Abs("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json")
 	if err != nil {
 		t.Fatal(err)
@@ -91,10 +91,13 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
+
+	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
+
 	// Clear required properties, for easier setup
 	ac.propertyRegistry = newPropertyRegistry()
 	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
-	return &ac, nil
+	return ac, nil
 }
 
 func TestAppcoreStart(t *testing.T) {
@@ -155,6 +158,34 @@ func TestAppcoreStartBadConfig(t *testing.T) {
 	if ac.config != nil {
 		t.Fatal("Loaded config from bad url")
 	}
+}
+
+func TestSendEvent(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// invalid events should error
+	err = ac.SendEvent("io.criticalmoments.events.built_in.invalid")
+	if err == nil {
+		t.Fatal("invalid build in event did not error")
+	}
+	err = ac.SendEvent("io.criticalmoments.events.well_known.invalid")
+	if err == nil {
+		t.Fatal("invalid well known event did not error")
+	}
+
+	// custom events with no actions should work
+	err = ac.SendEvent("net.scosman.asdf")
+	if err != nil {
+		t.Fatal("valid custom event errored", err)
+	}
+
 }
 
 func TestPerformingAction(t *testing.T) {
@@ -293,4 +324,58 @@ func TestSetDefaultTheme(t *testing.T) {
 	if defaultTheme == nil && defaultTheme.BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not set after start")
 	}
+}
+
+func TestNamedConditions(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// conditions without overrides should use provided condition
+	r, err := ac.CheckNamedCondition("newCondition1", "false")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+	r, err = ac.CheckNamedCondition("newCondition2", "true")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+
+	// falseCondition should override provided string
+	r, err = ac.CheckNamedCondition("falseCondition", "true")
+	if err != nil || r {
+		t.Fatal("false conditions failed")
+	}
+
+	// trueCondition should override provided string
+	r, err = ac.CheckNamedCondition("trueCondition", "false")
+	if err != nil || !r {
+		t.Fatal("false conditions failed")
+	}
+
+	// Check name check
+	r, err = ac.CheckNamedCondition("", "false")
+	if err == nil {
+		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
+	}
+
+	// Check debug mode checker
+	dmerr := ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
+		t.Fatal("dev mode condition failed")
+	}
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "false")
+	if dmerr != nil {
+		t.Fatal("dev mode condition second time errored, but should pass with same condition")
+	}
+	dmerr = ac.CheckNamedConditionCollision("uniqueName", "true")
+	if dmerr == nil {
+		t.Fatal("unque condition with new value should return a dev warning")
+	}
+
 }

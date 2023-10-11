@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */; };
+		E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E62ACBAD4100A879AD /* SnapshotTesting */; };
+		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
 		E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */; };
 		E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E692A0D73F10069E5BD /* LinkDemoScreen.m */; };
-		E0446E732A0DBF450069E5BD /* iOSSnapshotTestCase in Frameworks */ = {isa = PBXBuildFile; productRef = E0446E722A0DBF450069E5BD /* iOSSnapshotTestCase */; };
 		E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E742A0DC0170069E5BD /* SnapshotTests.m */; };
 		E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */; };
-		E05AB4E52A0E9CF70034A9CA /* defaultThemeTest.json in Resources */ = {isa = PBXBuildFile; fileRef = E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */; };
+		E05AB4E52A0E9CF70034A9CA /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E05AB4E42A0E9CF70034A9CA /* testConfig.json */; };
 		E069BFB12A217A9E00A4B65E /* ConditionsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */; };
 		E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774A29F9B202001521F4 /* CMDemoScreen.m */; };
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
@@ -45,6 +47,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSnapshotTests.swift; sourceTree = "<group>"; };
+		E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SampleAppTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
@@ -56,7 +60,7 @@
 		E0446E742A0DC0170069E5BD /* SnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SnapshotTests.m; sourceTree = "<group>"; };
 		E0446E762A0DC2430069E5BD /* SampleAppCoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleAppCoreViewController.h; sourceTree = "<group>"; };
 		E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAppCoreViewController.m; sourceTree = "<group>"; };
-		E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = defaultThemeTest.json; sourceTree = "<group>"; };
+		E05AB4E42A0E9CF70034A9CA /* testConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = testConfig.json; sourceTree = "<group>"; };
 		E069BFAF2A217A9E00A4B65E /* ConditionsDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConditionsDemoScreen.h; sourceTree = "<group>"; };
 		E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConditionsDemoScreen.m; sourceTree = "<group>"; };
 		E07B774929F9B202001521F4 /* CMDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMDemoScreen.h; sourceTree = "<group>"; };
@@ -100,7 +104,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0A582CB2A019F5400178076 /* CriticalMoments in Frameworks */,
-				E0446E732A0DBF450069E5BD /* iOSSnapshotTestCase in Frameworks */,
+				E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */,
+				E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,7 +185,9 @@
 			children = (
 				E0B5460829F407C3002A25A8 /* SampleAppTests.m */,
 				E0446E742A0DC0170069E5BD /* SnapshotTests.m */,
-				E05AB4E42A0E9CF70034A9CA /* defaultThemeTest.json */,
+				E05AB4E42A0E9CF70034A9CA /* testConfig.json */,
+				E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */,
+				E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */,
 			);
 			path = SampleAppTests;
 			sourceTree = "<group>";
@@ -239,7 +246,8 @@
 			name = SampleAppTests;
 			packageProductDependencies = (
 				E0A582CA2A019F5400178076 /* CriticalMoments */,
-				E0446E722A0DBF450069E5BD /* iOSSnapshotTestCase */,
+				E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */,
+				E03977E62ACBAD4100A879AD /* SnapshotTesting */,
 			);
 			productName = SampleAppTests;
 			productReference = E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */;
@@ -259,6 +267,7 @@
 					};
 					E0B5460329F407C3002A25A8 = {
 						CreatedOnToolsVersion = 14.3;
+						LastSwiftMigration = 1430;
 						TestTargetID = E0B545E829F407C2002A25A8;
 					};
 				};
@@ -273,7 +282,7 @@
 			);
 			mainGroup = E0B545E029F407C2002A25A8;
 			packageReferences = (
-				E0446E712A0DBF450069E5BD /* XCRemoteSwiftPackageReference "ios-snapshot-test-case" */,
+				E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			productRefGroup = E0B545EA29F407C2002A25A8 /* Products */;
 			projectDirPath = "";
@@ -301,7 +310,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E05AB4E52A0E9CF70034A9CA /* defaultThemeTest.json in Resources */,
+				E05AB4E52A0E9CF70034A9CA /* testConfig.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +345,7 @@
 				E0C508D42A0DCB130084B31B /* Utils.m in Sources */,
 				E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */,
 				E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */,
+				E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,8 +502,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -520,8 +529,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -539,15 +547,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.criticalmoments.SampleAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SampleAppTests/SampleAppTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SampleApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SampleApp";
 			};
@@ -557,15 +569,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.criticalmoments.SampleAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "SampleAppTests/SampleAppTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SampleApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SampleApp";
 			};
@@ -604,21 +619,26 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E0446E712A0DBF450069E5BD /* XCRemoteSwiftPackageReference "ios-snapshot-test-case" */ = {
+		E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/uber/ios-snapshot-test-case.git";
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 8.0.0;
+				minimumVersion = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E0446E722A0DBF450069E5BD /* iOSSnapshotTestCase */ = {
+		E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E0446E712A0DBF450069E5BD /* XCRemoteSwiftPackageReference "ios-snapshot-test-case" */;
-			productName = iOSSnapshotTestCase;
+			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		E03977E62ACBAD4100A879AD /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
 		};
 		E0A582CA2A019F5400178076 /* CriticalMoments */ = {
 			isa = XCSwiftPackageProductDependency;

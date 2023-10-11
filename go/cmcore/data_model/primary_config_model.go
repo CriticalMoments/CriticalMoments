@@ -23,6 +23,9 @@ type PrimaryConfig struct {
 
 	// Triggers
 	namedTriggers map[string]Trigger
+
+	// Conditions
+	namedConditions map[string]*Condition
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
@@ -37,6 +40,14 @@ func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
 		return &action
+	}
+	return nil
+}
+
+func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
+	c, ok := pc.namedConditions[name]
+	if ok {
+		return c
 	}
 	return nil
 }
@@ -67,6 +78,9 @@ type jsonPrimaryConfig struct {
 
 	// Triggers
 	TriggerConfig *jsonTriggersSection `json:"triggers"`
+
+	// Conditions
+	ConditionsConfig *jsonConditionsSection `json:"conditions"`
 }
 
 type jsonThemesSection struct {
@@ -80,6 +94,10 @@ type jsonActionsSection struct {
 
 type jsonTriggersSection struct {
 	NamedTriggers map[string]Trigger `json:"namedTriggers"`
+}
+
+type jsonConditionsSection struct {
+	NamedConditions map[string]*Condition `json:"namedConditions"`
 }
 
 func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
@@ -116,6 +134,13 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
 	} else {
 		pc.namedTriggers = make(map[string]Trigger)
+	}
+
+	// Conditions
+	if jpc.ConditionsConfig != nil && jpc.ConditionsConfig.NamedConditions != nil {
+		pc.namedConditions = jpc.ConditionsConfig.NamedConditions
+	} else {
+		pc.namedConditions = make(map[string]*Condition)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {

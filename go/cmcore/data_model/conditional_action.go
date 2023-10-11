@@ -3,20 +3,18 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 )
 
 type ConditionalAction struct {
-	Condition        string
+	Condition        *Condition
 	PassedActionName string
 	FailedActionName string
 }
 
 type jsonConditionalAction struct {
-	Condition        string `json:"condition"`
-	PassedActionName string `json:"passedActionName"`
-	FailedActionName string `json:"failedActionName,omitempty"`
+	Condition        *Condition `json:"condition"`
+	PassedActionName string     `json:"passedActionName"`
+	FailedActionName string     `json:"failedActionName,omitempty"`
 }
 
 func unpackConditionalActionFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTypeInterface, error) {
@@ -34,10 +32,10 @@ func (c *ConditionalAction) Validate() bool {
 }
 
 func (c *ConditionalAction) ValidateReturningUserReadableIssue() string {
-	if c.Condition == "" {
+	if c.Condition == nil {
 		return "Conditional actions must have a condition"
 	}
-	if err := cmcore.ValidateCondition(c.Condition); err != nil {
+	if err := c.Condition.Validate(); err != nil {
 		return fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition)
 	}
 	if c.PassedActionName == "" {

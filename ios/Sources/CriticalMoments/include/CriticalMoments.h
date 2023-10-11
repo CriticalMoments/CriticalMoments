@@ -13,16 +13,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// :nodoc:
+/**
+ The primary interface into Critical Moments. See out getting started docs for usage instructions:
+ https://docs.criticalmoments.io/get-started
+ */
 @interface CriticalMoments : NSObject
 
-// Simple "ping" method for testing end to end integrations
-/// :nodoc:
-+ (NSString *)objcPing;
+/// init is not available. Use sharedInstance for all use cases.
+- (instancetype)init NS_UNAVAILABLE;
 
-// Golang "ping" method for testing end to end integrations
-/// :nodoc:
-+ (NSString *)goPing;
+/**
+ The default instance of critical moments. You should always use this instance
+ */
++ (CriticalMoments *)sharedInstance;
 
 /**
  Start should be called once you've performed all needed initialization for
@@ -38,7 +41,19 @@ NS_ASSUME_NONNULL_BEGIN
  - Setup a default theme from code (optional). Can also be done through config
  or not at all.
  */
-+ (void)start;
+- (void)start;
+
+/**
+ Set the API Key for critical moments.
+
+ You can get a valid API key from criticalmoments.io
+
+ API Keys are not transferable; each app requires it's own key.
+
+ @param apiKey the API Key. Create one on criticalmoments.io
+ @param error optional, any error created when validating the API key
+ */
+- (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
 /**
  Set the config URL for critical moments.
@@ -54,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  file can present messages directly to your users, and you should treat security
  seriously, as you would your app update release process or webpage.
  */
-+ (void)setConfigUrl:(NSString *)urlString;
+- (void)setConfigUrl:(NSString *)urlString;
 
 // TODO: improve docs
 // TODO: enforce naming limits (ascii, no spaces)?
@@ -66,7 +81,48 @@ NS_ASSUME_NONNULL_BEGIN
  @param eventName a string describing the event. Example:
  `user_updated_profile_photo`
  */
-+ (void)sendEvent:(NSString *)eventName;
+- (void)sendEvent:(NSString *)eventName;
+
+/**
+ Checks a condition string, returning the result of evaluating it.
+
+ A name is provided so that you can remotely override the condition string using a cloud based config file.
+
+ The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
+can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
+
+ @param name A name for this condition. Must be provided and can not be an empty string.
+ The name allows you to override the hardcoded condition string remotely from the cloud-hosted
+ CM config file later if needed.
+ @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
+options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
+ @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
+returns any errors occured evaluating the condition. The boolean value is false for any error.
+ @warning Be sure to provide a unique name to each condition you use. Reusing names will make it impossible to override
+each usage independently from remote configuration. Reused names will log warnings in the debug console.
+ */
+- (void)checkNamedCondition:(NSString *_Nonnull)name
+                  condition:(NSString *_Nonnull)condition
+                    handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+
+/// :nodoc: TBD if this is a public API or not. For now, it's not.
+- (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
+
+#pragma mark Themes
+
+/// Fetch the current theme for this CM instance
+- (CMTheme *)currentTheme;
+/// Set the current theme for this CM instance
+- (void)setTheme:(CMTheme *)theme;
+
+// Simple "ping" method for testing end to end integrations
+/// :nodoc:
+- (NSString *)objcPing;
+
+// Golang "ping" method for testing end to end integrations
+/// :nodoc:
+- (NSString *)goPing;
 
 @end
 

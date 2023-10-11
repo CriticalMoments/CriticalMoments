@@ -1,0 +1,8 @@
+{
+    "actionType": "conditional_action",
+    "actionData": {
+        "condition": "nil > 5",
+        "passedActionName": "conditional_true",
+        "failedActionName": "conditional_false"
+    }
+}

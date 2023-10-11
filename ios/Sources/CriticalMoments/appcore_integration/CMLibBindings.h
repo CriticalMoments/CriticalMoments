@@ -7,24 +7,17 @@
 
 #import <Foundation/Foundation.h>
 
+@import Appcore;
+#import "CriticalMoments.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMLibBindings : NSObject
+@interface CMLibBindings : NSObject <AppcoreLibBindings>
 
-#pragma mark Shared Instance
+/// init is not available. Use initWithCM for all use cases.
+- (instancetype)init NS_UNAVAILABLE;
 
-/**
- :nodoc:
- A shared instance reference.
- @return a shared instance of CMActionDispatcher
- */
-+ (CMLibBindings *)shared;
-
-/**
- :nodoc:
- Register the shared instance with appcore
- */
-+ (void)registerWithAppcore;
+- (instancetype)initWithCM:(CriticalMoments *)cm;
 
 @end
 

@@ -39,13 +39,14 @@
     } else if (self.actionNextScreen) {
         [self pushNextScreen];
     } else if (self.actionCMEventName) {
-        [CriticalMoments sendEvent:self.actionCMEventName];
+        [CriticalMoments.sharedInstance sendEvent:self.actionCMEventName];
     } else if (self.actionCMActionName) {
-        NSError *error;
-        [AppcoreSharedAppcore() performNamedAction:self.actionCMActionName error:&error];
-        if (error) {
-            NSLog(@"SampleApp: Menu tap action unknown issue: %@", error);
-        }
+        [CriticalMoments.sharedInstance performNamedAction:self.actionCMActionName
+                                                   handler:^(NSError *_Nullable error) {
+                                                     if (error) {
+                                                         NSLog(@"SampleApp: Menu tap action unknown issue: %@", error);
+                                                     }
+                                                   }];
     } else if (self.actionBlock) {
         self.actionBlock();
     } else if (self.actionTarget && self.actionSelector) {
