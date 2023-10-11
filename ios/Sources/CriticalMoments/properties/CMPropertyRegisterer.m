@@ -184,6 +184,8 @@
     // Misc
     CMAppInstallDatePropertyProviders *appInstallProvider = [[CMAppInstallDatePropertyProviders alloc] init];
     [self registerLibPropertyProvider:@"app_install_date" value:appInstallProvider];
+    CMHasWatchPropertyProviders *hasWatchProvider = [[CMHasWatchPropertyProviders alloc] init];
+    [self registerLibPropertyProvider:@"has_watch" value:hasWatchProvider];
 }
 
 - (void)setUserInterfaceIdiom {

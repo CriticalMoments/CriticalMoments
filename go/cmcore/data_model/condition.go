@@ -78,6 +78,7 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 		"has_wifi_connection":  reflect.Bool,
 		"has_cell_connection":  reflect.Bool,
 		"app_state":            reflect.String,
+		"has_watch":            reflect.Bool,
 		"on_call":              reflect.Bool,
 	}
 }
