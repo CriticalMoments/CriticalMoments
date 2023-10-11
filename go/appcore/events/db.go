@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"os"
+	"time"
 
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -44,16 +47,18 @@ func (db *DB) Close() error {
 }
 
 // migrations can be run on each start because they are incremental and non-destructive
-// Future migrations must also be incremental (only append to this, check if not exists)
+// Future migrations must also be incremental (only append to this, check if not exists),
+// or we must implement a versioning system
 func (db *DB) migrate() error {
 	_, err := db.sqldb.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			event_name TEXT NOT NULL,
-			event_data TEXT NOT NULL,
 			created_at DATETIME,
 			updated_at DATETIME
 		);
+
+		CREATE INDEX IF NOT EXISTS events_event_name_created_at ON events (event_name, created_at);
 
 		CREATE TRIGGER IF NOT EXISTS insert_events_created_at 
 		AFTER INSERT ON events
@@ -72,4 +77,58 @@ func (db *DB) migrate() error {
 	}
 
 	return nil
+}
+
+func (db *DB) InsertEvent(e *datamodel.Event) error {
+	_, err := db.sqldb.Exec(`
+		INSERT INTO events (event_name)
+		VALUES (?)
+	`, e.Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const eventCountByNameQuery = `SELECT COUNT(*) FROM events WHERE event_name = ?`
+
+func (db *DB) EventCountByName(name string) (int, error) {
+	r, err := db.sqldb.Query(eventCountByNameQuery, name)
+	if err != nil {
+		return 0, err
+	}
+	defer r.Close()
+
+	r.Next()
+	var count int
+	err = r.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE event_name = ? ORDER BY created_at DESC LIMIT 1`
+
+// a method that gets the time of the lastest event matching a provided name
+func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
+	r, err := db.sqldb.Query(latestEventTimeByNameQuery, name)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	r.Next()
+	var epochTime float64
+	err = r.Scan(&epochTime)
+	if err != nil {
+		return nil, err
+	}
+
+	_, fractionalSeconds := math.Modf(epochTime)
+	nanoseconds := int64(fractionalSeconds * 1_000_000_000)
+	time := time.Unix(int64(epochTime), nanoseconds)
+	return &time, nil
 }
