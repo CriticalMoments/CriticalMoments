@@ -9,6 +9,9 @@ import (
 	"testing"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"golang.org/x/exp/maps"
 )
 
 func TestPing(t *testing.T) {
@@ -83,11 +86,14 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	baseCachePath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
-	os.MkdirAll(baseCachePath, os.ModePerm)
-	err = ac.SetCacheDirPath(baseCachePath)
+	baseDataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
+	os.MkdirAll(baseDataPath, os.ModePerm)
+	err = ac.SetDataDirPath(baseDataPath)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if ac.eventHandler == nil || ac.cache == nil {
+		t.Fatal("event handler or cache not set")
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
@@ -95,7 +101,6 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
 	// Clear required properties, for easier setup
-	ac.propertyRegistry = newPropertyRegistry()
 	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
 	return ac, nil
 }
@@ -378,4 +383,68 @@ func TestNamedConditions(t *testing.T) {
 		t.Fatal("unque condition with new value should return a dev warning")
 	}
 
+}
+func TestEndToEndEvents(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c, err := datamodel.NewCondition("eventCount('test') == 0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := ac.propertyRegistry.evaluateCondition(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r {
+		t.Fatal("eventCount should be 0")
+	}
+
+	ac.SendEvent("test")
+	ac.SendEvent("test")
+	ac.SendEvent("test2")
+
+	c, err = datamodel.NewCondition("eventCount('test') == 2 && eventCount('test2') == 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err = ac.propertyRegistry.evaluateCondition(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r {
+		t.Fatal("eventCount should be 3 (2 and 1)")
+	}
+}
+
+func arraysEqualOrderInsensitive(a []string, b []string) bool {
+	less := func(aa, bb string) bool { return aa < bb }
+	return "" == cmp.Diff(a, b, cmpopts.SortSlices(less))
+}
+
+func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
+	// Verify on startup, all the functions we expect to support in cmcore.AllBuiltInDynamicFunctions
+	// are actually registered after .start. If not, strict validation is either not strict enough
+	// or too strict!
+
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	registered := ac.propertyRegistry.dynamicFunctionNames
+	expected := maps.Keys(datamodel.AllBuiltInDynamicFunctions)
+	if !arraysEqualOrderInsensitive(registered, expected) {
+		t.Fatal("Not all built in functions registered or too many registered")
+	}
 }

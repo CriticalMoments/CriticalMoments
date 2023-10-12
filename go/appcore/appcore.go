@@ -79,22 +79,22 @@ func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
 	return nil
 }
 
-func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
-	cache, err := newCacheWithBaseDir(cacheDirPath)
+func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
+	cache, err := newCacheWithBaseDir(dataDirPath)
 	if err != nil {
 		return err
 	}
-
 	ac.cache = cache
-	return nil
-}
 
-func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
 	eventHandler, err := events.NewEventManager(dataDirPath)
 	if err != nil {
 		return err
 	}
 	ac.eventHandler = eventHandler
+
+	dbOperations := eventHandler.EventManagerConditionFunctions()
+	ac.propertyRegistry.RegisterFunctions(dbOperations)
+
 	return nil
 }
 
@@ -219,12 +219,15 @@ func (ac *Appcore) SendEvent(name string) error {
 		return errors.New("Appcore not started")
 	}
 
-	_, err := datamodel.NewEventWithName(name)
+	event, err := datamodel.NewEventWithName(name)
 	if err != nil {
 		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
 	}
 
-	// TODO: save this event
+	err = ac.eventHandler.SendEvent(event)
+	if err != nil {
+		return err
+	}
 
 	// Perform any actions for this event
 	actions := ac.config.ActionsForEvent(name)

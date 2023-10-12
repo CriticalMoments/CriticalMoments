@@ -118,19 +118,20 @@ static CriticalMoments *sharedInstance = nil;
     CMPropertyRegisterer *propertryRegisterer = [[CMPropertyRegisterer alloc] initWithAppcore:_appcore];
     [propertryRegisterer registerDefaultPropertiesToAppcore];
 
-    // Set the cache directory to applicationSupport/CriticalMomentsData
     NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
                                                                  inDomains:NSUserDomainMask] lastObject];
+
+    // Set the data directory to applicationSupport/critical_moments_data
     NSError *error;
-    NSURL *criticalMomentsCacheDir = [appSupportDir URLByAppendingPathComponent:@"CriticalMomentsData"];
-    [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsCacheDir
+    NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
+    [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
                            withIntermediateDirectories:YES
                                             attributes:nil
                                                  error:&error];
     if (error) {
         return error;
     }
-    [_appcore setCacheDirPath:[criticalMomentsCacheDir path] error:&error];
+    [_appcore setDataDirPath:[criticalMomentsDataDir path] error:&error];
     if (error) {
         return error;
     }

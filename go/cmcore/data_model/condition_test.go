@@ -19,7 +19,11 @@ func extractVarsTestHelper(s string) ([]string, error) {
 	c := Condition{
 		conditionString: s,
 	}
-	return c.ExtractVariables()
+	fields, err := c.ExtractIdentifiers()
+	if err != nil {
+		return nil, err
+	}
+	return fields.Variables, nil
 }
 
 func TestConditionConstructor(t *testing.T) {
@@ -88,8 +92,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
 
-	// unregistered method names should be included (ab),
-	// registered ones should not (versionNumberComponent)
+	// method names should not be included
 	// build in methods (startsWith) should not
 	// repeated var a should only be listed once
 	code = "a || ab() || versionNumberComponent(1) > 1 || a startsWith 'hello'"
@@ -97,7 +100,7 @@ func TestConditionVariableExtraction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !arraysEqualOrderInsensitive(variables, []string{"a", "ab"}) {
+	if !arraysEqualOrderInsensitive(variables, []string{"a"}) {
 		t.Fatalf("Extract variables failed: %v", variables)
 	}
 }
@@ -261,5 +264,21 @@ func TestParseCondtion(t *testing.T) {
 	err = json.Unmarshal([]byte(""), &c)
 	if err == nil || c.String() != "" {
 		t.Fatal("Parse allowed non JSON formated string")
+	}
+}
+
+func TestExtractIdentifiers(t *testing.T) {
+	c := Condition{
+		conditionString: "func1() && func2(5) && both(1) && var1 == 3 && both < 4 && 4 > var2",
+	}
+	fields, err := c.ExtractIdentifiers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !arraysEqualOrderInsensitive(fields.Methods, []string{"func1", "func2", "both"}) {
+		t.Fatal("Extract methods failed")
+	}
+	if !arraysEqualOrderInsensitive(fields.Variables, []string{"var1", "var2", "both"}) {
+		t.Fatal("Extract variables failed")
 	}
 }

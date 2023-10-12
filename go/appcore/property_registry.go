@@ -7,6 +7,7 @@ import (
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -14,14 +15,31 @@ type propertyRegistry struct {
 	providers              map[string]propertyProvider
 	requiredPropertyTypes  map[string]reflect.Kind
 	wellKnownPropertyTypes map[string]reflect.Kind
+	dynamicFunctionNames   []string
+	dynamicFunctionOps     []expr.Option
+	mapFunctions           map[string]interface{}
 }
 
 func newPropertyRegistry() *propertyRegistry {
-	return &propertyRegistry{
+	pr := &propertyRegistry{
 		providers:              make(map[string]propertyProvider),
 		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
 		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
+		dynamicFunctionNames:   []string{},
 	}
+
+	// register static functions
+	pr.mapFunctions = datamodel.ConditionEnvWithHelpers()
+
+	return pr
+}
+
+func (pr *propertyRegistry) RegisterFunctions(newFuncs map[string]*datamodel.ConditionDynamicFunction) error {
+	for k, v := range newFuncs {
+		pr.dynamicFunctionNames = append(pr.dynamicFunctionNames, k)
+		pr.dynamicFunctionOps = append(pr.dynamicFunctionOps, expr.Function(k, v.Function, v.Types...))
+	}
+	return nil
 }
 
 func (pr *propertyRegistry) expectedTypeForKey(key string) reflect.Kind {
@@ -72,34 +90,94 @@ func (p *propertyRegistry) registerLibPropertyProvider(key string, dpp LibProper
 	return p.addProviderForKey(key, &dw)
 }
 
-func (p *propertyRegistry) propertyValue(key string) interface{} {
+var errPropertyNotFound = errors.New("Property not found")
+
+func (p *propertyRegistry) propertyValue(key string) (interface{}, error) {
 	v, ok := p.providers[key]
 	if !ok {
-		return nil
+		return nil, errPropertyNotFound
 	}
-	return v.Value()
+	return v.Value(), nil
 }
 
-func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (bool, error) {
-	variables, err := condition.ExtractVariables()
-	if err != nil {
-		return false, err
+func (p *propertyRegistry) buildPropertyMapForCondition(fields *datamodel.ConditionFields) (map[string]interface{}, error) {
+	// Extract only the used variables from the condition. Property evaluation isn't free, so
+	// only evaluate those we need
+	propsEnv := make(map[string]interface{})
+	for _, v := range fields.Variables {
+		if _, ok := propsEnv[v]; !ok {
+			pv, err := p.propertyValue(v)
+			if err != nil && err != errPropertyNotFound {
+				return nil, err
+			}
+			if err == errPropertyNotFound {
+				// set not-found variables to nil. Likely new var names from future SDK runing on an old SDK.
+				// We want the condition string to be able to check for nil for backwards compatibility (typically "?? true" or "?? false")
+				propsEnv[v] = nil
+			} else {
+				propsEnv[v] = pv
+			}
+		}
 	}
+	return propsEnv, nil
+}
 
-	// Build env with helper functions and vars from props
-	env := datamodel.ConditionEnvWithHelpers()
-	for _, v := range variables {
-		if _, ok := env[v]; !ok {
-			env[v] = p.propertyValue(v)
+// Any unrecoginized method should return nil (not the default error)
+func (p *propertyRegistry) nilMethodsForUnknownFunctions(fields *datamodel.ConditionFields) ([]expr.Option, error) {
+	existingFunctions := p.allFunctionNamesSupported()
+	nilFunctions := []expr.Option{}
+	for _, m := range fields.Methods {
+		if !slices.Contains(existingFunctions, m) {
+			nfunc := expr.Function(m, func(params ...any) (interface{}, error) {
+				return nil, nil
+			})
+			nilFunctions = append(nilFunctions, nfunc)
 		}
 	}
 
-	// TODO functions not bound here. bind to cmExprEnv if we add function support
-	program, err := condition.CompileWithEnv(expr.Env(env))
+	return nilFunctions, nil
+}
+
+func (p *propertyRegistry) allFunctionNamesSupported() []string {
+	functions := []string{}
+	functions = append(functions, maps.Keys(p.mapFunctions)...)
+	functions = append(functions, p.dynamicFunctionNames...)
+
+	return functions
+}
+
+func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (bool, error) {
+	// Parse the condition, extract variable and method names
+	fields, err := condition.ExtractIdentifiers()
 	if err != nil {
 		return false, err
 	}
-	result, err := expr.Run(program, env)
+
+	// Build a map of all properties(variables) used in this condition, and their values
+	envMap, err := p.buildPropertyMapForCondition(fields)
+	if err != nil {
+		return false, err
+	}
+
+	// Add all the static functions to the envidonment map
+	maps.Copy(envMap, p.mapFunctions)
+
+	// Build nil function handlers for any missing functions (backwards compatibility)
+	nilOps, err := p.nilMethodsForUnknownFunctions(fields)
+	if err != nil {
+		return false, err
+	}
+
+	mergedOptions := []expr.Option{}
+	mergedOptions = append(mergedOptions, p.dynamicFunctionOps...)
+	mergedOptions = append(mergedOptions, expr.Env(envMap))
+	mergedOptions = append(mergedOptions, nilOps...)
+
+	program, err := condition.CompileWithEnv(mergedOptions...)
+	if err != nil {
+		return false, err
+	}
+	result, err := expr.Run(program, envMap)
 	if err != nil {
 		return false, err
 	}
