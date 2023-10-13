@@ -139,7 +139,7 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 
 func (ac *ActionContainer) PerformAction(ab ActionBindings) error {
 	if ac.actionData == nil {
-		return errors.New("Attempted to perform action without AD interface")
+		return errors.New("attempted to perform action without AD interface")
 	}
 	return ac.actionData.PerformAction(ab)
 }

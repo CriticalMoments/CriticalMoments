@@ -11,7 +11,7 @@ import (
 
 func arraysEqualOrderInsensitive(a []string, b []string) bool {
 	less := func(aa, bb string) bool { return aa < bb }
-	return "" == cmp.Diff(a, b, cmpopts.SortSlices(less))
+	return cmp.Diff(a, b, cmpopts.SortSlices(less)) == ""
 }
 
 func extractVarsTestHelper(s string) ([]string, error) {

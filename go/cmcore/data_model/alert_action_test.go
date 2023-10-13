@@ -2,7 +2,6 @@ package datamodel
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"testing"
 
@@ -161,7 +160,7 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 	expectedActions := []string{"custom_event", "event1", "event2", "event3"}
 	for _, expected := range expectedActions {
 		if !slices.Contains(actions, expected) {
-			t.Fatal(fmt.Sprintf("Expected %v but missing", expected))
+			t.Fatalf("Expected %v but missing", expected)
 		}
 	}
 	if len(actions) != len(expectedActions) {

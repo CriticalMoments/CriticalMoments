@@ -1,7 +1,6 @@
 package datamodel
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -64,10 +63,10 @@ func NewEventWithName(name string) (*Event, error) {
 func NewBuiltInEventWithName(name string) (*Event, error) {
 	// Ensure this is a built in event we recognize
 	if !allBuiltInEventTypes[name] {
-		return nil, errors.New(fmt.Sprintf("Unknown built in event: %v", name))
+		return nil, fmt.Errorf("unknown built in event: %v", name)
 	}
 	if !strings.HasPrefix(name, buildInEventNamespace) {
-		return nil, errors.New(fmt.Sprintf("Built in event outside namespace: %v", name))
+		return nil, fmt.Errorf("built in event outside namespace: %v", name)
 	}
 
 	e := Event{
@@ -80,10 +79,10 @@ func NewBuiltInEventWithName(name string) (*Event, error) {
 func NewWellKnownEventWithName(name string) (*Event, error) {
 	// Ensure this is a well known event we recognize
 	if !allWellKnownEventTypes[name] {
-		return nil, errors.New(fmt.Sprintf("Unknown well known event: %v", name))
+		return nil, fmt.Errorf("unknown well known event: %v", name)
 	}
 	if !strings.HasPrefix(name, wellKnownEventNamespace) {
-		return nil, errors.New(fmt.Sprintf("Well known event outside namespace: %v", name))
+		return nil, fmt.Errorf("well known event outside namespace: %v", name)
 	}
 
 	e := Event{
@@ -95,7 +94,7 @@ func NewWellKnownEventWithName(name string) (*Event, error) {
 
 func NewCustomEventWithName(name string) (*Event, error) {
 	if strings.HasPrefix(name, wellKnownEventNamespace) || strings.HasPrefix(name, buildInEventNamespace) {
-		return nil, errors.New(fmt.Sprintf("Attempted to log custom event matching built in or well known event: %v", name))
+		return nil, fmt.Errorf("attempted to log custom event matching built in or well known event: %v", name)
 	}
 
 	e := Event{
