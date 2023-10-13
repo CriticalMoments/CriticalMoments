@@ -7,19 +7,6 @@ import (
 	"testing"
 )
 
-func testBuildTestEventManager(t *testing.T) *EventManager {
-	dataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
-	err := os.MkdirAll(dataPath, os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
-	em, err := NewEventManager(dataPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return em
-}
-
 func TestConstructor(t *testing.T) {
 	dataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
 	em, err := NewEventManager(dataPath)

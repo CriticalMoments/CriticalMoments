@@ -110,6 +110,25 @@ func (db *DB) EventCountByName(name string) (int, error) {
 	return count, nil
 }
 
+const eventCountByNameWithLimitQuery = `SELECT COUNT(*) FROM (SELECT id FROM events WHERE event_name = ? LIMIT ?)`
+
+func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
+	r, err := db.sqldb.Query(eventCountByNameWithLimitQuery, name, limit)
+	if err != nil {
+		return 0, err
+	}
+	defer r.Close()
+
+	r.Next()
+	var count int
+	err = r.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE event_name = ? ORDER BY created_at DESC LIMIT 1`
 
 // a method that gets the time of the lastest event matching a provided name

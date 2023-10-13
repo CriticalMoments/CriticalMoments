@@ -237,7 +237,7 @@ func TestInsertAndRetrieve(t *testing.T) {
 	if t == nil {
 		t.Fatal("LatestEventTimeByName returned nil")
 	}
-	if math.Abs(time.Now().Sub(*ct).Seconds()) > 0.01 {
+	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {
 		t.Fatal("LatestEventTimeByName returned wrong time")
 	}
 
@@ -280,10 +280,31 @@ func TestEventCount(t *testing.T) {
 			t.Fatal("EventCountByName returned wrong count")
 		}
 	}
+
+	// Check count with limit
+	count, err := db.EventCountByNameWithLimit("test", 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 9 {
+		t.Fatal("EventCountByNameWithLimit returned wrong count")
+	}
+
+	count, err = db.EventCountByNameWithLimit("test", 5)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 5 {
+		t.Fatal("EventCountByNameWithLimit returned count past limit")
+	}
 }
 
 func TestLatestEventUsesIndex(t *testing.T) {
 	testSqlExplainIncludes(latestEventTimeByNameQuery, "USING COVERING INDEX events_event_name_created_at", t, "test")
+}
+
+func TestEventCountLimitUsesIndex(t *testing.T) {
+	testSqlExplainIncludes(eventCountByNameWithLimitQuery, "USING COVERING INDEX events_event_name_created_at", t, "test", 5)
 }
 
 func TestEventCountUsesIndex(t *testing.T) {
@@ -301,19 +322,25 @@ func testSqlExplainIncludes(sql string, expectedExplain string, t *testing.T, ar
 	}
 	defer r.Close()
 
-	r.Next()
-	var er1 string
-	var er2 string
-	var er3 string
-	var er4 string
-	err = r.Scan(&er1, &er2, &er3, &er4)
-	if err != nil {
-		t.Fatal(err)
+	foundIndex := false
+	for r.Next() {
+		var er1 string
+		var er2 string
+		var er3 string
+		var er4 string
+		err = r.Scan(&er1, &er2, &er3, &er4)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// SQLite does not guaruntee this string is consistent across versions, so this string check
+		// may need to be updated if the SQLite version changes. Still good to have this check to ensure
+		// our perf design never breaks silently (SQL footgun #732)
+		if strings.Contains(er4, expectedExplain) {
+			foundIndex = true
+		}
 	}
-	// SQLite does not guaruntee this string is consistent across versions, so this string check
-	// may need to be updated if the SQLite version changes. Still good to have this check to ensure
-	// our perf design never breaks silently (SQL footgun #732)
-	if !strings.Contains(er4, expectedExplain) {
-		t.Fatal("latestEventTimeByNameQuery does not use index")
+	if !foundIndex {
+		t.Fatal("query does not use index: ", sql)
 	}
+
 }

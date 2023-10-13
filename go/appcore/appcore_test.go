@@ -364,7 +364,7 @@ func TestNamedConditions(t *testing.T) {
 	}
 
 	// Check name check
-	r, err = ac.CheckNamedCondition("", "false")
+	_, err = ac.CheckNamedCondition("", "false")
 	if err == nil {
 		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
 	}
@@ -421,11 +421,44 @@ func TestEndToEndEvents(t *testing.T) {
 	if !r {
 		t.Fatal("eventCount should be 3 (2 and 1)")
 	}
+
+	c, err = datamodel.NewCondition("eventCountWithLimit('test', 1) == 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err = ac.propertyRegistry.evaluateCondition(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r {
+		t.Fatal("eventCountWithLimit should limit")
+	}
+
+	// Confirm we are checking signature
+	invalidParams := []string{
+		"eventCount() > 1",
+		"eventCount('test', 'test2') > 1",
+		"eventCount(1) > 1",
+		"eventCount('test', 1) > 1",
+		"eventCountWithLimit('test') > 1",
+		"eventCountWithLimit('test', 'test2') > 1",
+		"eventCountWithLimit() > 1",
+	}
+	for _, cs := range invalidParams {
+		c, err = datamodel.NewCondition(cs)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = ac.propertyRegistry.evaluateCondition(c)
+		if err == nil {
+			t.Fatal("Allowed condition with invalid parameters", cs)
+		}
+	}
 }
 
 func arraysEqualOrderInsensitive(a []string, b []string) bool {
 	less := func(aa, bb string) bool { return aa < bb }
-	return "" == cmp.Diff(a, b, cmpopts.SortSlices(less))
+	return cmp.Diff(a, b, cmpopts.SortSlices(less)) == ""
 }
 
 func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {

@@ -106,7 +106,8 @@ func ConditionEnvWithHelpers() map[string]interface{} {
 }
 
 var AllBuiltInDynamicFunctions = map[string]bool{
-	"eventCount": true,
+	"eventCount":          true,
+	"eventCountWithLimit": true,
 }
 
 type ConditionFields struct {
