@@ -416,7 +416,7 @@ func TestDynamicMethods(t *testing.T) {
 		"platform": reflect.String,
 	}
 	pr.registerStaticProperty("platform", "ios")
-	pr.RegisterFunctions(map[string]*datamodel.ConditionDynamicFunction{
+	pr.RegisterDynamicFunctions(map[string]*datamodel.ConditionDynamicFunction{
 		"testFunc": {
 			Function: func(params ...any) (any, error) {
 				if len(params) != 1 {

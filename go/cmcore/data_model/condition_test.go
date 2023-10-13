@@ -161,6 +161,14 @@ func TestValidateProps(t *testing.T) {
 	if err == nil {
 		t.Fatal("Unrecognized method passed validation")
 	}
+	err = validateTestHelper("eventCount('test') > 1")
+	if err != nil {
+		t.Fatal("Allowed function failed validation")
+	}
+	err = validateTestHelper("seconds(1) > seconds(2)")
+	if err != nil {
+		t.Fatal("Allowed function failed validation")
+	}
 }
 
 func TestParseCondtion(t *testing.T) {

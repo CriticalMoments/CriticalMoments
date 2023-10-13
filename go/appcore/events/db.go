@@ -52,7 +52,7 @@ func (db *DB) Close() error {
 func (db *DB) migrate() error {
 	_, err := db.sqldb.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id INTEGER PRIMARY KEY,
 			event_name TEXT NOT NULL,
 			created_at DATETIME,
 			updated_at DATETIME
@@ -131,7 +131,6 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 
 const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE event_name = ? ORDER BY created_at DESC LIMIT 1`
 
-// a method that gets the time of the lastest event matching a provided name
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	r, err := db.sqldb.Query(latestEventTimeByNameQuery, name)
 	if err != nil {

@@ -93,7 +93,7 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
 	ac.eventManager = eventManager
 
 	dbOperations := eventManager.EventManagerConditionFunctions()
-	ac.propertyRegistry.RegisterFunctions(dbOperations)
+	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
 
 	return nil
 }

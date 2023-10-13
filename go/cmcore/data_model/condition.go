@@ -207,7 +207,9 @@ func (c *Condition) Validate() error {
 		// Check we support all methods used if strict parsing
 		for _, methodName := range fields.Methods {
 			if _, ok := AllBuiltInDynamicFunctions[methodName]; !ok {
-				return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
+				if _, ok := ConditionEnvWithHelpers()[methodName]; !ok {
+					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
+				}
 			}
 		}
 

@@ -26,15 +26,16 @@ func newPropertyRegistry() *propertyRegistry {
 		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
 		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
 		dynamicFunctionNames:   []string{},
+		dynamicFunctionOps:     []expr.Option{},
 	}
 
-	// register static functions
+	// register static/map functions
 	pr.mapFunctions = datamodel.ConditionEnvWithHelpers()
 
 	return pr
 }
 
-func (pr *propertyRegistry) RegisterFunctions(newFuncs map[string]*datamodel.ConditionDynamicFunction) error {
+func (pr *propertyRegistry) RegisterDynamicFunctions(newFuncs map[string]*datamodel.ConditionDynamicFunction) error {
 	for k, v := range newFuncs {
 		pr.dynamicFunctionNames = append(pr.dynamicFunctionNames, k)
 		pr.dynamicFunctionOps = append(pr.dynamicFunctionOps, expr.Function(k, v.Function, v.Types...))
@@ -123,8 +124,9 @@ func (p *propertyRegistry) buildPropertyMapForCondition(fields *datamodel.Condit
 }
 
 // Any unrecoginized method should return nil (not the default error)
+// This is because we want to allow for backwards compatibility when newer SDKs add functions (old SDKs shouldn't fail, should return nil)
 func (p *propertyRegistry) nilMethodsForUnknownFunctions(fields *datamodel.ConditionFields) ([]expr.Option, error) {
-	existingFunctions := p.allFunctionNamesSupported()
+	existingFunctions := p.allFunctionNamesRegistered()
 	nilFunctions := []expr.Option{}
 	for _, m := range fields.Methods {
 		if !slices.Contains(existingFunctions, m) {
@@ -138,7 +140,7 @@ func (p *propertyRegistry) nilMethodsForUnknownFunctions(fields *datamodel.Condi
 	return nilFunctions, nil
 }
 
-func (p *propertyRegistry) allFunctionNamesSupported() []string {
+func (p *propertyRegistry) allFunctionNamesRegistered() []string {
 	functions := []string{}
 	functions = append(functions, maps.Keys(p.mapFunctions)...)
 	functions = append(functions, p.dynamicFunctionNames...)
