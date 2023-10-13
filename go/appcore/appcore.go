@@ -35,7 +35,7 @@ type Appcore struct {
 	cache *cache
 
 	// Event handler
-	eventHandler *events.EventManager
+	eventManager *events.EventManager
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -86,13 +86,13 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
 	}
 	ac.cache = cache
 
-	eventHandler, err := events.NewEventManager(dataDirPath)
+	eventManager, err := events.NewEventManager(dataDirPath)
 	if err != nil {
 		return err
 	}
-	ac.eventHandler = eventHandler
+	ac.eventManager = eventManager
 
-	dbOperations := eventHandler.EventManagerConditionFunctions()
+	dbOperations := eventManager.EventManagerConditionFunctions()
 	ac.propertyRegistry.RegisterFunctions(dbOperations)
 
 	return nil
@@ -224,7 +224,7 @@ func (ac *Appcore) SendEvent(name string) error {
 		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
 	}
 
-	err = ac.eventHandler.SendEvent(event)
+	err = ac.eventManager.SendEvent(event)
 	if err != nil {
 		return err
 	}

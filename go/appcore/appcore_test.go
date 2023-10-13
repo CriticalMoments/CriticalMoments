@@ -92,7 +92,7 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ac.eventHandler == nil || ac.cache == nil {
+	if ac.eventManager == nil || ac.cache == nil {
 		t.Fatal("event handler or cache not set")
 	}
 	lb := testLibBindings{}
