@@ -134,8 +134,8 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if c3 == nil || c3.String() != "4 > 3 && os_version =='123'" {
 		t.Fatal("complex condition failed")
 	}
-	c3Var, err := c3.ExtractVariables()
-	if err != nil || len(c3Var) != 1 || c3Var[0] != "os_version" {
+	c3Var, err := c3.ExtractIdentifiers()
+	if err != nil || len(c3Var.Variables) != 1 || c3Var.Variables[0] != "os_version" {
 		t.Fatal("complex condition failed to parse")
 	}
 }

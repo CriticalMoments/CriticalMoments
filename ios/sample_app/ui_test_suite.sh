@@ -19,8 +19,8 @@ runTest()
 {
   echo "Running UI Tests for $1"
   spinner & spinnerPid=$!
-  # Clean optional
-  # xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' clean &> /tmp/critical_moments_clean_log.latest
+  # Clean optional (usually)
+  xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' clean &> /tmp/critical_moments_clean_log.latest
   xcodebuild -scheme SampleApp -target SampleAppTests -destination "$1" '-only-testing:SampleAppTests/SnapshotTests/testScreenshotAllSampleAppFeatures' test &> /tmp/critical_moments_test_log.latest
   RESULT=$?
   kill $spinnerPid 
@@ -49,7 +49,8 @@ runTest 'platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro'
 runTest 'platform=iOS Simulator,OS=16.4,name=iPad Pro (12.9-inch) (6th generation)'
 
 # iPhone 11, ios 13.7
-runTest 'platform=iOS Simulator,OS=13.7,name=iPhone 11'
+echo "Warning: not running on iPhone 11, 13.7. Simulator not supported in xcode 15+"
+#runTest 'platform=iOS Simulator,OS=13.7,name=iPhone 11'
 
 # iPhone 6s Plus, ios 15.5
 runTest 'platform=iOS Simulator,OS=15.5,name=iPhone 6s Plus'

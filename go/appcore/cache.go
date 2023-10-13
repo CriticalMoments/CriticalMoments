@@ -24,7 +24,7 @@ const (
 
 func newCacheWithBaseDir(cacheDirPath string) (*cache, error) {
 	// validate cache dir exists
-	if _, err := os.Stat(cacheDirPath); os.IsNotExist(err) {
+	if dirInfo, err := os.Stat(cacheDirPath); err != nil || !dirInfo.IsDir() {
 		return nil, errors.New("CriticalMoments: Cache directory does not exist")
 	}
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/events"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
@@ -32,6 +33,9 @@ type Appcore struct {
 
 	// Cache
 	cache *cache
+
+	// Event handler
+	eventManager *events.EventManager
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -75,13 +79,22 @@ func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
 	return nil
 }
 
-func (ac *Appcore) SetCacheDirPath(cacheDirPath string) error {
-	cache, err := newCacheWithBaseDir(cacheDirPath)
+func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
+	cache, err := newCacheWithBaseDir(dataDirPath)
 	if err != nil {
 		return err
 	}
-
 	ac.cache = cache
+
+	eventManager, err := events.NewEventManager(dataDirPath)
+	if err != nil {
+		return err
+	}
+	ac.eventManager = eventManager
+
+	dbOperations := eventManager.EventManagerConditionFunctions()
+	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
+
 	return nil
 }
 
@@ -206,12 +219,15 @@ func (ac *Appcore) SendEvent(name string) error {
 		return errors.New("Appcore not started")
 	}
 
-	_, err := datamodel.NewEventWithName(name)
+	event, err := datamodel.NewEventWithName(name)
 	if err != nil {
 		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
 	}
 
-	// TODO: save this event
+	err = ac.eventManager.SendEvent(event)
+	if err != nil {
+		return err
+	}
 
 	// Perform any actions for this event
 	actions := ac.config.ActionsForEvent(name)

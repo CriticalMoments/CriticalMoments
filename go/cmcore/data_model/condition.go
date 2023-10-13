@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/antonmedv/expr"
@@ -15,6 +16,11 @@ import (
 	"github.com/antonmedv/expr/vm"
 	"golang.org/x/exp/maps"
 )
+
+type ConditionDynamicFunction struct {
+	Function func(params ...any) (any, error)
+	Types    []any
+}
 
 type Condition struct {
 	conditionString string
@@ -89,32 +95,61 @@ func ConditionEnvWithHelpers() map[string]interface{} {
 		"versionGreaterThan":     conditions.VersionGreaterThan,
 		"versionLessThan":        conditions.VersionLessThan,
 		"versionEqual":           conditions.VersionEqual,
-		"now":                    conditions.Now,
-		"seconds":                conditions.Seconds,
-		"minutes":                conditions.Minutes,
-		"hours":                  conditions.Hours,
-		"days":                   conditions.Days,
-		"parseDate":              conditions.ParseDatetime,
+		// TODO: temp name. expr added "now" so this avoids a conflict
+		"cmnow":     conditions.Now,
+		"seconds":   conditions.Seconds,
+		"minutes":   conditions.Minutes,
+		"hours":     conditions.Hours,
+		"days":      conditions.Days,
+		"parseDate": conditions.ParseDatetime,
 	}
 }
 
-// An AST walker we use to analyize code, to see if it's compatible with CM
-type cmAnalysisVisitor struct {
-	variables map[string]bool
+var AllBuiltInDynamicFunctions = map[string]bool{
+	"eventCount":          true,
+	"eventCountWithLimit": true,
 }
 
-func (v *cmAnalysisVisitor) Visit(n *ast.Node) {
+type ConditionFields struct {
+	Identifiers []string
+	Variables   []string
+	Methods     []string
+}
+
+// An AST walker we use to analyze code, to see if it's compatible with CM
+type conditionWalker struct {
+	condition   string
+	identifiers map[string]bool
+	variables   map[string]bool
+	methods     map[string]bool
+}
+
+func (v *conditionWalker) Visit(n *ast.Node) {
 	if node, ok := (*n).(*ast.IdentifierNode); ok {
-		// exclude methods
-		helperMethod := ConditionEnvWithHelpers()[node.Value]
-		if helperMethod == nil {
+		v.identifiers[node.Value] = true
+
+		// Check if this is a variable or a method. Unfortunately .Method() on the node does not work
+		// so we check for open paren immediately after the identifier
+		isMethod := false
+		parenLoc := (*n).Location().Column + len(node.Value)
+		if parenLoc < len(v.condition) {
+			paran := v.condition[parenLoc : parenLoc+1]
+			if paran == "(" {
+				isMethod = true
+			}
+		}
+		if isMethod {
+			v.methods[node.Value] = true
+		} else {
 			v.variables[node.Value] = true
 		}
 	}
 }
 
-func (c *Condition) ExtractVariables() ([]string, error) {
-	tree, err := parser.Parse(c.conditionString)
+func (c *Condition) ExtractIdentifiers() (*ConditionFields, error) {
+	// single line needed because we use the location offset
+	singleLineCondition := strings.ReplaceAll(c.conditionString, "\n", " ")
+	tree, err := parser.Parse(singleLineCondition)
 	if err != nil {
 		return nil, err
 	}
@@ -130,11 +165,20 @@ func (c *Condition) ExtractVariables() ([]string, error) {
 		return nil, err
 	}
 
-	visitor := &cmAnalysisVisitor{
-		variables: make(map[string]bool),
+	visitor := &conditionWalker{
+		condition:   singleLineCondition,
+		identifiers: map[string]bool{},
+		variables:   map[string]bool{},
+		methods:     map[string]bool{},
 	}
 	ast.Walk(&tree.Node, visitor)
-	return maps.Keys(visitor.variables), nil
+
+	results := ConditionFields{
+		Identifiers: maps.Keys(visitor.identifiers),
+		Variables:   maps.Keys(visitor.variables),
+		Methods:     maps.Keys(visitor.methods),
+	}
+	return &results, nil
 }
 
 func (c *Condition) Validate() error {
@@ -142,30 +186,42 @@ func (c *Condition) Validate() error {
 		return NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
 	}
 
-	// Run this even if not strict. It checking the format of the condition as well
-	variables, err := c.ExtractVariables()
+	// Run this even if not strict. It is checking the format of the condition as well
+	fields, err := c.ExtractIdentifiers()
 	if err != nil {
 		return err
 	}
 
-	// Check we support all variables used if strict parsing
 	if StrictDatamodelParsing {
+		// Check we support all variables used if strict parsing
 		allValidVariables := make(map[string]reflect.Kind)
 		maps.Copy(allValidVariables, RequiredPropertyTypes())
 		maps.Copy(allValidVariables, WellKnownPropertyTypes())
 
-		for _, varName := range variables {
+		for _, varName := range fields.Variables {
 			if _, ok := allValidVariables[varName]; !ok {
 				return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
 			}
 		}
+
+		// Check we support all methods used if strict parsing
+		for _, methodName := range fields.Methods {
+			if _, ok := AllBuiltInDynamicFunctions[methodName]; !ok {
+				if _, ok := ConditionEnvWithHelpers()[methodName]; !ok {
+					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
+				}
+			}
+		}
+
 	}
 
 	return nil
 }
 
-func (c *Condition) CompileWithEnv(env expr.Option) (*vm.Program, error) {
-	return expr.Compile(c.conditionString, env, expr.AllowUndefinedVariables(), expr.AsBool())
+func (c *Condition) CompileWithEnv(ops ...expr.Option) (*vm.Program, error) {
+	allOptions := append(ops, expr.AsBool())
+
+	return expr.Compile(c.conditionString, allOptions...)
 }
 
 func (c *Condition) UnmarshalJSON(data []byte) error {

@@ -1,6 +1,7 @@
 package appcore
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -9,6 +10,14 @@ import (
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
+func propertyValueOrNil(pr *propertyRegistry, key string) interface{} {
+	v, err := pr.propertyValue(key)
+	if err != nil {
+		return nil
+	}
+	return v
+}
+
 func TestPropertyRegistrySetGet(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int, "c": reflect.Float64, "d": reflect.Bool}
@@ -16,28 +25,28 @@ func TestPropertyRegistrySetGet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pr.propertyValue("a") != "a" {
+	if propertyValueOrNil(pr, "a") != "a" {
 		t.Fatal("Property registry failed for string")
 	}
 	err = pr.registerStaticProperty("b", 2)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pr.propertyValue("b") != 2 {
+	if propertyValueOrNil(pr, "b") != 2 {
 		t.Fatal("Property registry failed for int")
 	}
 	err = pr.registerStaticProperty("c", 3.3)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pr.propertyValue("c") != 3.3 {
+	if propertyValueOrNil(pr, "c") != 3.3 {
 		t.Fatal("Property registry failed for int")
 	}
 	err = pr.registerStaticProperty("d", true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pr.propertyValue("d") != true {
+	if propertyValueOrNil(pr, "d") != true {
 		t.Fatal("Property registry failed for bool")
 	}
 }
@@ -49,21 +58,21 @@ func TestPropertyRegistrySetInvalid(t *testing.T) {
 	if err == nil {
 		t.Fatal("Allowed type mismatch")
 	}
-	if pr.propertyValue("a") != nil {
+	if propertyValueOrNil(pr, "a") != nil {
 		t.Fatal("Property registry allowed invalid")
 	}
 	err = pr.registerStaticProperty("b", []string{}) // invalid type
 	if err == nil {
 		t.Fatal("Allowed invalid type")
 	}
-	if pr.propertyValue("b") != nil {
+	if propertyValueOrNil(pr, "b") != nil {
 		t.Fatal("Property registry allowed invalid")
 	}
 	err = pr.registerStaticProperty("c", 3.3) // unexpected key
 	if err == nil {
 		t.Fatal("Allowed unexpected key")
 	}
-	if pr.propertyValue("c") != nil {
+	if propertyValueOrNil(pr, "c") != nil {
 		t.Fatal("Property registry allowed invalid")
 	}
 }
@@ -148,7 +157,7 @@ func TestPropertyRegistryVersionNumberComponent(t *testing.T) {
 	if err := pr.registerStaticProperty("os_version", "1.2.3"); err != nil {
 		t.Fatal("Valid version number failed to save")
 	}
-	if pr.propertyValue("os_version") != "1.2.3" {
+	if propertyValueOrNil(pr, "os_version") != "1.2.3" {
 		t.Fatal("Valid version number failed to save")
 	}
 	if r, err := pr.evaluateCondition(testHelperNewCondition("versionNumberComponent(os_version, 0) == 1", t)); err != nil || !r {
@@ -171,7 +180,7 @@ func TestPropertyRegistryVersionNumberComponent(t *testing.T) {
 	if err := pr.registerStaticProperty("app_version", "1.b.3"); err != nil {
 		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
 	}
-	if pr.propertyValue("app_version") != "1.b.3" {
+	if propertyValueOrNil(pr, "app_version") != "1.b.3" {
 		t.Fatal("Invalid version number failed to save. Should still save as string for exact comparison")
 	}
 	if r, err := pr.evaluateCondition(testHelperNewCondition("versionNumberComponent(app_version, 0) == nil", t)); err != nil || !r {
@@ -207,13 +216,13 @@ func TestDynamicProperties(t *testing.T) {
 
 	dp := testPropertyProvider{}
 	pr.registerLibPropertyProvider("a", &dp)
-	if pr.propertyValue("a").(int64) != 1 {
+	if propertyValueOrNil(pr, "a").(int64) != 1 {
 		t.Fatal("dynamic property doesn't work")
 	}
-	if pr.propertyValue("a").(int64) != 2 {
+	if propertyValueOrNil(pr, "a").(int64) != 2 {
 		t.Fatal("dynamic property not dynamic")
 	}
-	if pr.propertyValue("a").(int64) != 3 {
+	if propertyValueOrNil(pr, "a").(int64) != 3 {
 		t.Fatal("dynamic property not dynamic")
 	}
 }
@@ -229,10 +238,10 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 
 	pr.registerStaticProperty("app_version", "hello")
 	pr.registerStaticProperty("screen_width_pixels", 42)
-	if pr.propertyValue("app_version") != "hello" {
+	if propertyValueOrNil(pr, "app_version") != "hello" {
 		t.Fatal("property not set")
 	}
-	if pr.propertyValue("screen_width_pixels") != 42 {
+	if propertyValueOrNil(pr, "screen_width_pixels") != 42 {
 		t.Fatal("property not set")
 	}
 
@@ -303,6 +312,7 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 		t.Fatal("true condition for allowed missing var failed")
 	}
 
+	// Failing, used to be nil. Not not nil
 	result, err = pr.evaluateCondition(testHelperNewCondition("os_version ?? false", t))
 	if err != nil || result {
 		t.Fatal("nil condition did not eval to false")
@@ -320,12 +330,12 @@ func TestDateFunctionsInConditions(t *testing.T) {
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	// time library created
-	result, err := pr.evaluateCondition(testHelperNewCondition("now() < 1688764455000", t))
+	result, err := pr.evaluateCondition(testHelperNewCondition("cmnow() < 1688764455000", t))
 	if err != nil || result {
 		t.Fatal("back to the future isn't real: now() gave incorrect time")
 	}
 	// time in 2050
-	result, err = pr.evaluateCondition(testHelperNewCondition("now() > 2540841255000", t))
+	result, err = pr.evaluateCondition(testHelperNewCondition("cmnow() > 2540841255000", t))
 	if err != nil || result {
 		t.Fatal("back to the future 2 isn't real: now() gave incorrect time")
 	}
@@ -387,5 +397,100 @@ func TestUnknownVarsInConditions(t *testing.T) {
 	}
 	if result != false {
 		t.Fatal("failed to return false for error")
+	}
+
+	c, err = datamodel.NewCondition("unknownFunction() == nil")
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err = pr.evaluateCondition(c)
+	if err != nil || !result {
+		t.Fatal("unknown function didn't return nil")
+	}
+}
+
+func TestDynamicMethods(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.requiredPropertyTypes = map[string]reflect.Kind{
+		"platform": reflect.String,
+	}
+	pr.registerStaticProperty("platform", "ios")
+	pr.RegisterDynamicFunctions(map[string]*datamodel.ConditionDynamicFunction{
+		"testFunc": {
+			Function: func(params ...any) (any, error) {
+				if len(params) != 1 {
+					return nil, errors.New("eventCount requires one parameter")
+				}
+				_, ok := params[0].(string)
+				if !ok {
+					return nil, errors.New("eventCount requires a string parameter")
+				}
+				return 99, nil
+			},
+			Types: []any{new(func(string) int)},
+		},
+		"isNintyNine": {
+			Function: func(params ...any) (any, error) {
+				v, ok := params[0].(int)
+				if !ok {
+					return nil, errors.New("notZero requires an int parameter")
+				}
+				return v != 0, nil
+			},
+			Types: []any{new(func(int) bool)},
+		},
+	})
+
+	// Check we a method that doesn't exist returns nil
+	result, err := pr.evaluateCondition(testHelperNewCondition("notRealFunc('test') == nil", t))
+	if err != nil || !result {
+		t.Fatal("Invalid method didn't return nil")
+	}
+
+	// Check mixing methods that exist and don't exist
+	result, err = pr.evaluateCondition(testHelperNewCondition("notRealFunc('test') == nil && testFunc('asfd') == 99", t))
+	if err != nil || !result {
+		t.Fatal("Invalid method didn't return nil")
+	}
+
+	// Check we can't call a method with the wrong number of params
+	result, err = pr.evaluateCondition(testHelperNewCondition("testFunc() == 99", t))
+	if err == nil || result {
+		t.Fatal("Allowed invalid method")
+	}
+	result, err = pr.evaluateCondition(testHelperNewCondition("testFunc('test', 'test') == 99", t))
+	if err == nil || result {
+		t.Fatal("Allowed invalid method")
+	}
+
+	// Check we can't call a method with the wrong param type
+	result, err = pr.evaluateCondition(testHelperNewCondition("testFunc(1) == 99", t))
+	if err == nil || result {
+		t.Fatal("Allowed invalid method")
+	}
+
+	// Check we can call a method with the right number of params
+	result, err = pr.evaluateCondition(testHelperNewCondition("testFunc('test') == 99", t))
+	if err != nil || !result {
+		t.Fatal("Failed to call method")
+	}
+
+	// Check we can call a method with a property
+	result, err = pr.evaluateCondition(testHelperNewCondition("testFunc(platform) == 99", t))
+	if err != nil || !result {
+		t.Fatal("Failed to call method")
+	}
+
+	// Check we a method and vars that don't exist, right up to last charater to check string parsing
+	result, err = pr.evaluateCondition(testHelperNewCondition("notRealFunc('test') == nil && notRealFunc2 == nil && nil == notRealEnd", t))
+	if err != nil || !result {
+		t.Fatal("Invalid method/vars didn't return nil")
+	}
+
+	// Check we can chain methods and properties
+	result, err = pr.evaluateCondition(testHelperNewCondition("isNintyNine(testFunc(platform))", t))
+	if err != nil || !result {
+		t.Fatal("Failed to call method chain")
 	}
 }

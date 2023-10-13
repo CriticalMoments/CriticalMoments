@@ -189,6 +189,8 @@
 - (void)testSendEventBeforeStart {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
 
+    NSString *randEventName = [NSString stringWithFormat:@"event_%d", arc4random()];
+
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     // Inverted means we check that we don't run before we start, and queue works
@@ -224,7 +226,7 @@
     // tracks that sends event after we start
     XCTestExpectation *expectationSuccess2 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectationSuccess2];
-    [cm sendEvent:DatamodelSignedInEvent
+    [cm sendEvent:randEventName
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@2];
@@ -255,6 +257,18 @@
     XCTAssert([@1 isEqualToNumber:orderRan.firstObject], @"ran out of order");
     XCTAssert([@2 isEqualToNumber:orderRan[1]], @"ran out of order");
     XCTAssert([@3 isEqualToNumber:orderRan[2]], @"ran out of order");
+
+    XCTestExpectation *expectCount = [[XCTestExpectation alloc] init];
+    // Test a condition counting events
+    NSString *testCondition = [NSString stringWithFormat:@"eventCount('%@') == 1", randEventName];
+    [cm checkNamedCondition:@"testCondition"
+                  condition:testCondition
+                    handler:^(bool result, NSError *_Nullable error) {
+                      if (result && !error) {
+                          [expectCount fulfill];
+                      }
+                    }];
+    [self waitForExpectations:@[ expectCount ] timeout:5.0];
 }
 
 - (void)testPerformActionBeforeStart {
@@ -352,4 +366,5 @@
     // Both should have run, and returned correct results
     [self waitForExpectations:expectations timeout:5.0];
 }
+
 @end
