@@ -165,9 +165,9 @@ func TestValidateProps(t *testing.T) {
 	if err != nil {
 		t.Fatal("Allowed function failed validation")
 	}
-	err = validateTestHelper("seconds(1) > seconds(2)")
+	err = validateTestHelper("date('2023-01-01') > unixTimeSeconds(1672531200) && RFC3339 == '2023-01-01T00:00:00Z'")
 	if err != nil {
-		t.Fatal("Allowed function failed validation")
+		t.Fatal("Allowed function and constants failed validation")
 	}
 }
 

@@ -330,40 +330,40 @@ func TestDateFunctionsInConditions(t *testing.T) {
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	// time library created
-	result, err := pr.evaluateCondition(testHelperNewCondition("cmnow() < 1688764455000", t))
+	result, err := pr.evaluateCondition(testHelperNewCondition("now() < unixTimeMilliseconds(1688764455000)", t))
 	if err != nil || result {
 		t.Fatal("back to the future isn't real: now() gave incorrect time")
 	}
 	// time in 2050
-	result, err = pr.evaluateCondition(testHelperNewCondition("cmnow() > 2540841255000", t))
+	result, err = pr.evaluateCondition(testHelperNewCondition("now() > unixTimeMilliseconds(2540841255000)", t))
 	if err != nil || result {
 		t.Fatal("back to the future 2 isn't real: now() gave incorrect time")
 	}
 
 	verifyDurationCondition := testHelperNewCondition(`
-		(seconds(1) == 1000) && 
-		(seconds(9) == 9000) &&
-		(minutes(1) == seconds(60)) &&
-		(minutes(2) == 120000) &&
-		(hours(1) == minutes(60)) &&
-		(hours(2) == 7200000) &&
-		(days(1) == hours(24)) &&
-		(days(2) == 172800000)
+		(duration('2s') == 2 * duration('1s')) &&
+		(duration('1m') == 60 * duration('1s')) &&
+		(duration('1h') == 60 * duration('1m'))
 	`, t)
 	result, err = pr.evaluateCondition(verifyDurationCondition)
 	if err != nil || !result {
 		t.Fatal("Duration functions failed e2e test")
 	}
 
-	// Verify parseDate function is wired up properly. Actual testing of the
-	// function is in date_functions_test.go
-	result, err = pr.evaluateCondition(testHelperNewCondition("parseDate('2006-01-02T15:04:05.9997+07:00') == 1136189045999", t))
+	// Verify parseDate function is wired up properly.
+	result, err = pr.evaluateCondition(testHelperNewCondition("date('2006-01-02T15:04:05.999+07:00', RFC3339) == unixTimeMilliseconds(1136189045999)", t))
 	if err != nil || !result {
-		t.Fatal("parseDate did not work inside a condition")
+		t.Fatal("date() did not work inside a condition")
+	}
+
+	// Verify RFC3339Nano also works without the subsecond component
+	result, err = pr.evaluateCondition(testHelperNewCondition("date('2006-01-02T15:04:05+07:00', RFC3339) == unixTimeSeconds(1136189045)", t))
+	if err != nil || !result {
+		t.Fatal("date() did not work inside a condition")
 	}
 
 	// Check invalid returns errors though the stack
-	result, err = pr.evaluateCondition(testHelperNewCondition("parseDate('invalid') == 1136189045999", t))
+	result, err = pr.evaluateCondition(testHelperNewCondition("date('invalid') == unixTimeMilliseconds(1136189045999)", t))
 	if err == nil || result {
 		t.Fatal("invalid date didn't error", err)
 	}

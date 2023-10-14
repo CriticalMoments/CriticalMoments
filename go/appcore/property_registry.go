@@ -18,6 +18,7 @@ type propertyRegistry struct {
 	dynamicFunctionNames   []string
 	dynamicFunctionOps     []expr.Option
 	mapFunctions           map[string]interface{}
+	mapConstants           map[string]interface{}
 }
 
 func newPropertyRegistry() *propertyRegistry {
@@ -30,7 +31,8 @@ func newPropertyRegistry() *propertyRegistry {
 	}
 
 	// register static/map functions
-	pr.mapFunctions = datamodel.ConditionEnvWithHelpers()
+	pr.mapFunctions = datamodel.StaticConditionHelperFunctions()
+	pr.mapConstants = datamodel.StaticConditionConstantProperties()
 
 	return pr
 }
@@ -169,7 +171,10 @@ func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (re
 		return false, err
 	}
 
-	// Add all the static functions to the envidonment map
+	// Add all the static constants to the environment map
+	maps.Copy(envMap, p.mapConstants)
+
+	// Add all the static functions to the environment map
 	maps.Copy(envMap, p.mapFunctions)
 
 	// Build nil function handlers for any missing functions (backwards compatibility)

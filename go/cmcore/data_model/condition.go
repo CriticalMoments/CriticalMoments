@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/antonmedv/expr"
@@ -89,19 +90,30 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 	}
 }
 
-func ConditionEnvWithHelpers() map[string]interface{} {
+func StaticConditionHelperFunctions() map[string]interface{} {
 	return map[string]interface{}{
 		"versionNumberComponent": conditions.VersionNumberComponent,
 		"versionGreaterThan":     conditions.VersionGreaterThan,
 		"versionLessThan":        conditions.VersionLessThan,
 		"versionEqual":           conditions.VersionEqual,
-		// TODO: temp name. expr added "now" so this avoids a conflict
-		"cmnow":     conditions.Now,
-		"seconds":   conditions.Seconds,
-		"minutes":   conditions.Minutes,
-		"hours":     conditions.Hours,
-		"days":      conditions.Days,
-		"parseDate": conditions.ParseDatetime,
+
+		"unixTimeNanoseconds":  conditions.UnixTimeNanoseconds,
+		"unixTimeMilliseconds": conditions.UnixTimeMilliseconds,
+		"unixTimeSeconds":      conditions.UnixTimeSeconds,
+	}
+}
+
+func StaticConditionConstantProperties() map[string]interface{} {
+	return map[string]interface{}{
+		"RFC3339":              time.RFC3339Nano,
+		"RFC822":               time.RFC822,
+		"RFC850":               time.RFC850,
+		"RFC1123":              time.RFC1123,
+		"RFC822Z":              time.RFC822Z,
+		"RFC1123Z":             time.RFC1123Z,
+		"date_with_tz_format":  conditions.DateWithTzFormat,
+		"date_and_time_format": conditions.DateAndTimeFormat,
+		"date_formant":         conditions.DateFormat,
 	}
 }
 
@@ -205,6 +217,9 @@ func (c *Condition) Validate() error {
 		allValidVariables := make(map[string]reflect.Kind)
 		maps.Copy(allValidVariables, RequiredPropertyTypes())
 		maps.Copy(allValidVariables, WellKnownPropertyTypes())
+		for k, v := range StaticConditionConstantProperties() {
+			allValidVariables[k] = reflect.TypeOf(v).Kind()
+		}
 
 		for _, varName := range fields.Variables {
 			if _, ok := allValidVariables[varName]; !ok {
@@ -215,7 +230,7 @@ func (c *Condition) Validate() error {
 		// Check we support all methods used if strict parsing
 		for _, methodName := range fields.Methods {
 			if _, ok := AllBuiltInDynamicFunctions[methodName]; !ok {
-				if _, ok := ConditionEnvWithHelpers()[methodName]; !ok {
+				if _, ok := StaticConditionHelperFunctions()[methodName]; !ok {
 					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
 				}
 			}
