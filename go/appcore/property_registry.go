@@ -148,7 +148,15 @@ func (p *propertyRegistry) allFunctionNamesRegistered() []string {
 	return functions
 }
 
-func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (bool, error) {
+func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (returnResult bool, returnErr error) {
+	// expr can panic, so catch it and return an error instead
+	defer func() {
+		if r := recover(); r != nil {
+			returnResult = false
+			returnErr = fmt.Errorf("panic in evaluateCondition: %v", r)
+		}
+	}()
+
 	// Parse the condition, extract variable and method names
 	fields, err := condition.ExtractIdentifiers()
 	if err != nil {

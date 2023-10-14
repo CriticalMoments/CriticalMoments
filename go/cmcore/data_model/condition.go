@@ -146,7 +146,15 @@ func (v *conditionWalker) Visit(n *ast.Node) {
 	}
 }
 
-func (c *Condition) ExtractIdentifiers() (*ConditionFields, error) {
+func (c *Condition) ExtractIdentifiers() (returnFields *ConditionFields, returnError error) {
+	// expr can panic, so catch it and return an error instead
+	defer func() {
+		if r := recover(); r != nil {
+			returnFields = nil
+			returnError = fmt.Errorf("panic in ExtractIdentifiers: %v", r)
+		}
+	}()
+
 	// single line needed because we use the location offset
 	singleLineCondition := strings.ReplaceAll(c.conditionString, "\n", " ")
 	tree, err := parser.Parse(singleLineCondition)
@@ -218,7 +226,15 @@ func (c *Condition) Validate() error {
 	return nil
 }
 
-func (c *Condition) CompileWithEnv(ops ...expr.Option) (*vm.Program, error) {
+func (c *Condition) CompileWithEnv(ops ...expr.Option) (resultProgram *vm.Program, returnError error) {
+	// expr can panic, so catch it and return an error instead
+	defer func() {
+		if r := recover(); r != nil {
+			resultProgram = nil
+			returnError = fmt.Errorf("panic in CompileWithEnv: %v", r)
+		}
+	}()
+
 	allOptions := append(ops, expr.AsBool())
 
 	return expr.Compile(c.conditionString, allOptions...)
