@@ -4,6 +4,8 @@
 
 **/.DS_Store
 
+.vscode
+
 ## START .gitignore from swift project setup
 
 .DS_Store
