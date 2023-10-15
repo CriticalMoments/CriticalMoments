@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        working-directory: 'go'
     - uses: actions/setup-go@v4
       with:
         go-version-file: 'go/go.mod'
