@@ -136,7 +136,7 @@ func (c *cache) fetchAndCache(url string, fileName string) (cachedFile string, e
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return "", errors.New("Failed to fetch config file")
+		return "", errors.New("failed to fetch config file")
 	}
 
 	cacheFileName := fileName + configFileSuffix
@@ -176,7 +176,7 @@ func (c *cache) fetchAndCache(url string, fileName string) (cachedFile string, e
 		return "", err
 	}
 	if cacheFileFullPath == "" {
-		return "", errors.New("Unknown issue caching config file")
+		return "", errors.New("unknown issue caching config file")
 	}
 
 	return cacheFileFullPath, nil

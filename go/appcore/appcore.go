@@ -57,7 +57,7 @@ const httpsPrefix = "https://"
 
 func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	if !strings.HasPrefix(configUrl, filePrefix) && !strings.HasPrefix(configUrl, httpsPrefix) {
-		return errors.New("Config URL must start with https:// or file://")
+		return errors.New("config URL must start with https:// or file://")
 	}
 	ac.configUrlString = configUrl
 
@@ -67,13 +67,13 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
 	key, err := signing.ParseApiKey(apiKey)
 	if err != nil {
-		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+		return errors.New("invalid API Key. Please make sure you get your key from criticalmoments.io")
 	}
 	if v, err := key.Valid(); err != nil || !v {
-		return errors.New("Invalid API Key. Please make sure you get your key from criticalmoments.io")
+		return errors.New("invalid API Key. Please make sure you get your key from criticalmoments.io")
 	}
 	if key.BundleId() != bundleID {
-		return errors.New(fmt.Sprintf("This API key isn't valid for this app. API key is for %s, but this app has bundle ID %s", key.BundleId(), bundleID))
+		return fmt.Errorf("this API key isn't valid for this app. API key is for %s, but this app has bundle ID %s", key.BundleId(), bundleID)
 	}
 	ac.apiKey = key
 	return nil
@@ -116,7 +116,7 @@ func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString str
 	if priorSeen == "" {
 		ac.seenNamedConditions[name] = conditionString
 	} else if priorSeen != conditionString {
-		return errors.New(fmt.Sprintf("The named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition.", name, priorSeen, conditionString))
+		return fmt.Errorf("the named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition", name, priorSeen, conditionString)
 	}
 	return nil
 }
@@ -150,20 +150,20 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 
 func (ac *Appcore) Start() error {
 	if ac.started {
-		return errors.New("Appcore already started. Start should only be called once")
+		return errors.New("appcore already started. Start should only be called once")
 	}
 
 	if ac.apiKey == nil {
-		return errors.New("An API Key must be provided before starting critical moments")
+		return errors.New("an API Key must be provided before starting critical moments")
 	}
 	if ac.configUrlString == "" {
-		return errors.New("A config URL must be provided before starting critical moments")
+		return errors.New("a config URL must be provided before starting critical moments")
 	}
 	if ac.libBindings == nil {
-		return errors.New("The SDK must register LibBindings before calling start")
+		return errors.New("the SDK must register LibBindings before calling start")
 	}
 	if ac.cache == nil {
-		return errors.New("The SDK must register a cache directory before calling start")
+		return errors.New("the SDK must register a cache directory before calling start")
 	}
 	if err := ac.propertyRegistry.validateProperties(); err != nil {
 		return err
@@ -223,7 +223,7 @@ func (ac *Appcore) SendEvent(name string) error {
 
 	event, err := datamodel.NewEventWithName(name)
 	if err != nil {
-		return errors.New(fmt.Sprintf("SendEvent error for \"%v\"", name))
+		return fmt.Errorf("SendEvent error for \"%v\"", name)
 	}
 
 	err = ac.eventManager.SendEvent(event)
@@ -238,7 +238,7 @@ func (ac *Appcore) SendEvent(name string) error {
 		err := ac.PerformAction(&action)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = errors.New(fmt.Sprintf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v\n", name, err))
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", name, err)
 		}
 	}
 	return lastErr
@@ -250,7 +250,7 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 	}
 	action := ac.config.ActionWithName(actionName)
 	if action == nil {
-		return errors.New(fmt.Sprintf("No action found named %v", actionName))
+		return fmt.Errorf("no action found named %v", actionName)
 	}
 	return ac.PerformAction(action)
 }

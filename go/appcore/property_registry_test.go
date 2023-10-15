@@ -2,7 +2,6 @@ package appcore
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"testing"
 	"unsafe"
@@ -120,7 +119,7 @@ func TestPropertyRegistryValidateWellKnown(t *testing.T) {
 func testHelperNewCondition(s string, t *testing.T) *datamodel.Condition {
 	c, err := datamodel.NewCondition(s)
 	if err != nil {
-		t.Fatal(fmt.Sprintf("Condition in test is not valid %v", s))
+		t.Fatalf("Condition in test is not valid %v", s)
 	}
 	return c
 }
@@ -287,12 +286,12 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	cf := v.FieldByName("conditionString")
 	cf = reflect.NewAt(cf.Type(), unsafe.Pointer(cf.UnsafeAddr())).Elem()
 	cf.SetString("")
-	result, e := pr.evaluateCondition(con)
-	if e == nil || result {
+	result, err = pr.evaluateCondition(con)
+	if err == nil || result {
 		t.Fatal("Allowed empty condition")
 	}
 	cf.SetString("app_version ^#$%")
-	result, e = pr.evaluateCondition(con)
+	result, err = pr.evaluateCondition(con)
 	if err == nil || result {
 		t.Fatal("Allowed invalid condition")
 	}

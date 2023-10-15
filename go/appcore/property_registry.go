@@ -65,7 +65,7 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 
 	expectedType := pr.expectedTypeForKey(key)
 	if expectedType == reflect.Invalid {
-		return errors.New("Invalid property registered. Properties must be required or well known. Arbitrary properties are not allowed.")
+		return errors.New("invalid property registered. Properties must be required or well known. Arbitrary properties are not allowed")
 	}
 
 	validTypes := []reflect.Kind{reflect.Bool, reflect.String, reflect.Int, reflect.Float64}
@@ -93,7 +93,7 @@ func (p *propertyRegistry) registerLibPropertyProvider(key string, dpp LibProper
 	return p.addProviderForKey(key, &dw)
 }
 
-var errPropertyNotFound = errors.New("Property not found")
+var errPropertyNotFound = errors.New("property not found")
 
 func (p *propertyRegistry) propertyValue(key string) (interface{}, error) {
 	v, ok := p.providers[key]
@@ -227,13 +227,13 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	provider, ok := p.providers[propName]
 
 	if !ok && !allowMissing {
-		return errors.New(fmt.Sprintf("Missing required property: %v", propName))
+		return fmt.Errorf("missing required property: %v", propName)
 	}
 	if !ok && allowMissing {
 		return nil
 	}
 	if provider.Kind() != expectedKind {
-		return errors.New(fmt.Sprintf("Property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String()))
+		return fmt.Errorf("property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String())
 	}
 	return nil
 }
