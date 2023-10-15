@@ -11,6 +11,10 @@ jobs:
       with:
         go-version-file: 'go/go.mod'
         cache-dependency-path: go/go.sum
+    - uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        working-directory: 'go'
+        install-go: false
 
     - name: Golang vet
       run: cd go && go vet ./... && cd ..
