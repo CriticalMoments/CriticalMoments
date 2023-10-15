@@ -70,6 +70,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"cm_version":              reflect.String,
 		"foreground":              reflect.Bool,
 		"app_install_date":        reflect.Int,
+		"timezone_gmt_offset":     reflect.Int,
 	}
 }
 

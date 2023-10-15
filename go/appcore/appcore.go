@@ -102,6 +102,8 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
 	tz := time.FixedZone(tzName, gmtOffset)
 	time.Local = tz
+
+	ac.propertyRegistry.registerStaticProperty("timezone_gmt_offset", gmtOffset)
 }
 
 func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
