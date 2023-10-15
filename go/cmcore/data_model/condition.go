@@ -100,6 +100,10 @@ func StaticConditionHelperFunctions() map[string]interface{} {
 		"unixTimeNanoseconds":  conditions.UnixTimeNanoseconds,
 		"unixTimeMilliseconds": conditions.UnixTimeMilliseconds,
 		"unixTimeSeconds":      conditions.UnixTimeSeconds,
+
+		"rand":        conditions.Random,
+		"sessionRand": conditions.SessionRandom,
+		"randForKey":  conditions.RandomForKey,
 	}
 }
 

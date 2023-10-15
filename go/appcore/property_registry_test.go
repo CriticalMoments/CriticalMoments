@@ -494,3 +494,24 @@ func TestDynamicMethods(t *testing.T) {
 		t.Fatal("Failed to call method chain")
 	}
 }
+
+func TestRandomInConditions(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+
+	result, err := pr.evaluateCondition(testHelperNewCondition("rand() >= 0 && rand() <= 2^63 && rand() != rand()", t))
+	if err != nil || !result {
+		t.Fatal("random generation not in range or is stable (not random)")
+	}
+
+	result, err = pr.evaluateCondition(testHelperNewCondition("sessionRand() >= 0 && sessionRand() <= 2^63 && sessionRand() == sessionRand()", t))
+	if err != nil || !result {
+		t.Fatal("session random generation not in range, or changing")
+	}
+
+	result, err = pr.evaluateCondition(testHelperNewCondition("randForKey('key1', 1) == 292785326893130985 && randForKey('x', sessionRand()) >= 0", t))
+	if err != nil || !result {
+		t.Fatal("randForKey not stable, or can't be seeded with sessionRand")
+	}
+}
