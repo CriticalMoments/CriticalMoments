@@ -108,7 +108,7 @@ func TestApiKeyParsing(t *testing.T) {
 
 	// unsigned key
 	k, err = ParseApiKey("CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==")
-	if err == nil {
+	if err == nil || k != nil {
 		t.Fatal(err)
 	}
 
@@ -120,13 +120,13 @@ func TestApiKeyParsing(t *testing.T) {
 
 	// missing bundle ID (but another valid prop)
 	k, err = ParseApiKey("CM1-eDppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MD0CHQDSQjQuYPtfG9xRn1KvVQOI3zMRJu/YCZ1XoaLVAhwEzgxjn8ysier97gZjW0+JR9g9yGbiSVPNxcUY")
-	if err == nil {
+	if err == nil || k != nil {
 		t.Fatal("API Key missing bundle ID passed")
 	}
 
 	// no props
 	k, err = ParseApiKey("CM1-Yjo=-MD0CHQC/sbrxCs5VI/NL86juc1SJpyJkZrhuCAOXn/ObAhwocvTYZF84qu/0rBu0+y1fJFkOfsEpM1YiDmQj")
-	if err == nil {
+	if err == nil || k != nil {
 		t.Fatal("API Key missing all props")
 	}
 
@@ -138,7 +138,7 @@ func TestApiKeyParsing(t *testing.T) {
 
 	// empty key
 	k, err = ParseApiKey("")
-	if err == nil {
+	if err == nil || k != nil {
 		t.Fatal("Empty key passes")
 	}
 }

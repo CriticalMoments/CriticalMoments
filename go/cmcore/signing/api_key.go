@@ -57,11 +57,11 @@ func NewSignedApiKey(bundleId string) (*ApiKey, error) {
 
 func NewSignedApiKeyWithSigner(bundleId string, u *SignUtil) (*ApiKey, error) {
 	if bundleId == "" {
-		return nil, errors.New("Bundle ID required")
+		return nil, errors.New("bundle ID required")
 	}
 
 	if u.privateKey == nil {
-		return nil, errors.New("Can't create new API keys without a private key")
+		return nil, errors.New("can not create new API keys without a private key")
 	}
 
 	key := ApiKey{
@@ -104,7 +104,7 @@ func ParseApiKey(s string) (*ApiKey, error) {
 	// Signed Portion is everything before last separator
 	i := strings.LastIndex(s, apiSeparator)
 	if i <= 0 {
-		return nil, errors.New("Invalid API Key")
+		return nil, errors.New("invalid API Key")
 	}
 	sp := s[:i]
 
@@ -120,11 +120,11 @@ func ParseApiKey(s string) (*ApiKey, error) {
 
 func parseVersionNumber(s string) (int, error) {
 	if strings.Index(s, apiPrefix) != 0 {
-		return -1, errors.New("All API keys should start with CM")
+		return -1, errors.New("all API keys should start with CM")
 	}
 	i := strings.Index(s, apiSeparator)
 	if i < len(apiPrefix)+1 {
-		return -1, errors.New("No version number or invalid format")
+		return -1, errors.New("no version number or invalid format")
 	}
 	versionString := s[len(apiPrefix):i]
 	v, err := strconv.Atoi(versionString)
@@ -147,7 +147,7 @@ func parseProperties(s string) (map[string]string, error) {
 	propStart := strings.Index(s, apiSeparator)
 	propEnd := strings.LastIndex(s, apiSeparator)
 	if propStart <= 0 || propEnd <= propStart {
-		return nil, errors.New("Invalid API key format")
+		return nil, errors.New("invalid API key format")
 	}
 
 	values := map[string]string{}
@@ -155,17 +155,17 @@ func parseProperties(s string) (map[string]string, error) {
 	for _, rawProp := range strings.Split(propsSection, apiSeparator) {
 		propBytes, err := base64.StdEncoding.DecodeString(rawProp)
 		if err != nil {
-			return nil, errors.New("Invalid API key format")
+			return nil, errors.New("invalid API key format")
 		}
 		decodedProp := string(propBytes)
 		pi := strings.Index(decodedProp, propertyKeyDelimiter)
 		if pi <= 0 {
-			return nil, errors.New("Invalid API key format")
+			return nil, errors.New("invalid API key format")
 		}
 		key := decodedProp[:pi]
 		value := decodedProp[pi+1:]
 		if key == "" || value == "" {
-			return nil, errors.New("Invalid API Key Prop")
+			return nil, errors.New("invalid API Key Prop")
 		}
 		values[key] = value
 	}
@@ -182,7 +182,7 @@ func (k *ApiKey) buildNewKeySignedPortion() string {
 	// Make prop order deterministic.
 	// Doesn't tecnhically need to be, but will save confusion
 	propKeys := make([]string, 0)
-	for k, _ := range k.props {
+	for k := range k.props {
 		propKeys = append(propKeys, k)
 	}
 	sort.Strings(propKeys)

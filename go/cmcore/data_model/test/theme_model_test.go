@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -149,7 +148,7 @@ func TestJsonParsingInvalid(t *testing.T) {
 }
 
 func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
-	files, err := ioutil.ReadDir(basePath)
+	files, err := os.ReadDir(basePath)
 	if err != nil {
 		t.Fatal()
 	}

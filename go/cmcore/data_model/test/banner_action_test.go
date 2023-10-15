@@ -2,7 +2,6 @@ package testing
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -39,7 +38,7 @@ func TestInvalidBannerMissingField(t *testing.T) {
 
 func TestJsonParsingInvalidBanners(t *testing.T) {
 	basePath := "./testdata/actions/banner/invalid"
-	files, err := ioutil.ReadDir(basePath)
+	files, err := os.ReadDir(basePath)
 	if err != nil {
 		t.Fatal()
 	}

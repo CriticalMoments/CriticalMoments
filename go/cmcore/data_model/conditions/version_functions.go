@@ -14,7 +14,7 @@ type versionNumber struct {
 
 func versionFromVersionString(s string) (*versionNumber, error) {
 	if s == "" {
-		return nil, errors.New("Invalid version: empty string")
+		return nil, errors.New("invalid version: empty string")
 	}
 
 	// trim leading "v" if it exists
@@ -31,7 +31,7 @@ func versionFromVersionString(s string) (*versionNumber, error) {
 	}
 
 	if s == "" {
-		return nil, errors.New("Invalid version number")
+		return nil, errors.New("invalid version number")
 	}
 
 	// Parse string in format "16.4.1" to get each components
@@ -40,7 +40,7 @@ func versionFromVersionString(s string) (*versionNumber, error) {
 	for i, component := range components {
 		intComponent, err := strconv.Atoi(component)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid version component: %v", component)
+			return nil, fmt.Errorf("invalid version component: %v", component)
 		}
 		intComponents[i] = intComponent
 	}

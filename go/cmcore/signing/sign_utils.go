@@ -113,7 +113,7 @@ func msgHash(msg []byte) ([]byte, error) {
 
 func (u *SignUtil) SignMessage(msg []byte) (string, error) {
 	if u.privateKey == nil {
-		return "", errors.New("Can't sign a message without a private key")
+		return "", errors.New("can not sign a message without a private key")
 	}
 
 	msgHashRaw, err := msgHash(msg)
