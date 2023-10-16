@@ -2,6 +2,7 @@ package appcore
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -22,6 +23,10 @@ func (s *staticPropertyProvider) Value() interface{} {
 func (s *staticPropertyProvider) Kind() reflect.Kind {
 	return reflect.TypeOf(s.value).Kind()
 }
+
+const LibPropertyProviderNilStringValue = "io.criticalmoments.libpropertyprovider.nilstringvalue"
+const LibPropertyProviderNilFloatValue = -math.MaxFloat64
+const LibPropertyProviderNilIntValue = math.MinInt64
 
 // An interface libraries can implement to provide dynamic properties.
 // Not ideal interface in go, but gomobile won't map interface{}, reflect.Kind, or enum types
@@ -55,11 +60,23 @@ func (d *dynamicPropertyProviderWrapper) Value() interface{} {
 	case LibPropertyProviderTypeBool:
 		return d.propertyProvider.BoolValue()
 	case LibPropertyProviderTypeFloat:
-		return d.propertyProvider.FloatValue()
+		v := d.propertyProvider.FloatValue()
+		if v == LibPropertyProviderNilFloatValue {
+			return nil
+		}
+		return v
 	case LibPropertyProviderTypeInt:
-		return d.propertyProvider.IntValue()
+		v := d.propertyProvider.IntValue()
+		if v == LibPropertyProviderNilIntValue {
+			return nil
+		}
+		return v
 	case LibPropertyProviderTypeString:
-		return d.propertyProvider.StringValue()
+		v := d.propertyProvider.StringValue()
+		if v == LibPropertyProviderNilStringValue {
+			return nil
+		}
+		return v
 	}
 	fmt.Println("CriticalMoments: Invalid property type!")
 	return nil

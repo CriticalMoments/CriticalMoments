@@ -12,6 +12,7 @@
 #import "CMAudioPropertyProvider.h"
 #import "CMBatteryLevelPropertyProvider.h"
 #import "CMCallPropertyProvider.h"
+#import "CMLocationPropertyProvider.h"
 #import "CMMiscPropertyProviders.h"
 #import "CMNetworkingPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
@@ -186,6 +187,22 @@
     [self registerLibPropertyProvider:@"app_install_date" value:appInstallProvider];
     CMHasWatchPropertyProviders *hasWatchProvider = [[CMHasWatchPropertyProviders alloc] init];
     [self registerLibPropertyProvider:@"has_watch" value:hasWatchProvider];
+
+    // Location
+    CMLocationPermissionsPropertyProvider *lppp = [[CMLocationPermissionsPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_permission" value:lppp];
+    CMLocationPermissionDetailedPropertyProvider *lpdpp = [[CMLocationPermissionDetailedPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_permission_detailed" value:lpdpp];
+    CMLatitudePropertyProvider *latpp = [[CMLatitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_latitude" value:latpp];
+    CMLongitudePropertyProvider *longpp = [[CMLongitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_longitude" value:longpp];
+    CMCityPropertyProvider *citypp = [[CMCityPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_city" value:citypp];
+    CMRegionPropertyProvider *regionpp = [[CMRegionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_region" value:regionpp];
+    CMCountryPropertyProvider *countrypp = [[CMCountryPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_country" value:countrypp];
 }
 
 - (void)setUserInterfaceIdiom {
