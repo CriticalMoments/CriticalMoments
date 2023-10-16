@@ -56,7 +56,6 @@ static CMLocationCache *sharedInstance = nil;
     }
 
     // allow for 5 mins of staleness
-    // TODO document
     NSDate *now = [[NSDate alloc] init];
     if ([location.timestamp compare:[now dateByAddingTimeInterval:-5 * 60]] == NSOrderedDescending) {
         return location;
@@ -198,8 +197,7 @@ static CMLocationCache *sharedInstance = nil;
 - (double)floatValue {
     CLLocation *loc = [CMLocationCache.shared getLocationBlocking];
     if (!loc) {
-        // TODO how to return nil?
-        return 0.0;
+        return AppcoreLibPropertyProviderNilFloatValue;
     }
 
     return loc.coordinate.latitude;
@@ -216,8 +214,7 @@ static CMLocationCache *sharedInstance = nil;
 - (double)floatValue {
     CLLocation *loc = [CMLocationCache.shared getLocationBlocking];
     if (!loc) {
-        // TODO how to return nil?
-        return 0.0;
+        return AppcoreLibPropertyProviderNilFloatValue;
     }
 
     return loc.coordinate.longitude;
@@ -232,8 +229,11 @@ static CMLocationCache *sharedInstance = nil;
 @implementation CMCityPropertyProvider : CMBaseDynamicPropertyProvider
 
 - (NSString *)stringValue {
-    // TODO document cached until next app launch
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    if (!place.locality) {
+        // nils are replaced by empty strings in go, so pass nil placeholder
+        return AppcoreLibPropertyProviderNilStringValue;
+    }
     return place.locality;
 }
 
@@ -247,6 +247,10 @@ static CMLocationCache *sharedInstance = nil;
 
 - (NSString *)stringValue {
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    if (!place.administrativeArea) {
+        // nils are replaced by empty strings in go, so pass nil placeholder
+        return AppcoreLibPropertyProviderNilStringValue;
+    }
     return place.administrativeArea;
 }
 
@@ -260,6 +264,10 @@ static CMLocationCache *sharedInstance = nil;
 
 - (NSString *)stringValue {
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    if (!place.ISOcountryCode) {
+        // nils are replaced by empty strings in go, so pass nil placeholder
+        return AppcoreLibPropertyProviderNilStringValue;
+    }
     return place.ISOcountryCode;
 }
 
