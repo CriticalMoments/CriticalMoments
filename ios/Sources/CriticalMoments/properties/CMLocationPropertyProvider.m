@@ -13,6 +13,7 @@
 @property(nonatomic, strong) CLLocationManager *manager;
 @property(nonatomic, strong) dispatch_semaphore_t requestWait;
 @property(nonatomic, strong) NSDate *lastErrorTimestamp;
+@property(nonatomic, strong) CLPlacemark *reverseGeocodeResponse;
 @end
 
 @implementation CMLocationCache
@@ -112,6 +113,31 @@ static CMLocationCache *sharedInstance = nil;
     return [self getLocationFromCache];
 }
 
+- (CLPlacemark *)reverseGeocode {
+    // try cache before request
+    if (self.reverseGeocodeResponse) {
+        return self.reverseGeocodeResponse;
+    }
+
+    CLLocation *loc = [self getLocationBlocking];
+    if (!loc) {
+        return nil;
+    }
+
+    dispatch_semaphore_t geocodeWait = dispatch_semaphore_create(0);
+    CLGeocoder *g = [[CLGeocoder alloc] init];
+    [g reverseGeocodeLocation:loc
+            completionHandler:^(NSArray<CLPlacemark *> *_Nullable placemarks, NSError *_Nullable error) {
+              if (error == nil && placemarks.firstObject) {
+                  self.reverseGeocodeResponse = placemarks.firstObject;
+              }
+              dispatch_semaphore_signal(geocodeWait);
+            }];
+
+    dispatch_semaphore_wait(geocodeWait, dispatch_time(DISPATCH_TIME_NOW, 5.0 * NSEC_PER_SEC));
+    return self.reverseGeocodeResponse;
+}
+
 #pragma mark CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
@@ -199,6 +225,46 @@ static CMLocationCache *sharedInstance = nil;
 
 - (long)type {
     return AppcoreLibPropertyProviderTypeFloat;
+}
+
+@end
+
+@implementation CMCityPropertyProvider : CMBaseDynamicPropertyProvider
+
+- (NSString *)stringValue {
+    // TODO document cached until next app launch
+    CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    return place.locality;
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMRegionPropertyProvider : CMBaseDynamicPropertyProvider
+
+- (NSString *)stringValue {
+    CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    return place.administrativeArea;
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMCountryPropertyProvider : CMBaseDynamicPropertyProvider
+
+- (NSString *)stringValue {
+    CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
+    return place.ISOcountryCode;
+}
+
+- (long)type {
+    return AppcoreLibPropertyProviderTypeString;
 }
 
 @end

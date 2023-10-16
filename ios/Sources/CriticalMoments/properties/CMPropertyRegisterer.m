@@ -197,6 +197,12 @@
     [self registerLibPropertyProvider:@"location_latitude" value:latpp];
     CMLongitudePropertyProvider *longpp = [[CMLongitudePropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"location_longitude" value:longpp];
+    CMCityPropertyProvider *citypp = [[CMCityPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_city" value:citypp];
+    CMRegionPropertyProvider *regionpp = [[CMRegionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_region" value:regionpp];
+    CMCountryPropertyProvider *countrypp = [[CMCountryPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_country" value:countrypp];
 }
 
 - (void)setUserInterfaceIdiom {

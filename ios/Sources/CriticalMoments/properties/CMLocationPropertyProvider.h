@@ -21,4 +21,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMLongitudePropertyProvider : CMBaseDynamicPropertyProvider
 @end
 
+@interface CMCityPropertyProvider : CMBaseDynamicPropertyProvider
+@end
+
+@interface CMRegionPropertyProvider : CMBaseDynamicPropertyProvider
+@end
+
+@interface CMCountryPropertyProvider : CMBaseDynamicPropertyProvider
+@end
+
 NS_ASSUME_NONNULL_END

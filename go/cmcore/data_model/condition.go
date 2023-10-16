@@ -76,6 +76,9 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"location_permission_detailed": reflect.String,
 		"location_latitude":            reflect.Float64,
 		"location_longitude":           reflect.Float64,
+		"location_city":                reflect.String,
+		"location_region":              reflect.String,
+		"location_country":             reflect.String,
 	}
 }
 
