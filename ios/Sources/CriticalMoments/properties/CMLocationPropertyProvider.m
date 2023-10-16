@@ -194,13 +194,13 @@ static CMLocationCache *sharedInstance = nil;
 
 @implementation CMLatitudePropertyProvider
 
-- (double)floatValue {
+- (NSNumber *)nillableFloatValue {
     CLLocation *loc = [CMLocationCache.shared getLocationBlocking];
     if (!loc) {
-        return AppcoreLibPropertyProviderNilFloatValue;
+        return nil;
     }
 
-    return loc.coordinate.latitude;
+    return [NSNumber numberWithDouble:loc.coordinate.latitude];
 }
 
 - (long)type {
@@ -211,13 +211,13 @@ static CMLocationCache *sharedInstance = nil;
 
 @implementation CMLongitudePropertyProvider
 
-- (double)floatValue {
+- (NSNumber *)nillableFloatValue {
     CLLocation *loc = [CMLocationCache.shared getLocationBlocking];
     if (!loc) {
-        return AppcoreLibPropertyProviderNilFloatValue;
+        return nil;
     }
 
-    return loc.coordinate.longitude;
+    return [NSNumber numberWithDouble:loc.coordinate.longitude];
 }
 
 - (long)type {
@@ -226,14 +226,10 @@ static CMLocationCache *sharedInstance = nil;
 
 @end
 
-@implementation CMCityPropertyProvider : CMBaseDynamicPropertyProvider
+@implementation CMCityPropertyProvider
 
 - (NSString *)stringValue {
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
-    if (!place.locality) {
-        // nils are replaced by empty strings in go, so pass nil placeholder
-        return AppcoreLibPropertyProviderNilStringValue;
-    }
     return place.locality;
 }
 
@@ -243,14 +239,10 @@ static CMLocationCache *sharedInstance = nil;
 
 @end
 
-@implementation CMRegionPropertyProvider : CMBaseDynamicPropertyProvider
+@implementation CMRegionPropertyProvider
 
 - (NSString *)stringValue {
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
-    if (!place.administrativeArea) {
-        // nils are replaced by empty strings in go, so pass nil placeholder
-        return AppcoreLibPropertyProviderNilStringValue;
-    }
     return place.administrativeArea;
 }
 
@@ -260,14 +252,10 @@ static CMLocationCache *sharedInstance = nil;
 
 @end
 
-@implementation CMCountryPropertyProvider : CMBaseDynamicPropertyProvider
+@implementation CMCountryPropertyProvider
 
 - (NSString *)stringValue {
     CLPlacemark *place = [CMLocationCache.shared reverseGeocode];
-    if (!place.ISOcountryCode) {
-        // nils are replaced by empty strings in go, so pass nil placeholder
-        return AppcoreLibPropertyProviderNilStringValue;
-    }
     return place.ISOcountryCode;
 }
 

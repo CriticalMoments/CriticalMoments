@@ -9,13 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMBatteryLevelPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMBatteryLevelPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMBatteryStatePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMBatteryStatePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMLowPowerModePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLowPowerModePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
 NS_ASSUME_NONNULL_END

@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMCallPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMCallPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
 NS_ASSUME_NONNULL_END

@@ -76,9 +76,11 @@
     [self processError:error];
 }
 
-- (void)registerLibPropertyProvider:(NSString *)key value:(id<AppcoreLibPropertyProvider>)value {
+- (void)registerLibPropertyProvider:(NSString *)key value:(id<CMDynamicPropertyProvider>)value {
     NSError *error;
-    [_appcore registerLibPropertyProvider:key dpp:value error:&error];
+    // Wrap the CMDynamicPropertyProvider to implement the appcore interface
+    CMDynamicPropertyProviderWrapper *wrapper = [[CMDynamicPropertyProviderWrapper alloc] initWithPP:value];
+    [_appcore registerLibPropertyProvider:key dpp:wrapper error:&error];
     [self processError:error];
 }
 

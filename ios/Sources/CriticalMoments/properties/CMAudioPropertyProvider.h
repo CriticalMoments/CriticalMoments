@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMAudioPlayingPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMAudioPlayingPropertyProvider : NSObject <CMDynamicPropertyProvider>
 
 @end
 

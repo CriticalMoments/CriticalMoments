@@ -9,25 +9,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMLocationPermissionsPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLocationPermissionsPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMLocationPermissionDetailedPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLocationPermissionDetailedPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMLatitudePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLatitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMLongitudePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLongitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMCityPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMCityPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMRegionPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMRegionPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMCountryPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMCountryPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
 NS_ASSUME_NONNULL_END

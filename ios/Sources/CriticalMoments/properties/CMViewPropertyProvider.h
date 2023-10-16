@@ -9,19 +9,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMDeviceOrientationPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMDeviceOrientationPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMInterfaceOrientationPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMInterfaceOrientationPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMDarkModePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMDarkModePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMAppStatePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMAppStatePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMForegroundProvider : CMBaseDynamicPropertyProvider
+@interface CMForegroundProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
 NS_ASSUME_NONNULL_END

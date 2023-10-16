@@ -9,22 +9,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CMLowDataModePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMLowDataModePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMNetworkTypePropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMNetworkTypePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMExpensiveNetworkPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMExpensiveNetworkPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMHasActiveNetworkPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMHasActiveNetworkPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMHasWifiConnectionPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMHasWifiConnectionPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-@interface CMHasCellConnectionPropertyProvider : CMBaseDynamicPropertyProvider
+@interface CMHasCellConnectionPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
 NS_ASSUME_NONNULL_END

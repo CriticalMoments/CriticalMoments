@@ -7,12 +7,30 @@
 
 #import <Foundation/Foundation.h>
 
+// This class hides the idiosyncrasies of gomobile.
+// Expose a clean protocol for objective C - CMDynamicPropertyProvider
+// Implement AppcoreLibPropertyProvider mapping nil values internally
+
+@protocol CMDynamicPropertyProvider <NSObject>
+- (long)type;
+@optional
+- (BOOL)boolValue;
+- (double)floatValue;
+- (NSNumber *_Nullable)nillableFloatValue;
+- (int64_t)intValue;
+- (NSNumber *_Nullable)nillableIntValue;
+- (NSString *_Nullable)stringValue;
+@end
+
 @import Appcore;
 
 NS_ASSUME_NONNULL_BEGIN
 
 // intented to be subclassed
-@interface CMBaseDynamicPropertyProvider : NSObject <AppcoreLibPropertyProvider>
+@interface CMDynamicPropertyProviderWrapper : NSObject <AppcoreLibPropertyProvider>
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPP:(id<CMDynamicPropertyProvider>)pp;
 
 @end
 
