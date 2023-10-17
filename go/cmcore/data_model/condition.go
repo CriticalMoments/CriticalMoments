@@ -50,6 +50,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"os_version":              reflect.String,
 		"device_manufacturer":     reflect.String,
 		"device_model":            reflect.String,
+		"device_model_class":      reflect.String,
 		"locale_language_code":    reflect.String,
 		"locale_country_code":     reflect.String,
 		"locale_currency_code":    reflect.String,
@@ -58,6 +59,9 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"app_id":                  reflect.String,
 		"screen_width_pixels":     reflect.Int,
 		"screen_height_pixels":    reflect.Int,
+		"screen_width_points":     reflect.Int,
+		"screen_height_points":    reflect.Int,
+		"screen_scale":            reflect.Float64,
 		"device_battery_state":    reflect.String,
 		"device_battery_level":    reflect.Float64,
 		"device_low_power_mode":   reflect.Bool,
@@ -65,12 +69,18 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"interface_orientation":   reflect.String,
 		"dark_mode":               reflect.Bool,
 		"network_connection_type": reflect.String,
+		"has_wifi_connection":     reflect.Bool,
+		"has_cell_connection":     reflect.Bool,
 		"has_active_network":      reflect.Bool,
+		"expensive_network":       reflect.Bool,
 		"other_audio_playing":     reflect.Bool,
 		"cm_version":              reflect.String,
 		"foreground":              reflect.Bool,
 		"app_install_date":        reflect.Int,
 		"timezone_gmt_offset":     reflect.Int,
+		"app_state":               reflect.String,
+		"has_watch":               reflect.Bool,
+		"on_call":                 reflect.Bool,
 
 		// Location
 		"location_permission":          reflect.Bool,
@@ -96,18 +106,8 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 
 func WellKnownPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
-		"device_model_class":   reflect.String,
 		"device_model_version": reflect.String,
-		"screen_width_points":  reflect.Int,
-		"screen_height_points": reflect.Int,
-		"screen_scale":         reflect.Float64,
 		"low_data_mode":        reflect.Bool,
-		"expensive_network":    reflect.Bool,
-		"has_wifi_connection":  reflect.Bool,
-		"has_cell_connection":  reflect.Bool,
-		"app_state":            reflect.String,
-		"has_watch":            reflect.Bool,
-		"on_call":              reflect.Bool,
 	}
 }
 
