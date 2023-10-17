@@ -72,6 +72,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"app_install_date":        reflect.Int,
 		"timezone_gmt_offset":     reflect.Int,
 
+		// Location
 		"location_permission":          reflect.Bool,
 		"location_permission_detailed": reflect.String,
 		"location_latitude":            reflect.Float64,
@@ -79,6 +80,9 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"location_city":                reflect.String,
 		"location_region":              reflect.String,
 		"location_country":             reflect.String,
+
+		// Permisions
+		"notifications_permission": reflect.String,
 	}
 }
 

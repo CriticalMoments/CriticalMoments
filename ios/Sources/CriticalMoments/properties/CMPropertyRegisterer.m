@@ -15,6 +15,7 @@
 #import "CMLocationPropertyProvider.h"
 #import "CMMiscPropertyProviders.h"
 #import "CMNetworkingPropertyProvider.h"
+#import "CMPermissionsPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
 
 #import <sys/utsname.h>
@@ -205,6 +206,10 @@
     [self registerLibPropertyProvider:@"location_region" value:regionpp];
     CMCountryPropertyProvider *countrypp = [[CMCountryPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"location_country" value:countrypp];
+
+    // Permissions
+    CMNotificationPermissionsPropertyProvider *npp = [[CMNotificationPermissionsPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"notifications_permission" value:npp];
 }
 
 - (void)setUserInterfaceIdiom {
