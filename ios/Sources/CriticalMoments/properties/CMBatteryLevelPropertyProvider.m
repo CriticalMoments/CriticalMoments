@@ -19,8 +19,8 @@
     return UIDevice.currentDevice.batteryLevel;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeFloat;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
 }
 
 @end
@@ -45,8 +45,8 @@
     return @"unknown";
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -58,8 +58,8 @@
     return processInfo.lowPowerModeEnabled;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end

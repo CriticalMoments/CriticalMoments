@@ -161,8 +161,8 @@ static CMLocationCache *sharedInstance = nil;
     return [CMLocationCache.shared isAuthorized];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -186,8 +186,8 @@ static CMLocationCache *sharedInstance = nil;
     return @"unknown";
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -203,8 +203,8 @@ static CMLocationCache *sharedInstance = nil;
     return [NSNumber numberWithDouble:loc.coordinate.latitude];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeFloat;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
 }
 
 @end
@@ -220,8 +220,8 @@ static CMLocationCache *sharedInstance = nil;
     return [NSNumber numberWithDouble:loc.coordinate.longitude];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeFloat;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
 }
 
 @end
@@ -233,8 +233,8 @@ static CMLocationCache *sharedInstance = nil;
     return place.locality;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -246,8 +246,8 @@ static CMLocationCache *sharedInstance = nil;
     return place.administrativeArea;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -259,8 +259,8 @@ static CMLocationCache *sharedInstance = nil;
     return place.ISOcountryCode;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end

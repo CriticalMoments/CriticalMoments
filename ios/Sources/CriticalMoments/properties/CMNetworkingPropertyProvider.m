@@ -144,8 +144,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared isLowDataMode];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -156,8 +156,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared networkType];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -168,8 +168,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared isExpensiveNetwork];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -180,8 +180,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared hasActiveNetwork];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -192,8 +192,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared hasWifiConnection];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -204,8 +204,8 @@ static CMNetworkMonitor *sharedInstance = nil;
     return [CMNetworkMonitor.shared hasCellConnection];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end

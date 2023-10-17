@@ -15,8 +15,8 @@
     return AVAudioSession.sharedInstance.isOtherAudioPlaying;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end

@@ -11,8 +11,8 @@
 
 @implementation CMCallPropertyProvider
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 - (BOOL)boolValue {

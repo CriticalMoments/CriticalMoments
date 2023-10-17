@@ -28,8 +28,8 @@
     return @"unknown";
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -45,8 +45,8 @@
     return @"portrait";
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -63,8 +63,8 @@
     return NO;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end
@@ -85,8 +85,8 @@
     return @"unknown";
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeString;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
 }
 
 @end
@@ -98,8 +98,8 @@
     return state != UIApplicationStateBackground;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 @end

@@ -9,10 +9,17 @@
 
 // This class hides the idiosyncrasies of gomobile.
 // Expose a clean protocol for objective C - CMDynamicPropertyProvider
-// Implement AppcoreLibPropertyProvider mapping nil values internally
+// And the wrapper implements AppcoreLibPropertyProvider
+
+typedef NS_ENUM(NSUInteger, CMPropertyProviderType) {
+    CMPropertyProviderTypeBool,
+    CMPropertyProviderTypeString,
+    CMPropertyProviderTypeInt,
+    CMPropertyProviderTypeFloat,
+};
 
 @protocol CMDynamicPropertyProvider <NSObject>
-- (long)type;
+- (CMPropertyProviderType)type;
 @optional
 - (BOOL)boolValue;
 - (double)floatValue;

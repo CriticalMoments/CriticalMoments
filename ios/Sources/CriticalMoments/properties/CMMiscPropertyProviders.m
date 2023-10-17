@@ -31,8 +31,8 @@
     return [CMUtils cmTimestampFromDate:appInstallDate];
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeInt;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeInt;
 }
 
 @end
@@ -74,8 +74,8 @@
     return self.hasWatch.boolValue;
 }
 
-- (long)type {
-    return AppcoreLibPropertyProviderTypeBool;
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
 }
 
 #pragma Mark WCSessionDelegate

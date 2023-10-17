@@ -65,7 +65,18 @@
 }
 
 - (long)type {
-    return self.pp.type;
+    switch (self.pp.type) {
+    case CMPropertyProviderTypeBool:
+        return AppcoreLibPropertyProviderTypeBool;
+    case CMPropertyProviderTypeString:
+        return AppcoreLibPropertyProviderTypeString;
+    case CMPropertyProviderTypeInt:
+        return AppcoreLibPropertyProviderTypeInt;
+    case CMPropertyProviderTypeFloat:
+        return AppcoreLibPropertyProviderTypeFloat;
+    }
+
+    return AppcoreLibPropertyProviderTypeBool;
 }
 
 @end
