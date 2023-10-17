@@ -11,11 +11,6 @@
 @import Contacts;
 @import CoreBluetooth;
 
-// Allow compiling on iOS 16 SDK. Shouldn't be used.
-#ifndef EKAuthorizationStatusWriteOnly
-#define EKAuthorizationStatusWriteOnly 999999999
-#endif
-
 @implementation CMNotificationPermissionsPropertyProvider
 
 - (CMPropertyProviderType)type {
@@ -202,10 +197,8 @@ API_AVAILABLE(ios(14))
         return @"denied";
     case EKAuthorizationStatusAuthorized: // Same as FullAuthorized, but that constant isn't in 16 sdk
         return @"authorized_full";
-    case EKAuthorizationStatusWriteOnly:
+    case 4: // EKAuthorizationStatusWriteOnly. allow compiling to iOS 16 SDK. Test added to catch if this ever changes
         return @"authorized_write_only";
-    default:
-        break;
     }
 
     return @"unknown";

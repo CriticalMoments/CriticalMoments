@@ -12,6 +12,7 @@
 @import Appcore;
 #import "CriticalMoments.h"
 #import "CriticalMoments_private.h"
+@import EventKit;
 
 // This key is only valid for test bundle "com.apple.dt.xctest.tool"
 #define TEST_API_KEY                                                                                                   \
@@ -365,6 +366,23 @@
 
     // Both should have run, and returned correct results
     [self waitForExpectations:expectations timeout:5.0];
+}
+
+- (void)testHardcodedEnumCompatibility {
+    // Allow compiling on iOS 16 SDK, but really should use iOS 17
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000
+    if (@available(iOS 17.0, *)) {
+        if (EKAuthorizationStatusAuthorized != EKAuthorizationStatusFullAccess) {
+            XCTAssert(
+                false,
+                @"Code assumes EKAuthorizationStatusAuthorized == EKAuthorizationStatusFullAccess for SDK back compat");
+        }
+
+        if (4 != EKAuthorizationStatusWriteOnly) {
+            XCTAssert(false, @"Code assumes EKAuthorizationStatusWriteOnly == 4 for SDK back compat");
+        }
+    }
+#endif
 }
 
 @end
