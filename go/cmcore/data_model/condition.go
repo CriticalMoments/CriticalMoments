@@ -83,6 +83,8 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 
 		// Permisions
 		"notifications_permission": reflect.String,
+		"microphone_permission":    reflect.String,
+		"camera_permission":        reflect.String,
 	}
 }
 

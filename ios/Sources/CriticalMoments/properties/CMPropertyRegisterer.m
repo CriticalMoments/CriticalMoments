@@ -210,6 +210,12 @@
     // Permissions
     CMNotificationPermissionsPropertyProvider *npp = [[CMNotificationPermissionsPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"notifications_permission" value:npp];
+    CMCapturePermissionsPropertyProvider *micpp =
+        [[CMCapturePermissionsPropertyProvider alloc] initWithMediaType:AVMediaTypeAudio];
+    [self registerLibPropertyProvider:@"microphone_permission" value:micpp];
+    CMCapturePermissionsPropertyProvider *campp =
+        [[CMCapturePermissionsPropertyProvider alloc] initWithMediaType:AVMediaTypeVideo];
+    [self registerLibPropertyProvider:@"camera_permission" value:campp];
 }
 
 - (void)setUserInterfaceIdiom {
