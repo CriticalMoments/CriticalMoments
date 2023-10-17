@@ -9,6 +9,7 @@
 
 @import UserNotifications;
 @import Contacts;
+@import CoreBluetooth;
 
 @implementation CMNotificationPermissionsPropertyProvider
 
@@ -202,6 +203,42 @@ API_AVAILABLE(ios(14))
     }
 
     return @"unknown";
+}
+
+@end
+
+@implementation CMBluetoothPermissionsPropertyProvider
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+- (NSString *)stringValue {
+    if (@available(iOS 13.0, *)) {
+        CBManagerAuthorization as;
+
+        if (@available(iOS 13.1, *)) {
+            as = CBCentralManager.authorization;
+        } else {
+            CBManager *m = [[CBCentralManager alloc] init];
+            as = m.authorization;
+        }
+
+        switch (as) {
+        case CBManagerAuthorizationNotDetermined:
+            return @"not_determined";
+        case CBManagerAuthorizationRestricted:
+            return @"restricted";
+        case CBManagerAuthorizationDenied:
+            return @"denied";
+        case CBManagerAuthorizationAllowedAlways:
+            return @"authorized";
+        }
+
+        return @"unknown";
+    } else {
+        return @"authorized";
+    }
 }
 
 @end

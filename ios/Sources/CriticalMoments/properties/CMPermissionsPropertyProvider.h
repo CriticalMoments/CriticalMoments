@@ -42,4 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface CMBluetoothPermissionsPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END

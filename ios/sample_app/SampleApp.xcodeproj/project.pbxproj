@@ -499,6 +499,8 @@
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow location to demo checking location in the SampleApp";
@@ -532,6 +534,8 @@
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow location to demo checking location in the SampleApp";

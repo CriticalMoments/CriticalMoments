@@ -90,6 +90,7 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"add_photo_permission":     reflect.String,
 		"calendar_permission":      reflect.String,
 		"reminders_permission":     reflect.String,
+		"bluetooth_permission":     reflect.String,
 	}
 }
 

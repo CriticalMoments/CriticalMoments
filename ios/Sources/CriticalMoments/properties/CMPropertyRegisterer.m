@@ -237,6 +237,8 @@
     CMCalendarPermissionsPropertyProvider *rempp =
         [[CMCalendarPermissionsPropertyProvider alloc] initWithEntityType:EKEntityTypeReminder];
     [self registerLibPropertyProvider:@"reminders_permission" value:rempp];
+    CMBluetoothPermissionsPropertyProvider *btpp = [[CMBluetoothPermissionsPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"bluetooth_permission" value:btpp];
 }
 
 - (void)setUserInterfaceIdiom {
