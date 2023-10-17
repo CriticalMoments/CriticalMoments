@@ -11,6 +11,11 @@
 @import Contacts;
 @import CoreBluetooth;
 
+// Allow compiling on iOS 16 SDK. Shouldn't be used.
+#ifndef EKAuthorizationStatusWriteOnly
+#define EKAuthorizationStatusWriteOnly 999999999
+#endif
+
 @implementation CMNotificationPermissionsPropertyProvider
 
 - (CMPropertyProviderType)type {
@@ -188,33 +193,19 @@ API_AVAILABLE(ios(14))
 - (NSString *)stringValue {
     EKAuthorizationStatus as = [EKEventStore authorizationStatusForEntityType:self.entityType];
 
-    if (@available(iOS 17.0, *)) {
-        switch (as) {
-        case EKAuthorizationStatusNotDetermined:
-            return @"not_determined";
-        case EKAuthorizationStatusRestricted:
-            return @"restricted";
-        case EKAuthorizationStatusDenied:
-            return @"denied";
-        case EKAuthorizationStatusFullAccess:
-            return @"authorized_full";
-        case EKAuthorizationStatusWriteOnly:
-            return @"authorized_write_only";
-        }
-    } else {
-        // iOS 16 doesn't support Full/WriteOnly deliniation
-        switch (as) {
-        case EKAuthorizationStatusNotDetermined:
-            return @"not_determined";
-        case EKAuthorizationStatusRestricted:
-            return @"restricted";
-        case EKAuthorizationStatusDenied:
-            return @"denied";
-        case EKAuthorizationStatusAuthorized:
-            return @"authorized_full";
-        default:
-            break;
-        }
+    switch (as) {
+    case EKAuthorizationStatusNotDetermined:
+        return @"not_determined";
+    case EKAuthorizationStatusRestricted:
+        return @"restricted";
+    case EKAuthorizationStatusDenied:
+        return @"denied";
+    case EKAuthorizationStatusAuthorized: // Same as FullAuthorized, but that constant isn't in 16 sdk
+        return @"authorized_full";
+    case EKAuthorizationStatusWriteOnly:
+        return @"authorized_write_only";
+    default:
+        break;
     }
 
     return @"unknown";
