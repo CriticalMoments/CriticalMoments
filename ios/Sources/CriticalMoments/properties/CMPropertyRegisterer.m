@@ -231,6 +231,12 @@
         [self registerLibPropertyProvider:@"photo_library_permission" value:ppp];
         [self registerLibPropertyProvider:@"add_photo_permission" value:ppp];
     }
+    CMCalendarPermissionsPropertyProvider *calpp =
+        [[CMCalendarPermissionsPropertyProvider alloc] initWithEntityType:EKEntityTypeEvent];
+    [self registerLibPropertyProvider:@"calendar_permission" value:calpp];
+    CMCalendarPermissionsPropertyProvider *rempp =
+        [[CMCalendarPermissionsPropertyProvider alloc] initWithEntityType:EKEntityTypeReminder];
+    [self registerLibPropertyProvider:@"reminders_permission" value:rempp];
 }
 
 - (void)setUserInterfaceIdiom {

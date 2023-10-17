@@ -165,3 +165,43 @@ API_AVAILABLE(ios(14))
 }
 
 @end
+
+@interface CMCalendarPermissionsPropertyProvider ()
+@property(nonatomic) EKEntityType entityType;
+@end
+
+@implementation CMCalendarPermissionsPropertyProvider
+
+- (instancetype)initWithEntityType:(EKEntityType)entityType {
+    self = [super init];
+    if (self) {
+        self.entityType = entityType;
+    }
+    return self;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+- (NSString *)stringValue {
+    EKAuthorizationStatus as = [EKEventStore authorizationStatusForEntityType:self.entityType];
+
+    switch (as) {
+    case EKAuthorizationStatusNotDetermined:
+        return @"not_determined";
+    case EKAuthorizationStatusRestricted:
+        return @"restricted";
+    case EKAuthorizationStatusDenied:
+        return @"denied";
+    case EKAuthorizationStatusFullAccess:
+        return @"authorized_full";
+    case EKAuthorizationStatusWriteOnly:
+        return @"authorized_write_only";
+        break;
+    }
+
+    return @"unknown";
+}
+
+@end

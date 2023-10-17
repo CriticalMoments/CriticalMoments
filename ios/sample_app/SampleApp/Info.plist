@@ -15,6 +15,10 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Allow location to demo checking location in the SampleApp</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Allow location to demo checking location in the SampleApp</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
