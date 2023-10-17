@@ -503,6 +503,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -534,6 +536,8 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Allow testing CriticalMoments in SampleApp";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

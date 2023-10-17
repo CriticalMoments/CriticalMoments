@@ -218,6 +218,19 @@
     [self registerLibPropertyProvider:@"camera_permission" value:campp];
     CMContactsPermissionsPropertyProvider *conpp = [[CMContactsPermissionsPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"contacts_permission" value:conpp];
+    if (@available(iOS 14.0, *)) {
+        CMPhotosPermissionsPropertyProvider *plpp =
+            [[CMPhotosPermissionsPropertyProvider alloc] initWithAccessLevel:PHAccessLevelReadWrite];
+        [self registerLibPropertyProvider:@"photo_library_permission" value:plpp];
+        CMPhotosPermissionsPropertyProvider *appp =
+            [[CMPhotosPermissionsPropertyProvider alloc] initWithAccessLevel:PHAccessLevelAddOnly];
+        [self registerLibPropertyProvider:@"add_photo_permission" value:appp];
+    } else {
+        // same permission for both prior to iOS 14
+        CMPhotosPermissionsPropertyProvider *ppp = [[CMPhotosPermissionsPropertyProvider alloc] init];
+        [self registerLibPropertyProvider:@"photo_library_permission" value:ppp];
+        [self registerLibPropertyProvider:@"add_photo_permission" value:ppp];
+    }
 }
 
 - (void)setUserInterfaceIdiom {

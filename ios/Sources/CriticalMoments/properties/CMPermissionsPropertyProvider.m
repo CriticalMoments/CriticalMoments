@@ -113,3 +113,55 @@
 }
 
 @end
+
+API_AVAILABLE(ios(14))
+@interface CMPhotosPermissionsPropertyProvider ()
+@property(nonatomic) PHAccessLevel accessLevel;
+@end
+
+@implementation CMPhotosPermissionsPropertyProvider
+
+- (instancetype)init {
+    self = [super init];
+    return self;
+}
+
+- (instancetype)initWithAccessLevel:(PHAccessLevel)level {
+    self = [super init];
+    if (self) {
+        self.accessLevel = level;
+    }
+    return self;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+- (NSString *)stringValue {
+    PHAuthorizationStatus as;
+    if (@available(iOS 14.0, *)) {
+        PHAccessLevel al = self.accessLevel ? self.accessLevel : PHAccessLevelReadWrite;
+        as = [PHPhotoLibrary authorizationStatusForAccessLevel:al];
+    } else {
+        as = [PHPhotoLibrary authorizationStatus];
+    }
+
+    switch (as) {
+    case PHAuthorizationStatusNotDetermined:
+        return @"not_determined";
+    case PHAuthorizationStatusRestricted:
+        return @"restricted";
+    case PHAuthorizationStatusDenied:
+        return @"denied";
+    case PHAuthorizationStatusAuthorized:
+        return @"authorized";
+    case PHAuthorizationStatusLimited:
+        return @"limited";
+        break;
+    }
+
+    return @"unknown";
+}
+
+@end
