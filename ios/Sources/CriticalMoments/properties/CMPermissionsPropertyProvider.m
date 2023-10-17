@@ -188,18 +188,33 @@ API_AVAILABLE(ios(14))
 - (NSString *)stringValue {
     EKAuthorizationStatus as = [EKEventStore authorizationStatusForEntityType:self.entityType];
 
-    switch (as) {
-    case EKAuthorizationStatusNotDetermined:
-        return @"not_determined";
-    case EKAuthorizationStatusRestricted:
-        return @"restricted";
-    case EKAuthorizationStatusDenied:
-        return @"denied";
-    case EKAuthorizationStatusFullAccess:
-        return @"authorized_full";
-    case EKAuthorizationStatusWriteOnly:
-        return @"authorized_write_only";
-        break;
+    if (@available(iOS 17.0, *)) {
+        switch (as) {
+        case EKAuthorizationStatusNotDetermined:
+            return @"not_determined";
+        case EKAuthorizationStatusRestricted:
+            return @"restricted";
+        case EKAuthorizationStatusDenied:
+            return @"denied";
+        case EKAuthorizationStatusFullAccess:
+            return @"authorized_full";
+        case EKAuthorizationStatusWriteOnly:
+            return @"authorized_write_only";
+        }
+    } else {
+        // iOS 16 doesn't support Full/WriteOnly deliniation
+        switch (as) {
+        case EKAuthorizationStatusNotDetermined:
+            return @"not_determined";
+        case EKAuthorizationStatusRestricted:
+            return @"restricted";
+        case EKAuthorizationStatusDenied:
+            return @"denied";
+        case EKAuthorizationStatusAuthorized:
+            return @"authorized_full";
+        default:
+            break;
+        }
     }
 
     return @"unknown";
