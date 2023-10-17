@@ -216,6 +216,8 @@
     CMCapturePermissionsPropertyProvider *campp =
         [[CMCapturePermissionsPropertyProvider alloc] initWithMediaType:AVMediaTypeVideo];
     [self registerLibPropertyProvider:@"camera_permission" value:campp];
+    CMContactsPermissionsPropertyProvider *conpp = [[CMContactsPermissionsPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"contacts_permission" value:conpp];
 }
 
 - (void)setUserInterfaceIdiom {

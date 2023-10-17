@@ -8,6 +8,7 @@
 #import "CMPermissionsPropertyProvider.h"
 
 @import UserNotifications;
+@import Contacts;
 
 @implementation CMNotificationPermissionsPropertyProvider
 
@@ -83,4 +84,32 @@
     }
     return result;
 }
+@end
+
+@implementation CMContactsPermissionsPropertyProvider
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+- (NSString *)stringValue {
+    CNAuthorizationStatus as = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
+    NSString *result = @"unknown";
+    switch (as) {
+    case CNAuthorizationStatusNotDetermined:
+        result = @"not_determined";
+        break;
+    case CNAuthorizationStatusRestricted:
+        result = @"restricted";
+        break;
+    case CNAuthorizationStatusDenied:
+        result = @"denied";
+        break;
+    case CNAuthorizationStatusAuthorized:
+        result = @"authorized";
+        break;
+    }
+    return result;
+}
+
 @end

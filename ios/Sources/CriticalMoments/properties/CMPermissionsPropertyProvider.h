@@ -23,4 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface CMContactsPermissionsPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END
