@@ -17,6 +17,7 @@
 #import "CMNetworkingPropertyProvider.h"
 #import "CMPermissionsPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
+#import "CMWeatherPropertyProvider.h"
 
 #import <sys/utsname.h>
 
@@ -239,6 +240,14 @@
     [self registerLibPropertyProvider:@"reminders_permission" value:rempp];
     CMBluetoothPermissionsPropertyProvider *btpp = [[CMBluetoothPermissionsPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"bluetooth_permission" value:btpp];
+
+    // Weather
+    NSDictionary<NSString *, CMWeatherPropertyProvider *> *weatherProviders =
+        [CMWeatherPropertyProvider allWeatherProviders];
+    for (NSString *conditionName in weatherProviders.keyEnumerator) {
+        CMWeatherPropertyProvider *provider = weatherProviders[conditionName];
+        [self registerLibPropertyProvider:conditionName value:provider];
+    }
 }
 
 - (void)setUserInterfaceIdiom {

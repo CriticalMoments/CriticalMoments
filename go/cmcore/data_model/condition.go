@@ -108,6 +108,13 @@ func WellKnownPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
 		"device_model_version": reflect.String,
 		"low_data_mode":        reflect.Bool,
+
+		// Weather only iOS 16+
+		"weather_temperature":          reflect.Float64,
+		"weather_apparent_temperature": reflect.Float64,
+		"weather_condition":            reflect.String,
+		"weather_cloud_cover":          reflect.Float64,
+		"is_daylight":                  reflect.Bool,
 	}
 }
 
