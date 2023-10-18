@@ -2,6 +2,30 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
+
+// Production release binary by default
+var appcoreTarget = Target.binaryTarget(
+    name: "Appcore",
+    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.8-beta/Appcore.xcframework.zip",
+    checksum: "5d96757dbe1103c98fc3dbcdcfa8a8a5d1bc0d99599cd3012fddc0cea13c83a0")
+
+// If the user has built the appcore framework themselves locally, use that. 
+// This is primarily for development.
+// We highly recommend end users use the production binary.
+// If you don't trust the precompiled binaries, you can verify the checksums/source commit from Github release action logs.
+// Building yourself should work fine, but requires additional tooling (golang) and we don't offer support for this flow.
+let filePath = #filePath
+let endOfPath = filePath.count - "Package.swift".count - 1
+let dirPath = String(filePath[...String.Index.init(utf16Offset: endOfPath, in: filePath)])
+let infoPath = dirPath + "go/appcore/build/Appcore.xcframework/Info.plist"
+if (FileManager.default.fileExists(atPath: infoPath))
+{
+    print("Using Local Appcore Build From: " + infoPath);
+    appcoreTarget = Target.binaryTarget(
+        name: "Appcore",
+        path: "go/appcore/build/Appcore.xcframework")
+}
 
 let package = Package(
     name: "CriticalMoments",
@@ -20,10 +44,11 @@ let package = Package(
             dependencies: ["Appcore"],
             path: "ios/Sources/CriticalMoments",
             publicHeadersPath:"include"),
-        .binaryTarget(
+        appcoreTarget,
+        /*.binaryTarget(
             name: "Appcore",
             url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.7-beta/Appcore.xcframework.zip",
-            checksum: "d3281ac6f8592830f6adb41524777e67f95fead539b09afa42bfc392fb964737"),
+            checksum: "d3281ac6f8592830f6adb41524777e67f95fead539b09afa42bfc392fb964737"),*/
         .testTarget(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
