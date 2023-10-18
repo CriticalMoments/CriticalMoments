@@ -35,6 +35,9 @@ jobs:
       - name: zip Appcore.xcframework
         run: cd go/appcore/build && zip -r ../../../Appcore.xcframework.zip Appcore.xcframework && cd ../../..
 
+      - name: Compute checksum
+        run: swift package compute-checksum Appcore.xcframework.zip
+
       - name: Upload xcframework to release
         uses: softprops/action-gh-release@v1
         with:

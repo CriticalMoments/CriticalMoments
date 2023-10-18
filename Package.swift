@@ -22,7 +22,8 @@ let package = Package(
             publicHeadersPath:"include"),
         .binaryTarget(
             name: "Appcore",
-            path: "go/appcore/build/Appcore.xcframework"),
+            url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.7-beta/Appcore.xcframework.zip",
+            checksum: "d3281ac6f8592830f6adb41524777e67f95fead539b09afa42bfc392fb964737"),
         .testTarget(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
