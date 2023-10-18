@@ -135,6 +135,14 @@
     return NO;
 }
 
+- (BOOL)canOpenURL:(NSString *_Nullable)urlString {
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (url) {
+        return [UIApplication.sharedApplication canOpenURL:url];
+    }
+    return NO;
+}
+
 - (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
     dispatch_async(dispatch_get_main_queue(), ^{
       SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];

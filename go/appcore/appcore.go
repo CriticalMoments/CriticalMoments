@@ -146,6 +146,17 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (boo
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	ac.libBindings = lb
+
+	// connect iOS functions to condition system
+	ac.propertyRegistry.RegisterDynamicFunctions(map[string]*datamodel.ConditionDynamicFunction{
+		"canOpenUrl": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				return lb.CanOpenURL(params[0].(string)), nil
+			},
+			Types: []any{new(func(string) bool)},
+		},
+	})
 }
 
 func (ac *Appcore) Start() error {

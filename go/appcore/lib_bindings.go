@@ -15,4 +15,7 @@ type LibBindings interface {
 	ShowLink(link *datamodel.LinkAction) error
 	ShowReviewPrompt() error
 	ShowModal(modal *datamodel.ModalAction) error
+
+	// Condition functions
+	CanOpenURL(url string) bool
 }
