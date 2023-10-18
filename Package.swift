@@ -10,11 +10,10 @@ var appcoreTarget = Target.binaryTarget(
     url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.8-beta/Appcore.xcframework.zip",
     checksum: "5d96757dbe1103c98fc3dbcdcfa8a8a5d1bc0d99599cd3012fddc0cea13c83a0")
 
-// If the user has built the appcore framework themselves locally, use that. 
-// This is primarily for development.
+// If this device has built the appcore framework locally, use that. This is primarily for development.
 // We highly recommend end users use the production binary.
-// If you don't trust the precompiled binaries, you can verify the checksums/source commit from Github release action logs.
-// Building yourself should work fine, but requires additional tooling (golang) and we don't offer support for this flow.
+// If you don't trust the precompiled binaries, you can verify the checksums/source from Github release action logs which built it https://github.com/CriticalMoments/CriticalMoments/actions.
+// Building yourself should work, but requires additional tooling (golang) and we don't offer support for this flow.
 let filePath = #filePath
 let endOfPath = filePath.count - "Package.swift".count - 1
 let dirPath = String(filePath[...String.Index.init(utf16Offset: endOfPath, in: filePath)])
@@ -45,10 +44,6 @@ let package = Package(
             path: "ios/Sources/CriticalMoments",
             publicHeadersPath:"include"),
         appcoreTarget,
-        /*.binaryTarget(
-            name: "Appcore",
-            url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.7-beta/Appcore.xcframework.zip",
-            checksum: "d3281ac6f8592830f6adb41524777e67f95fead539b09afa42bfc392fb964737"),*/
         .testTarget(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
