@@ -1,0 +1,44 @@
+name: Build Appcore Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+    contents: write
+    packages: write
+
+jobs:
+  build_xcframework:
+    name: Build an the appcore framework for this release 
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: go/go.sum
+
+      - name: Setup gomobile
+        run: cd go && go install golang.org/x/mobile/cmd/gomobile && gomobile init && cd ..
+
+      - name: Golang tests
+        run: cd go && go test -v ./... && cd ..
+
+      - name: Go verify module integrity
+        run: cd go && go mod verify && cd ..
+
+      - name: Build go appcore xcframework
+        run: ./go/build_appcore.sh
+
+      - name: cd appcore/build && zip Appcore.xcframework
+        run: cd appcore/build && zip -r ../../../Appcore.xcframework.zip Appcore.xcframework
+
+      - name: Upload xcframework to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: Appcore.xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
