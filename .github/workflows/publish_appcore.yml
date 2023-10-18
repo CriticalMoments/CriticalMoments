@@ -32,8 +32,8 @@ jobs:
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh
 
-      - name: cd appcore/build && zip Appcore.xcframework
-        run: cd appcore/build && zip -r ../../../Appcore.xcframework.zip Appcore.xcframework
+      - name: zip Appcore.xcframework
+        run: cd go/appcore/build && zip -r ../../../Appcore.xcframework.zip Appcore.xcframework && cd ../../..
 
       - name: Upload xcframework to release
         uses: softprops/action-gh-release@v1
