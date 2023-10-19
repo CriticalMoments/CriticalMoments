@@ -145,6 +145,7 @@ func StaticConditionConstantProperties() map[string]interface{} {
 var AllBuiltInDynamicFunctions = map[string]bool{
 	"eventCount":          true,
 	"eventCountWithLimit": true,
+	"canOpenUrl":          true,
 }
 
 type ConditionFields struct {

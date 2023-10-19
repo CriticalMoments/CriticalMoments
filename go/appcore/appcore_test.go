@@ -74,6 +74,9 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 	lb.lastModal = modal
 	return nil
 }
+func (lb *testLibBindings) CanOpenURL(url string) bool {
+	return false
+}
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	ac := NewAppcore()
