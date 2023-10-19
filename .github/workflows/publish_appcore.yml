@@ -3,6 +3,7 @@ name: Build Appcore Release
 on:
   release:
     types: [created]
+    tags: [appcore-v*]
 
 permissions:
     contents: write
