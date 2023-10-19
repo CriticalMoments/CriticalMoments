@@ -42,6 +42,14 @@
         @"testCantOpenUnknownScheme" : @"canOpenUrl('asfsdfdsfsdf://asdf.com') == false",
     };
 
+    // Wait for main thread to start responding. Needed for CI or we hit timeout below.
+    dispatch_semaphore_t mainWait = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_semaphore_signal(mainWait);
+    });
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    dispatch_semaphore_wait(mainWait, dispatch_time(DISPATCH_TIME_NOW, 120.0 * NSEC_PER_SEC));
+
     for (NSString *name in cases.keyEnumerator) {
         NSString *condition = cases[name];
 
@@ -55,6 +63,7 @@
                           }
                         }];
     }
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
 
     [self waitForExpectations:expectations timeout:20.0];
 }
