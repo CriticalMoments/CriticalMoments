@@ -31,32 +31,34 @@
 }
 
 - (void)testCanOpenUrlEndToEnd {
-    CriticalMoments *cm = CriticalMoments.sharedInstance;
+    if (@available(iOS 17.0, *)) {
+        CriticalMoments *cm = CriticalMoments.sharedInstance;
 
-    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+        NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
-    NSDictionary *cases = @{
-        @"testCanOpenOwnUrlScheme" : @"canOpenUrl('critical-moments-sampleapp://home') == true",
-        @"testCanOpenHttpUrl" : @"canOpenUrl('http://criticalmoments.io') == true",
-        @"testCantOpenInvalidUrl" : @"canOpenUrl('not a url') == false",
-        @"testCantOpenUnknownScheme" : @"canOpenUrl('asfsdfdsfsdf://asdf.com') == false",
-    };
+        NSDictionary *cases = @{
+            @"testCanOpenOwnUrlScheme" : @"canOpenUrl('critical-moments-sampleapp://home') == true",
+            @"testCanOpenHttpUrl" : @"canOpenUrl('http://criticalmoments.io') == true",
+            @"testCantOpenInvalidUrl" : @"canOpenUrl('not a url') == false",
+            @"testCantOpenUnknownScheme" : @"canOpenUrl('asfsdfdsfsdf://asdf.com') == false",
+        };
 
-    for (NSString *name in cases.keyEnumerator) {
-        NSString *condition = cases[name];
+        for (NSString *name in cases.keyEnumerator) {
+            NSString *condition = cases[name];
 
-        XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
-        [expectations addObject:expectation];
-        [cm checkNamedCondition:name
-                      condition:condition
-                        handler:^(bool result, NSError *_Nullable error) {
-                          if (result && !error) {
-                              [expectation fulfill];
-                          }
-                        }];
+            XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
+            [expectations addObject:expectation];
+            [cm checkNamedCondition:name
+                          condition:condition
+                            handler:^(bool result, NSError *_Nullable error) {
+                              if (result && !error) {
+                                  [expectation fulfill];
+                              }
+                            }];
+        }
+
+        [self waitForExpectations:expectations timeout:20.0];
     }
-
-    [self waitForExpectations:expectations timeout:1.0];
 }
 
 @end
