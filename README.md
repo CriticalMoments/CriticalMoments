@@ -2,7 +2,6 @@
 
 [![Release Build](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml)
 [![Release Tests](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Coming Soon
 

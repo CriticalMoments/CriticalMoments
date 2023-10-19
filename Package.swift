@@ -7,8 +7,8 @@ import Foundation
 // Production release binary by default
 var appcoreTarget = Target.binaryTarget(
     name: "Appcore",
-    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/0.1.8-beta/Appcore.xcframework.zip",
-    checksum: "5d96757dbe1103c98fc3dbcdcfa8a8a5d1bc0d99599cd3012fddc0cea13c83a0")
+    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.1.10-beta/Appcore.xcframework.zip",
+    checksum: "1d71f844ac556d921a7e44a66c0b61fcb9cc0d560e2c24b97f56bceb2f37c9d6")
 
 // If this device has built the appcore framework locally, use that. This is primarily for development.
 // We highly recommend end users use the production binary.
