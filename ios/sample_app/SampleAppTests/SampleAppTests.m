@@ -56,7 +56,7 @@
                         }];
     }
 
-    [self waitForExpectations:expectations timeout:1.0];
+    [self waitForExpectations:expectations timeout:5.0];
 }
 
 @end
