@@ -1,6 +1,5 @@
 # CriticalMoments iOS
 
-[![Release Build](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/publish_xcframework.yml)
 [![Release Tests](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml)
 
 # Coming Soon
