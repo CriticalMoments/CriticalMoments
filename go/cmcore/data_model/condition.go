@@ -44,7 +44,7 @@ func (c *Condition) String() string {
 	return c.conditionString
 }
 
-func RequiredPropertyTypes() map[string]reflect.Kind {
+func BuiltInPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
 		"platform":                reflect.String,
 		"os_version":              reflect.String,
@@ -101,13 +101,25 @@ func RequiredPropertyTypes() map[string]reflect.Kind {
 		"calendar_permission":      reflect.String,
 		"reminders_permission":     reflect.String,
 		"bluetooth_permission":     reflect.String,
+
+		// Optional built in props (listed below in IsBuiltInPropertyOptional)
+		"device_model_version": reflect.String,
+		"low_data_mode":        reflect.Bool,
 	}
+}
+
+func IsBuiltInPropertyOptional(key string) bool {
+	optionalBuiltInProps := map[string]bool{
+		"device_model_version": true,
+		"low_data_mode":        true,
+	}
+	_, ok := optionalBuiltInProps[key]
+	return ok
 }
 
 func WellKnownPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
-		"device_model_version": reflect.String,
-		"low_data_mode":        reflect.Bool,
+		"user_signup_date": reflect.Int,
 	}
 }
 
@@ -239,19 +251,7 @@ func (c *Condition) Validate() error {
 	}
 
 	if StrictDatamodelParsing {
-		// Check we support all variables used if strict parsing
-		allValidVariables := make(map[string]reflect.Kind)
-		maps.Copy(allValidVariables, RequiredPropertyTypes())
-		maps.Copy(allValidVariables, WellKnownPropertyTypes())
-		for k, v := range StaticConditionConstantProperties() {
-			allValidVariables[k] = reflect.TypeOf(v).Kind()
-		}
-
-		for _, varName := range fields.Variables {
-			if _, ok := allValidVariables[varName]; !ok {
-				return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
-			}
-		}
+		// Don't check variable names. We support custom vars so every name is valid
 
 		// Check we support all methods used if strict parsing
 		for _, methodName := range fields.Methods {

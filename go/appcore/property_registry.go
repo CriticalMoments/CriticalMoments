@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
@@ -11,9 +12,11 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const CustomPropertyPrefix = "custom_"
+
 type propertyRegistry struct {
 	providers              map[string]propertyProvider
-	requiredPropertyTypes  map[string]reflect.Kind
+	builtInPropertyTypes   map[string]reflect.Kind
 	wellKnownPropertyTypes map[string]reflect.Kind
 	dynamicFunctionNames   []string
 	dynamicFunctionOps     []expr.Option
@@ -24,7 +27,7 @@ type propertyRegistry struct {
 func newPropertyRegistry() *propertyRegistry {
 	pr := &propertyRegistry{
 		providers:              make(map[string]propertyProvider),
-		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
+		builtInPropertyTypes:   datamodel.BuiltInPropertyTypes(),
 		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
 		dynamicFunctionNames:   []string{},
 		dynamicFunctionOps:     []expr.Option{},
@@ -46,7 +49,7 @@ func (pr *propertyRegistry) RegisterDynamicFunctions(newFuncs map[string]*datamo
 }
 
 func (pr *propertyRegistry) expectedTypeForKey(key string) reflect.Kind {
-	expectedType, foundType := pr.requiredPropertyTypes[key]
+	expectedType, foundType := pr.builtInPropertyTypes[key]
 	if foundType {
 		return expectedType
 	}
@@ -63,18 +66,21 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 		fmt.Println("CriticalMoments Warning: Re-registering property provider for key: " + key)
 	}
 
-	expectedType := pr.expectedTypeForKey(key)
-	if expectedType == reflect.Invalid {
-		return errors.New("invalid property registered. Properties must be required or well known. Arbitrary properties are not allowed")
+	isCustom := strings.HasPrefix(key, CustomPropertyPrefix)
+	if !isCustom {
+		expectedType := pr.expectedTypeForKey(key)
+		if expectedType == reflect.Invalid {
+			return errors.New("invalid property registered. Properties must be custom, built in or well known")
+		}
+
+		if pp.Kind() != expectedType {
+			return errors.New("Property registered of wrong type (does not match expected type): " + key)
+		}
 	}
 
 	validTypes := []reflect.Kind{reflect.Bool, reflect.String, reflect.Int, reflect.Float64}
-	if !slices.Contains(validTypes, expectedType) {
+	if !slices.Contains(validTypes, pp.Kind()) {
 		return errors.New("Invalid property type for key: " + key)
-	}
-
-	if pp.Kind() != expectedType {
-		return errors.New("Property registered of wrong type (does not match expected type): " + key)
 	}
 
 	pr.providers[key] = pp
@@ -97,6 +103,10 @@ var errPropertyNotFound = errors.New("property not found")
 
 func (p *propertyRegistry) propertyValue(key string) (interface{}, error) {
 	v, ok := p.providers[key]
+	// Allow custom properties to be accessed without the prefix
+	if !ok {
+		v, ok = p.providers[CustomPropertyPrefix+key]
+	}
 	if !ok {
 		return nil, errPropertyNotFound
 	}
@@ -204,9 +214,10 @@ func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (re
 }
 
 func (p *propertyRegistry) validateProperties() error {
-	// Check required
-	for propName, expectedKind := range p.requiredPropertyTypes {
-		err := p.validateExpectedProvider(propName, expectedKind, false)
+	// Check built in
+	for propName, expectedKind := range p.builtInPropertyTypes {
+		allowMissing := datamodel.IsBuiltInPropertyOptional(propName)
+		err := p.validateExpectedProvider(propName, expectedKind, allowMissing)
 		if err != nil {
 			return err
 		}
@@ -217,6 +228,17 @@ func (p *propertyRegistry) validateProperties() error {
 		err := p.validateExpectedProvider(propName, expectedKind, true)
 		if err != nil {
 			return err
+		}
+	}
+
+	// validate any others are custom_ prefix
+	for propName := range p.providers {
+		_, isWellKnown := p.wellKnownPropertyTypes[propName]
+		_, isBuiltIn := p.builtInPropertyTypes[propName]
+		if !isWellKnown && !isBuiltIn {
+			if !strings.HasPrefix(propName, CustomPropertyPrefix) {
+				return fmt.Errorf("property \"%v\" is not a custom property and is not a built in or well known property", propName)
+			}
 		}
 	}
 

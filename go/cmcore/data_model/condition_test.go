@@ -47,9 +47,9 @@ func TestConditionConstructor(t *testing.T) {
 		StrictDatamodelParsing = false
 	}()
 
-	c, err = NewCondition("bad_var > 2")
+	c, err = NewCondition("bad_func() > 2")
 	if err == nil || c != nil {
-		t.Fatal("Unknown var not valid conditions")
+		t.Fatal("Unknown func not valid conditions")
 	}
 }
 
@@ -153,10 +153,6 @@ func TestValidateProps(t *testing.T) {
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	err = validateTestHelper("not_a_supported_prop > 1")
-	if err == nil {
-		t.Fatal("Invalid prop passed strict validation")
-	}
 	err = validateTestHelper("AddTwo(1) > 1")
 	if err == nil {
 		t.Fatal("Unrecognized method passed validation")
@@ -237,14 +233,6 @@ func TestParseCondtion(t *testing.T) {
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-
-	// Unknown vars not allowed in strict mode
-	c = Condition{}
-	s = "unknown_var > 6"
-	err = json.Unmarshal([]byte(fmt.Sprintf("\"%v\"", s)), &c)
-	if err == nil || c.String() != "" {
-		t.Fatal("Strict mode ignored unknown var", err)
-	}
 
 	// invalid conditions should fail in strict mode
 	c = Condition{}

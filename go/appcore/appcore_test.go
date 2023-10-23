@@ -103,10 +103,8 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
-	ac.SetTimezoneGMTOffset(-5 * 60 * 60)
-
 	// Clear required properties, for easier setup
-	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
+	ac.propertyRegistry.builtInPropertyTypes = map[string]reflect.Kind{}
 	return ac, nil
 }
 
@@ -484,23 +482,5 @@ func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
 	expected := maps.Keys(datamodel.AllBuiltInDynamicFunctions)
 	if !arraysEqualOrderInsensitive(registered, expected) {
 		t.Fatal("Not all built in functions registered or too many registered")
-	}
-}
-
-func TestTimezonePropertyEndToEnd(t *testing.T) {
-	ac, err := testBuildValidTestAppCore(t)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = ac.Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	tz, err := ac.propertyRegistry.propertyValue("timezone_gmt_offset")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if tz != -5*60*60 {
-		t.Fatal("Timezone offset incorrect")
 	}
 }
