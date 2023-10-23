@@ -61,6 +61,10 @@ func (pr *propertyRegistry) expectedTypeForKey(key string) reflect.Kind {
 }
 
 func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) error {
+	if !validPropertyName(key) {
+		return errors.New("invalid property name: " + key)
+	}
+
 	_, hasCurrent := pr.providers[key]
 	if hasCurrent {
 		fmt.Println("CriticalMoments Warning: Re-registering property provider for key: " + key)
@@ -287,4 +291,19 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 		return fmt.Errorf("property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String())
 	}
 	return nil
+}
+
+func validPropertyName(name string) bool {
+	if name == "" || name == CustomPropertyPrefix {
+		return false
+	}
+
+	// if name is not alphanumeric, or an underscore, return false
+	for _, c := range name {
+		if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || (c >= 'A' && c <= 'Z')) {
+			return false
+		}
+	}
+
+	return true
 }

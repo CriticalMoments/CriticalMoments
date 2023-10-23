@@ -667,3 +667,38 @@ func TestClientPropertyRegistration(t *testing.T) {
 		t.Fatal("Allowed nil value")
 	}
 }
+
+func TestDisallowInvalidPropertyNames(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	invalidNames := []string{
+		"with.period",
+		"With space",
+		"with-dash",
+		"withEmoji😀",
+		"withPunctuation!",
+		"",
+	}
+
+	for _, n := range invalidNames {
+		err := pr.registerClientProperty(n, "hello2")
+		if err == nil {
+			t.Fatal("allowed non alphanumeric property name" + n)
+		}
+	}
+	if !validPropertyName("edgesAZaz09_") {
+		t.Fatal("valid property name failed")
+	}
+	for name := range datamodel.WellKnownPropertyTypes() {
+		if !validPropertyName(name) {
+			t.Fatalf("Invalid well known property name: %s", name)
+		}
+	}
+	for name := range datamodel.BuiltInPropertyTypes() {
+		if !validPropertyName(name) {
+			t.Fatalf("Invalid well known property name: %s", name)
+		}
+	}
+}
