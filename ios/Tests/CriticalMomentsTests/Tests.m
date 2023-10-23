@@ -385,4 +385,49 @@
 #endif
 }
 
+- (void)testRegisteringProperties {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    // Registering built in properties should fail
+    NSError *error;
+    [cm registerStringProperty:@"hello" forKey:@"platform" error:&error];
+    XCTAssertNotNil(error, @"did not error on built in property");
+    error = nil;
+
+    // Register well known property with wrong type should fail
+    [cm registerStringProperty:@"hello" forKey:@"user_signup_date" error:&error];
+    XCTAssertNotNil(error, @"did not error on type missmatch");
+    error = nil;
+
+    // Register well known property should work
+    [cm registerIntegerProperty:1698093984 forKey:@"user_signup_date" error:&error];
+    XCTAssertNil(error, @"failed to register well known property");
+
+    // Registering custom propety should work
+    [cm registerStringProperty:@"hello" forKey:@"stringy" error:&error];
+    XCTAssertNil(error, @"failed to register custom property");
+
+    [self startCMForTest:cm];
+
+    // registering after start should error
+    [cm registerStringProperty:@"hello" forKey:@"stringy2" error:&error];
+    XCTAssertNotNil(error, @"allowed registartion after start");
+
+    // Fetching set properties should work (both short and long form accessors)
+    XCTestExpectation *expectationSuccess = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess];
+    [cm checkNamedCondition:@"nonName3"
+                  condition:@"user_signup_date == 1698093984 && stringy =='hello' && custom_stringy == 'hello' && "
+                            @"stringy2 == nil"
+                    handler:^(bool result, NSError *_Nullable er2) {
+                      if (!er2 && result) {
+                          [expectationSuccess fulfill];
+                      }
+                    }];
+
+    // Both should have run, and returned correct results
+    [self waitForExpectations:expectations timeout:5.0];
+}
+
 @end

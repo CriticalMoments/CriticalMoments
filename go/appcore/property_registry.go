@@ -87,6 +87,35 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 	return nil
 }
 
+func (p *propertyRegistry) registerClientProperty(key string, value interface{}) error {
+	// check not built in key
+	_, isBuiltIn := p.builtInPropertyTypes[key]
+	if isBuiltIn {
+		return errors.New("client cannot register reserved built in property: " + key)
+	}
+
+	// Nil not supported
+	if value == nil {
+		return errors.New("client cannot register nil property: " + key)
+	}
+
+	// Well known types must be correct type
+	wellKnownType, isWellKnown := p.wellKnownPropertyTypes[key]
+	if isWellKnown {
+		if reflect.TypeOf(value).Kind() != wellKnownType {
+			return errors.New("property registered of wrong type (does not match expected type): " + key)
+		}
+	}
+
+	// Non well known get prefixed with custom_
+	updatedKey := key
+	if !isWellKnown {
+		updatedKey = CustomPropertyPrefix + key
+	}
+
+	return p.registerStaticProperty(updatedKey, value)
+}
+
 func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) error {
 	s := staticPropertyProvider{
 		value: value,

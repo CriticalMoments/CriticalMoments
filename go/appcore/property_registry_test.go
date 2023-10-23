@@ -608,3 +608,62 @@ func TestValidateCustomPrefix(t *testing.T) {
 		t.Fatal("allowed non custom property")
 	}
 }
+
+func TestClientPropertyRegistration(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"well_known":  reflect.String,
+		"well_known2": reflect.String,
+	}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{
+		"built_in": reflect.String,
+	}
+
+	// Should not allow registering well known with wrong type
+	err := pr.registerClientProperty("well_known", 42)
+	if err == nil || pr.providers["well_known"] != nil {
+		t.Fatal("Allowed registering well known with wrong type")
+	}
+
+	// Should not allow registering built in
+	err = pr.registerClientProperty("built_in", "hello")
+	if err == nil || pr.providers["built_in"] != nil {
+		t.Fatal("Allowed registering built in")
+	}
+
+	// should be able to register well known
+	err = pr.registerClientProperty("well_known", "hello")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pr.providers["well_known"] == nil {
+		t.Fatal("Failed to register well known without a prefix")
+	}
+	if v, err := pr.propertyValue("well_known"); v != "hello" || err != nil {
+		t.Fatal("Failed to register well known")
+	}
+
+	// should be able to register custom
+	err = pr.registerClientProperty("customv", "hello2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pr.providers["custom_customv"] == nil {
+		t.Fatal("Failed to register well known without a prefix")
+	}
+	if pr.providers["customv"] != nil {
+		t.Fatal("registered custom without a prefix")
+	}
+	if v, err := pr.propertyValue("customv"); v != "hello2" || err != nil {
+		t.Fatal("Failed to access custom via short hand")
+	}
+	if v, err := pr.propertyValue("custom_customv"); v != "hello2" || err != nil {
+		t.Fatal("Failed to access custom via full name")
+	}
+
+	// should not be able to regsiter nil
+	err = pr.registerClientProperty("well_known2", nil)
+	if err == nil || pr.providers["well_known2"] != nil {
+		t.Fatal("Allowed nil value")
+	}
+}

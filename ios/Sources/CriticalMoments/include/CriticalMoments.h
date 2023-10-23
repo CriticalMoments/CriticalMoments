@@ -116,6 +116,42 @@ each usage independently from remote configuration. Reused names will log warnin
 /// Set the current theme for this CM instance
 - (void)setTheme:(CMTheme *)theme;
 
+/**
+ Register a custom or well-known string property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+/**
+ Register a custom or well-known integer (int64) property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+;
+/**
+ Register a custom or well-known boolean property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+;
+/**
+ Register a custom or well-known floating point (double) property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+;
+
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)objcPing;

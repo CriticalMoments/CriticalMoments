@@ -21,6 +21,9 @@ func (s *staticPropertyProvider) Value() interface{} {
 }
 
 func (s *staticPropertyProvider) Kind() reflect.Kind {
+	if s.value == nil {
+		return reflect.Invalid
+	}
 	return reflect.TypeOf(s.value).Kind()
 }
 
