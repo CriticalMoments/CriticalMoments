@@ -44,7 +44,14 @@ let package = Package(
             name: "CriticalMoments",
             dependencies: ["Appcore"],
             path: "ios/Sources/CriticalMoments",
-            publicHeadersPath:"include"),
+            publicHeadersPath:"include",
+            cSettings: [
+                .unsafeFlags([
+                    "-Werror=return-type",
+                    "-Werror=unused-variable",
+                    "-Werror"
+                ]),
+            ]),
         appcoreTarget,
         .testTarget(
             name: "CriticalMomentsTests",

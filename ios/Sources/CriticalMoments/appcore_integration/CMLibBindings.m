@@ -102,6 +102,9 @@
       BOOL isWebLink = [@"http" isEqualToString:url.scheme] || [@"https" isEqualToString:url.scheme];
       if (link.useEmbeddedBrowser && isWebLink) {
           BOOL success = [self openLinkInEmbeddedBrowser:url];
+          if (!success) {
+              NSLog(@"CriticalMoments: failed to launch link in embedded browser.");
+          }
       }
 
       [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];

@@ -178,7 +178,6 @@
 
     // Audio
     CMAudioPlayingPropertyProvider *audioPlayingProvider = [[CMAudioPlayingPropertyProvider alloc] init];
-    bool audio = [audioPlayingProvider boolValue];
     [self registerLibPropertyProvider:@"other_audio_playing" value:audioPlayingProvider];
 
     // Calls
