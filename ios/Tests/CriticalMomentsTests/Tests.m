@@ -430,4 +430,26 @@
     [self waitForExpectations:expectations timeout:5.0];
 }
 
+- (void)testTimezoneOffset {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    [self startCMForTest:cm];
+
+    XCTestExpectation *expectationSuccess = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectationSuccess];
+
+    NSTimeZone *tz = NSTimeZone.localTimeZone;
+    NSString *condition = [NSString stringWithFormat:@"timezone_gmt_offset == %ld", tz.secondsFromGMT];
+    [cm checkNamedCondition:@"nonName4"
+                  condition:condition
+                    handler:^(bool result, NSError *_Nullable er2) {
+                      if (!er2 && result) {
+                          [expectationSuccess fulfill];
+                      }
+                    }];
+
+    [self waitForExpectations:expectations timeout:5.0];
+}
+
 @end
