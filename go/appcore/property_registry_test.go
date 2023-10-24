@@ -3,6 +3,7 @@ package appcore
 import (
 	"errors"
 	"reflect"
+	"strings"
 	"testing"
 	"unsafe"
 
@@ -78,7 +79,7 @@ func TestPropertyRegistrySetInvalid(t *testing.T) {
 
 func TestPropertyRegistryValidateRequired(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{
+	pr.builtInPropertyTypes = map[string]reflect.Kind{
 		"platform": reflect.String,
 	}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
@@ -96,21 +97,24 @@ func TestPropertyRegistryValidateRequired(t *testing.T) {
 	}
 }
 
-func TestPropertyRegistryValidateWellKnown(t *testing.T) {
+func TestPropertyRegistryValidateOptional(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"user_signed_in": reflect.Bool,
+	pr.builtInPropertyTypes = map[string]reflect.Kind{
+		"low_data_mode": reflect.Bool, // this property is optional
 	}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	if pr.validateProperties() != nil {
-		t.Fatal("Missing well known failed validation")
+		t.Fatal("Missing optional failed validation")
 	}
-	err := pr.registerStaticProperty("user_signed_in", 42)
+	err := pr.registerStaticProperty("low_data_mode", 42)
 	if err == nil {
 		t.Fatal("Added with type mismatch")
 	}
-	pr.registerStaticProperty("user_signed_in", true)
+	err = pr.registerStaticProperty("low_data_mode", true)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if pr.validateProperties() != nil {
 		t.Fatal("Validation failed on valid type")
 	}
@@ -126,7 +130,7 @@ func testHelperNewCondition(s string, t *testing.T) *datamodel.Condition {
 
 func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	versionConditions := testHelperNewCondition(`
@@ -149,7 +153,7 @@ func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
 
 func TestPropertyRegistryVersionNumberComponent(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"os_version": reflect.String, "app_version": reflect.String}
 
 	// Valid string -- saves and able to parse components with function
@@ -210,7 +214,7 @@ func (p *testPropertyProvider) BoolValue() bool {
 
 func TestDynamicProperties(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.Int}
 
 	dp := testPropertyProvider{}
@@ -228,7 +232,7 @@ func TestDynamicProperties(t *testing.T) {
 
 func TestPropertyRegistryConditionEval(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
 		"app_version":         reflect.String, // using as a populated string
 		"screen_width_pixels": reflect.Int,    // using as a populated in
@@ -325,7 +329,7 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 
 func TestDateFunctionsInConditions(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	// time library created
@@ -375,7 +379,7 @@ func TestUnknownVarsInConditions(t *testing.T) {
 	}
 
 	pr := newPropertyRegistry()
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	result, err := pr.evaluateCondition(c)
@@ -411,7 +415,7 @@ func TestUnknownVarsInConditions(t *testing.T) {
 func TestDynamicMethods(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.requiredPropertyTypes = map[string]reflect.Kind{
+	pr.builtInPropertyTypes = map[string]reflect.Kind{
 		"platform": reflect.String,
 	}
 	pr.registerStaticProperty("platform", "ios")
@@ -497,7 +501,7 @@ func TestDynamicMethods(t *testing.T) {
 func TestRandomInConditions(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.requiredPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 
 	result, err := pr.evaluateCondition(testHelperNewCondition("rand() >= 0 && rand() <= 2^63 && rand() != rand()", t))
 	if err != nil || !result {
@@ -512,5 +516,226 @@ func TestRandomInConditions(t *testing.T) {
 	result, err = pr.evaluateCondition(testHelperNewCondition("randForKey('key1', 1) == 292785326893130985 && randForKey('x', sessionRand()) >= 0", t))
 	if err != nil || !result {
 		t.Fatal("randForKey not stable, or can't be seeded with sessionRand")
+	}
+}
+
+func TestCustomProperties(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"well_known_v": reflect.String,
+	}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	// Test a custom properties with correct prefix
+	err := pr.registerStaticProperty("custom_stringv", "hello")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("custom_boolv", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("custom_intv", 42)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("custom_floatv", 3.3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// test accessing with full name
+	result, err := pr.evaluateCondition(testHelperNewCondition("custom_stringv == 'hello' && custom_boolv == false && custom_intv == 42 && custom_floatv == 3.3 && custom_nilv == nil", t))
+	if err != nil || !result {
+		t.Fatal("custom properties failed")
+	}
+	// test accessing with short name
+	result, err = pr.evaluateCondition(testHelperNewCondition("stringv == 'hello' && boolv == false && intv == 42 && floatv == 3.3 && nilv == nil", t))
+	if err != nil || !result {
+		t.Fatal("custom properties failed with short names")
+	}
+
+	// test without prefix
+	err = pr.registerStaticProperty("no_prefix_v", "hello")
+	if err == nil {
+		t.Fatal("Allowed custom property without prefix")
+	}
+
+	// Test an invalid type property (float32)
+	err = pr.registerStaticProperty("custom_float32v", float32(3.3))
+	if err == nil {
+		t.Fatal("Allowed custom property with invalid type")
+	}
+}
+
+func TestNoPrefixCollision(t *testing.T) {
+	// Built in and well known can't use custom prefix
+	for k := range datamodel.BuiltInPropertyTypes() {
+		if strings.HasPrefix(k, CustomPropertyPrefix) {
+			t.Fatalf("Built in property has custom prefix: %s", k)
+		}
+	}
+
+	for k := range datamodel.WellKnownPropertyTypes() {
+		if strings.HasPrefix(k, CustomPropertyPrefix) {
+			t.Fatalf("Built in property has custom prefix: %s", k)
+		}
+	}
+}
+
+func TestValidateCustomPrefix(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	err := pr.validateProperties()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := staticPropertyProvider{
+		value: 42,
+	}
+
+	pr.providers["custom_stringv"] = &s
+	err = pr.validateProperties()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pr.providers["not_custom_stringv"] = &s
+	err = pr.validateProperties()
+	if err == nil {
+		t.Fatal("allowed non custom property")
+	}
+}
+
+func TestClientPropertyRegistration(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"well_known":  reflect.String,
+		"well_known2": reflect.String,
+	}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{
+		"built_in": reflect.String,
+	}
+
+	// Should not allow registering well known with wrong type
+	err := pr.registerClientProperty("well_known", 42)
+	if err == nil || pr.providers["well_known"] != nil {
+		t.Fatal("Allowed registering well known with wrong type")
+	}
+
+	// Should not allow registering built in
+	err = pr.registerClientProperty("built_in", "hello")
+	if err == nil || pr.providers["built_in"] != nil {
+		t.Fatal("Allowed registering built in")
+	}
+
+	// should be able to register well known
+	err = pr.registerClientProperty("well_known", "hello")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pr.providers["well_known"] == nil {
+		t.Fatal("Failed to register well known without a prefix")
+	}
+	if v, err := pr.propertyValue("well_known"); v != "hello" || err != nil {
+		t.Fatal("Failed to register well known")
+	}
+
+	// should be able to register custom
+	err = pr.registerClientProperty("customv", "hello2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pr.providers["custom_customv"] == nil {
+		t.Fatal("Failed to register well known without a prefix")
+	}
+	if pr.providers["customv"] != nil {
+		t.Fatal("registered custom without a prefix")
+	}
+	if v, err := pr.propertyValue("customv"); v != "hello2" || err != nil {
+		t.Fatal("Failed to access custom via short hand")
+	}
+	if v, err := pr.propertyValue("custom_customv"); v != "hello2" || err != nil {
+		t.Fatal("Failed to access custom via full name")
+	}
+
+	// should not be able to regsiter nil
+	err = pr.registerClientProperty("well_known2", nil)
+	if err == nil || pr.providers["well_known2"] != nil {
+		t.Fatal("Allowed nil value")
+	}
+}
+
+func TestDisallowInvalidPropertyNames(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	invalidNames := []string{
+		"with.period",
+		"With space",
+		"with-dash",
+		"withEmoji😀",
+		"withPunctuation!",
+		"",
+	}
+
+	for _, n := range invalidNames {
+		err := pr.registerClientProperty(n, "hello2")
+		if err == nil {
+			t.Fatal("allowed non alphanumeric property name" + n)
+		}
+	}
+	if !validPropertyName("edgesAZaz09_") {
+		t.Fatal("valid property name failed")
+	}
+	for name := range datamodel.WellKnownPropertyTypes() {
+		if !validPropertyName(name) {
+			t.Fatalf("Invalid well known property name: %s", name)
+		}
+	}
+	for name := range datamodel.BuiltInPropertyTypes() {
+		if !validPropertyName(name) {
+			t.Fatalf("Invalid well known property name: %s", name)
+		}
+	}
+}
+
+func TestClientPropertyJsonRegistration(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"stringKey": reflect.String,
+	}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	j := `{
+		"stringKey": "stringVal",
+		"invalidKey": {},
+		"boolKey": true,
+		"intKey": 42,
+		"floatKey": 3.3
+	}`
+
+	err := pr.registerClientPropertiesFromJson(([]byte)(j))
+	if err == nil {
+		t.Fatal("json registration failed to error on invalid")
+		// but we still expect some to succeed
+	}
+	if v, err := pr.propertyValue("stringKey"); v != "stringVal" || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("boolKey"); v != true || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("intKey"); v != 42.0 || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("floatKey"); v != 3.3 || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if _, err := pr.propertyValue("invalidKey"); err == nil {
+		t.Fatal("invalid registered")
 	}
 }

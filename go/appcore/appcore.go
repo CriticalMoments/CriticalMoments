@@ -293,19 +293,67 @@ func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
 	return ac.config.ThemeWithName(themeName)
 }
 
+var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
+
 // Repeitive, but gomobile doesn't allow for `interface{}`
 func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticIntProperty(key string, value int) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
+func (ac *Appcore) RegisterClientStringProperty(key string, value string) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientIntProperty(key string, value int) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientFloatProperty(key string, value float64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+
 func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
+}
+func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
 }

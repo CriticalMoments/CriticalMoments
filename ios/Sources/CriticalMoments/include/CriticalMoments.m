@@ -253,6 +253,30 @@ static CriticalMoments *sharedInstance = nil;
     return [_appcore themeForName:name];
 }
 
+#pragma mark Custom Properties
+
+- (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error {
+    [_appcore registerClientStringProperty:name value:value error:error];
+}
+
+- (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientBoolProperty:name value:value error:error];
+}
+
+- (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientFloatProperty:name value:value error:error];
+}
+
+- (void)registerIntegerProperty:(long long)value
+                         forKey:(NSString *)name
+                          error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientIntProperty:name value:value error:error];
+}
+
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientPropertiesFromJson:jsonData error:error];
+}
+
 #pragma mark Current Theme
 
 - (CMTheme *)currentTheme {
