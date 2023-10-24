@@ -408,6 +408,10 @@
     [cm registerStringProperty:@"hello" forKey:@"stringy" error:&error];
     XCTAssertNil(error, @"failed to register custom property");
 
+    NSString *jsonString = @"{\"js\": \"a\", \"jb\": true, \"jn\": 3.3}";
+    [cm registerPropertiesFromJson:[jsonString dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssertNil(error, @"failed to register json properties");
+
     [self startCMForTest:cm];
 
     // registering after start should error
@@ -419,7 +423,7 @@
     [expectations addObject:expectationSuccess];
     [cm checkNamedCondition:@"nonName3"
                   condition:@"user_signup_date == 1698093984 && stringy =='hello' && custom_stringy == 'hello' && "
-                            @"stringy2 == nil"
+                            @"stringy2 == nil && js == 'a' && jb == true && jn == 3.3"
                     handler:^(bool result, NSError *_Nullable er2) {
                       if (!er2 && result) {
                           [expectationSuccess fulfill];

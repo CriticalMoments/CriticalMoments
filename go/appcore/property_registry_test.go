@@ -702,3 +702,40 @@ func TestDisallowInvalidPropertyNames(t *testing.T) {
 		}
 	}
 }
+
+func TestClientPropertyJsonRegistration(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
+		"stringKey": reflect.String,
+	}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+
+	j := `{
+		"stringKey": "stringVal",
+		"invalidKey": {},
+		"boolKey": true,
+		"intKey": 42,
+		"floatKey": 3.3
+	}`
+
+	err := pr.registerClientPropertiesFromJson(([]byte)(j))
+	if err == nil {
+		t.Fatal("json registration failed to error on invalid")
+		// but we still expect some to succeed
+	}
+	if v, err := pr.propertyValue("stringKey"); v != "stringVal" || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("boolKey"); v != true || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("intKey"); v != 42.0 || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if v, err := pr.propertyValue("floatKey"); v != 3.3 || err != nil {
+		t.Fatal("Failed to register json properties")
+	}
+	if _, err := pr.propertyValue("invalidKey"); err == nil {
+		t.Fatal("invalid registered")
+	}
+}

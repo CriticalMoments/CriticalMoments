@@ -120,6 +120,19 @@ func (p *propertyRegistry) registerClientProperty(key string, value interface{})
 	return p.registerStaticProperty(updatedKey, value)
 }
 
+func (p *propertyRegistry) registerClientPropertiesFromJson(jsonData []byte) error {
+	ps, err := newPropertySetFromJson(jsonData)
+	// we process partial results, even if there was an error
+	if ps != nil && ps.values != nil {
+		for k, v := range ps.values {
+			nerr := p.registerClientProperty(k, v)
+			err = errors.Join(err, nerr)
+		}
+	}
+
+	return err
+}
+
 func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) error {
 	s := staticPropertyProvider{
 		value: value,

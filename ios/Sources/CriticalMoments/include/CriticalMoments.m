@@ -273,6 +273,10 @@ static CriticalMoments *sharedInstance = nil;
     [_appcore registerClientIntProperty:name value:value error:error];
 }
 
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientPropertiesFromJson:jsonData error:error];
+}
+
 #pragma mark Current Theme
 
 - (CMTheme *)currentTheme {

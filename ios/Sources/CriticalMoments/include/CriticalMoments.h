@@ -132,7 +132,7 @@ each usage independently from remote configuration. Reused names will log warnin
  @param error Any errors encountered setting the property
  */
 - (void)registerIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
-;
+
 /**
  Register a custom or well-known boolean property for use in the CM condition engine.
 
@@ -141,7 +141,7 @@ each usage independently from remote configuration. Reused names will log warnin
  @param error Any errors encountered setting the property
  */
 - (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
-;
+
 /**
  Register a custom or well-known floating point (double) property for use in the CM condition engine.
 
@@ -150,7 +150,22 @@ each usage independently from remote configuration. Reused names will log warnin
  @param error Any errors encountered setting the property
  */
 - (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
-;
+
+/**
+ Register a set of custom or well-known properties from JSON formatted data.
+
+ The JSON object should be a single level JSON object, with string keys and bool, string or number values.
+
+ On an issue, it will skip they problematic key/value pair, but continue on and parse as many supported key/value pairs
+ as possible.
+
+ All JSON number values are parsed into float64 values (including integers).
+
+ @param jsonData The json data, in the format described above
+ @param error Any errors encountered setting these properties. An error does not necessarily indicate that all fields
+ failed, just that some field(s) failed.
+ */
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:

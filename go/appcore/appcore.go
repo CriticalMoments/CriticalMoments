@@ -320,12 +320,6 @@ func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
 	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
-func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
-	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
-}
 func (ac *Appcore) RegisterClientStringProperty(key string, value string) error {
 	if ac.started {
 		return errRegisterAfterStart
@@ -349,4 +343,17 @@ func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
 		return errRegisterAfterStart
 	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
+}
+func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
 }
