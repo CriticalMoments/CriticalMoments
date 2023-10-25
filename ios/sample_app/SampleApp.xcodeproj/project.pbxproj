@@ -30,6 +30,7 @@
 		E0B545FC29F407C3002A25A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0B545FA29F407C3002A25A8 /* LaunchScreen.storyboard */; };
 		E0B545FF29F407C3002A25A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545FE29F407C3002A25A8 /* main.m */; };
 		E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B5460829F407C3002A25A8 /* SampleAppTests.m */; };
+		E0C102E62AE95EE4005E1A1F /* PropertiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C102E52AE95EE4005E1A1F /* PropertiesTests.m */; };
 		E0C508D42A0DCB130084B31B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E0DA23EF29F4095900DB0AC7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0DA23EE29F4095900DB0AC7 /* CriticalMoments */; };
 		E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */; };
@@ -84,6 +85,7 @@
 		E0B545FE29F407C3002A25A8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B5460829F407C3002A25A8 /* SampleAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleAppTests.m; sourceTree = "<group>"; };
+		E0C102E52AE95EE4005E1A1F /* PropertiesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PropertiesTests.m; sourceTree = "<group>"; };
 		E0DA23F029F560A800DB0AC7 /* DemoViewContoller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoViewContoller.h; sourceTree = "<group>"; };
 		E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoViewContoller.m; sourceTree = "<group>"; };
 		E0DD1D182A3A1B4B0059CC38 /* SheetDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SheetDemoScreen.h; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 		E0B5460729F407C3002A25A8 /* SampleAppTests */ = {
 			isa = PBXGroup;
 			children = (
+				E0C102E52AE95EE4005E1A1F /* PropertiesTests.m */,
 				E0B5460829F407C3002A25A8 /* SampleAppTests.m */,
 				E0446E742A0DC0170069E5BD /* SnapshotTests.m */,
 				E05AB4E42A0E9CF70034A9CA /* testConfig.json */,
@@ -343,6 +346,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E0C508D42A0DCB130084B31B /* Utils.m in Sources */,
+				E0C102E62AE95EE4005E1A1F /* PropertiesTests.m in Sources */,
 				E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */,
 				E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */,
 				E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */,
