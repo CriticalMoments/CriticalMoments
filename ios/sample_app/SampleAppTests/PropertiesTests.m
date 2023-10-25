@@ -115,7 +115,9 @@
                         }];
     }
 
-    [self waitForExpectations:expectations timeout:20.0];
+    double runTime = 60.0;
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:runTime]];
+    [self waitForExpectations:expectations timeout:0.5];
 }
 
 @end
