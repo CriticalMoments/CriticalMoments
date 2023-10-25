@@ -229,7 +229,7 @@ static CriticalMoments *sharedInstance = nil;
     dispatch_async(_actionQueue, ^{
       NSError *error;
       BOOL result;
-      [_appcore checkNamedCondition:blockName conditionString:blockCondition ret0_:&result error:&error];
+      [_appcore checkNamedCondition:blockName conditionString:blockCondition returnResult:&result error:&error];
 
       if (blockHandler) {
           blockHandler(result, error);
