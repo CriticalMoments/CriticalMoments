@@ -22,7 +22,6 @@
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
 		E07B775129FA0144001521F4 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775329FA04FF001521F4 /* MainDemoScreen.m */; };
-		E0A582CB2A019F5400178076 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0A582CA2A019F5400178076 /* CriticalMoments */; };
 		E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
 		E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545F029F407C2002A25A8 /* SceneDelegate.m */; };
 		E0B545F729F407C2002A25A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0B545F529F407C2002A25A8 /* Main.storyboard */; };
@@ -31,6 +30,7 @@
 		E0B545FF29F407C3002A25A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545FE29F407C3002A25A8 /* main.m */; };
 		E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B5460829F407C3002A25A8 /* SampleAppTests.m */; };
 		E0C102E62AE95EE4005E1A1F /* PropertiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C102E52AE95EE4005E1A1F /* PropertiesTests.m */; };
+		E0C102FD2AE9AA1A005E1A1F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
 		E0C508D42A0DCB130084B31B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E0DA23EF29F4095900DB0AC7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0DA23EE29F4095900DB0AC7 /* CriticalMoments */; };
 		E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */; };
@@ -105,7 +105,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0A582CB2A019F5400178076 /* CriticalMoments in Frameworks */,
 				E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */,
 				E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */,
 			);
@@ -248,7 +247,6 @@
 			);
 			name = SampleAppTests;
 			packageProductDependencies = (
-				E0A582CA2A019F5400178076 /* CriticalMoments */,
 				E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */,
 				E03977E62ACBAD4100A879AD /* SnapshotTesting */,
 			);
@@ -350,6 +348,7 @@
 				E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */,
 				E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */,
 				E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */,
+				E0C102FD2AE9AA1A005E1A1F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,6 +524,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
@@ -560,6 +560,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = D5VFD22Y98;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
@@ -684,10 +685,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
-		};
-		E0A582CA2A019F5400178076 /* CriticalMoments */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CriticalMoments;
 		};
 		E0DA23EE29F4095900DB0AC7 /* CriticalMoments */ = {
 			isa = XCSwiftPackageProductDependency;

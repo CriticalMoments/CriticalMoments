@@ -7,7 +7,7 @@
 
 #import <XCTest/XCTest.h>
 
-@import CriticalMoments;
+#import "../SampleApp/AppDelegate.h"
 
 @interface PropertiesTests : XCTestCase
 
@@ -94,6 +94,10 @@
     };
     // clang-format on
 
+    id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
+    AppDelegate *aad = (AppDelegate *)ad;
+    CriticalMoments *cm = [aad cmInstance];
+
     // Expectations just used to test condition evaluated, not that it passed
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
@@ -103,8 +107,7 @@
         // Expectations are only used to wait -- actual assets in the callback
         XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
         [expectations addObject:expectation];
-        [CriticalMoments.sharedInstance
-            checkNamedCondition:name
+        [cm checkNamedCondition:name
                       condition:condition
                         handler:^(bool result, NSError *_Nullable error) {
                           if (error != nil) {
@@ -115,9 +118,7 @@
                         }];
     }
 
-    double runTime = 60.0;
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:runTime]];
-    [self waitForExpectations:expectations timeout:0.5];
+    [self waitForExpectations:expectations timeout:20];
 }
 
 @end
