@@ -7,6 +7,8 @@
 
 #import "AppDelegate.h"
 
+@import CriticalMoments;
+
 #import "Utils.h"
 
 @interface AppDelegate ()
@@ -18,6 +20,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     return YES;
+}
+
+- (id)cmInstance {
+    return CriticalMoments.sharedInstance;
 }
 
 #pragma mark - UISceneSession lifecycle
