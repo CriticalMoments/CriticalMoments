@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */; };
 		E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E62ACBAD4100A879AD /* SnapshotTesting */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
@@ -106,6 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */,
+				E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */,
 				E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -249,6 +251,7 @@
 			packageProductDependencies = (
 				E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */,
 				E03977E62ACBAD4100A879AD /* SnapshotTesting */,
+				E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */,
 			);
 			productName = SampleAppTests;
 			productReference = E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */;
@@ -676,6 +679,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CriticalMoments;
+		};
 		E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
