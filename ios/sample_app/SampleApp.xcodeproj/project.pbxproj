@@ -31,8 +31,6 @@
 		E0B545FF29F407C3002A25A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545FE29F407C3002A25A8 /* main.m */; };
 		E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B5460829F407C3002A25A8 /* SampleAppTests.m */; };
 		E0C102E62AE95EE4005E1A1F /* PropertiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C102E52AE95EE4005E1A1F /* PropertiesTests.m */; };
-		E0C102FD2AE9AA1A005E1A1F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
-		E0C508D42A0DCB130084B31B /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E0DA23EF29F4095900DB0AC7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0DA23EE29F4095900DB0AC7 /* CriticalMoments */; };
 		E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */; };
 		E0DD1D1A2A3A1B4B0059CC38 /* SheetDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */; };
@@ -346,12 +344,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0C508D42A0DCB130084B31B /* Utils.m in Sources */,
 				E0C102E62AE95EE4005E1A1F /* PropertiesTests.m in Sources */,
 				E0B5460929F407C3002A25A8 /* SampleAppTests.m in Sources */,
 				E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */,
 				E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */,
-				E0C102FD2AE9AA1A005E1A1F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
