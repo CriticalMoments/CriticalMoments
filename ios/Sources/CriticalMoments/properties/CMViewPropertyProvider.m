@@ -71,13 +71,13 @@
 
 @implementation CMAppStatePropertyProvider
 
-+(UIApplicationState) getApplicationStateBlocking {
++ (UIApplicationState)getApplicationStateBlocking {
     // [UIApplication applicationState] must be used from main thread only
     UIApplicationState __block state = -999999;
     dispatch_semaphore_t stateSem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
-       state = UIApplication.sharedApplication.applicationState;
-        dispatch_semaphore_signal(stateSem);
+      state = UIApplication.sharedApplication.applicationState;
+      dispatch_semaphore_signal(stateSem);
     });
     dispatch_semaphore_wait(stateSem, dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC));
     return state;

@@ -91,7 +91,14 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 	return nil
 }
 
-func (p *propertyRegistry) registerClientProperty(key string, value interface{}) error {
+func (p *propertyRegistry) registerClientProperty(key string, value interface{}) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in registerClientProperty: %v", r)
+		}
+	}()
+
 	// check not built in key
 	_, isBuiltIn := p.builtInPropertyTypes[key]
 	if isBuiltIn {
@@ -133,7 +140,14 @@ func (p *propertyRegistry) registerClientPropertiesFromJson(jsonData []byte) err
 	return err
 }
 
-func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) error {
+func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in registerStaticProperty: %v", r)
+		}
+	}()
+
 	s := staticPropertyProvider{
 		value: value,
 	}

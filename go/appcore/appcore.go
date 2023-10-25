@@ -55,7 +55,14 @@ func NewAppcore() *Appcore {
 const filePrefix = "file://"
 const httpsPrefix = "https://"
 
-func (ac *Appcore) SetConfigUrl(configUrl string) error {
+func (ac *Appcore) SetConfigUrl(configUrl string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetConfigUrl: %v", r)
+		}
+	}()
+
 	if !strings.HasPrefix(configUrl, filePrefix) && !strings.HasPrefix(configUrl, httpsPrefix) {
 		return errors.New("config URL must start with https:// or file://")
 	}
@@ -64,7 +71,14 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	return nil
 }
 
-func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
+func (ac *Appcore) SetApiKey(apiKey string, bundleID string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetApiKey: %v", r)
+		}
+	}()
+
 	key, err := signing.ParseApiKey(apiKey)
 	if err != nil {
 		return errors.New("invalid API Key. Please make sure you get your key from criticalmoments.io")
@@ -79,7 +93,14 @@ func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
 	return nil
 }
 
-func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
+func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetDataDirPath: %v", r)
+		}
+	}()
+
 	cache, err := newCacheWithBaseDir(dataDirPath)
 	if err != nil {
 		return err
@@ -99,6 +120,13 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
 }
 
 func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in SetTimezoneGMTOffset: %v\n", r)
+		}
+	}()
+
 	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
 	tz := time.FixedZone(tzName, gmtOffset)
 	time.Local = tz
@@ -106,7 +134,14 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	ac.propertyRegistry.registerStaticProperty("timezone_gmt_offset", gmtOffset)
 }
 
-func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
+func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in CheckNamedConditionsCollision: %v", r)
+		}
+	}()
+
 	if name == "" {
 		return nil
 	}
@@ -121,7 +156,15 @@ func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString str
 	return nil
 }
 
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (returnResult bool, returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnResult = false
+			returnErr = fmt.Errorf("panic in CheckNamedCondition: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return false, errors.New("Appcore not started")
 	}
@@ -145,6 +188,13 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (boo
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in RegisterLibrayBindings: %v\n", r)
+		}
+	}()
+
 	ac.libBindings = lb
 
 	// connect iOS functions to condition system
@@ -159,7 +209,14 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	})
 }
 
-func (ac *Appcore) Start() error {
+func (ac *Appcore) Start() (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in Start: %v", r)
+		}
+	}()
+
 	if ac.started {
 		return errors.New("appcore already started. Start should only be called once")
 	}
@@ -227,7 +284,14 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-func (ac *Appcore) SendEvent(name string) error {
+func (ac *Appcore) SendEvent(name string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SendEvent: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
@@ -255,7 +319,14 @@ func (ac *Appcore) SendEvent(name string) error {
 	return lastErr
 }
 
-func (ac *Appcore) PerformNamedAction(actionName string) error {
+func (ac *Appcore) PerformNamedAction(actionName string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in PerformNamedAction: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
@@ -266,7 +337,14 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 	return ac.PerformAction(action)
 }
 
-func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
+func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in PerformAction: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
@@ -286,7 +364,15 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
 	return action.PerformAction(&ad)
 }
 
-func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
+func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in ThemeForName: %v", r)
+			resultTheme = nil
+		}
+	}()
+
 	if !ac.started {
 		return nil
 	}
@@ -296,6 +382,7 @@ func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
 var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
 
 // Repeitive, but gomobile doesn't allow for `interface{}`
+// Panic catching is one level down stack here, but still there.
 func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
 	if ac.started {
 		return errRegisterAfterStart
@@ -345,13 +432,27 @@ func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
 	return ac.propertyRegistry.registerClientProperty(key, value)
 }
 
-func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in RegisterLibPropertyProvider: %v", r)
+		}
+	}()
+
 	if ac.started {
 		return errRegisterAfterStart
 	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }
-func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) error {
+func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in RegisterClientPropertiesFromJson: %v", r)
+		}
+	}()
+
 	if ac.started {
 		return errRegisterAfterStart
 	}
