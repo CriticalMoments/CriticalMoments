@@ -125,6 +125,8 @@
     [self registerStaticFloatProperty:@"screen_scale" value:UIScreen.mainScreen.scale];
     CMBrightnessProvider *brpp = [[CMBrightnessProvider alloc] init];
     [self registerLibPropertyProvider:@"screen_brightness" value:brpp];
+    CMScreenCapturedProvider *scpp = [[CMScreenCapturedProvider alloc] init];
+    [self registerLibPropertyProvider:@"screen_captured" value:scpp];
 
     [self setUserInterfaceIdiom];
 

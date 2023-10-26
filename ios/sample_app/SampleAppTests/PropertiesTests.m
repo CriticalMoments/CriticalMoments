@@ -27,6 +27,9 @@
     // Running on device is better than simulator as some properties have more rich data on device (battery level,
     // networking, orientation, etc), but should pass on any platform/device.
 
+    // Important: these tests should reflect the exact values from our documentation as a confirmation docs are correct
+    // For example: only allow nil if we have documented that the value is nullable
+
     // clang-format off
     NSDictionary *cases = @{
         @"platform" : @"platform in ['iOS', 'iPadOS']",
@@ -47,6 +50,8 @@
         @"screen_height_pixels": @"screen_height_pixels != nil && screen_height_pixels > 0 && screen_height_pixels < 99999", // add_test_count
         @"screen_scale": @"screen_scale != nil && screen_scale >= 1.0 && screen_scale <= 10.0", // add_test_count
         @"screenScalePixToPoint": @"screen_width_pixels / screen_scale == screen_width_points && screen_height_pixels / screen_scale == screen_height_points", // add_test_count
+        @"screen_brightness": @"screen_brightness >= 0.0 && screen_brightness <= 1.0", // add_test_count
+        @"screen_captured": @"screen_captured in [true,false]", // add_test_count
         @"locale_language_code": @"locale_language_code != nil && len(locale_language_code) == 2", // add_test_count
         @"locale_country_code": @"locale_country_code != nil && len(locale_country_code) == 2", // add_test_count
         @"locale_currency_code": @"locale_currency_code != nil && len(locale_currency_code) == 3", // add_test_count
@@ -91,7 +96,6 @@
         @"calendar_permission": @"calendar_permission in ['not_determined', 'denied', 'authorized_full', 'authorized_write_only', 'restricted', 'unknown']", // add_test_count
         @"reminders_permission": @"reminders_permission in ['not_determined', 'denied', 'authorized_full', 'authorized_write_only', 'restricted', 'unknown']", // add_test_count
         @"bluetooth_permission": @"bluetooth_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
-        @"screen_brightness": @"screen_brightness >= 0.0 && screen_brightness <= 1.0", // add_test_count
     };
     // clang-format on
 

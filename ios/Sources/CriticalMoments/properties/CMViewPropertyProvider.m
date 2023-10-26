@@ -127,3 +127,15 @@
 }
 
 @end
+
+@implementation CMScreenCapturedProvider
+
+- (BOOL)boolValue {
+    return UIScreen.mainScreen.captured;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeBool;
+}
+
+@end

@@ -27,4 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMBrightnessProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
+@interface CMScreenCapturedProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END
