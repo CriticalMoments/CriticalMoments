@@ -1,6 +1,7 @@
 {
     "actionType": "alert",
     "condition": "platform == 'iOS'",
+    "fallback": "fallbackName",
     "actionData": {
         "title": "For real?",
         "message": "Are you sure you want to?",

@@ -55,7 +55,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 11 {
+	if len(pc.namedActions) != 14 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -103,6 +103,21 @@ func TestPrimaryConfigJson(t *testing.T) {
 	ma := pc.ActionWithName("modalAction")
 	if ma.ModalAction == nil || len(ma.ModalAction.Content.Sections) != 1 {
 		t.Fatal("failed to parse modal action")
+	}
+	fa := pc.ActionWithName("futureAction")
+	_, ok = fa.actionData.(*UnknownAction)
+	if fa.ActionType != "future_action_type" || !ok || fa.FallbackActionName != "alertAction" {
+		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
+	}
+	nfa := pc.ActionWithName("nestedFutureTypeFail")
+	_, ok = nfa.actionData.(*UnknownAction)
+	if nfa.ActionType != "future_action_type" || !ok || nfa.FallbackActionName != "unknownActionTypeFutureProof" {
+		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
+	}
+	nfas := pc.ActionWithName("nestedFutureTypeSuccess")
+	_, ok = nfas.actionData.(*UnknownAction)
+	if nfas.ActionType != "future_action_type" || !ok || nfas.FallbackActionName != "futureAction" {
+		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
 	}
 
 	// Triggers

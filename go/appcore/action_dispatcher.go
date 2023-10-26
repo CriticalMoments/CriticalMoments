@@ -39,3 +39,7 @@ func (ap *actionDispatcher) PerformConditionalAction(ca *datamodel.ConditionalAc
 	}
 	return nil
 }
+
+func (ap *actionDispatcher) PerformNamedAction(actionName string) error {
+	return ap.appcore.PerformNamedAction(actionName)
+}

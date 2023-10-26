@@ -99,6 +99,23 @@
             "reviewAction": {
                 "actionType": "review_prompt"
             },
+            "futureAction": {
+                "actionType": "future_action_type",
+                "fallback": "alertAction",
+                "actionData": {
+                    "futureProp": 1234
+                }
+            },
+            "nestedFutureTypeFail": {
+              "actionType": "future_action_type",
+              "fallback": "unknownActionTypeFutureProof",
+              "actionData": {}
+            },
+            "nestedFutureTypeSuccess": {
+              "actionType": "future_action_type",
+              "fallback": "futureAction",
+              "actionData": {}
+            },
             "modalAction": {
                 "actionType": "modal",
                 "actionData": {

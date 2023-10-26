@@ -43,12 +43,16 @@ type ActionContainer struct {
 	// generalized interface for functions we need for any actions type.
 	// Typically a pointer to the one value above that is populated.
 	actionData ActionTypeInterface
+
+	// Fallback if any issues performing action
+	FallbackActionName string
 }
 
 type jsonActionContainer struct {
-	ActionType    string          `json:"actionType"`
-	Condition     *Condition      `json:"condition"`
-	RawActionData json.RawMessage `json:"actionData"`
+	ActionType         string          `json:"actionType"`
+	Condition          *Condition      `json:"condition"`
+	FallbackActionName string          `json:"fallback"`
+	RawActionData      json.RawMessage `json:"actionData"`
 }
 
 // To be implemented by client libaray (eg: iOS SDK or Appcore)
@@ -58,6 +62,7 @@ type ActionBindings interface {
 	ShowAlert(alert *AlertAction) error
 	ShowLink(link *LinkAction) error
 	PerformConditionalAction(conditionalAction *ConditionalAction) error
+	PerformNamedAction(name string) error
 	ShowReviewPrompt() error
 	ShowModal(modal *ModalAction) error
 }
@@ -112,6 +117,7 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	ac.actionData = actionData
 	ac.ActionType = jac.ActionType
 	ac.Condition = jac.Condition
+	ac.FallbackActionName = jac.FallbackActionName
 	return nil
 }
 
@@ -141,5 +147,11 @@ func (ac *ActionContainer) PerformAction(ab ActionBindings) error {
 	if ac.actionData == nil {
 		return errors.New("attempted to perform action without AD interface")
 	}
-	return ac.actionData.PerformAction(ab)
+	err := ac.actionData.PerformAction(ab)
+
+	if err != nil && ac.FallbackActionName != "" {
+		err = ab.PerformNamedAction(ac.FallbackActionName)
+	}
+
+	return err
 }

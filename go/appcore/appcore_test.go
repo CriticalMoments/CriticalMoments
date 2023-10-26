@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -254,6 +255,32 @@ func TestPerformingAction(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).lastModal == nil {
 		t.Fatal("modal event didn't fire")
+	}
+
+	err = ac.PerformNamedAction("unknownActionTypeFutureProof")
+	if err == nil || !strings.Contains(err.Error(), "does not support this action type") {
+		t.Fatal("Unknown action didn't error")
+	}
+
+	err = ac.PerformNamedAction("nestedFutureTypeFail")
+	if err == nil || !strings.Contains(err.Error(), "does not support this action type") {
+		t.Fatal("Nested unknown actions didn't error up the stack")
+	}
+
+	// Verify fallback from future to alert, both single level and deep nested
+	fallbackActions := []string{"futureAction", "nestedFutureTypeSuccess"} // add_test_count
+	for _, actionName := range fallbackActions {
+		ac.libBindings.(*testLibBindings).lastAlertAction = nil
+		if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+			t.Fatal("test not initialized")
+		}
+		err = ac.PerformNamedAction(actionName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+			t.Fatal("alert event didn't fire as fallback")
+		}
 	}
 }
 
