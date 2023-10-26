@@ -123,6 +123,8 @@
     [self registerStaticIntProperty:@"screen_width_pixels" value:MIN(screenHeightPixels, screenWidthPixels)];
     [self registerStaticIntProperty:@"screen_height_pixels" value:MAX(screenHeightPixels, screenWidthPixels)];
     [self registerStaticFloatProperty:@"screen_scale" value:UIScreen.mainScreen.scale];
+    CMBrightnessProvider *brpp = [[CMBrightnessProvider alloc] init];
+    [self registerLibPropertyProvider:@"screen_brightness" value:brpp];
 
     [self setUserInterfaceIdiom];
 

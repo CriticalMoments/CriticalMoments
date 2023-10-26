@@ -115,3 +115,15 @@
 }
 
 @end
+
+@implementation CMBrightnessProvider
+
+- (double)floatValue {
+    return UIScreen.mainScreen.brightness;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
+}
+
+@end

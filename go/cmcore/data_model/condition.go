@@ -81,6 +81,7 @@ func BuiltInPropertyTypes() map[string]reflect.Kind {
 		"app_state":               reflect.String,
 		"has_watch":               reflect.Bool,
 		"on_call":                 reflect.Bool,
+		"screen_brightness":       reflect.Float64,
 
 		// Location
 		"location_permission":          reflect.Bool,

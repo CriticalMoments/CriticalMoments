@@ -24,4 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMForegroundProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
+@interface CMBrightnessProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END
