@@ -119,7 +119,7 @@ func TestAppcoreStart(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Check it loaded the config (more detailed test of parsing in cmcore)
-	if ac.config.DefaultTheme == nil {
+	if ac.config.DefaultTheme() == nil {
 		t.Fatal("Failed to load config in Appcore setup")
 	}
 }

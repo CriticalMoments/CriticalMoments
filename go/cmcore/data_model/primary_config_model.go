@@ -15,8 +15,8 @@ type PrimaryConfig struct {
 	ConfigVersion string
 
 	// Themes
-	DefaultTheme *Theme
-	namedThemes  map[string]Theme
+	defaultTheme *Theme
+	namedThemes  map[string]*Theme
 
 	// Actions
 	namedActions map[string]ActionContainer
@@ -28,12 +28,12 @@ type PrimaryConfig struct {
 	namedConditions map[string]*Condition
 }
 
+func (pc *PrimaryConfig) DefaultTheme() *Theme {
+	return pc.themeIteratingFallbacks(pc.defaultTheme)
+}
+
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
-	theme, ok := pc.namedThemes[name]
-	if ok {
-		return &theme
-	}
-	return nil
+	return pc.themeIteratingFallbacks(pc.namedThemes[name])
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
@@ -84,8 +84,8 @@ type jsonPrimaryConfig struct {
 }
 
 type jsonThemesSection struct {
-	DefaultTheme *Theme           `json:"defaultTheme"`
-	NamedThemes  map[string]Theme `json:"namedThemes"`
+	DefaultTheme *Theme            `json:"defaultTheme"`
+	NamedThemes  map[string]*Theme `json:"namedThemes"`
 }
 
 type jsonActionsSection struct {
@@ -112,14 +112,14 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	// Themes
 	if jpc.ThemesConfig != nil {
 		if jpc.ThemesConfig.DefaultTheme != nil {
-			pc.DefaultTheme = jpc.ThemesConfig.DefaultTheme
+			pc.defaultTheme = jpc.ThemesConfig.DefaultTheme
 		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
 		}
 	}
 	if pc.namedThemes == nil {
-		pc.namedThemes = make(map[string]Theme)
+		pc.namedThemes = make(map[string]*Theme)
 	}
 
 	// Actions
@@ -150,6 +150,28 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
+	if t == nil {
+		return nil
+	}
+	// Limit depth of search, to avoid infinite loops
+	for i := 0; i < 50; i++ {
+		if t.ValidateDisallowFallthoughReturningUserReadableIssue() == "" {
+			return t
+		}
+		if t.FallbackThemeName == "" {
+			return nil
+		}
+		nextTheme, ok := pc.namedThemes[t.FallbackThemeName]
+		if !ok {
+			return nil
+		}
+		t = nextTheme
+	}
+
+	return nil
+}
+
 func (pc PrimaryConfig) Validate() bool {
 	return pc.ValidateReturningUserReadableIssue() == ""
 }
@@ -172,14 +194,17 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if emptyKeyIssue := pc.validateMapsDontContainEmptyStringReturningUserReadable(); emptyKeyIssue != "" {
 		return emptyKeyIssue
 	}
+	if fallbackNameIssue := pc.validateFallbackNames(); fallbackNameIssue != "" {
+		return fallbackNameIssue
+	}
 
 	// Run nested validations
 	return pc.validateNestedReturningUserReadableIssue()
 }
 
 func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
-	if pc.DefaultTheme != nil {
-		if defaultThemeIssue := pc.DefaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
+	if pc.defaultTheme != nil {
+		if defaultThemeIssue := pc.defaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
 			return defaultThemeIssue
 		}
 	}
@@ -254,6 +279,35 @@ func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() stri
 			_, ok := pc.namedActions[actionName]
 			if !ok {
 				return fmt.Sprintf("Action \"%v\" specified named action \"%v\", which doesn't exist", sourceActionName, actionName)
+			}
+		}
+	}
+
+	return ""
+}
+
+func (pc *PrimaryConfig) validateFallbackNames() string {
+	for themeName, theme := range pc.namedThemes {
+		if theme.FallbackThemeName != "" {
+			_, ok := pc.namedThemes[theme.FallbackThemeName]
+			if !ok {
+				return fmt.Sprintf("Theme \"%v\" specified fallback theme \"%v\", which doesn't exist", themeName, theme.FallbackThemeName)
+			}
+		}
+	}
+
+	if pc.defaultTheme != nil && pc.defaultTheme.FallbackThemeName != "" {
+		_, ok := pc.namedThemes[pc.defaultTheme.FallbackThemeName]
+		if !ok {
+			return fmt.Sprintf("defaultTheme specified fallback theme \"%v\", which doesn't exist", pc.defaultTheme.FallbackThemeName)
+		}
+	}
+
+	for actionName, action := range pc.namedActions {
+		if action.FallbackActionName != "" {
+			_, ok := pc.namedActions[action.FallbackActionName]
+			if !ok {
+				return fmt.Sprintf("Action \"%v\" specified fallback action \"%v\", which doesn't exist", actionName, action.FallbackActionName)
 			}
 		}
 	}
