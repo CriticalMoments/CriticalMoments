@@ -1,0 +1,12 @@
+{
+  "configVersion": "v1",
+  "themes": {
+    "defaultTheme": {
+      "bannerBackgroundColor": "invalidNewColorFormat",
+      "fallback": "fbTheme"
+    },
+    "namedThemes": {
+      "fbTheme": {}
+    }
+  }
+}
