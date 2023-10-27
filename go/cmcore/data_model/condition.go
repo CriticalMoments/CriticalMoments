@@ -73,16 +73,23 @@ func BuiltInPropertyTypes() map[string]reflect.Kind {
 		"has_cell_connection":     reflect.Bool,
 		"has_active_network":      reflect.Bool,
 		"expensive_network":       reflect.Bool,
-		"other_audio_playing":     reflect.Bool,
 		"cm_version":              reflect.String,
 		"foreground":              reflect.Bool,
 		"app_install_date":        reflect.Int,
 		"timezone_gmt_offset":     reflect.Int,
 		"app_state":               reflect.String,
 		"has_watch":               reflect.Bool,
-		"on_call":                 reflect.Bool,
 		"screen_brightness":       reflect.Float64,
 		"screen_captured":         reflect.Bool,
+
+		// Audio
+		"other_audio_playing": reflect.Bool,
+		"has_headphones":      reflect.Bool,
+		"has_bt_headphones":   reflect.Bool,
+		"has_bt_headset":      reflect.Bool,
+		"has_wired_headset":   reflect.Bool,
+		"has_car_audio":       reflect.Bool,
+		"on_call":             reflect.Bool,
 
 		// Location
 		"location_permission":          reflect.Bool,

@@ -73,6 +73,13 @@
         @"foreground": @"foreground in [true, false]", // add_test_count
         @"app_state": @"app_state in ['active', 'inactive', 'background', 'unknown']", // add_test_count
         
+        // Audio
+        @"has_headphones": @"has_headphones in [true,false]", // add_test_count
+        @"has_bt_headphones": @"has_bt_headphones in [true,false]", // add_test_count
+        @"has_bt_headset": @"has_bt_headset in [true,false]", // add_test_count
+        @"has_wired_headset": @"has_wired_headset in [true,false]", // add_test_count
+        @"has_car_audio": @"has_car_audio in [true,false]", // add_test_count
+
         @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
         @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
         @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count
