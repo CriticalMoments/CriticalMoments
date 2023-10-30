@@ -105,11 +105,11 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
 		}
 	} else {
-		typeErr := fmt.Sprintf("Unsupported action type: \"%v\" found in config file.", jac.ActionType)
+		// Allow backwards compatibility, defaulting to no-op
 		if StrictDatamodelParsing {
+			typeErr := fmt.Sprintf("unsupported action type found in config file: \"%v\"", jac.ActionType)
 			return NewUserPresentableError(typeErr)
 		} else {
-			fmt.Printf("CriticalMoments: %v. Will proceed, but this action will be a no-op. If unexpected, check the CM config file.\n", typeErr)
 			actionData = &UnknownAction{ActionType: jac.ActionType}
 		}
 	}

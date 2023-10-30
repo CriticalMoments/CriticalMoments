@@ -177,7 +177,6 @@
         return UIImageSymbolWeightBlack;
     }
 
-    NSLog(@"CriticalMoments: unrecognized symbol weight %@. Defaulting to regular weight.", s);
     return UIImageSymbolWeightRegular;
 }
 

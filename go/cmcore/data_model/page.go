@@ -56,10 +56,9 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 
 func (p *Page) ValidateReturningUserReadableIssue() string {
 	if len(p.Sections) == 0 {
+		// back-compat: allow zero sections when not strict
 		if StrictDatamodelParsing {
-			return "Page with 0 sections is not valid"
-		} else {
-			fmt.Printf("CriticalMoments: page with 0 sections not valid. Ignoring but if unexpected check your config file.")
+			return "page with 0 sections is not valid"
 		}
 	}
 

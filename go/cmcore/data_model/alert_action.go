@@ -151,11 +151,10 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		if slices.Contains(alertStyles, *ja.Style) {
 			alertStyle = *ja.Style
 		} else {
-			styleErr := fmt.Sprintf("Invalid alert style \"%v\".", *ja.Style)
+			// Backwards compatibilty -- default to dialog if this client doesn't recognize the style
 			if StrictDatamodelParsing {
+				styleErr := fmt.Sprintf("invalid alert style found in config file: \"%v\"", *ja.Style)
 				return NewUserPresentableError(styleErr)
-			} else {
-				fmt.Printf("CriticalMoments: %v Ignoring and Will default to dialog. If not expected, check your CM config file.\n", styleErr)
 			}
 		}
 	}
@@ -192,11 +191,10 @@ func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, 
 		if slices.Contains(alertActionStyles, *jb.Style) {
 			buttonStyle = *jb.Style
 		} else {
-			btnStyleErr := fmt.Sprintf("Alert action style \"%v\" is not a valid style.", *jb.Style)
+			// Backwards compatibility: fall back to default style if this isn't recognized by this client
 			if StrictDatamodelParsing {
+				btnStyleErr := fmt.Sprintf("alert action style \"%v\" is not a valid style", *jb.Style)
 				return nil, NewUserPresentableError(btnStyleErr)
-			} else {
-				fmt.Printf("CriticalMoments: %v Ignoring and defaulting to default style. If this is not expected, check your CM config file.", btnStyleErr)
 			}
 		}
 	}
