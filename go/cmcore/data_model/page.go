@@ -131,12 +131,10 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := pageSectionTypeRegistry[js.PageSectionType]
 	if !ok {
-		errString := fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file. This section will be ignored. If unexpected, check the CM config file.\n", s.PageSectionType)
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(errString)
+			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file", s.PageSectionType))
 		} else {
-			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
-			fmt.Println(errString)
+			// back-compat -- fallback to unknown section type
 			s.pageSectionData = UnknownSection{}
 		}
 	} else {
