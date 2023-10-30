@@ -101,13 +101,10 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       BOOL isWebLink = [@"http" isEqualToString:url.scheme] || [@"https" isEqualToString:url.scheme];
       if (link.useEmbeddedBrowser && isWebLink) {
-          BOOL success = [self openLinkInEmbeddedBrowser:url];
-          if (!success) {
-              NSLog(@"CriticalMoments: failed to launch link in embedded browser.");
-          }
+          [self openLinkInEmbeddedBrowser:url];
+      } else {
+          [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
       }
-
-      [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
     });
     // TODO: what is the bool return here?
     return YES;
@@ -146,7 +143,7 @@
     return NO;
 }
 
-- (BOOL)openLinkInEmbeddedBrowser:(NSURL *)url {
+- (void)openLinkInEmbeddedBrowser:(NSURL *)url {
     dispatch_async(dispatch_get_main_queue(), ^{
       SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];
       UIViewController *topController = CMUtils.topViewController;
@@ -155,9 +152,6 @@
       }
       [topController presentViewController:safariVc animated:YES completion:nil];
     });
-
-    // TODO: what is the bool return here?
-    return YES;
 }
 
 @end
