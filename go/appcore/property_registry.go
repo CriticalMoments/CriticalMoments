@@ -156,7 +156,7 @@ func (p *propertyRegistry) registerStaticProperty(key string, value interface{})
 
 func (p *propertyRegistry) registerLibPropertyProvider(key string, dpp LibPropertyProvider) error {
 	dw := newLibPropertyProviderWrapper(dpp)
-	return p.addProviderForKey(key, &dw)
+	return p.addProviderForKey(key, dw)
 }
 
 var errPropertyNotFound = errors.New("property not found")

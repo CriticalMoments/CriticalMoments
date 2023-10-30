@@ -48,8 +48,8 @@ const (
 	LibPropertyProviderTypeBool
 )
 
-func newLibPropertyProviderWrapper(dpp LibPropertyProvider) dynamicPropertyProviderWrapper {
-	return dynamicPropertyProviderWrapper{
+func newLibPropertyProviderWrapper(dpp LibPropertyProvider) *dynamicPropertyProviderWrapper {
+	return &dynamicPropertyProviderWrapper{
 		propertyProvider: dpp,
 	}
 }
