@@ -313,7 +313,7 @@ func unpackImageSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 
 	s.ImageData = &i
 
-	return i, nil
+	return &i, nil
 }
 
 // Enumerators because go mobile doesn't support arrays...

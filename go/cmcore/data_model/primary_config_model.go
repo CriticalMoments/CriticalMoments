@@ -172,11 +172,11 @@ func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	return nil
 }
 
-func (pc PrimaryConfig) Validate() bool {
+func (pc *PrimaryConfig) Validate() bool {
 	return pc.ValidateReturningUserReadableIssue() == ""
 }
 
-func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if pc.ConfigVersion != "v1" {
 		return "Config must have a config version of v1"
 	}
@@ -202,7 +202,7 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	return pc.validateNestedReturningUserReadableIssue()
 }
 
-func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	if pc.defaultTheme != nil {
 		if defaultThemeIssue := pc.defaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
 			return defaultThemeIssue
@@ -227,7 +227,7 @@ func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
+func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
 	_, themeFound := pc.namedThemes[""]
 	_, actionFound := pc.namedActions[""]
 	_, triggerFound := pc.namedTriggers[""]
@@ -237,7 +237,7 @@ func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable(
 	return ""
 }
 
-func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	for sourceActionName, action := range pc.namedActions {
 		if action.ActionType == "" || action.actionData == nil {
 			return "Internal issue. Code 15234328"
@@ -257,7 +257,7 @@ func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
 	// Validate the actions in the trigger actually exist
 	for tName, t := range pc.namedTriggers {
 		_, ok := pc.namedActions[t.ActionName]
