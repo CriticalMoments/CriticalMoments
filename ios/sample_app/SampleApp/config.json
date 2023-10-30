@@ -220,7 +220,7 @@
             "conditional_installed_recently": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "app_install_date > now() - hours(1)",
+                    "condition": "unixTimeMilliseconds(app_install_date) > now() - duration('1h')",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
