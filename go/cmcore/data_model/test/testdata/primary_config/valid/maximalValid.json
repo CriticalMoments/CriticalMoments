@@ -25,6 +25,10 @@
                 "fontName": "AvenirNext-Regular",
                 "boldFontName": "AvenirNext-Bold",
                 "scaleFontForUserPreference": false
+            },
+            "futureThemeWithFallback": {
+                "bannerBackgroundColor": "invalidNewColorFormat",
+                "fallback": "blueTheme"
             }
         }
     },

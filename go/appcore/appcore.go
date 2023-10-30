@@ -273,8 +273,9 @@ func (ac *Appcore) Start() (returnErr error) {
 }
 
 func (ac *Appcore) postConfigSetup() error {
-	if ac.config.DefaultTheme != nil {
-		err := ac.libBindings.SetDefaultTheme(ac.config.DefaultTheme)
+	dt := ac.config.DefaultTheme()
+	if dt != nil {
+		err := ac.libBindings.SetDefaultTheme(dt)
 		if err != nil {
 			fmt.Println("CriticalMoments: there was an issue setting up the default theme from config")
 			return err

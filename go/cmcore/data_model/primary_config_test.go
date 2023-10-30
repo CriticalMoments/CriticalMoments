@@ -39,10 +39,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Themes
-	if pc.DefaultTheme == nil || pc.DefaultTheme.BannerBackgroundColor != "#ffffff" {
+	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not parsed")
 	}
-	if len(pc.namedThemes) != 2 {
+	if len(pc.namedThemes) != 3 {
 		t.Fatal("Wrong number of named themes")
 	}
 	blueTheme := pc.ThemeWithName("blueTheme")
@@ -52,6 +52,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	greenTheme := pc.ThemeWithName("greenTheme")
 	if greenTheme == nil || greenTheme.BannerBackgroundColor != "#0000ff" {
 		t.Fatal("Named theme not parsed")
+	}
+	futureThemeWithFallback := pc.ThemeWithName("futureThemeWithFallback")
+	if futureThemeWithFallback != blueTheme {
+		t.Fatal("Theme that fails validation should fallback")
 	}
 
 	// Actions
@@ -226,7 +230,7 @@ func TestInvalidConfigVersionTheme(t *testing.T) {
 func TestNoDefaultTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
-	pc.DefaultTheme = nil
+	pc.defaultTheme = nil
 	if !pc.Validate() {
 		t.Fatal("Not allowing nil default theme, which should be allowed")
 	}
@@ -239,7 +243,7 @@ func TestNoNamedThemes(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named themes map is nil, and validated")
 	}
-	pc.namedThemes = make(map[string]Theme)
+	pc.namedThemes = make(map[string]*Theme)
 	if pc.Validate() {
 		t.Fatal("Named themes map is empty, and an action uses a missing named theme, but it improperly validated")
 	}
@@ -294,7 +298,7 @@ func TestEmptyKey(t *testing.T) {
 	}
 	delete(pc.namedActions, "")
 
-	pc.namedThemes[""] = Theme{}
+	pc.namedThemes[""] = &Theme{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
@@ -341,15 +345,15 @@ func TestBreakNestedTheme(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.DefaultTheme = &Theme{} // invalid
+	pc.defaultTheme = &Theme{} // invalid
 	if pc.Validate() {
 		t.Fatal("default theme not re-validated")
 	}
-	pc.DefaultTheme = nil // valid
+	pc.defaultTheme = nil // valid
 	if !pc.Validate() {
 		t.Fatal()
 	}
-	pc.namedThemes["newInvalidTheme"] = Theme{}
+	pc.namedThemes["newInvalidTheme"] = &Theme{}
 	if pc.Validate() {
 		t.Fatal("named themes not re-validated")
 	}
@@ -443,5 +447,45 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 	err = strictDecoder.Decode(&strictPc)
 	if err == nil {
 		t.Fatal("Strict parsing ignored extra field")
+	}
+}
+func TestFallbackNameChecks(t *testing.T) {
+	invalidJson := []string{
+		"invalidFallbackAction1.json",
+		"invalidFallbackTheme2.json", // add_test_count
+		"invalidFallbackTheme1.json", // add_test_count
+	}
+
+	for _, invalidFile := range invalidJson {
+		testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/" + invalidFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pc := PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err == nil {
+			t.Fatal("Failed to disallow invalid fallback")
+		}
+	}
+}
+
+func TestFallbackDefaultTheme(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/valid/validFallbackDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc := PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pc.DefaultTheme() == nil {
+		t.Fatal("Failed to fallback to default theme")
+	}
+	if pc.DefaultTheme() != pc.ThemeWithName("fbTheme") {
+		t.Fatal("Failed to fallback to named theme")
+	}
+	if pc.ThemeWithName("missingName") != nil {
+		t.Fatal("missing name not nil")
 	}
 }

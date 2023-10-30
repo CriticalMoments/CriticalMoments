@@ -193,13 +193,13 @@ func unpackSymbolImage(data map[string]interface{}, i *Image) (imageTypeInterfac
 
 	weight, _ := data["weight"].(string)
 	if !StrictDatamodelParsing && weight != "" && !slices.Contains(symbolWeights, weight) {
-		fmt.Printf("Unrecognized symbol weight \"%v\". Falling back to regular weight.", weight)
+		// Back-compat: default to regular
 		weight = SystemSymbolWeightEnumRegular
 	}
 
 	mode, _ := data["mode"].(string)
 	if !StrictDatamodelParsing && mode != "" && !slices.Contains(symbolModes, mode) {
-		fmt.Printf("Unrecognized symbol mode \"%v\". Falling back to monochromatic.", mode)
+		// Back-compat: default to monocromatic
 		mode = SystemSymbolModeEnumMono
 	}
 
@@ -225,20 +225,16 @@ func (si SymbolImage) ValidateReturningUserReadableIssue() string {
 	}
 
 	if si.Weight != "" && !slices.Contains(symbolWeights, si.Weight) {
-		werr := fmt.Sprintf("Invalid SF Symbold weight: %v", si.Weight)
+		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return werr
-		} else {
-			fmt.Printf("CriticalMoments: %v. Ignoring, but if not expected, check your config file.\n", werr)
+			return fmt.Sprintf("Invalid SF Symbold weight: %v", si.Weight)
 		}
 	}
 
 	if si.Mode != "" && !slices.Contains(symbolModes, si.Mode) {
-		werr := fmt.Sprintf("Invalid SF Symbold mode: %v", si.Mode)
+		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return werr
-		} else {
-			fmt.Printf("CriticalMoments: %v. Ignoring, but if not expected, check your config file.\n", werr)
+			return fmt.Sprintf("invalid SF Symbold mode: %v", si.Mode)
 		}
 	}
 

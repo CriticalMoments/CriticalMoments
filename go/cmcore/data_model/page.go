@@ -56,10 +56,9 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 
 func (p *Page) ValidateReturningUserReadableIssue() string {
 	if len(p.Sections) == 0 {
+		// back-compat: allow zero sections when not strict
 		if StrictDatamodelParsing {
-			return "Page with 0 sections is not valid"
-		} else {
-			fmt.Printf("CriticalMoments: page with 0 sections not valid. Ignoring but if unexpected check your config file.")
+			return "page with 0 sections is not valid"
 		}
 	}
 
@@ -132,12 +131,10 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := pageSectionTypeRegistry[js.PageSectionType]
 	if !ok {
-		errString := fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file. This section will be ignored. If unexpected, check the CM config file.\n", s.PageSectionType)
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(errString)
+			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file", s.PageSectionType))
 		} else {
-			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
-			fmt.Println(errString)
+			// back-compat -- fallback to unknown section type
 			s.pageSectionData = UnknownSection{}
 		}
 	} else {
