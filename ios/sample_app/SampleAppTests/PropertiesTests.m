@@ -55,7 +55,7 @@
         @"locale_language_code": @"locale_language_code != nil && len(locale_language_code) == 2", // add_test_count
         @"locale_country_code": @"locale_country_code != nil && len(locale_country_code) == 2", // add_test_count
         @"locale_currency_code": @"locale_currency_code != nil && len(locale_currency_code) == 3", // add_test_count
-        @"app_id": @"app_id == 'io.criticalmoments.SampleApp'", // add_test_count
+        @"app_id": @"app_id == 'io.criticalmoments.sample-app'", // add_test_count
         @"app_version": @"app_version == '1.0'", // add_test_count
         @"app_install_date": @"app_install_date != nil && app_install_date > 1688744356123 && app_install_date < 1988744356123", // add_test_count
         @"device_battery_level": @"device_battery_level == -1 || (device_battery_level >= 0.0 && device_battery_level <= 1.0)", // add_test_count
@@ -73,6 +73,13 @@
         @"foreground": @"foreground in [true, false]", // add_test_count
         @"app_state": @"app_state in ['active', 'inactive', 'background', 'unknown']", // add_test_count
         
+        // Audio
+        @"has_headphones": @"has_headphones in [true,false]", // add_test_count
+        @"has_bt_headphones": @"has_bt_headphones in [true,false]", // add_test_count
+        @"has_bt_headset": @"has_bt_headset in [true,false]", // add_test_count
+        @"has_wired_headset": @"has_wired_headset in [true,false]", // add_test_count
+        @"has_car_audio": @"has_car_audio in [true,false]", // add_test_count
+
         @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
         @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
         @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count

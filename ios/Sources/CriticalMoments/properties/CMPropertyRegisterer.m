@@ -183,6 +183,11 @@
     // Audio
     CMAudioPlayingPropertyProvider *audioPlayingProvider = [[CMAudioPlayingPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"other_audio_playing" value:audioPlayingProvider];
+    [self registerLibPropertyProvider:@"has_headphones" value:[CMAudioPortPropertyProvider hasHeadphones]];
+    [self registerLibPropertyProvider:@"has_bt_headphones" value:[CMAudioPortPropertyProvider hasBtHeadphones]];
+    [self registerLibPropertyProvider:@"has_bt_headset" value:[CMAudioPortPropertyProvider hasBtHeadset]];
+    [self registerLibPropertyProvider:@"has_wired_headset" value:[CMAudioPortPropertyProvider hasWiredHeadset]];
+    [self registerLibPropertyProvider:@"has_car_audio" value:[CMAudioPortPropertyProvider hasCarAudio]];
 
     // Calls
     CMCallPropertyProvider *callsPP = [[CMCallPropertyProvider alloc] init];
