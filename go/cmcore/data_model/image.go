@@ -69,7 +69,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 		} else {
 			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
 			fmt.Printf("CriticalMoments: %v This image will be ignored. If unexpected, check the CM config file.", errString)
-			i.imageData = UnknownImage{}
+			i.imageData = &UnknownImage{}
 		}
 	} else {
 		imageData, err := unpacker(ji.RawSectionData, i)
@@ -86,7 +86,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (i Image) ValidateReturningUserReadableIssue() string {
+func (i *Image) ValidateReturningUserReadableIssue() string {
 	if i.Height <= 0 {
 		return "Image height must be > 0"
 	}
@@ -109,7 +109,7 @@ func (i Image) ValidateReturningUserReadableIssue() string {
 
 type UnknownImage struct{}
 
-func (u UnknownImage) ValidateReturningUserReadableIssue() string {
+func (u *UnknownImage) ValidateReturningUserReadableIssue() string {
 	return ""
 }
 
@@ -130,10 +130,10 @@ func unpackLocalImage(data map[string]interface{}, i *Image) (imageTypeInterface
 	}
 	i.LocalImageData = &id
 
-	return id, nil
+	return &id, nil
 }
 
-func (li LocalImage) ValidateReturningUserReadableIssue() string {
+func (li *LocalImage) ValidateReturningUserReadableIssue() string {
 	if li.Path == "" {
 		return "Local images must include a path."
 	}
@@ -216,10 +216,10 @@ func unpackSymbolImage(data map[string]interface{}, i *Image) (imageTypeInterfac
 	}
 
 	i.SymbolImageData = &id
-	return id, nil
+	return &id, nil
 }
 
-func (si SymbolImage) ValidateReturningUserReadableIssue() string {
+func (si *SymbolImage) ValidateReturningUserReadableIssue() string {
 	if si.SymbolName == "" {
 		return "Symbol images must include a symbolName."
 	}

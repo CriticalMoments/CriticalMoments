@@ -130,11 +130,11 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	return nil
 }
 
-func (t Theme) Validate() bool {
+func (t *Theme) Validate() bool {
 	return t.ValidateReturningUserReadableIssue() == ""
 }
 
-func (t Theme) ValidateReturningUserReadableIssue() string {
+func (t *Theme) ValidateReturningUserReadableIssue() string {
 	// Fallthough themes are valid as long as they have fallback name
 	if t.IsFallthoughTheme && t.FallbackThemeName != "" {
 		return ""
@@ -143,7 +143,7 @@ func (t Theme) ValidateReturningUserReadableIssue() string {
 	return t.ValidateDisallowFallthoughReturningUserReadableIssue()
 }
 
-func (t Theme) ValidateDisallowFallthoughReturningUserReadableIssue() string {
+func (t *Theme) ValidateDisallowFallthoughReturningUserReadableIssue() string {
 	// Check all colors are valid, but allow empty
 	colors := []string{t.BackgroundColor, t.BannerBackgroundColor, t.BannerForegroundColor, t.PrimaryColor, t.PrimaryTextColor, t.SecondaryTextColor}
 	for _, color := range colors {

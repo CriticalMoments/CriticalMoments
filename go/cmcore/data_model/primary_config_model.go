@@ -19,10 +19,10 @@ type PrimaryConfig struct {
 	namedThemes  map[string]*Theme
 
 	// Actions
-	namedActions map[string]ActionContainer
+	namedActions map[string]*ActionContainer
 
 	// Triggers
-	namedTriggers map[string]Trigger
+	namedTriggers map[string]*Trigger
 
 	// Conditions
 	namedConditions map[string]*Condition
@@ -39,7 +39,7 @@ func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
-		return &action
+		return action
 	}
 	return nil
 }
@@ -52,9 +52,9 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-func (pc *PrimaryConfig) ActionsForEvent(eventName string) []ActionContainer {
+func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 	// TODO P2: don't iterate, use a map
-	actions := make([]ActionContainer, 0)
+	actions := make([]*ActionContainer, 0)
 	for _, trigger := range pc.namedTriggers {
 		if trigger.EventName == eventName {
 			action, ok := pc.namedActions[trigger.ActionName]
@@ -89,11 +89,11 @@ type jsonThemesSection struct {
 }
 
 type jsonActionsSection struct {
-	NamedActions map[string]ActionContainer `json:"namedActions"`
+	NamedActions map[string]*ActionContainer `json:"namedActions"`
 }
 
 type jsonTriggersSection struct {
-	NamedTriggers map[string]Trigger `json:"namedTriggers"`
+	NamedTriggers map[string]*Trigger `json:"namedTriggers"`
 }
 
 type jsonConditionsSection struct {
@@ -126,14 +126,14 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	if jpc.ActionsConfig != nil && jpc.ActionsConfig.NamedActions != nil {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
 	} else {
-		pc.namedActions = map[string]ActionContainer{}
+		pc.namedActions = map[string]*ActionContainer{}
 	}
 
 	// Triggers
 	if jpc.TriggerConfig != nil && jpc.TriggerConfig.NamedTriggers != nil {
 		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
 	} else {
-		pc.namedTriggers = make(map[string]Trigger)
+		pc.namedTriggers = make(map[string]*Trigger)
 	}
 
 	// Conditions
@@ -172,11 +172,11 @@ func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	return nil
 }
 
-func (pc PrimaryConfig) Validate() bool {
+func (pc *PrimaryConfig) Validate() bool {
 	return pc.ValidateReturningUserReadableIssue() == ""
 }
 
-func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if pc.ConfigVersion != "v1" {
 		return "Config must have a config version of v1"
 	}
@@ -202,7 +202,7 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	return pc.validateNestedReturningUserReadableIssue()
 }
 
-func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	if pc.defaultTheme != nil {
 		if defaultThemeIssue := pc.defaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
 			return defaultThemeIssue
@@ -227,7 +227,7 @@ func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
+func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
 	_, themeFound := pc.namedThemes[""]
 	_, actionFound := pc.namedActions[""]
 	_, triggerFound := pc.namedTriggers[""]
@@ -237,7 +237,7 @@ func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable(
 	return ""
 }
 
-func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	for sourceActionName, action := range pc.namedActions {
 		if action.ActionType == "" || action.actionData == nil {
 			return "Internal issue. Code 15234328"
@@ -257,7 +257,7 @@ func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
 	// Validate the actions in the trigger actually exist
 	for tName, t := range pc.namedTriggers {
 		_, ok := pc.namedActions[t.ActionName]

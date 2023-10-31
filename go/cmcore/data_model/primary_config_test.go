@@ -264,7 +264,7 @@ func TestNoNamedTriggers(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named triggers map is nil, and validated")
 	}
-	pc.namedTriggers = make(map[string]Trigger)
+	pc.namedTriggers = make(map[string]*Trigger)
 	if !pc.Validate() {
 		t.Fatal("empty triggers map should be allowed")
 	}
@@ -277,7 +277,7 @@ func TestNoNamedActions(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named actions map is nil, and validated")
 	}
-	pc.namedActions = map[string]ActionContainer{}
+	pc.namedActions = map[string]*ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("empty map should fail since still triggers referencing them")
 	}
@@ -292,7 +292,7 @@ func TestNoNamedActions(t *testing.T) {
 func TestEmptyKey(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
-	pc.namedActions[""] = ActionContainer{}
+	pc.namedActions[""] = &ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
@@ -304,7 +304,7 @@ func TestEmptyKey(t *testing.T) {
 	}
 	delete(pc.namedThemes, "")
 
-	pc.namedTriggers[""] = Trigger{}
+	pc.namedTriggers[""] = &Trigger{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
@@ -321,7 +321,7 @@ func TestBreakNestedValidationActions(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.namedActions["invalidAction"] = ActionContainer{}
+	pc.namedActions["invalidAction"] = &ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("actions not re-validated")
 	}
@@ -333,7 +333,7 @@ func TestBreakNestedValidationTriggers(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.namedTriggers["invalidTrigger"] = Trigger{}
+	pc.namedTriggers["invalidTrigger"] = &Trigger{}
 	if pc.Validate() {
 		t.Fatal("trigger not re-validated")
 	}

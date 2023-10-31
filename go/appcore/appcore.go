@@ -311,7 +311,7 @@ func (ac *Appcore) SendEvent(name string) (returnErr error) {
 	actions := ac.config.ActionsForEvent(name)
 	var lastErr error
 	for _, action := range actions {
-		err := ac.PerformAction(&action)
+		err := ac.PerformAction(action)
 		if err != nil {
 			// return an error, but don't stop processing
 			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", name, err)
