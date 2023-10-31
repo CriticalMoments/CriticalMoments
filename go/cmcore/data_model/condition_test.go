@@ -123,7 +123,6 @@ func TestValidateProps(t *testing.T) {
 		t.Fatal("Invalid prop didn't pass non strict validation")
 	}
 
-	// TODO: test this returns nil
 	err = validateTestHelper("AddTwo(1) > 1")
 	if err != nil {
 		t.Fatal("Unrecognized method failed non-strict validation")
