@@ -82,8 +82,7 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 		}
 	}
 
-	validTypes := []reflect.Kind{reflect.Bool, reflect.String, reflect.Int, reflect.Float64}
-	if !slices.Contains(validTypes, pp.Kind()) {
+	if !slices.Contains(validPropertyTypes, pp.Kind()) {
 		return errors.New("Invalid property type for key: " + key)
 	}
 
@@ -113,7 +112,7 @@ func (p *propertyRegistry) registerClientProperty(key string, value interface{})
 	// Well known types must be correct type
 	wellKnownType, isWellKnown := p.wellKnownPropertyTypes[key]
 	if isWellKnown {
-		if reflect.TypeOf(value).Kind() != wellKnownType {
+		if typeFromValue(value) != wellKnownType {
 			return errors.New("property registered of wrong type (does not match expected type): " + key)
 		}
 	}

@@ -273,6 +273,15 @@ static CriticalMoments *sharedInstance = nil;
     [_appcore registerClientIntProperty:name value:value error:error];
 }
 
+- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    if (!value) {
+        [_appcore registerClientTimeProperty:name value:AppcoreLibPropertyProviderNilIntValue error:error];
+    } else {
+        int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
+        [_appcore registerClientTimeProperty:name value:epochMilliseconds error:error];
+    }
+}
+
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
     [_appcore registerClientPropertiesFromJson:jsonData error:error];
 }

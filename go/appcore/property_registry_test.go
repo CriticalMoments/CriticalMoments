@@ -2,9 +2,11 @@ package appcore
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 	"unsafe"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -20,7 +22,7 @@ func propertyValueOrNil(pr *propertyRegistry, key string) interface{} {
 
 func TestPropertyRegistrySetGet(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int, "c": reflect.Float64, "d": reflect.Bool}
+	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int, "c": reflect.Float64, "d": reflect.Bool, "e": datamodel.CMTimeKind}
 	err := pr.registerStaticProperty("a", "a")
 	if err != nil {
 		t.Fatal(err)
@@ -49,12 +51,27 @@ func TestPropertyRegistrySetGet(t *testing.T) {
 	if propertyValueOrNil(pr, "d") != true {
 		t.Fatal("Property registry failed for bool")
 	}
+	now := time.Now()
+	err = pr.registerStaticProperty("e", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if propertyValueOrNil(pr, "e").(time.Time) != now {
+		t.Fatal("Property registry failed for time")
+	}
 }
 
 func TestPropertyRegistrySetInvalid(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int}
 	err := pr.registerStaticProperty("a", 1) // type mismatch from expected
+	if err == nil {
+		t.Fatal("Allowed type mismatch")
+	}
+	if propertyValueOrNil(pr, "a") != nil {
+		t.Fatal("Property registry allowed invalid")
+	}
+	err = pr.registerStaticProperty("a", time.Now()) // type mismatch from expected
 	if err == nil {
 		t.Fatal("Allowed type mismatch")
 	}
@@ -212,13 +229,22 @@ func (p *testPropertyProvider) BoolValue() bool {
 	return false
 }
 
+const testTimestampUnixMilli = 1698767307000
+
+func (p *testPropertyProvider) TimeEpochMilliseconds() int64 {
+	return testTimestampUnixMilli
+}
+
 func TestDynamicProperties(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.Int}
 
 	dp := testPropertyProvider{}
-	pr.registerLibPropertyProvider("a", &dp)
+	err := pr.registerLibPropertyProvider("a", &dp)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if propertyValueOrNil(pr, "a").(int64) != 1 {
 		t.Fatal("dynamic property doesn't work")
 	}
@@ -234,13 +260,15 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	pr := newPropertyRegistry()
 	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"app_version":         reflect.String, // using as a populated string
-		"screen_width_pixels": reflect.Int,    // using as a populated in
-		"os_version":          reflect.String, // using as a nil string
+		"app_version":         reflect.String,       // using as a populated string
+		"screen_width_pixels": reflect.Int,          // using as a populated in
+		"os_version":          reflect.String,       // using as a nil string
+		"test_time":           datamodel.CMTimeKind, // populated date
 	}
 
 	pr.registerStaticProperty("app_version", "hello")
 	pr.registerStaticProperty("screen_width_pixels", 42)
+	pr.registerStaticProperty("test_time", time.UnixMilli(testTimestampUnixMilli))
 	if propertyValueOrNil(pr, "app_version") != "hello" {
 		t.Fatal("property not set")
 	}
@@ -281,6 +309,12 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 	result, err = pr.evaluateCondition(testHelperNewCondition("1 + 2 + 3", t))
 	if err == nil || result {
 		t.Fatal("Allowed condition with non bool result")
+	}
+
+	timeCondition := fmt.Sprintf("test_time == unixTimeMilliseconds(%d) && test_time > unixTimeMilliseconds(%d)", testTimestampUnixMilli, testTimestampUnixMilli-1)
+	result, err = pr.evaluateCondition(testHelperNewCondition(timeCondition, t))
+	if err != nil || !result {
+		t.Fatal("Failed conduition with timestamps")
 	}
 
 	// Need reflection to created these invalid cases.

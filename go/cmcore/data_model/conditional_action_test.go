@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -125,5 +126,11 @@ func TestJsonParsingInvalidStrictConditionalActionCondition(t *testing.T) {
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil {
 		t.Fatal("should not pass strict validation")
+	}
+}
+
+func TestCustomReflectTypeDoesNotConflict(t *testing.T) {
+	if CMTimeKind <= reflect.UnsafePointer+100000 {
+		t.Fatal("Custom type should not conflict with built in types")
 	}
 }

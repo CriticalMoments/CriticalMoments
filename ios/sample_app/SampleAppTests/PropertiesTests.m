@@ -57,7 +57,8 @@
         @"locale_currency_code": @"locale_currency_code != nil && len(locale_currency_code) == 3", // add_test_count
         @"app_id": @"app_id == 'io.criticalmoments.sample-app'", // add_test_count
         @"app_version": @"app_version == '1.0'", // add_test_count
-        @"app_install_date": @"app_install_date != nil && app_install_date > 1688744356123 && app_install_date < 1988744356123", // add_test_count
+        @"app_install_date": @"app_install_date != nil && app_install_date > unixTimeMilliseconds(1688744356123) && app_install_date < unixTimeMilliseconds(1988744356123)", // add_test_count
+        @"app_install_date_now": @"app_install_date <= now()", // add_test_count
         @"device_battery_level": @"device_battery_level == -1 || (device_battery_level >= 0.0 && device_battery_level <= 1.0)", // add_test_count
         @"device_battery_state": @"device_battery_state in ['charging', 'full', 'unplugged', 'unknown']", // add_test_count
         @"device_low_power_mode": @"device_low_power_mode in [true,false]", // add_test_count

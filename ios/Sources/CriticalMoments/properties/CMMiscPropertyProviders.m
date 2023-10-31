@@ -13,7 +13,7 @@
 
 @implementation CMAppInstallDatePropertyProviders
 
-- (int64_t)intValue {
+- (NSDate *)dateValue {
     NSURL *docsFolderUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                    inDomains:NSUserDomainMask] lastObject];
     if (!docsFolderUrl) {
@@ -25,14 +25,14 @@
         objectForKey:NSFileCreationDate];
 
     if (err != nil || appInstallDate == nil) {
-        return 0;
+        return nil;
     }
 
-    return [CMUtils cmTimestampFromDate:appInstallDate];
+    return appInstallDate;
 }
 
 - (CMPropertyProviderType)type {
-    return CMPropertyProviderTypeInt;
+    return CMPropertyProviderTypeTime;
 }
 
 @end
