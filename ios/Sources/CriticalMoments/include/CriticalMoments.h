@@ -152,6 +152,15 @@ each usage independently from remote configuration. Reused names will log warnin
 - (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
 
 /**
+ Register a custom or well-known timestamp property (NSDate) for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error;
+
+/**
  Register a set of custom or well-known properties from JSON formatted data.
 
  The JSON object should be a single level JSON object, with string keys and bool, string or number values.

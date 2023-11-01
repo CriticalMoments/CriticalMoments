@@ -54,6 +54,18 @@
     return AppcoreLibPropertyProviderNilIntValue;
 }
 
+- (int64_t)timeEpochMilliseconds {
+    NSDate *date = nil;
+    if ([_pp respondsToSelector:@selector(dateValue)]) {
+        date = self.pp.dateValue;
+    }
+    if (!date) {
+        return AppcoreLibPropertyProviderNilIntValue;
+    }
+    int64_t epochMilliseconds = [@(floor([date timeIntervalSince1970] * 1000)) longLongValue];
+    return epochMilliseconds;
+}
+
 - (NSString *_Nonnull)stringValue {
     if ([_pp respondsToSelector:@selector(stringValue)]) {
         NSString *v = self.pp.stringValue;
@@ -74,6 +86,8 @@
         return AppcoreLibPropertyProviderTypeInt;
     case CMPropertyProviderTypeFloat:
         return AppcoreLibPropertyProviderTypeFloat;
+    case CMPropertyProviderTypeTime:
+        return AppcoreLibPropertyProviderTypeTime;
     }
 
     return AppcoreLibPropertyProviderTypeBool;

@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, CMPropertyProviderType) {
     CMPropertyProviderTypeString,
     CMPropertyProviderTypeInt,
     CMPropertyProviderTypeFloat,
+    CMPropertyProviderTypeTime,
 };
 
 @protocol CMDynamicPropertyProvider <NSObject>
@@ -27,6 +28,7 @@ typedef NS_ENUM(NSUInteger, CMPropertyProviderType) {
 - (int64_t)intValue;
 - (NSNumber *_Nullable)nillableIntValue;
 - (NSString *_Nullable)stringValue;
+- (NSDate *_Nullable)dateValue;
 @end
 
 @import Appcore;

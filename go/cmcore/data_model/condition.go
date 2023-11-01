@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -44,6 +45,8 @@ func (c *Condition) String() string {
 	return c.conditionString
 }
 
+const CMTimeKind = (reflect.Kind)(math.MaxUint)
+
 func BuiltInPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
 		"platform":                reflect.String,
@@ -75,7 +78,7 @@ func BuiltInPropertyTypes() map[string]reflect.Kind {
 		"expensive_network":       reflect.Bool,
 		"cm_version":              reflect.String,
 		"foreground":              reflect.Bool,
-		"app_install_date":        reflect.Int,
+		"app_install_date":        CMTimeKind,
 		"timezone_gmt_offset":     reflect.Int,
 		"app_state":               reflect.String,
 		"has_watch":               reflect.Bool,
@@ -128,7 +131,7 @@ func IsBuiltInPropertyOptional(key string) bool {
 
 func WellKnownPropertyTypes() map[string]reflect.Kind {
 	return map[string]reflect.Kind{
-		"user_signup_date": reflect.Int,
+		"user_signup_date": CMTimeKind,
 	}
 }
 

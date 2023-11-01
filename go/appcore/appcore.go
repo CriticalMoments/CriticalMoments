@@ -408,6 +408,16 @@ func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
 	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
+func (ac *Appcore) RegisterStaticTimeProperty(key string, value int64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	if value == LibPropertyProviderNilIntValue {
+		return ac.propertyRegistry.registerStaticProperty(key, nil)
+	}
+	timeVal := time.UnixMilli(value)
+	return ac.propertyRegistry.registerStaticProperty(key, timeVal)
+}
 func (ac *Appcore) RegisterClientStringProperty(key string, value string) error {
 	if ac.started {
 		return errRegisterAfterStart
@@ -431,6 +441,16 @@ func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
 		return errRegisterAfterStart
 	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientTimeProperty(key string, value int64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	if value == LibPropertyProviderNilIntValue {
+		return ac.propertyRegistry.registerClientProperty(key, nil)
+	}
+	timeVal := time.UnixMilli(value)
+	return ac.propertyRegistry.registerClientProperty(key, timeVal)
 }
 
 func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) (returnErr error) {

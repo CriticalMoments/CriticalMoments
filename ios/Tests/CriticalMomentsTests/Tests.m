@@ -400,8 +400,9 @@
     XCTAssertNotNil(error, @"did not error on type missmatch");
     error = nil;
 
-    // Register well known property should work
-    [cm registerIntegerProperty:1698093984 forKey:@"user_signup_date" error:&error];
+    // Register well known property with correct type should work
+    NSDate *signupDate = [NSDate dateWithTimeIntervalSince1970:1698093984];
+    [cm registerTimeProperty:signupDate forKey:@"user_signup_date" error:&error];
     XCTAssertNil(error, @"failed to register well known property");
 
     // Registering custom propety should work
@@ -419,15 +420,16 @@
     XCTAssertNotNil(error, @"allowed registartion after start");
 
     // Fetching set properties should work (both short and long form accessors)
-    XCTestExpectation *expectationSuccess = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectationSuccess];
+    XCTestExpectation *wait = [[XCTestExpectation alloc] init];
+    [expectations addObject:wait];
     [cm checkNamedCondition:@"nonName3"
-                  condition:@"user_signup_date == 1698093984 && stringy =='hello' && custom_stringy == 'hello' && "
+                  condition:@"user_signup_date == unixTimeSeconds(1698093984) && stringy =='hello' && custom_stringy "
+                            @"== 'hello' && "
                             @"stringy2 == nil && js == 'a' && jb == true && jn == 3.3"
                     handler:^(bool result, NSError *_Nullable er2) {
-                      if (!er2 && result) {
-                          [expectationSuccess fulfill];
-                      }
+                      XCTAssert(!er2, @"test condition errored");
+                      XCTAssert(result, @"test condition false");
+                      [wait fulfill];
                     }];
 
     // Both should have run, and returned correct results
