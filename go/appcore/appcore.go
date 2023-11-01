@@ -450,7 +450,6 @@ func (ac *Appcore) RegisterClientTimeProperty(key string, value int64) error {
 		return ac.propertyRegistry.registerClientProperty(key, nil)
 	}
 	timeVal := time.UnixMilli(value)
-	fmt.Printf("Time: %v\n", timeVal.UnixMilli())
 	return ac.propertyRegistry.registerClientProperty(key, timeVal)
 }
 
