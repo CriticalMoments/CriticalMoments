@@ -154,11 +154,11 @@ func TestTimeFormat(t *testing.T) {
 	if r != 11 {
 		t.Fatal("Failed to parse moy int")
 	}
-	r = TimeFormat(ti, "month_string", "America/Toronto")
+	r = TimeFormat(ti, "month_short", "America/Toronto")
 	if r != "Nov" {
 		t.Fatal("Failed to parse moy string")
 	}
-	r = TimeFormat(ti, "month_short", "America/Toronto")
+	r = TimeFormat(ti, "month_long", "America/Toronto")
 	if r != "November" {
 		t.Fatal("Failed to parse moy string")
 	}
