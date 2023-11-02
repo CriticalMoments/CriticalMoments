@@ -107,3 +107,111 @@ func TestParseDatetime(t *testing.T) {
 
 	time.Local = local
 }
+
+func TestTimeFormat(t *testing.T) {
+	ti := time.UnixMilli(1698881571000)
+
+	// Test golang formats
+	r := TimeFormat(ti, "Mon", "America/Toronto")
+	if r != "Wed" {
+		t.Fatal("Failed to parse dow string")
+	}
+	r = TimeFormat(ti, "1", "America/Toronto")
+	if r != 11 {
+		t.Fatal("Failed to parse moy int")
+	}
+	r = TimeFormat(ti, "Jan", "America/Toronto")
+	if r != "Nov" {
+		t.Fatal("Failed to parse moy string")
+	}
+	r = TimeFormat(ti, "January", "America/Toronto")
+	if r != "November" {
+		t.Fatal("Failed to parse moy string")
+	}
+	r = TimeFormat(ti, "2006", "America/Toronto")
+	if r != 2023 {
+		t.Fatal("Failed to parse year")
+	}
+
+	// Test our short hands
+	r = TimeFormat(ti, "dow", "America/Toronto")
+	if r != 3 {
+		t.Fatal("Failed to parse dow string")
+	}
+	r = TimeFormat(ti, "dow_short", "America/Toronto")
+	if r != "Wed" {
+		t.Fatal("Failed to parse dow string")
+	}
+	r = TimeFormat(ti, "dow_long", "America/Toronto")
+	if r != "Wednesday" {
+		t.Fatal("Failed to parse dow string")
+	}
+	r = TimeFormat(ti, "dom", "America/Toronto")
+	if r != 1 {
+		t.Fatal("Failed to parse dom int")
+	}
+	r = TimeFormat(ti, "month", "America/Toronto")
+	if r != 11 {
+		t.Fatal("Failed to parse moy int")
+	}
+	r = TimeFormat(ti, "month_short", "America/Toronto")
+	if r != "Nov" {
+		t.Fatal("Failed to parse moy string")
+	}
+	r = TimeFormat(ti, "month_long", "America/Toronto")
+	if r != "November" {
+		t.Fatal("Failed to parse moy string")
+	}
+	r = TimeFormat(ti, "hod", "America/Toronto")
+	if r != 19 {
+		t.Fatal("Failed to parse hod int")
+	}
+	r = TimeFormat(ti, "moh", "America/Toronto")
+	if r != 32 {
+		t.Fatal("Failed to parse moh int")
+	}
+	r = TimeFormat(ti, "ampm", "America/Toronto")
+	if r != "PM" {
+		t.Fatal("Failed to parse ampm string")
+	}
+	r = TimeFormat(ti, "year", "America/Toronto")
+	if r != 2023 {
+		t.Fatal("Failed to parse year")
+	}
+
+	// constants in format
+	r = TimeFormat(ti, "nada", "America/Toronto")
+	if r != "nada" {
+		t.Fatal("Failed to return nil for invalid format")
+	}
+	r = TimeFormat(ti, "nada Mon", "America/Toronto")
+	if r != "nada Wed" {
+		t.Fatal("Failed to return nil for invalid format")
+	}
+
+	// Test UTC
+	r = TimeFormat(ti, "hod", "UTC")
+	if r != 23 {
+		t.Fatal("Failed to parse hod int in UTC")
+	}
+
+	// Test TZ: local, explicit and default (to Local)
+	local := time.Local
+	defer func() {
+		time.Local = local
+	}()
+	time.Local, _ = time.LoadLocation("America/St_Johns")
+	ti = time.UnixMilli(1698881571000)
+
+	testTz := []string{"Local", "America/St_Johns", ""}
+	for _, tz := range testTz {
+		r = TimeFormat(ti, "hod", tz)
+		if r != 21 {
+			t.Fatal("Failed to parse hod int in another TZ")
+		}
+		r = TimeFormat(ti, "moh", tz)
+		if r != 2 {
+			t.Fatal("Failed to parse moh int in another TZ")
+		}
+	}
+}
