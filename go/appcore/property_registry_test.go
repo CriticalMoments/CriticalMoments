@@ -404,6 +404,27 @@ func TestDateFunctionsInConditions(t *testing.T) {
 	if err == nil || result {
 		t.Fatal("invalid date didn't error", err)
 	}
+
+	// Check date formatting
+	local := time.Local
+	defer func() {
+		time.Local = local
+	}()
+	time.Local, _ = time.LoadLocation("America/St_Johns")
+	formatConditionCases := []string{
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod', 'America/Toronto') == 19",
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod', 'America/St_Johns') == 21",     // add_test_count
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod', 'Local') == 21",                // add_test_count
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod') == 21",                         // add_test_count
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod', '') == 21",                     // add_test_count
+		"formatTime(unixTimeMilliseconds(1698881571000), 'hod', 'Local', 'extraParam') == nil", // add_test_count
+	}
+	for _, c := range formatConditionCases {
+		result, err = pr.evaluateCondition(testHelperNewCondition(c, t))
+		if err != nil || !result {
+			t.Fatal("Failed to use time format function: ", c)
+		}
+	}
 }
 
 func TestUnknownVarsInConditions(t *testing.T) {

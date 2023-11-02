@@ -145,6 +145,7 @@ func StaticConditionHelperFunctions() map[string]interface{} {
 		"unixTimeNanoseconds":  conditions.UnixTimeNanoseconds,
 		"unixTimeMilliseconds": conditions.UnixTimeMilliseconds,
 		"unixTimeSeconds":      conditions.UnixTimeSeconds,
+		"formatTime":           conditions.TimeFormat,
 
 		"rand":        conditions.Random,
 		"sessionRand": conditions.SessionRandom,
@@ -162,7 +163,7 @@ func StaticConditionConstantProperties() map[string]interface{} {
 		"RFC1123Z":             time.RFC1123Z,
 		"date_with_tz_format":  conditions.DateWithTzFormat,
 		"date_and_time_format": conditions.DateAndTimeFormat,
-		"date_formant":         conditions.DateFormat,
+		"date_format":          conditions.DateFormat,
 	}
 }
 
