@@ -23,16 +23,16 @@ const DateFormat = "2006-01-02"
 
 var timeFormats = map[string]string{
 	// dow: 0-6, Sunday is 0
-	"dow_short":    "Mon",     // string short day of week
-	"dow_long":     "Monday",  // string long day of week
-	"dom":          "02",      // int day of month
-	"hod":          "15",      // int hour of day
-	"moh":          "04",      // int minute of hour
-	"ampm":         "PM",      // AM or PM
-	"month":        "01",      // int month. Jan is 1, Dec is 12
-	"month_string": "Jan",     // string short month of year
-	"month_long":   "January", // string long month of year
-	"year":         "2006",    // int year
+	"dow_short":   "Mon",     // string short day of week
+	"dow_long":    "Monday",  // string long day of week
+	"dom":         "02",      // int day of month
+	"hod":         "15",      // int hour of day
+	"moh":         "04",      // int minute of hour
+	"ampm":        "PM",      // AM or PM
+	"month":       "01",      // int month. Jan is 1, Dec is 12
+	"month_short": "Jan",     // string short month of year
+	"month_long":  "January", // string long month of year
+	"year":        "2006",    // int year
 }
 
 func TimeFormat(t time.Time, format string, params ...string) interface{} {
