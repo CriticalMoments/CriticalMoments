@@ -1,5 +1,6 @@
 {
     "configVersion": "v1",
+    "appId": "io.criticalmoments.sample-app",
     "themes": {
         "defaultTheme": {
             "bannerBackgroundColor": "#ffffff",

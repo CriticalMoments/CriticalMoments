@@ -2,7 +2,11 @@ package datamodel
 
 import (
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"strings"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -11,8 +15,10 @@ import (
 var StrictDatamodelParsing = false
 
 type PrimaryConfig struct {
-	// Version number
-	ConfigVersion string
+	// Metadata
+	ContainerVersion string
+	ConfigVersion    string
+	AppId            string
 
 	// Themes
 	defaultTheme *Theme
@@ -52,6 +58,8 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
+// TODO appcore should validate appId is correct
+
 func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 	// TODO P2: don't iterate, use a map
 	actions := make([]*ActionContainer, 0)
@@ -66,9 +74,91 @@ func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 	return actions
 }
 
+// Container Decoding
+
+func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfig, error) {
+	pc := &PrimaryConfig{}
+
+	var rest []byte
+	rest = data
+
+	var configSignature string
+	var configBytes []byte
+
+	for len(rest) > 0 {
+		var block *pem.Block
+		block, rest = pem.Decode(rest)
+		if block == nil {
+			break
+		}
+
+		switch block.Type {
+		case "CONFIG":
+			configBytes = block.Bytes
+			configSignature = block.Headers["Signature"]
+			err := json.Unmarshal(block.Bytes, pc)
+			if err != nil {
+				return nil, err
+			}
+		case "CM":
+			err := pc.ParseHeadBlock(block)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Validate CM block
+	if pc.ContainerVersion == "" {
+		return nil, NewUserPresentableError("No valid CM block found in config file")
+	}
+
+	// Validate CONFIG block
+	if len(configBytes) == 0 {
+		return nil, NewUserPresentableError("No CONFIG block found in config file")
+	}
+	err := ValidateSignature(signUtil, configBytes, configSignature)
+	if err != nil {
+		return nil, err
+	}
+	configErr := pc.ValidateReturningUserReadableIssue()
+	if configErr != "" {
+		return nil, NewUserPresentableError(configErr)
+	}
+
+	return pc, nil
+}
+
+func (pc *PrimaryConfig) ParseHeadBlock(b *pem.Block) error {
+	pc.ContainerVersion = b.Headers["Container-Version"]
+	// We bump container version to 2+ when we want to break backwards compatibility.
+	// We try to parse all v1 versions (including new subversions)
+	if pc.ContainerVersion != "v1" && !strings.HasPrefix(pc.ContainerVersion, "v1.") {
+		return NewUserPresentableError("Unsupported container version")
+	}
+	return nil
+}
+
+func ValidateSignature(su *signing.SignUtil, configBytes []byte, sig string) error {
+	if sig == "" {
+		return NewUserPresentableError("Missing Config Signature. Please sign your config at https://criticalmoments.io")
+	}
+	valid, err := su.VerifyMessage(configBytes, sig)
+	if err != nil {
+		return err
+	}
+	if !valid {
+		return NewUserPresentableError("Configuration file invalid. The signature does not match the JSON body. Please re-sign your config at https://criticalmoments.io")
+	}
+
+	return nil
+}
+
+// JSON
+
 type jsonPrimaryConfig struct {
-	// Version number
 	ConfigVersion string `json:"configVersion"`
+	AppId         string `json:"appId"`
 
 	// Themes
 	ThemesConfig *jsonThemesSection `json:"themes"`
@@ -108,6 +198,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
+	pc.AppId = jpc.AppId
 
 	// Themes
 	if jpc.ThemesConfig != nil {
@@ -177,8 +268,14 @@ func (pc *PrimaryConfig) Validate() bool {
 }
 
 func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
-	if pc.ConfigVersion != "v1" {
+	// We bump version to 2+ when we want to break backwards compatibility.
+	// We try to parse all v1 versions (including new subversions)
+	if pc.ConfigVersion != "v1" && !strings.HasPrefix(pc.ConfigVersion, "v1.") {
 		return "Config must have a config version of v1"
+	}
+
+	if pc.AppId == "" {
+		return "Config must have an appId"
 	}
 
 	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {

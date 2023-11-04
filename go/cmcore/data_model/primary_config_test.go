@@ -3,8 +3,91 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
+
+var testContainer = `
+-----BEGIN CM-----
+Container-Version: v1
+additional-future-header: value2
+
+-----END CM-----
+-----BEGIN CONFIG-----
+Signature: MD0CHQDVjg2+dxUL47DvlctnjAcObzCKvvM6mp2tT507Ahwsvr2Zs5vgE8BSgai6XIMGaFL3CZshtgFubvpq
+ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50cy5zYW1wbGUtYXBwIgp9
+-----END CONFIG-----
+-----BEGIN FUTUREBLOCK-----
+aGVsbG8gd29ybGQ=
+-----END FUTUREBLOCK-----
+`
+
+var testPubKey = "ME4wEAYHKoZIzj0CAQYFK4EEACEDOgAEg5Y7l6n/3YnOL5wH0bahbJf30ADXImPsQApIDjhPTBoL7vlyH0zqrKmoCyemVHnW2brORVGuGsE="
+
+func TestContainer(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig([]byte(testContainer), su)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pc.ContainerVersion != "v1" {
+		t.Fatal("Failed to parse container version")
+	}
+	if pc.AppId != "io.criticalmoments.sample-app" {
+		t.Fatal("Failed to parse app id")
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version from JSON")
+	}
+
+}
+
+func TestContainerVersionCheck(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	subversion := strings.Replace(testContainer, "Container-Version: v1", "Container-Version: v1.2", 1)
+	pc, err := DecodePrimaryConfig([]byte(subversion), su)
+	if err != nil || pc == nil {
+		t.Fatal(err)
+	}
+
+	v2 := strings.Replace(testContainer, "Container-Version: v1", "Container-Version: v2", 1)
+	pc, err = DecodePrimaryConfig([]byte(v2), su)
+	if err == nil || pc != nil {
+		t.Fatal("Failed to error on containerVersion = v2")
+	}
+}
+
+func TestContainerInvalidSig(t *testing.T) {
+	// Signature is correct format, and signed by correct key, but does not match this body
+	var testContainerInvalidSig = `
+-----BEGIN CM-----
+Container-Version: v1
+aGVsbG8gd29ybGQ=
+-----END CM-----
+-----BEGIN CONFIG-----
+Signature: MD4CHQDWjw/kUoBUF5C4M1rLtYSHdcpkLBkH0vGYfSrRAh0AyV/+yosj2C2hqybZEsWYU/x4bPeP2soQF+2cIQ==
+ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50cy5zYW1wbGUtYXBwIgp9
+-----END CONFIG-----
+`
+
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig([]byte(testContainerInvalidSig), su)
+	if err == nil || pc != nil {
+		t.Fatal("Failed to error on pc with invalid sig")
+	}
+}
 
 func testHelperBuildMaxPrimaryConfig(t *testing.T) *PrimaryConfig {
 	return testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/maximalValid.json")
@@ -402,6 +485,9 @@ func TestMinValidConfig(t *testing.T) {
 		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}
 	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+	if pc.AppId != "io.criticalmoments.sample-app" {
 		t.Fatal("Failed to parse config version")
 	}
 }
