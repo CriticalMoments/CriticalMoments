@@ -80,8 +80,12 @@ func (lb *testLibBindings) CanOpenURL(url string) bool {
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
+	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+}
+
+func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	ac := NewAppcore()
-	configPath, err := filepath.Abs("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json")
+	configPath, err := filepath.Abs(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +118,7 @@ func TestAppcoreStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +134,7 @@ func TestAppcoreStartMissingConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.configUrlString = ""
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start without config")
 	}
@@ -145,7 +149,7 @@ func TestAppcoreStartMissingBindings(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.libBindings = nil
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start without bindings")
 	}
@@ -160,7 +164,7 @@ func TestAppcoreStartBadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.configUrlString = "file:///Not/A/Real/Path"
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start with bad config")
 	}
@@ -174,7 +178,7 @@ func TestSendEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +206,7 @@ func TestPerformingAction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -289,7 +293,7 @@ func TestConditionalActionDispatching(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -351,7 +355,7 @@ func TestSetDefaultTheme(t *testing.T) {
 	if ac.libBindings.(*testLibBindings).defaultTheme != nil {
 		t.Fatal("Theme should be nil until started")
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -366,7 +370,7 @@ func TestNamedConditions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -419,7 +423,7 @@ func TestEndToEndEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -500,7 +504,7 @@ func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -509,5 +513,48 @@ func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
 	expected := maps.Keys(datamodel.AllBuiltInDynamicFunctions)
 	if !arraysEqualOrderInsensitive(registered, expected) {
 		t.Fatal("Not all built in functions registered or too many registered")
+	}
+}
+
+func TestLoadingSignedConfig(t *testing.T) {
+	// Signed with prod signature
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/signedValid.cmconfig", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.config == nil || ac.config.ConfigVersion != "v1" {
+		t.Fatal("Failed to load signed config")
+	}
+}
+
+func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Debug=false should not allow unsigned
+	err = ac.Start(false)
+	if err == nil || ac.config != nil {
+		t.Fatal("Should not load json config unless in debug mode", err)
+	}
+	// Debug=true should load unsigned/json
+	err = ac.Start(true)
+	if err != nil || ac.config == nil || ac.config.AppId != "io.criticalmoments.demo" {
+		t.Fatal("Should not load json config unless in debug mode")
+	}
+}
+
+func TestChecksAppId(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/invalid/invalidAppId.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err == nil || !strings.Contains(err.Error(), "this config file isn't valid for this app") {
+		t.Fatal("Allowed loading a config with a bundle ID mismatch")
 	}
 }

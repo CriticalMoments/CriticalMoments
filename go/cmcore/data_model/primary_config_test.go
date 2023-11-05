@@ -487,7 +487,7 @@ func TestMinValidConfig(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version")
 	}
-	if pc.AppId != "io.criticalmoments.sample-app" {
+	if pc.AppId != "io.criticalmoments.demo" {
 		t.Fatal("Failed to parse config version")
 	}
 }

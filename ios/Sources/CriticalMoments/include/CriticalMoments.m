@@ -136,7 +136,8 @@ static CriticalMoments *sharedInstance = nil;
         return error;
     }
 
-    [_appcore start:&error];
+    bool allowDebugLoad = [self isDebug] && [self urlAllowedForDebugLoad];
+    [_appcore start:allowDebugLoad error:&error];
     if (error) {
         return error;
     }
@@ -145,6 +146,15 @@ static CriticalMoments *sharedInstance = nil;
     [self startQueues];
 
     return nil;
+}
+
+- (bool)urlAllowedForDebugLoad {
+    NSString *bundlePath = [[[NSBundle mainBundle] bundleURL] absoluteString];
+    NSString *configUrl = _appcore.configUrl;
+    if (!configUrl || !bundlePath) {
+        return false;
+    }
+    return [configUrl hasPrefix:bundlePath];
 }
 
 - (void)startQueues {
@@ -304,6 +314,13 @@ static CriticalMoments *sharedInstance = nil;
     @synchronized(self) {
         _currentTheme = theme;
     }
+}
+
+- (bool)isDebug {
+#if DEBUG
+    return true;
+#endif
+    return false;
 }
 
 @end
