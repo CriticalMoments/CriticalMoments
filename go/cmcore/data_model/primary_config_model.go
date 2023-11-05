@@ -58,8 +58,6 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-// TODO appcore should validate appId is correct
-
 func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 	// TODO P2: don't iterate, use a map
 	actions := make([]*ActionContainer, 0)
