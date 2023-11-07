@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import "../SampleApp/AppDelegate.h"
+#import "../SampleApp/Utils.h"
 @import CriticalMoments;
 
 @interface SampleAppTests : XCTestCase
@@ -62,6 +63,13 @@
     }
 
     [self waitForExpectations:expectations timeout:20.0];
+}
+
+- (void)testBundleCheck {
+    // Roundabout test to ensure urlAllowedForDebugLoad excludes writeable directories.
+    // XCUnitTests have their own set of directories, so we save paths in the main app, and check them here
+    BOOL success = [Utils verifyTestFileUrls];
+    XCTAssert(success, @"A app-writeable directory passes urlAllowedForDebugLoad check");
 }
 
 @end

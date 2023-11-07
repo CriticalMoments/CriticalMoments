@@ -149,20 +149,16 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (bool)urlAllowedForDebugLoad {
-    // Allowed if in a bundle (main or test both okay), but not if in data directories (downloaded/external)
-    NSURL *potentualBundleUrl = [NSURL URLWithString:_appcore.configUrl];
-    // Iterate with max depth check
-    for (int i = 0; potentualBundleUrl && i < 100; i++) {
-        NSBundle *bundle = [NSBundle bundleWithURL:potentualBundleUrl];
-        if (bundle) {
-            return true;
-        }
-        potentualBundleUrl = [potentualBundleUrl URLByDeletingLastPathComponent];
-        if ([@"file:///" isEqualToString:potentualBundleUrl.absoluteString]) {
-            break;
-        }
+    // Allow any in test cases
+    if ([@"com.apple.dt.xctest.tool" isEqualToString:NSBundle.mainBundle.bundleIdentifier]) {
+        return true;
     }
-    return false;
+    // Allowed if in main bundle, but not if in data directories (downloaded/external)
+    NSString *mainBundlePath = NSBundle.mainBundle.bundleURL.absoluteString;
+    if (!mainBundlePath) {
+        return false;
+    }
+    return [_appcore.configUrl hasPrefix:mainBundlePath];
 }
 
 - (void)startQueues {
