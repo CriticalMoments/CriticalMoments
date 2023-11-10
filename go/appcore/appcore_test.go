@@ -522,7 +522,7 @@ func TestLoadingSignedConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start(true)
+	err = ac.Start(false)
 	if err != nil {
 		t.Fatal(err)
 	}
