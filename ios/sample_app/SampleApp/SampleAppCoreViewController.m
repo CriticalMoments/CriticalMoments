@@ -9,6 +9,7 @@
 
 #import "DemoViewContoller.h"
 #import "MainDemoScreen.h"
+#import "Utils.h"
 
 #define BANNER_HEIGHT 60.0
 
@@ -69,6 +70,9 @@
     [CriticalMoments.sharedInstance setConfigUrl:webBasedConfigUrl];*/
 
     [CriticalMoments.sharedInstance start];
+
+    // Needed to be in app content, not test context
+    [Utils createTestFileUrls];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {

@@ -71,6 +71,10 @@ func (ac *Appcore) SetConfigUrl(configUrl string) (returnErr error) {
 	return nil
 }
 
+func (ac *Appcore) ConfigUrl() string {
+	return ac.configUrlString
+}
+
 func (ac *Appcore) SetApiKey(apiKey string, bundleID string) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
@@ -209,7 +213,7 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	})
 }
 
-func (ac *Appcore) Start() (returnErr error) {
+func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
@@ -237,10 +241,21 @@ func (ac *Appcore) Start() (returnErr error) {
 		return err
 	}
 
+	err := ac.loadConfig(allowDebugLoad)
+	if err != nil {
+		return err
+	}
+
+	ac.started = true
+	return nil
+}
+
+func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 	var configFilePath string
 	var err error
+	isFilePath := strings.HasPrefix(ac.configUrlString, filePrefix)
 
-	if strings.HasPrefix(ac.configUrlString, filePrefix) {
+	if isFilePath {
 		// Strip file:// prefix
 		configFilePath = ac.configUrlString[len(filePrefix):]
 	} else if strings.HasPrefix(ac.configUrlString, httpsPrefix) {
@@ -257,18 +272,30 @@ func (ac *Appcore) Start() (returnErr error) {
 	if err != nil {
 		return err
 	}
-	var pc datamodel.PrimaryConfig
-	err = json.Unmarshal(configFileData, &pc)
+
+	pc, err := datamodel.DecodePrimaryConfig(configFileData, signing.SharedSignUtil())
 	if err != nil {
-		return err
+		// If we're in debug mode and the file is local, allow parsing unsigned config files
+		allowParsingUnsigned := allowDebugLoad && isFilePath
+		if !allowParsingUnsigned {
+			return err
+		}
+		pc = &datamodel.PrimaryConfig{}
+		err = json.Unmarshal(configFileData, &pc)
+		if err != nil {
+			return err
+		}
+		fmt.Println("CriticalMoments: DEVELOPMENT MODE. Loaded an unsigned config file. This is allowed for local development, but don't forget to sign your config file before releasing to app store.")
 	}
-	ac.config = &pc
+	if pc.AppId != ac.apiKey.BundleId() {
+		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())
+	}
+	ac.config = pc
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
 	}
 
-	ac.started = true
 	return nil
 }
 

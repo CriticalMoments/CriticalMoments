@@ -136,7 +136,8 @@ static CriticalMoments *sharedInstance = nil;
         return error;
     }
 
-    [_appcore start:&error];
+    bool allowDebugLoad = [self isDebug] && [self urlAllowedForDebugLoad];
+    [_appcore start:allowDebugLoad error:&error];
     if (error) {
         return error;
     }
@@ -145,6 +146,19 @@ static CriticalMoments *sharedInstance = nil;
     [self startQueues];
 
     return nil;
+}
+
+- (bool)urlAllowedForDebugLoad {
+    // Allow any in test cases
+    if ([@"com.apple.dt.xctest.tool" isEqualToString:NSBundle.mainBundle.bundleIdentifier]) {
+        return true;
+    }
+    // Allowed if in main bundle, but not if in data directories (downloaded/external)
+    NSString *mainBundlePath = NSBundle.mainBundle.bundleURL.absoluteString;
+    if (!mainBundlePath) {
+        return false;
+    }
+    return [_appcore.configUrl hasPrefix:mainBundlePath];
 }
 
 - (void)startQueues {
@@ -304,6 +318,13 @@ static CriticalMoments *sharedInstance = nil;
     @synchronized(self) {
         _currentTheme = theme;
     }
+}
+
+- (bool)isDebug {
+#if DEBUG
+    return true;
+#endif
+    return false;
 }
 
 @end

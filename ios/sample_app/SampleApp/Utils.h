@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIWindow *)keyWindow;
 + (UINavigationController *)appNavControl;
++ (void)createTestFileUrls;
++ (BOOL)verifyTestFileUrls;
 
 @end
 

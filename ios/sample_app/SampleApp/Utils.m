@@ -35,4 +35,30 @@
     return navController;
 }
 
+static NSArray<NSURL *> *writeableDirs = nil;
+static NSURL *bundleUrl = nil;
+
++ (void)createTestFileUrls {
+    NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
+                                                                 inDomains:NSUserDomainMask] lastObject];
+    NSURL *cachesDir = [[NSFileManager.defaultManager URLsForDirectory:NSCachesDirectory
+                                                             inDomains:NSUserDomainMask] lastObject];
+    NSURL *docsDir = [[NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory
+                                                           inDomains:NSUserDomainMask] lastObject];
+    NSURL *tempDirUrl = [NSURL fileURLWithPath:NSTemporaryDirectory()];
+
+    writeableDirs = @[ tempDirUrl, cachesDir, appSupportDir, docsDir ];
+    bundleUrl = [[NSBundle mainBundle] bundleURL];
+}
+
++ (BOOL)verifyTestFileUrls {
+    for (NSURL *dir in writeableDirs) {
+        if ([dir.absoluteString hasPrefix:bundleUrl.absoluteString]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 @end

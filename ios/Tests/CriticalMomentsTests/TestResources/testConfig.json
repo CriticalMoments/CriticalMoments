@@ -1,5 +1,6 @@
 {
     "configVersion": "v1",
+    "appId": "com.apple.dt.xctest.tool",
     "themes": {
         "defaultTheme": {
             "bannerBackgroundColor": "#ff0000",
