@@ -1,6 +1,8 @@
 package datamodel
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
@@ -74,6 +76,11 @@ func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 
 // Container Decoding
 
+const primaryConfigConfigPemBlock = "CONFIG"
+const primaryConfigHeadPemBlock = "CM"
+const primaryConfigConfigSignatureHeader = "Signature"
+const primaryConfigHeadContainerVersion = "Container-Version"
+
 func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfig, error) {
 	pc := &PrimaryConfig{}
 
@@ -91,14 +98,14 @@ func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfi
 		}
 
 		switch block.Type {
-		case "CONFIG":
+		case primaryConfigConfigPemBlock:
 			configBytes = block.Bytes
-			configSignature = block.Headers["Signature"]
+			configSignature = block.Headers[primaryConfigConfigSignatureHeader]
 			err := json.Unmarshal(block.Bytes, pc)
 			if err != nil {
 				return nil, err
 			}
-		case "CM":
+		case primaryConfigHeadPemBlock:
 			err := pc.ParseHeadBlock(block)
 			if err != nil {
 				return nil, err
@@ -128,7 +135,7 @@ func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfi
 }
 
 func (pc *PrimaryConfig) ParseHeadBlock(b *pem.Block) error {
-	pc.ContainerVersion = b.Headers["Container-Version"]
+	pc.ContainerVersion = b.Headers[primaryConfigHeadContainerVersion]
 	// We bump container version to 2+ when we want to break backwards compatibility.
 	// We try to parse all v1 versions (including new subversions)
 	if pc.ContainerVersion != "v1" && !strings.HasPrefix(pc.ContainerVersion, "v1.") {
@@ -150,6 +157,54 @@ func ValidateSignature(su *signing.SignUtil, configBytes []byte, sig string) err
 	}
 
 	return nil
+}
+
+func EncodeConfig(configBytes []byte, su *signing.SignUtil) ([]byte, error) {
+	var b bytes.Buffer
+	r := bufio.NewWriter(&b)
+
+	// Parse the config data to ensure it's valid
+	pc := &PrimaryConfig{}
+	err := json.Unmarshal(configBytes, pc)
+	if err != nil {
+		return nil, err
+	}
+
+	// Header block
+	headerBlock := &pem.Block{
+		Type: primaryConfigHeadPemBlock,
+		Headers: map[string]string{
+			primaryConfigHeadContainerVersion: "v1",
+		},
+		Bytes: []byte{},
+	}
+	err = pem.Encode(r, headerBlock)
+	if err != nil {
+		return nil, err
+	}
+
+	// Config block
+	sig, err := su.SignMessage(configBytes)
+	if err != nil {
+		return nil, err
+	}
+	configBlock := &pem.Block{
+		Type: primaryConfigConfigPemBlock,
+		Headers: map[string]string{
+			primaryConfigConfigSignatureHeader: sig,
+		},
+		Bytes: configBytes,
+	}
+	err = pem.Encode(r, configBlock)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Flush()
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
 }
 
 // JSON

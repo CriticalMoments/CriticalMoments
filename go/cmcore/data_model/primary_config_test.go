@@ -24,6 +24,7 @@ aGVsbG8gd29ybGQ=
 -----END FUTUREBLOCK-----
 `
 
+var testPrivKey = "MGgCAQEEHOEUmigOOoZ+STQ1jkYuXRN2hXLbxLKTvKdlXEygBwYFK4EEACGhPAM6AASDljuXqf/dic4vnAfRtqFsl/fQANciY+xACkgOOE9MGgvu+XIfTOqsqagLJ6ZUedbZus5FUa4awQ=="
 var testPubKey = "ME4wEAYHKoZIzj0CAQYFK4EEACEDOgAEg5Y7l6n/3YnOL5wH0bahbJf30ADXImPsQApIDjhPTBoL7vlyH0zqrKmoCyemVHnW2brORVGuGsE="
 
 func TestContainer(t *testing.T) {
@@ -86,6 +87,33 @@ ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50
 	pc, err := DecodePrimaryConfig([]byte(testContainerInvalidSig), su)
 	if err == nil || pc != nil {
 		t.Fatal("Failed to error on pc with invalid sig")
+	}
+}
+
+func TestContainerEncode(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPrivateKey(testPrivKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Invalid
+	_, err = EncodeConfig([]byte("not json"), su)
+	if err == nil {
+		t.Fatal("Failed to error on invalid json")
+	}
+
+	// Valid
+	c := []byte("{\"configVersion\": \"v1\",\"appId\": \"io.criticalmoments.demo\"}")
+	b, err := EncodeConfig(c, su)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig(b, su)
+	if err != nil || pc == nil {
+		t.Fatal("Failed to decode encoded config", err)
+	}
+	if pc.ContainerVersion != "v1" || pc.ConfigVersion != "v1" || pc.AppId != "io.criticalmoments.demo" {
+		t.Fatal("Failed to decode encoded config")
 	}
 }
 
