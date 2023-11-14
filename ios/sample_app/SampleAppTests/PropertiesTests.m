@@ -150,7 +150,7 @@
     XCTSkipIf(true, @"skipping location test as it expected results vary by location.");
 
     NSString *condition =
-        @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'Ontario' "
+        @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'ON' "
         @"&& abs(location_approx_latitude - 43.651070) < 0.5 && abs(location_approx_longitude - -79.347015) < 0.5";
 
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
