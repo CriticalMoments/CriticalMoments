@@ -141,6 +141,7 @@
     [self waitForExpectations:expectations timeout:20];
 }
 
+// Touch iOS folder
 - (void)testGeoIpLocation {
     id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
     AppDelegate *aad = (AppDelegate *)ad;
