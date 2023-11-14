@@ -154,6 +154,12 @@ func (p *propertyRegistry) registerStaticProperty(key string, value interface{})
 }
 
 func (p *propertyRegistry) registerLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	// check key is built in
+	_, isBuiltIn := p.builtInPropertyTypes[key]
+	if !isBuiltIn {
+		return errors.New("Library can not register non built in property: " + key)
+	}
+
 	dw := newLibPropertyProviderWrapper(dpp)
 	return p.addProviderForKey(key, dw)
 }

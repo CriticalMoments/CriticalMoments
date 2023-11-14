@@ -237,21 +237,30 @@ func (p *testPropertyProvider) TimeEpochMilliseconds() int64 {
 
 func TestDynamicProperties(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]reflect.Kind{"screen_width_pixels": reflect.Int}
 	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.Int}
 
 	dp := testPropertyProvider{}
 	err := pr.registerLibPropertyProvider("a", &dp)
+	if err == nil {
+		t.Fatal("allowed registering a 'Lib' property provider that isn't built in")
+	}
+	err = pr.registerLibPropertyProvider("b", &dp)
+	if err == nil {
+		t.Fatal("allowed registering a 'Lib' property provider that isn't built in")
+	}
+
+	err = pr.registerLibPropertyProvider("screen_width_pixels", &dp)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if propertyValueOrNil(pr, "a").(int64) != 1 {
+	if propertyValueOrNil(pr, "screen_width_pixels").(int64) != 1 {
 		t.Fatal("dynamic property doesn't work")
 	}
-	if propertyValueOrNil(pr, "a").(int64) != 2 {
+	if propertyValueOrNil(pr, "screen_width_pixels").(int64) != 2 {
 		t.Fatal("dynamic property not dynamic")
 	}
-	if propertyValueOrNil(pr, "a").(int64) != 3 {
+	if propertyValueOrNil(pr, "screen_width_pixels").(int64) != 3 {
 		t.Fatal("dynamic property not dynamic")
 	}
 }
