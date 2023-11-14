@@ -193,6 +193,14 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+- (nonnull NSString *)getApiKey {
+    NSString *apiKey = [_appcore apiKey];
+    if (apiKey.length == 0) {
+        return nil;
+    }
+    return apiKey;
+}
+
 - (void)setConfigUrl:(NSString *)urlString {
     NSError *error;
     [_appcore setConfigUrl:urlString error:&error];

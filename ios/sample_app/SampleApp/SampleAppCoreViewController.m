@@ -56,7 +56,7 @@
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
 
-    // This key is only valid for this sample app. Do not try to use it
+    // This key is only valid for this sample app. Do not try to use it for other apps.
     NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuc2FtcGxlLWFwcA==-MEUCIAYpsqXhurTwN6/H2KkKH6x3+kbXR9g/"
                        @"Lbiq9heKBcyxAiEA5vv972PgKiyN1qxA4grzJY7RYFbk8rHMHDVULDQQ5FM=";
     [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];

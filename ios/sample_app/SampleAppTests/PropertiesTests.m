@@ -95,6 +95,13 @@
         @"location_region": @"location_region == nil || len (location_region ?? '') > 0", // add_test_count
         @"location_country": @"location_country == nil || len (location_country ?? '') > 0", // add_test_count
         
+        // approx location will change based on ip
+        @"location_approx_latitude": @"(location_approx_latitude ?? 0) <= 90.0 && (location_approx_latitude ?? 0) >= -90.0", // add_test_count
+        @"location_approx_longitude": @"(location_approx_longitude ?? 0) <= 180.0 && (location_approx_longitude ?? 0) >= -180.0", // add_test_count
+        @"location_approx_city": @"location_approx_city == nil || len (location_approx_city ?? '') > 0", // add_test_count
+        @"location_approx_region": @"location_approx_region == nil || len (location_approx_region ?? '') > 0", // add_test_count
+        @"location_approx_country": @"location_approx_country == nil || len (location_approx_country ?? '') > 0", // add_test_count
+        
         @"contacts_permission": @"contacts_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"camera_permission": @"camera_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"microphone_permission": @"microphone_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
@@ -132,6 +139,34 @@
     }
 
     [self waitForExpectations:expectations timeout:20];
+}
+
+- (void)testGeoIpLocation {
+    id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
+    AppDelegate *aad = (AppDelegate *)ad;
+    CriticalMoments *cm = [aad cmInstance];
+
+    // Response varries on... location, so manual testing required.
+    XCTSkipIf(true, @"skipping location test as it expected results vary by location.");
+
+    NSString *condition =
+        @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'Ontario' "
+        @"&& abs(location_approx_latitude - 43.651070) < 0.5 && abs(location_approx_longitude - -79.347015) < 0.5";
+
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation1];
+    [cm checkNamedCondition:@"locCondition"
+                  condition:condition
+                    handler:^(bool result, NSError *error) {
+                      if (!result || error) {
+                          XCTAssert(false, "approx location condition failed to return");
+                      }
+                      [expectation1 fulfill];
+                    }];
+
+    [self waitForExpectations:expectations timeout:5.0];
 }
 
 @end

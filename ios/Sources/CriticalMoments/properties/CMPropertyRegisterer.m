@@ -215,6 +215,18 @@
     CMCountryPropertyProvider *countrypp = [[CMCountryPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"location_country" value:countrypp];
 
+    // Approx Location
+    CMApproxCityPropertyProvider *approxCity = [[CMApproxCityPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_city" value:approxCity];
+    CMApproxRegionPropertyProvider *approxRegion = [[CMApproxRegionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_region" value:approxRegion];
+    CMApproxCountryPropertyProvider *approxCountry = [[CMApproxCountryPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_country" value:approxCountry];
+    CMApproxLatitudePropertyProvider *approxLat = [[CMApproxLatitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_latitude" value:approxLat];
+    CMApproxLongitudePropertyProvider *approxLong = [[CMApproxLongitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_longitude" value:approxLong];
+
     // Permissions
     CMNotificationPermissionsPropertyProvider *npp = [[CMNotificationPermissionsPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"notifications_permission" value:npp];

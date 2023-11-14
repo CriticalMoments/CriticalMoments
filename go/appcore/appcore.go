@@ -97,6 +97,13 @@ func (ac *Appcore) SetApiKey(apiKey string, bundleID string) (returnErr error) {
 	return nil
 }
 
+func (ac *Appcore) ApiKey() string {
+	if ac.apiKey == nil {
+		return ""
+	}
+	return ac.apiKey.String()
+}
+
 func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do

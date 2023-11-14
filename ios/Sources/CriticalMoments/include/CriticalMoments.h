@@ -55,6 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
+/// :nodoc:
+- (nonnull NSString *)getApiKey;
+
 /**
  Set the config URL for critical moments.
 

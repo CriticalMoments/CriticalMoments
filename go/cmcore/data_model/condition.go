@@ -102,6 +102,11 @@ func BuiltInPropertyTypes() map[string]reflect.Kind {
 		"location_city":                reflect.String,
 		"location_region":              reflect.String,
 		"location_country":             reflect.String,
+		"location_approx_city":         reflect.String,
+		"location_approx_region":       reflect.String,
+		"location_approx_country":      reflect.String,
+		"location_approx_latitude":     reflect.Float64,
+		"location_approx_longitude":    reflect.Float64,
 
 		// Permisions
 		"notifications_permission": reflect.String,

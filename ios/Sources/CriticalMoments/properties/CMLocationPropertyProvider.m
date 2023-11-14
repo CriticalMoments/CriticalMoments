@@ -6,14 +6,28 @@
 //
 
 #import "CMLocationPropertyProvider.h"
+#import "../include/CriticalMoments.h"
 
 @import CoreLocation;
+
+@interface GeoIpPlace : NSObject
+@property(nonatomic, strong) NSString *city, *region, *isoCountryCode;
+@property(nonatomic, strong) NSNumber *latitude, *longitude;
+@end
+
+@implementation GeoIpPlace
+@end
 
 @interface CMLocationCache : NSObject <CLLocationManagerDelegate>
 @property(nonatomic, strong) CLLocationManager *manager;
 @property(nonatomic, strong) dispatch_semaphore_t requestWait;
 @property(nonatomic, strong) NSDate *lastErrorTimestamp;
 @property(nonatomic, strong) CLPlacemark *reverseGeocodeResponse;
+
+// Approx IP location
+@property(nonatomic, strong) NSDate *lastGeoIpErrorTimestamp;
+@property(nonatomic, strong) NSDate *lastGeoIpTimestamp;
+@property(nonatomic, strong) GeoIpPlace *geoIpPlace;
 @end
 
 @implementation CMLocationCache
@@ -59,6 +73,21 @@ static CMLocationCache *sharedInstance = nil;
     NSDate *now = [[NSDate alloc] init];
     if ([location.timestamp compare:[now dateByAddingTimeInterval:-5 * 60]] == NSOrderedDescending) {
         return location;
+    }
+
+    return nil;
+}
+
+- (GeoIpPlace *)getGeoIpPlaceFromCache {
+    GeoIpPlace *ipplace = self.geoIpPlace;
+    if (!ipplace) {
+        return nil;
+    }
+
+    // allow for 20 mins of staleness for geoip
+    NSDate *now = [[NSDate alloc] init];
+    if ([self.lastGeoIpTimestamp compare:[now dateByAddingTimeInterval:-20 * 60]] == NSOrderedDescending) {
+        return ipplace;
     }
 
     return nil;
@@ -110,6 +139,72 @@ static CMLocationCache *sharedInstance = nil;
 
     // May still be nil but at this point we're out of ways to get it
     return [self getLocationFromCache];
+}
+
+- (GeoIpPlace *)getApproxLocation {
+    GeoIpPlace *ipplace = [self getGeoIpPlaceFromCache];
+    if (ipplace) {
+        return ipplace;
+    }
+
+    @synchronized(self) {
+        // try cache again, may have populated while waiting on @synchronized
+        ipplace = [self getGeoIpPlaceFromCache];
+        if (ipplace) {
+            return ipplace;
+        }
+
+        // Fail fast if we errored in last 9s. Conditions with several properties (lat, long, etc)
+        // should not dispatch repeated serial 10s waits when ip location isn't available (eg, no network).
+        NSDate *now = [[NSDate alloc] init];
+        if (self.lastGeoIpErrorTimestamp &&
+            [self.lastGeoIpErrorTimestamp compare:[now dateByAddingTimeInterval:-9]] == NSOrderedDescending) {
+            return nil;
+        }
+
+        NSURL *url = [NSURL URLWithString:@"https://api.criticalmoments.io/geo_ip"];
+        NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:url];
+        NSString *apiKey = [CriticalMoments.sharedInstance getApiKey];
+        [req setValue:apiKey forHTTPHeaderField:@"X-CM-Api-Key"];
+
+        dispatch_semaphore_t approxSem = dispatch_semaphore_create(0);
+        [[[NSURLSession sharedSession] dataTaskWithRequest:req
+                                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *reqErr) {
+                                           NSHTTPURLResponse *httpResp;
+                                           GeoIpPlace *newPlace;
+                                           if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                                               httpResp = (NSHTTPURLResponse *)response;
+                                           }
+                                           if (!reqErr && data.length > 0 && httpResp && httpResp.statusCode == 200) {
+                                               NSError *error = nil;
+                                               id jsonObj = [NSJSONSerialization JSONObjectWithData:data
+                                                                                            options:0
+                                                                                              error:&error];
+                                               if (!error && [jsonObj isKindOfClass:[NSDictionary class]]) {
+                                                   NSDictionary *jsonResp = (NSDictionary *)jsonObj;
+                                                   newPlace = [[GeoIpPlace alloc] init];
+                                                   newPlace.city = jsonResp[@"city"];
+                                                   newPlace.region = jsonResp[@"region"];
+                                                   newPlace.isoCountryCode = jsonResp[@"country"];
+                                                   newPlace.latitude = jsonResp[@"latitude"];
+                                                   newPlace.longitude = jsonResp[@"longitude"];
+                                               }
+                                           }
+
+                                           if (newPlace) {
+                                               self.geoIpPlace = newPlace;
+                                               self.lastGeoIpTimestamp = [[NSDate alloc] init];
+                                           } else {
+                                               self.lastGeoIpErrorTimestamp = [[NSDate alloc] init];
+                                           }
+
+                                           dispatch_semaphore_signal(approxSem);
+                                         }] resume];
+        dispatch_semaphore_wait(approxSem, dispatch_time(DISPATCH_TIME_NOW, 10.0 * NSEC_PER_SEC));
+    }
+
+    // May still be nil but at this point we're out of ways to get it
+    return [self getGeoIpPlaceFromCache];
 }
 
 - (CLPlacemark *)reverseGeocode {
@@ -261,6 +356,69 @@ static CMLocationCache *sharedInstance = nil;
 
 - (CMPropertyProviderType)type {
     return CMPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMApproxCityPropertyProvider
+
+- (NSString *)stringValue {
+    GeoIpPlace *place = [CMLocationCache.shared getApproxLocation];
+    return place.city;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMApproxCountryPropertyProvider
+
+- (NSString *)stringValue {
+    GeoIpPlace *place = [CMLocationCache.shared getApproxLocation];
+    return place.isoCountryCode;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMApproxRegionPropertyProvider
+
+- (NSString *)stringValue {
+    GeoIpPlace *place = [CMLocationCache.shared getApproxLocation];
+    return place.region;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
+
+@end
+
+@implementation CMApproxLongitudePropertyProvider
+
+- (NSNumber *)nillableFloatValue {
+    return [CMLocationCache.shared getApproxLocation].longitude;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
+}
+
+@end
+
+@implementation CMApproxLatitudePropertyProvider
+
+- (NSNumber *)nillableFloatValue {
+    return [CMLocationCache.shared getApproxLocation].latitude;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeFloat;
 }
 
 @end
