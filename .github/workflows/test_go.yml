@@ -1,10 +1,13 @@
-name: Build and Test
+name: Build and Test Go
 
-on: [push]
+on: 
+  push: 
+    paths:
+      - 'go/**'
 
 jobs:
   build_and_test:
-    name: Build & test SPM
+    name: Build and Test Go
     runs-on: macos-12
 
     steps:
@@ -20,11 +23,8 @@ jobs:
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
 
+      - name: Golang race condition tests
+        run: cd go && go test -race -vet=off -v ./... && cd ..
+
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
-
-      - name: Select xcode
-        run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
-
-      - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test && cd ../..
