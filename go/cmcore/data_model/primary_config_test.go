@@ -521,7 +521,7 @@ func TestMinValidConfig(t *testing.T) {
 }
 
 func TestOddballValidConfig(t *testing.T) {
-	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballValid.json")
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballvalid.json")
 	if !pc.Validate() {
 		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}
