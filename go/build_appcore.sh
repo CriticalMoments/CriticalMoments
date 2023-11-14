@@ -4,6 +4,13 @@
 dir="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 cd $dir
 
+# MacOS or Linux
+which md6 > /dev/null 2>&1
+if [ $? -ne 0 ]
+then
+  alias md5=md5sum
+fi
+
 # no op if the go folder hasn't changed. This verifies the code and 
 # xcframework build match. 
 # Saves time when developing, and ensures edits are built before running.
