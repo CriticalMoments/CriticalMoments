@@ -71,6 +71,29 @@ func (db *DB) migrate() error {
 		BEGIN
 			UPDATE events SET updated_at =unixepoch('subsec') WHERE id = NEW.id;
 		END;
+
+		CREATE TABLE IF NOT EXISTS property_history (
+			id INTEGER PRIMARY KEY,
+			property_name TEXT NOT NULL,
+			property_value TEXT NOT NULL,
+			sample_type INTEGER NOT NULL,
+			created_at DATETIME,
+			updated_at DATETIME
+		);
+
+		CREATE INDEX IF NOT EXISTS property_history_name_created_at ON property_history (property_name, created_at);
+
+		CREATE TRIGGER IF NOT EXISTS insert_property_history_created_at
+		AFTER INSERT ON property_history
+		BEGIN
+			UPDATE property_history SET created_at =unixepoch('subsec') WHERE id = NEW.id;
+		END;
+
+		CREATE TRIGGER IF NOT EXISTS update_property_history_updated_at
+		AFTER UPDATE ON property_history
+		BEGIN
+			UPDATE property_history SET updated_at =unixepoch('subsec') WHERE id = NEW.id;
+		END;
 	`)
 	if err != nil {
 		return err
@@ -149,4 +172,16 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	nanoseconds := int64(fractionalSeconds * 1_000_000_000)
 	time := time.Unix(int64(epochTime), nanoseconds)
 	return &time, nil
+}
+
+func (db *DB) InsertPropertyHistory(name string, value string, sampleType int) error {
+	_, err := db.sqldb.Exec(`
+		INSERT INTO property_history (property_name, property_value, sample_type)
+		VALUES (?, ?, ?)
+	`, name, value, sampleType)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
