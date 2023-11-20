@@ -22,7 +22,14 @@ func propertyValueOrNil(pr *propertyRegistry, key string) interface{} {
 
 func TestPropertyRegistrySetGet(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int, "c": reflect.Float64, "d": reflect.Bool, "e": datamodel.CMTimeKind}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"a": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"b": {Type: reflect.Int, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"c": {Type: reflect.Float64, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"d": {Type: reflect.Bool, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"e": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: true},
+	}
+
 	err := pr.registerStaticProperty("a", "a")
 	if err != nil {
 		t.Fatal(err)
@@ -63,7 +70,10 @@ func TestPropertyRegistrySetGet(t *testing.T) {
 
 func TestPropertyRegistrySetInvalid(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.String, "b": reflect.Int}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"a": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"b": {Type: reflect.Int, Source: datamodel.CMPropertySourceLib, Optional: true},
+	}
 	err := pr.registerStaticProperty("a", 1) // type mismatch from expected
 	if err == nil {
 		t.Fatal("Allowed type mismatch")
@@ -78,6 +88,14 @@ func TestPropertyRegistrySetInvalid(t *testing.T) {
 	if propertyValueOrNil(pr, "a") != nil {
 		t.Fatal("Property registry allowed invalid")
 	}
+	err = pr.registerStaticProperty("a", "aval") // correct type
+	if err != nil {
+		t.Fatal(err)
+	}
+	if propertyValueOrNil(pr, "a") != "aval" {
+		t.Fatal("Failed to set with valid type")
+	}
+
 	err = pr.registerStaticProperty("b", []string{}) // invalid type
 	if err == nil {
 		t.Fatal("Allowed invalid type")
@@ -85,6 +103,14 @@ func TestPropertyRegistrySetInvalid(t *testing.T) {
 	if propertyValueOrNil(pr, "b") != nil {
 		t.Fatal("Property registry allowed invalid")
 	}
+	err = pr.registerStaticProperty("b", 42) // correct type
+	if err != nil {
+		t.Fatal(err)
+	}
+	if propertyValueOrNil(pr, "b") != 42 {
+		t.Fatal("Failed to set with valid type")
+	}
+
 	err = pr.registerStaticProperty("c", 3.3) // unexpected key
 	if err == nil {
 		t.Fatal("Allowed unexpected key")
@@ -96,10 +122,9 @@ func TestPropertyRegistrySetInvalid(t *testing.T) {
 
 func TestPropertyRegistryValidateRequired(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{
-		"platform": reflect.String,
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"platform": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false},
 	}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	if pr.validateProperties() == nil {
 		t.Fatal("Validated missing required properties")
@@ -116,19 +141,18 @@ func TestPropertyRegistryValidateRequired(t *testing.T) {
 
 func TestPropertyRegistryValidateOptional(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{
-		"low_data_mode": reflect.Bool, // this property is optional
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"optional_bool": {Type: reflect.Bool, Source: datamodel.CMPropertySourceLib, Optional: true},
 	}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
 
 	if pr.validateProperties() != nil {
 		t.Fatal("Missing optional failed validation")
 	}
-	err := pr.registerStaticProperty("low_data_mode", 42)
+	err := pr.registerStaticProperty("optional_bool", 42)
 	if err == nil {
 		t.Fatal("Added with type mismatch")
 	}
-	err = pr.registerStaticProperty("low_data_mode", true)
+	err = pr.registerStaticProperty("optional_bool", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,8 +171,7 @@ func testHelperNewCondition(s string, t *testing.T) *datamodel.Condition {
 
 func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	versionConditions := testHelperNewCondition(`
 		(versionGreaterThan('invalid', '1.0') == false) && 
@@ -170,8 +193,10 @@ func TestPropertyRegistryVersionNumberHelpers(t *testing.T) {
 
 func TestPropertyRegistryVersionNumberComponent(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"os_version": reflect.String, "app_version": reflect.String}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"os_version":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},
+		"app_version": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},
+	}
 
 	// Valid string -- saves and able to parse components with function
 	if err := pr.registerStaticProperty("os_version", "1.2.3"); err != nil {
@@ -237,8 +262,10 @@ func (p *testPropertyProvider) TimeEpochMilliseconds() int64 {
 
 func TestDynamicProperties(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{"screen_width_pixels": reflect.Int}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{"a": reflect.Int}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"screen_width_pixels": {Type: reflect.Int, Source: datamodel.CMPropertySourceLib, Optional: false},
+		"a":                   {Type: reflect.Int, Source: datamodel.CMPropertySourceClient, Optional: true},
+	}
 
 	dp := testPropertyProvider{}
 	err := pr.registerLibPropertyProvider("a", &dp)
@@ -267,12 +294,11 @@ func TestDynamicProperties(t *testing.T) {
 
 func TestPropertyRegistryConditionEval(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"app_version":         reflect.String,       // using as a populated string
-		"screen_width_pixels": reflect.Int,          // using as a populated in
-		"os_version":          reflect.String,       // using as a nil string
-		"test_time":           datamodel.CMTimeKind, // populated date
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"app_version":         {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},       // using as a populated string
+		"screen_width_pixels": {Type: reflect.Int, Source: datamodel.CMPropertySourceLib, Optional: true},          // using as a populated int
+		"os_version":          {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: true},       // using as a nil string
+		"test_time":           {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: true}, // populated date
 	}
 
 	pr.registerStaticProperty("app_version", "hello")
@@ -372,8 +398,7 @@ func TestPropertyRegistryConditionEval(t *testing.T) {
 
 func TestDateFunctionsInConditions(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	// time library created
 	result, err := pr.evaluateCondition(testHelperNewCondition("now() < unixTimeMilliseconds(1688764455000)", t))
@@ -443,8 +468,7 @@ func TestUnknownVarsInConditions(t *testing.T) {
 	}
 
 	pr := newPropertyRegistry()
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	result, err := pr.evaluateCondition(c)
 	if err != nil {
@@ -478,9 +502,8 @@ func TestUnknownVarsInConditions(t *testing.T) {
 
 func TestDynamicMethods(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{
-		"platform": reflect.String,
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"platform": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false},
 	}
 	pr.registerStaticProperty("platform", "ios")
 	pr.RegisterDynamicFunctions(map[string]*datamodel.ConditionDynamicFunction{
@@ -564,8 +587,7 @@ func TestDynamicMethods(t *testing.T) {
 
 func TestRandomInConditions(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	result, err := pr.evaluateCondition(testHelperNewCondition("rand() >= 0 && rand() <= 2^63 && rand() != rand()", t))
 	if err != nil || !result {
@@ -585,25 +607,24 @@ func TestRandomInConditions(t *testing.T) {
 
 func TestCustomProperties(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"well_known_v": reflect.String,
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"well_known_v": {Type: reflect.String, Source: datamodel.CMPropertySourceClient, Optional: true},
 	}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 
 	// Test a custom properties with correct prefix
-	err := pr.registerStaticProperty("custom_stringv", "hello")
+	err := pr.registerStaticPropertyWithSource("custom_stringv", datamodel.CMPropertySourceClient, "hello")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pr.registerStaticProperty("custom_boolv", false)
+	err = pr.registerStaticPropertyWithSource("custom_boolv", datamodel.CMPropertySourceClient, false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pr.registerStaticProperty("custom_intv", 42)
+	err = pr.registerStaticPropertyWithSource("custom_intv", datamodel.CMPropertySourceClient, 42)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pr.registerStaticProperty("custom_floatv", 3.3)
+	err = pr.registerStaticPropertyWithSource("custom_floatv", datamodel.CMPropertySourceClient, 3.3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -638,18 +659,11 @@ func TestNoPrefixCollision(t *testing.T) {
 			t.Fatalf("Built in property has custom prefix: %s", k)
 		}
 	}
-
-	for k := range datamodel.WellKnownPropertyTypes() {
-		if strings.HasPrefix(k, CustomPropertyPrefix) {
-			t.Fatalf("Built in property has custom prefix: %s", k)
-		}
-	}
 }
 
 func TestValidateCustomPrefix(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	err := pr.validateProperties()
 	if err != nil {
@@ -675,12 +689,10 @@ func TestValidateCustomPrefix(t *testing.T) {
 
 func TestClientPropertyRegistration(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"well_known":  reflect.String,
-		"well_known2": reflect.String,
-	}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{
-		"built_in": reflect.String,
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"built_in":    {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false},
+		"well_known":  {Type: reflect.String, Source: datamodel.CMPropertySourceClient, Optional: true},
+		"well_known2": {Type: reflect.String, Source: datamodel.CMPropertySourceClient, Optional: true},
 	}
 
 	// Should not allow registering well known with wrong type
@@ -695,7 +707,13 @@ func TestClientPropertyRegistration(t *testing.T) {
 		t.Fatal("Allowed registering built in")
 	}
 
-	// should be able to register well known
+	// Should not allow registering built in through other API
+	err = pr.registerStaticPropertyWithSource("built_in", datamodel.CMPropertySourceClient, "hello")
+	if err == nil || pr.providers["built_in"] != nil {
+		t.Fatal("Allowed registering built in")
+	}
+
+	// should be able to register well known with correct type
 	err = pr.registerClientProperty("well_known", "hello")
 	if err != nil {
 		t.Fatal(err)
@@ -730,12 +748,25 @@ func TestClientPropertyRegistration(t *testing.T) {
 	if err == nil || pr.providers["well_known2"] != nil {
 		t.Fatal("Allowed nil value")
 	}
+
+	// Library register method should not be able to register non-built in
+	err = pr.registerStaticProperty("customv", "hello3")
+	if err == nil {
+		t.Fatal("Allowed library to register custom")
+	}
+	err = pr.registerStaticPropertyWithSource("customv", datamodel.CMPropertySourceLib, "hello3")
+	if err == nil {
+		t.Fatal("Allowed library to register custom")
+	}
+	// old value from above, not new one.
+	if v, err := pr.propertyValue("customv"); v != "hello2" || err != nil {
+		t.Fatal("Failed to access custom via full name")
+	}
 }
 
 func TestDisallowInvalidPropertyNames(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 
 	invalidNames := []string{
 		"with.period",
@@ -755,11 +786,6 @@ func TestDisallowInvalidPropertyNames(t *testing.T) {
 	if !validPropertyName("edgesAZaz09_") {
 		t.Fatal("valid property name failed")
 	}
-	for name := range datamodel.WellKnownPropertyTypes() {
-		if !validPropertyName(name) {
-			t.Fatalf("Invalid well known property name: %s", name)
-		}
-	}
 	for name := range datamodel.BuiltInPropertyTypes() {
 		if !validPropertyName(name) {
 			t.Fatalf("Invalid well known property name: %s", name)
@@ -769,10 +795,9 @@ func TestDisallowInvalidPropertyNames(t *testing.T) {
 
 func TestClientPropertyJsonRegistration(t *testing.T) {
 	pr := newPropertyRegistry()
-	pr.wellKnownPropertyTypes = map[string]reflect.Kind{
-		"stringKey": reflect.String,
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"stringsKey": {Type: reflect.String, Source: datamodel.CMPropertySourceClient, Optional: true},
 	}
-	pr.builtInPropertyTypes = map[string]reflect.Kind{}
 
 	j := `{
 		"stringKey": "stringVal",

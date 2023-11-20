@@ -3,8 +3,6 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
-	"math"
-	"reflect"
 	"strings"
 	"time"
 
@@ -43,101 +41,6 @@ func NewCondition(s string) (*Condition, error) {
 // Stringer Interface
 func (c *Condition) String() string {
 	return c.conditionString
-}
-
-const CMTimeKind = (reflect.Kind)(math.MaxUint)
-
-func BuiltInPropertyTypes() map[string]reflect.Kind {
-	return map[string]reflect.Kind{
-		"platform":                reflect.String,
-		"os_version":              reflect.String,
-		"device_manufacturer":     reflect.String,
-		"device_model":            reflect.String,
-		"device_model_class":      reflect.String,
-		"locale_language_code":    reflect.String,
-		"locale_country_code":     reflect.String,
-		"locale_currency_code":    reflect.String,
-		"app_version":             reflect.String,
-		"user_interface_idiom":    reflect.String,
-		"app_id":                  reflect.String,
-		"screen_width_pixels":     reflect.Int,
-		"screen_height_pixels":    reflect.Int,
-		"screen_width_points":     reflect.Int,
-		"screen_height_points":    reflect.Int,
-		"screen_scale":            reflect.Float64,
-		"device_battery_state":    reflect.String,
-		"device_battery_level":    reflect.Float64,
-		"device_low_power_mode":   reflect.Bool,
-		"device_orientation":      reflect.String,
-		"interface_orientation":   reflect.String,
-		"dark_mode":               reflect.Bool,
-		"network_connection_type": reflect.String,
-		"has_wifi_connection":     reflect.Bool,
-		"has_cell_connection":     reflect.Bool,
-		"has_active_network":      reflect.Bool,
-		"expensive_network":       reflect.Bool,
-		"cm_version":              reflect.String,
-		"foreground":              reflect.Bool,
-		"app_install_date":        CMTimeKind,
-		"timezone_gmt_offset":     reflect.Int,
-		"app_state":               reflect.String,
-		"has_watch":               reflect.Bool,
-		"screen_brightness":       reflect.Float64,
-		"screen_captured":         reflect.Bool,
-
-		// Audio
-		"other_audio_playing": reflect.Bool,
-		"has_headphones":      reflect.Bool,
-		"has_bt_headphones":   reflect.Bool,
-		"has_bt_headset":      reflect.Bool,
-		"has_wired_headset":   reflect.Bool,
-		"has_car_audio":       reflect.Bool,
-		"on_call":             reflect.Bool,
-
-		// Location
-		"location_permission":          reflect.Bool,
-		"location_permission_detailed": reflect.String,
-		"location_latitude":            reflect.Float64,
-		"location_longitude":           reflect.Float64,
-		"location_city":                reflect.String,
-		"location_region":              reflect.String,
-		"location_country":             reflect.String,
-		"location_approx_city":         reflect.String,
-		"location_approx_region":       reflect.String,
-		"location_approx_country":      reflect.String,
-		"location_approx_latitude":     reflect.Float64,
-		"location_approx_longitude":    reflect.Float64,
-
-		// Permisions
-		"notifications_permission": reflect.String,
-		"microphone_permission":    reflect.String,
-		"camera_permission":        reflect.String,
-		"contacts_permission":      reflect.String,
-		"photo_library_permission": reflect.String,
-		"add_photo_permission":     reflect.String,
-		"calendar_permission":      reflect.String,
-		"reminders_permission":     reflect.String,
-		"bluetooth_permission":     reflect.String,
-
-		// Optional built in props (listed below in IsBuiltInPropertyOptional)
-		"device_model_version": reflect.String,
-		"low_data_mode":        reflect.Bool,
-	}
-}
-
-func IsBuiltInPropertyOptional(key string) bool {
-	optionalBuiltInProps := map[string]bool{
-		"device_model_version": true,
-		"low_data_mode":        true,
-	}
-	_, ok := optionalBuiltInProps[key]
-	return ok
-}
-
-func WellKnownPropertyTypes() map[string]reflect.Kind {
-	return map[string]reflect.Kind{
-		"user_signup_date": CMTimeKind,
-	}
 }
 
 func StaticConditionHelperFunctions() map[string]interface{} {

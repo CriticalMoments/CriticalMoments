@@ -174,7 +174,7 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	return &time, nil
 }
 
-func (db *DB) InsertPropertyHistory(name string, value string, sampleType int) error {
+func (db *DB) InsertPropertyHistory(name string, value string, sampleType datamodel.CMPropertySampleType) error {
 	_, err := db.sqldb.Exec(`
 		INSERT INTO property_history (property_name, property_value, sample_type)
 		VALUES (?, ?, ?)
