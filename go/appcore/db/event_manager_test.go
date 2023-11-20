@@ -1,4 +1,4 @@
-package events
+package db
 
 import (
 	"fmt"
@@ -7,9 +7,20 @@ import (
 	"testing"
 )
 
+func testEventManager(path string) (*EventManager, error) {
+	db, err := NewDB(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &EventManager{
+		db: db,
+	}, nil
+}
+
 func TestConstructor(t *testing.T) {
 	dataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
-	em, err := NewEventManager(dataPath)
+	em, err := testEventManager(dataPath)
 	if err == nil {
 		t.Fatal("Failed to check path exists")
 	}
@@ -23,7 +34,7 @@ func TestConstructor(t *testing.T) {
 		t.Fatal(err)
 	}
 	file.Close()
-	em, err = NewEventManager(dataPath)
+	em, err = testEventManager(dataPath)
 	if err == nil {
 		t.Fatal("Failed to check path exists and is dir")
 	}
@@ -32,7 +43,7 @@ func TestConstructor(t *testing.T) {
 	}
 
 	os.MkdirAll(dataPath, os.ModePerm)
-	em, err = NewEventManager(dataPath)
+	em, err = testEventManager(dataPath)
 	expectedPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataPath)
 	if err != nil || em.db.databasePath != expectedPath {
 		t.Fatal("Failed to set data path")

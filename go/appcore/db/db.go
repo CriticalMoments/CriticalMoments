@@ -1,4 +1,4 @@
-package events
+package db
 
 import (
 	"database/sql"
@@ -15,6 +15,8 @@ import (
 type DB struct {
 	databasePath string
 	sqldb        *sql.DB
+
+	eventManager *EventManager
 }
 
 func NewDB(dataDir string) (*DB, error) {
@@ -39,11 +41,19 @@ func NewDB(dataDir string) (*DB, error) {
 		return nil, err
 	}
 
+	db.eventManager = &EventManager{
+		db: &db,
+	}
+
 	return &db, nil
 }
 
 func (db *DB) Close() error {
 	return db.sqldb.Close()
+}
+
+func (db *DB) EventManager() *EventManager {
+	return db.eventManager
 }
 
 // migrations can be run on each start because they are incremental and non-destructive

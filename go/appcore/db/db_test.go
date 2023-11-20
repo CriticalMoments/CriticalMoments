@@ -1,4 +1,4 @@
-package events
+package db
 
 import (
 	"fmt"

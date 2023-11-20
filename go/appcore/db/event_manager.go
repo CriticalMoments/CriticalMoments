@@ -1,4 +1,4 @@
-package events
+package db
 
 import (
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -6,17 +6,6 @@ import (
 
 type EventManager struct {
 	db *DB
-}
-
-func NewEventManager(dataDir string) (*EventManager, error) {
-	db, err := NewDB(dataDir)
-	if err != nil {
-		return nil, err
-	}
-
-	return &EventManager{
-		db: db,
-	}, nil
 }
 
 func (em *EventManager) SendEvent(e *datamodel.Event) error {
