@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/CriticalMoments/CriticalMoments/go/appcore/events"
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
@@ -34,8 +34,8 @@ type Appcore struct {
 	// Cache
 	cache *cache
 
-	// Event handler
-	eventManager *events.EventManager
+	// database
+	db *db.DB
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -118,13 +118,13 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
 	}
 	ac.cache = cache
 
-	eventManager, err := events.NewEventManager(dataDirPath)
+	db, err := db.NewDB(dataDirPath)
 	if err != nil {
 		return err
 	}
-	ac.eventManager = eventManager
+	ac.db = db
 
-	dbOperations := eventManager.EventManagerConditionFunctions()
+	dbOperations := db.EventManager().EventManagerConditionFunctions()
 	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
 
 	return nil
@@ -336,7 +336,7 @@ func (ac *Appcore) SendEvent(name string) (returnErr error) {
 		return fmt.Errorf("SendEvent error for \"%v\"", name)
 	}
 
-	err = ac.eventManager.SendEvent(event)
+	err = ac.db.EventManager().SendEvent(event)
 	if err != nil {
 		return err
 	}

@@ -99,8 +99,8 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ac.eventManager == nil || ac.cache == nil {
-		t.Fatal("event handler or cache not set")
+	if ac.db == nil || ac.db.EventManager() == nil || ac.cache == nil {
+		t.Fatal("db, event manager, or cache not setup")
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
