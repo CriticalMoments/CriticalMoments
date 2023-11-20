@@ -126,6 +126,62 @@ func testSchema(db *DB, t *testing.T) {
 	if v != "update_events_updated_at" {
 		t.Fatal("DB migration failed")
 	}
+
+	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='table' AND name='property_history'")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	err = r.Scan(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != "property_history" {
+		t.Fatal("DB migation failed")
+	}
+
+	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='index' AND name='property_history_name_created_at'")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	err = r.Scan(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != "property_history_name_created_at" {
+		t.Fatal("DB migration failed")
+	}
+
+	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='insert_property_history_created_at'")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	err = r.Scan(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != "insert_property_history_created_at" {
+		t.Fatal("DB migration failed")
+	}
+
+	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='update_property_history_updated_at'")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	err = r.Scan(&v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != "update_property_history_updated_at" {
+		t.Fatal("DB migration failed")
+	}
 }
 
 func BenchmarkWarmMigrate(b *testing.B) {
@@ -145,7 +201,7 @@ func TestCreatedAtTrigger(t *testing.T) {
 	db := testBuildTestDb(t)
 	defer db.Close()
 
-	// insert a row into events
+	// insert a row into table
 	_, err := db.sqldb.Exec(`
 		INSERT INTO events (event_name)
 		VALUES ('test')
@@ -343,4 +399,111 @@ func testSqlExplainIncludes(sql string, expectedExplain string, t *testing.T, ar
 		t.Fatal("query does not use index: ", sql)
 	}
 
+}
+
+func TestCreatedAtTriggerPropHistory(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	// insert a row into table
+	_, err := db.sqldb.Exec(`
+		INSERT INTO property_history (property_name, property_value, sample_type)
+		VALUES ('test', 'val', 1)
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// select the last row inserted
+	r, err := db.sqldb.Query(`
+		SELECT created_at, updated_at FROM property_history
+		LIMIT 1
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	var c float64
+	var u float64
+	err = r.Scan(&c, &u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	now := float64(time.Now().UnixNano()) / float64(time.Second)
+	if math.Abs(now-c) > 0.01 {
+		t.Fatal("Trigger failed to set created_at")
+	}
+	if math.Abs(now-u) > 0.01 {
+		t.Fatal("Trigger failed to set updated_at")
+	}
+
+	// update the row after small delay
+	time.Sleep(time.Millisecond * 2)
+	_, err = db.sqldb.Exec(`
+		UPDATE property_history SET property_value = 'val2'
+		WHERE property_name = 'test'
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// check created_at has not changed, but updated_at has
+	r, err = db.sqldb.Query(`
+		SELECT created_at, updated_at FROM property_history 
+		LIMIT 1
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	var c2 float64
+	var u2 float64
+	err = r.Scan(&c2, &u2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c != c2 {
+		t.Fatal("created_at changed")
+	}
+	if u == u2 {
+		t.Fatal("Trigger did not change updated_at")
+	}
+	now = float64(time.Now().UnixNano()) / float64(time.Second)
+	if math.Abs(now-u2) > 0.01 {
+		t.Fatal("Trigger failed to set updated_at")
+	}
+}
+
+func TestInsertAndRetrievePropHistory(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	// insert a row into property history
+	err := db.InsertPropertyHistory("testx", "valx", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// retrieve and verify
+	r, err := db.sqldb.Query(`
+		SELECT property_name, property_value, sample_type FROM property_history 
+		LIMIT 1
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	r.Next()
+	var n string
+	var v string
+	var s int
+	err = r.Scan(&n, &v, &s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != "testx" || v != "valx" || s != 1 {
+		t.Fatal("retrieve failed")
+	}
 }
