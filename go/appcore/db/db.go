@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"reflect"
 	"time"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -15,40 +16,51 @@ import (
 type DB struct {
 	databasePath string
 	sqldb        *sql.DB
+	started      bool
 
-	eventManager *EventManager
+	eventManager           *EventManager
+	propertyHistoryManager *PropertyHistoryManager
 }
 
-func NewDB(dataDir string) (*DB, error) {
+func NewDB() *DB {
+	db := DB{
+		started: false,
+	}
+
+	db.eventManager = &EventManager{
+		db: &db,
+	}
+	db.propertyHistoryManager = newPropertyHistoryManager(&db)
+
+	return &db
+}
+
+func (db *DB) StartWithPath(dataDir string) error {
 	if dirInfo, err := os.Stat(dataDir); err != nil || !dirInfo.IsDir() {
-		return nil, errors.New("CriticalMoments: Data directory path does not exist")
+		return errors.New("CriticalMoments: Data directory path does not exist")
 	}
 
 	dbPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataDir)
 
 	sqldb, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	db := DB{
-		databasePath: dbPath,
-		sqldb:        sqldb,
-	}
+	db.databasePath = dbPath
+	db.sqldb = sqldb
 
 	err = db.migrate()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	db.eventManager = &EventManager{
-		db: &db,
-	}
-
-	return &db, nil
+	db.started = true
+	return nil
 }
 
 func (db *DB) Close() error {
+	db.started = false
 	return db.sqldb.Close()
 }
 
@@ -56,10 +68,18 @@ func (db *DB) EventManager() *EventManager {
 	return db.eventManager
 }
 
+func (db *DB) PropertyHistoryManager() *PropertyHistoryManager {
+	return db.propertyHistoryManager
+}
+
 // migrations can be run on each start because they are incremental and non-destructive
 // Future migrations must also be incremental (only append to this, check if not exists),
 // or we must implement a versioning system
 func (db *DB) migrate() error {
+	if db.sqldb == nil {
+		return errors.New("CriticalMoments: DB not started")
+	}
+
 	_, err := db.sqldb.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 			id INTEGER PRIMARY KEY,
@@ -84,14 +104,18 @@ func (db *DB) migrate() error {
 
 		CREATE TABLE IF NOT EXISTS property_history (
 			id INTEGER PRIMARY KEY,
-			property_name TEXT NOT NULL,
-			property_value TEXT NOT NULL,
+			name TEXT NOT NULL,
+			type INTEGER NOT NULL,
+			int_value INTEGER,
+			text_value TEXT,
+			real_value REAL,
+			numeric_value NUMERIC,
 			sample_type INTEGER NOT NULL,
 			created_at DATETIME,
 			updated_at DATETIME
 		);
 
-		CREATE INDEX IF NOT EXISTS property_history_name_created_at ON property_history (property_name, created_at);
+		CREATE INDEX IF NOT EXISTS property_history_name_created_at ON property_history (name, created_at);
 
 		CREATE TRIGGER IF NOT EXISTS insert_property_history_created_at
 		AFTER INSERT ON property_history
@@ -113,6 +137,10 @@ func (db *DB) migrate() error {
 }
 
 func (db *DB) InsertEvent(e *datamodel.Event) error {
+	if !db.started {
+		return errors.New("CriticalMoments: DB not started")
+	}
+
 	_, err := db.sqldb.Exec(`
 		INSERT INTO events (event_name)
 		VALUES (?)
@@ -127,6 +155,10 @@ func (db *DB) InsertEvent(e *datamodel.Event) error {
 const eventCountByNameQuery = `SELECT COUNT(*) FROM events WHERE event_name = ?`
 
 func (db *DB) EventCountByName(name string) (int, error) {
+	if !db.started {
+		return 0, errors.New("CriticalMoments: DB not started")
+	}
+
 	r, err := db.sqldb.Query(eventCountByNameQuery, name)
 	if err != nil {
 		return 0, err
@@ -146,6 +178,10 @@ func (db *DB) EventCountByName(name string) (int, error) {
 const eventCountByNameWithLimitQuery = `SELECT COUNT(*) FROM (SELECT id FROM events WHERE event_name = ? LIMIT ?)`
 
 func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
+	if !db.started {
+		return 0, errors.New("CriticalMoments: DB not started")
+	}
+
 	r, err := db.sqldb.Query(eventCountByNameWithLimitQuery, name, limit)
 	if err != nil {
 		return 0, err
@@ -165,6 +201,10 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE event_name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
+	if !db.started {
+		return nil, errors.New("CriticalMoments: DB not started")
+	}
+
 	r, err := db.sqldb.Query(latestEventTimeByNameQuery, name)
 	if err != nil {
 		return nil, err
@@ -184,11 +224,68 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	return &time, nil
 }
 
-func (db *DB) InsertPropertyHistory(name string, value string, sampleType datamodel.CMPropertySampleType) error {
-	_, err := db.sqldb.Exec(`
-		INSERT INTO property_history (property_name, property_value, sample_type)
-		VALUES (?, ?, ?)
-	`, name, value, sampleType)
+type DBPropertyType int
+
+const (
+	DBPropertyTypeString DBPropertyType = 1
+	DBPropertyTypeInt    DBPropertyType = 2
+	DBPropertyTypeFloat  DBPropertyType = 3
+	DBPropertyTypeBool   DBPropertyType = 4
+	DBPropertyTypeTime   DBPropertyType = 5
+)
+
+func DBPropertyTypeIntFromKind(k reflect.Kind) (DBPropertyType, error) {
+	switch k {
+	case reflect.String:
+		return DBPropertyTypeString, nil
+	case reflect.Int:
+		return DBPropertyTypeInt, nil
+	case reflect.Float64:
+		return DBPropertyTypeFloat, nil
+	case reflect.Bool:
+		return DBPropertyTypeBool, nil
+	case datamodel.CMTimeKind:
+		return DBPropertyTypeTime, nil
+	default:
+		return 0, errors.New("CriticalMoments: Unsupported property type")
+	}
+}
+
+func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType datamodel.CMPropertySampleType) error {
+	if !db.started {
+		return errors.New("CriticalMoments: DB not started")
+	}
+
+	propKind := datamodel.CMTypeFromValue(value)
+	dbType, err := DBPropertyTypeIntFromKind(propKind)
+	if err != nil {
+		return err
+	}
+
+	sqlTemplate := ""
+	switch dbType {
+	case DBPropertyTypeString:
+		sqlTemplate = `INSERT INTO property_history (name, type, text_value, sample_type) VALUES (?, ?, ?, ?)`
+	case DBPropertyTypeInt:
+		sqlTemplate = `INSERT INTO property_history (name, type, int_value, sample_type) VALUES (?, ?, ?, ?)`
+	case DBPropertyTypeFloat:
+		sqlTemplate = `INSERT INTO property_history (name, type, real_value, sample_type) VALUES (?, ?, ?, ?)`
+	case DBPropertyTypeBool:
+		sqlTemplate = `INSERT INTO property_history (name, type, numeric_value, sample_type) VALUES (?, ?, ?, ?)`
+	case DBPropertyTypeTime:
+		// Time stored as microseconds, in int column
+		time, ok := value.(time.Time)
+		if !ok {
+			return errors.New("CriticalMoments: Invalid time")
+		}
+		value = time.UnixMicro()
+		sqlTemplate = `INSERT INTO property_history (name, type, int_value, sample_type) VALUES (?, ?, ?, ?)`
+	}
+	if sqlTemplate == "" {
+		return errors.New("CriticalMoments: Unsupported property type")
+	}
+
+	_, err = db.sqldb.Exec(sqlTemplate, name, dbType, value, sampleType)
 	if err != nil {
 		return err
 	}

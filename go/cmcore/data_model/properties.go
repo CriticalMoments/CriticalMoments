@@ -3,9 +3,34 @@ package datamodel
 import (
 	"math"
 	"reflect"
+	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 const CMTimeKind = (reflect.Kind)(math.MaxUint)
+
+var ValidPropertyTypes = []reflect.Kind{
+	reflect.Bool,
+	reflect.String,
+	reflect.Int,
+	reflect.Float64,
+	CMTimeKind,
+}
+
+func CMTypeFromValue(v interface{}) reflect.Kind {
+	if v == nil {
+		return reflect.Invalid
+	}
+	if _, ok := v.(time.Time); ok {
+		return CMTimeKind
+	}
+	k := reflect.TypeOf(v).Kind()
+	if slices.Contains(ValidPropertyTypes, k) {
+		return k
+	}
+	return reflect.Invalid
+}
 
 type CMPropertySampleType int
 

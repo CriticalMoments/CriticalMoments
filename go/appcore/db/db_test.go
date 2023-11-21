@@ -19,7 +19,8 @@ func testBuildTestDb(t *testing.T) *DB {
 	if err != nil {
 		t.Fatal(err)
 	}
-	db, err := NewDB(dataPath)
+	db := NewDB()
+	err = db.StartWithPath(dataPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +63,8 @@ func TestDBMigrate(t *testing.T) {
 
 	// run cold from new DB instance (schema should already exist)
 	db.Close()
-	db2, err := NewDB(path.Dir(db.databasePath)[5:])
+	db2 := NewDB()
+	err = db2.StartWithPath(path.Dir(db.databasePath)[5:])
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -407,9 +409,9 @@ func TestCreatedAtTriggerPropHistory(t *testing.T) {
 
 	// insert a row into table
 	_, err := db.sqldb.Exec(`
-		INSERT INTO property_history (property_name, property_value, sample_type)
-		VALUES ('test', 'val', 1)
-	`)
+		INSERT INTO property_history (name, type, text_value, sample_type)
+		VALUES ('test', ?, 'val', 1)
+	`, DBPropertyTypeString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -441,8 +443,8 @@ func TestCreatedAtTriggerPropHistory(t *testing.T) {
 	// update the row after small delay
 	time.Sleep(time.Millisecond * 2)
 	_, err = db.sqldb.Exec(`
-		UPDATE property_history SET property_value = 'val2'
-		WHERE property_name = 'test'
+		UPDATE property_history SET text_value = 'val2'
+		WHERE name = 'test'
 	`)
 	if err != nil {
 		t.Fatal(err)
@@ -481,6 +483,7 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 	defer db.Close()
 
 	// insert a row into property history
+	// Other types tested in property_hisotry_manager_test.go
 	err := db.InsertPropertyHistory("testx", "valx", 1)
 	if err != nil {
 		t.Fatal(err)
@@ -488,7 +491,7 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 
 	// retrieve and verify
 	r, err := db.sqldb.Query(`
-		SELECT property_name, property_value, sample_type FROM property_history 
+		SELECT name, text_value, sample_type FROM property_history 
 		LIMIT 1
 	`)
 	if err != nil {
