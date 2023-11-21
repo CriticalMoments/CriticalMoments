@@ -48,6 +48,7 @@ func NewAppcore() *Appcore {
 	return &Appcore{
 		propertyRegistry:    newPropertyRegistry(),
 		seenNamedConditions: map[string]string{},
+		db:                  db.NewDB(),
 	}
 }
 
@@ -118,13 +119,12 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
 	}
 	ac.cache = cache
 
-	db, err := db.NewDB(dataDirPath)
+	err = ac.db.StartWithPath(dataDirPath)
 	if err != nil {
 		return err
 	}
-	ac.db = db
 
-	dbOperations := db.EventManager().EventManagerConditionFunctions()
+	dbOperations := ac.db.EventManager().EventManagerConditionFunctions()
 	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
 
 	return nil

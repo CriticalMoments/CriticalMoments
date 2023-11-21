@@ -76,7 +76,7 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 		}
 	}
 
-	if !slices.Contains(validPropertyTypes, pp.Kind()) {
+	if !slices.Contains(datamodel.ValidPropertyTypes, pp.Kind()) {
 		return errors.New("Invalid property type for key: " + key)
 	}
 

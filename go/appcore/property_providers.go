@@ -7,7 +7,6 @@ import (
 	"time"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
-	"golang.org/x/exp/slices"
 )
 
 type propertyProvider interface {
@@ -15,26 +14,8 @@ type propertyProvider interface {
 	Kind() reflect.Kind
 }
 
-var validPropertyTypes = []reflect.Kind{
-	reflect.Bool,
-	reflect.String,
-	reflect.Int,
-	reflect.Float64,
-	datamodel.CMTimeKind,
-}
-
 func typeFromValue(v interface{}) reflect.Kind {
-	if v == nil {
-		return reflect.Invalid
-	}
-	if _, ok := v.(time.Time); ok {
-		return datamodel.CMTimeKind
-	}
-	k := reflect.TypeOf(v).Kind()
-	if slices.Contains(validPropertyTypes, k) {
-		return k
-	}
-	return reflect.Invalid
+	return datamodel.CMTypeFromValue(v)
 }
 
 // Set once properties

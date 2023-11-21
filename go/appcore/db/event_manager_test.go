@@ -8,7 +8,8 @@ import (
 )
 
 func testEventManager(path string) (*EventManager, error) {
-	db, err := NewDB(path)
+	db := NewDB()
+	err := db.StartWithPath(path)
 	if err != nil {
 		return nil, err
 	}
