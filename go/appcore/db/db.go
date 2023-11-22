@@ -292,3 +292,52 @@ func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType d
 
 	return nil
 }
+
+func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
+	if !db.started {
+		return nil, errors.New("CriticalMoments: DB not started")
+	}
+
+	var text_value sql.NullString
+	var int_value sql.NullInt64
+	var real_value sql.NullFloat64
+	var numeric_value sql.NullBool
+	var dbType sql.NullInt64
+	err := db.sqldb.
+		QueryRow(`SELECT text_value, int_value, real_value, numeric_value, type FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`, name).
+		Scan(&text_value, &int_value, &real_value, &numeric_value, &dbType)
+
+	if err != nil {
+		return nil, err
+	}
+	if !dbType.Valid {
+		return nil, errors.New("CriticalMoments: Property type invalid")
+	}
+
+	switch DBPropertyType(dbType.Int64) {
+	case DBPropertyTypeString:
+		if text_value.Valid {
+			return text_value.String, nil
+		}
+	case DBPropertyTypeInt:
+		if int_value.Valid {
+			return int_value.Int64, nil
+		}
+	case DBPropertyTypeFloat:
+		if real_value.Valid {
+			return real_value.Float64, nil
+		}
+	case DBPropertyTypeBool:
+		if numeric_value.Valid {
+			return numeric_value.Bool, nil
+		}
+	case DBPropertyTypeTime:
+		if int_value.Valid {
+			return time.UnixMicro(int_value.Int64), nil
+		}
+	default:
+		return nil, errors.New("CriticalMoments: Unsupported property type")
+	}
+
+	return nil, errors.New("CriticalMoments: Invalid property value")
+}
