@@ -127,7 +127,7 @@ func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
 		return err
 	}
 
-	dbOperations := ac.db.EventManager().EventManagerConditionFunctions()
+	dbOperations := ac.db.DbConditionFunctions()
 	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
 
 	return nil

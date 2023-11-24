@@ -593,4 +593,10 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 	if v, err := ac.db.LatestPropertyHistory("builtInNever"); err != sql.ErrNoRows || v != nil {
 		t.Fatal("built in static sample_never property recorded in history")
 	}
+
+	// Verify property history dynamic function also works
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyHistoryLatestValue('builtInString') == 'hello world' && propertyHistoryLatestValue('builtInNever') == nil && propertyHistoryLatestValue('custom_testInt') == 42", t))
+	if err != nil || !result {
+		t.Fatal("Property history not working through confition function")
+	}
 }

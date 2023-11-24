@@ -341,3 +341,45 @@ func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
 
 	return nil, errors.New("CriticalMoments: Invalid property value")
 }
+
+func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunction {
+	return map[string]*datamodel.ConditionDynamicFunction{
+		"eventCount": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done with the Types signature
+				count, err := db.EventCountByName(params[0].(string))
+				if err != nil {
+					return nil, err
+				}
+				return count, nil
+			},
+			Types: []any{new(func(string) int)},
+		},
+		"eventCountWithLimit": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				count, err := db.EventCountByNameWithLimit(params[0].(string), params[1].(int))
+				if err != nil {
+					return nil, err
+				}
+				return count, nil
+			},
+			Types: []any{new(func(string, int) int)},
+		},
+		"propertyHistoryLatestValue": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				value, err := db.LatestPropertyHistory(params[0].(string))
+				// no rows should return nil
+				if err == sql.ErrNoRows {
+					return nil, nil
+				}
+				if err != nil {
+					return nil, err
+				}
+				return value, nil
+			},
+			Types: []any{new(func(string) interface{})},
+		},
+	}
+}
