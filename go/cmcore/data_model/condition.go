@@ -76,9 +76,10 @@ func StaticConditionConstantProperties() map[string]interface{} {
 }
 
 var AllBuiltInDynamicFunctions = map[string]bool{
-	"eventCount":          true,
-	"eventCountWithLimit": true,
-	"canOpenUrl":          true,
+	"eventCount":                 true,
+	"eventCountWithLimit":        true,
+	"canOpenUrl":                 true,
+	"propertyHistoryLatestValue": true,
 }
 
 type ConditionFields struct {
