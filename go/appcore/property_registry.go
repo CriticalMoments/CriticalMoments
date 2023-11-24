@@ -78,6 +78,15 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 		}
 	}
 
+	// Currently all custom properties are CustomOnSet (and we only support static custom props).
+	// If this changes, should rework this for dynamic custom props or customOnUse
+	if isCustom && pr.phm != nil {
+		val := pp.Value()
+		if val != nil {
+			pr.phm.CustomPropertySet(key, val)
+		}
+	}
+
 	if !slices.Contains(datamodel.ValidPropertyTypes, pp.Kind()) {
 		return errors.New("Invalid property type for key: " + key)
 	}

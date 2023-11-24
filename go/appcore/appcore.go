@@ -45,11 +45,14 @@ type Appcore struct {
 }
 
 func NewAppcore() *Appcore {
-	return &Appcore{
+	ac := &Appcore{
 		propertyRegistry:    newPropertyRegistry(),
 		seenNamedConditions: map[string]string{},
 		db:                  db.NewDB(),
 	}
+	// Connect the property registry to the db/proptery history manager
+	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
+	return ac
 }
 
 // Hopefully no one wants http (no TLS) in 2023... but given the importance of the config file we can't open this up to injection attacks
@@ -251,6 +254,11 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	err := ac.loadConfig(allowDebugLoad)
 	if err != nil {
 		return err
+	}
+
+	err = ac.propertyRegistry.samplePropertiesForStartup()
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue sampling properties for startup. Continuing as this error is non-fatal: %v\n", err)
 	}
 
 	ac.started = true
