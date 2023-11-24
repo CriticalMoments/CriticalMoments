@@ -569,7 +569,6 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Add a built in property with static value and startup sample type
 	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
 		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
 		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
