@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
 	"golang.org/x/exp/maps"
@@ -21,6 +22,7 @@ type propertyRegistry struct {
 	dynamicFunctionOps   []expr.Option
 	mapFunctions         map[string]interface{}
 	mapConstants         map[string]interface{}
+	phm                  *db.PropertyHistoryManager
 }
 
 func newPropertyRegistry() *propertyRegistry {
@@ -73,6 +75,15 @@ func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) e
 
 		if pp.Kind() != expectedType {
 			return errors.New("Property registered of wrong type (does not match expected type): " + key)
+		}
+	}
+
+	// Currently all custom properties are CustomOnSet (and we only support static custom props).
+	// If this changes, should rework this for dynamic custom props or customOnUse
+	if isCustom && pr.phm != nil {
+		val := pp.Value()
+		if val != nil {
+			pr.phm.CustomPropertySet(key, val)
 		}
 	}
 
@@ -187,7 +198,23 @@ func (p *propertyRegistry) propertyValue(key string) (interface{}, error) {
 	if !ok {
 		return nil, errPropertyNotFound
 	}
-	return v.Value(), nil
+	value := v.Value()
+	p.trackPropertyHistoryForUsage(key, value)
+	return value, nil
+}
+
+func (p *propertyRegistry) trackPropertyHistoryForUsage(key string, value interface{}) {
+	if p.phm == nil {
+		return
+	}
+
+	propConfig, isBuiltIn := p.builtInPropertyTypes[key]
+	if !isBuiltIn || propConfig.SampleType != datamodel.CMPropertySampleTypeOnUse {
+		// Don't track history for non built in properties, or built in properties that don't have sample type=OnUse
+		return
+	}
+
+	p.phm.UpdateHistoryForPropertyAccessed(key, value)
 }
 
 func (p *propertyRegistry) buildPropertyMapForCondition(fields *datamodel.ConditionFields) (map[string]interface{}, error) {
@@ -340,4 +367,35 @@ func validPropertyName(name string) bool {
 	}
 
 	return true
+}
+
+func (pr *propertyRegistry) samplePropertiesForStartup() error {
+	if pr.phm == nil {
+		return errors.New("property history manager not set -- not sampling properties for startup")
+	}
+
+	startupProps := map[string]interface{}{}
+	errSet := []error{}
+
+	for propName, propConfig := range pr.builtInPropertyTypes {
+		if propConfig.SampleType == datamodel.CMPropertySampleTypeAppStart {
+			propValue, err := pr.propertyValue(propName)
+			if err != nil || propValue == nil {
+				errSet = append(errSet, err)
+			} else {
+				startupProps[propName] = propValue
+			}
+		}
+	}
+
+	err := pr.phm.TrackPropertyHistoryForStartup(startupProps)
+	if err != nil {
+		return err
+	}
+
+	if len(errSet) > 0 {
+		return errors.Join(errSet...)
+	}
+
+	return nil
 }

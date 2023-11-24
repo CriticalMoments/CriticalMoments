@@ -1,14 +1,18 @@
 package appcore
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
+	"math/rand"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
 	"unsafe"
 
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
@@ -826,5 +830,110 @@ func TestClientPropertyJsonRegistration(t *testing.T) {
 	}
 	if _, err := pr.propertyValue("invalidKey"); err == nil {
 		t.Fatal("invalid registered")
+	}
+}
+
+func testBuildTestDb(t *testing.T) *db.DB {
+	dataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
+	err := os.MkdirAll(dataPath, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	db := db.NewDB()
+	err = db.StartWithPath(dataPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return db
+}
+
+func TestSetPropertyHistoryOnStartup(t *testing.T) {
+	pr := newPropertyRegistry()
+	pr.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"on_start_prop":     {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"on_access_prop":    {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeOnUse},
+		"never_sample_prop": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"int_prop":          {Type: reflect.Int, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"float_prop":        {Type: reflect.Float64, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"bool_prop":         {Type: reflect.Bool, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"date_prop":         {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+	}
+
+	err := pr.registerStaticProperty("on_start_prop", "onstart")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("on_access_prop", "onaccess")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("never_sample_prop", "never")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("int_prop", 42)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("float_prop", 3.3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("bool_prop", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pr.registerStaticProperty("date_prop", time.UnixMilli(testTimestampUnixMilli))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create test DB and connect property manager
+	db := testBuildTestDb(t)
+	pr.phm = db.PropertyHistoryManager()
+
+	err = pr.samplePropertiesForStartup()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Check that the on start properties were set, and others were not
+	if v, err := db.LatestPropertyHistory("on_start_prop"); err != nil || v != "onstart" {
+		t.Fatal("on start property not set in db")
+	}
+	if v, err := db.LatestPropertyHistory("on_access_prop"); err != sql.ErrNoRows || v != nil {
+		t.Fatal("on access property set in db even though it has not been accessed")
+	}
+	if v, err := db.LatestPropertyHistory("never_sample_prop"); err != sql.ErrNoRows || v != nil {
+		t.Fatal("never sample prop in db")
+	}
+	if v, err := db.LatestPropertyHistory("int_prop"); err != nil || v != int64(42) {
+		t.Fatal("int prop in db")
+	}
+	if v, err := db.LatestPropertyHistory("float_prop"); err != nil || v != 3.3 {
+		t.Fatal("float prop in db")
+	}
+	if v, err := db.LatestPropertyHistory("bool_prop"); err != nil || v != true {
+		t.Fatal("bool prop in db")
+	}
+	if v, err := db.LatestPropertyHistory("date_prop"); err != nil || (v.(time.Time).UnixMilli() != testTimestampUnixMilli) {
+		t.Fatal("date prop in db")
+	}
+
+	result, err := pr.evaluateCondition(testHelperNewCondition("on_start_prop == 'onstart' && on_access_prop == 'onaccess' && never_sample_prop == 'never' && int_prop == 42 && float_prop == 3.3 && bool_prop", t))
+	if err != nil || !result {
+		t.Fatal("Properties not set correctly")
+	}
+
+	if v, err := db.LatestPropertyHistory("on_start_prop"); err != nil || v != "onstart" {
+		t.Fatal("on start property not set in db")
+	}
+	// Check that the on access property was set
+	if v, err := db.LatestPropertyHistory("on_access_prop"); err != nil || v != "onaccess" {
+		t.Fatal("on access property was not set after access")
+	}
+	// Check we don't set the never sample property, even after access
+	if v, err := db.LatestPropertyHistory("never_sample_prop"); err != sql.ErrNoRows || v != nil {
+		t.Fatal("never sample prop in db")
 	}
 }

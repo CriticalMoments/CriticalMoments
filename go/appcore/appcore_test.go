@@ -1,10 +1,12 @@
 package appcore
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -101,6 +103,9 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	}
 	if ac.db == nil || ac.db.EventManager() == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
 		t.Fatal("db, event manager, prop history manager, or cache not setup")
+	}
+	if ac.propertyRegistry.phm != ac.db.PropertyHistoryManager() {
+		t.Fatal("property history manager not set to the correct DB instance via NewAppcore")
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
@@ -555,5 +560,37 @@ func TestChecksAppId(t *testing.T) {
 	err = ac.Start(true)
 	if err == nil || !strings.Contains(err.Error(), "this config file isn't valid for this app") {
 		t.Fatal("Allowed loading a config with a bundle ID mismatch")
+	}
+}
+
+func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add a built in property with static value and startup sample type
+	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+	}
+
+	ac.RegisterClientIntProperty("testInt", 42)
+	ac.RegisterStaticStringProperty("builtInString", "hello world")
+	ac.RegisterStaticStringProperty("builtInNever", "never")
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if v, err := ac.db.LatestPropertyHistory("custom_testInt"); err != nil || v != int64(42) {
+		t.Fatal("custom static property not recorded in history")
+	}
+	if v, err := ac.db.LatestPropertyHistory("builtInString"); err != nil || v != "hello world" {
+		t.Fatal("built in static sample_on_start property not recorded in history")
+	}
+	if v, err := ac.db.LatestPropertyHistory("builtInNever"); err != sql.ErrNoRows || v != nil {
+		t.Fatal("built in static sample_never property recorded in history")
 	}
 }

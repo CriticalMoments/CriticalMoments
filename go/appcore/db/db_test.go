@@ -509,4 +509,14 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 	if n != "testx" || v != "valx" || s != 1 {
 		t.Fatal("retrieve failed")
 	}
+
+	// retrieve and verify with helper
+	// All types tested in property_registry_test.go
+	rv, err := db.LatestPropertyHistory("testx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rv != "valx" {
+		t.Fatal("retrieve failed")
+	}
 }
