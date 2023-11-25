@@ -519,4 +519,20 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 	if rv != "valx" {
 		t.Fatal("retrieve failed")
 	}
+
+	// check if it has ever had value
+	has, err := db.PropertyHistoryEverHadValue("testx", "valx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !has {
+		t.Fatal("PropertyHistoryEverHadValue failed")
+	}
+	has, err = db.PropertyHistoryEverHadValue("testx", "wrong value")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if has {
+		t.Fatal("PropertyHistoryEverHadValue failed")
+	}
 }

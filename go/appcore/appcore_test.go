@@ -596,6 +596,12 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 	// Verify property history dynamic function also works
 	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyHistoryLatestValue('builtInString') == 'hello world' && propertyHistoryLatestValue('builtInNever') == nil && propertyHistoryLatestValue('custom_testInt') == 42", t))
 	if err != nil || !result {
-		t.Fatal("Property history not working through confition function")
+		t.Fatal("Property history not working through condition function")
+	}
+
+	// Verify property history dynamic value check function also works
+	result, err = ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyEverHadValue('builtInString', 'hello world') && !propertyEverHadValue('builtInString', 'hello world2')", t))
+	if err != nil || !result {
+		t.Fatal("Property history by value not working through condition function")
 	}
 }

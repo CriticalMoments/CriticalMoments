@@ -936,4 +936,32 @@ func TestSetPropertyHistoryOnStartup(t *testing.T) {
 	if v, err := db.LatestPropertyHistory("never_sample_prop"); err != sql.ErrNoRows || v != nil {
 		t.Fatal("never sample prop in db")
 	}
+
+	// Check property history check method works for all types
+	historyChecks := map[string]any{
+		"on_start_prop":  "onstart",
+		"on_access_prop": "onaccess",                             // add_test_count
+		"int_prop":       42,                                     // add_test_count
+		"float_prop":     3.3,                                    // add_test_count
+		"bool_prop":      true,                                   // add_test_count
+		"date_prop":      time.UnixMilli(testTimestampUnixMilli), // add_test_count
+	}
+	for k, v := range historyChecks {
+		has, err := db.PropertyHistoryEverHadValue(k, v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !has {
+			t.Fatal("Property history check failed for " + k)
+		}
+	}
+
+	// Property value it has never had
+	has, err := db.PropertyHistoryEverHadValue("on_start_prop", "asdf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if has {
+		t.Fatal("Property history check failed for mismatched value")
+	}
 }

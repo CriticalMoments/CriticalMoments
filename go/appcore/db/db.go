@@ -341,6 +341,45 @@ func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
 
 	return nil, errors.New("CriticalMoments: Invalid property value")
 }
+func (db *DB) PropertyHistoryEverHadValue(name string, value interface{}) (bool, error) {
+	if !db.started {
+		return false, errors.New("CriticalMoments: DB not started")
+	}
+
+	propKind := datamodel.CMTypeFromValue(value)
+	sqlTemplate := ""
+	switch propKind {
+	case reflect.String:
+		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND text_value = ? LIMIT 1`
+	case reflect.Int:
+		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND int_value = ? LIMIT 1`
+	case reflect.Float64:
+		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND real_value = ? LIMIT 1`
+	case reflect.Bool:
+		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND numeric_value = ? LIMIT 1`
+	case datamodel.CMTimeKind:
+		// Time stored as microseconds, in int column
+		time, ok := value.(time.Time)
+		if !ok {
+			return false, errors.New("CriticalMoments: Invalid time")
+		}
+		value = time.UnixMicro()
+		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND int_value = ? LIMIT 1`
+	}
+	if sqlTemplate == "" {
+		return false, errors.New("CriticalMoments: Unsupported property type")
+	}
+
+	var count sql.NullInt64
+	err := db.sqldb.QueryRow(sqlTemplate, name, value).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	if !count.Valid {
+		return false, errors.New("CriticalMoments: unexpected error")
+	}
+	return count.Int64 > 0, nil
+}
 
 func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunction {
 	return map[string]*datamodel.ConditionDynamicFunction{
@@ -380,6 +419,17 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 				return value, nil
 			},
 			Types: []any{new(func(string) interface{})},
+		},
+		"propertyEverHadValue": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				value, err := db.PropertyHistoryEverHadValue(params[0].(string), params[1])
+				if err != nil {
+					return nil, err
+				}
+				return value, nil
+			},
+			Types: []any{new(func(string, interface{}) bool)},
 		},
 	}
 }

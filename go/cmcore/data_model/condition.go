@@ -80,6 +80,7 @@ var AllBuiltInDynamicFunctions = map[string]bool{
 	"eventCountWithLimit":        true,
 	"canOpenUrl":                 true,
 	"propertyHistoryLatestValue": true,
+	"propertyEverHadValue":       true,
 }
 
 type ConditionFields struct {
