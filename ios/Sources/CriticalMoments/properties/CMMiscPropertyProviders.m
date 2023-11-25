@@ -17,7 +17,7 @@
     NSURL *docsFolderUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                    inDomains:NSUserDomainMask] lastObject];
     if (!docsFolderUrl) {
-        return 0;
+        return nil;
     }
 
     NSError *err;

@@ -111,6 +111,10 @@
         @"calendar_permission": @"calendar_permission in ['not_determined', 'denied', 'authorized_full', 'authorized_write_only', 'restricted', 'unknown']", // add_test_count
         @"reminders_permission": @"reminders_permission in ['not_determined', 'denied', 'authorized_full', 'authorized_write_only', 'restricted', 'unknown']", // add_test_count
         @"bluetooth_permission": @"bluetooth_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
+        
+        // Functions
+        @"propertyHistoryLatestValue": @"propertyHistoryLatestValue('platform') == 'iOS' || propertyHistoryLatestValue('platform') == 'iPadOS'", // add_test_count
+        @"propertyHistoryLatestValueNil": @"propertyHistoryLatestValue('never_set_prop') == nil", // add_test_count
     };
     // clang-format on
 

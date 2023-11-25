@@ -15,30 +15,3 @@ func (em *EventManager) SendEvent(e *datamodel.Event) error {
 	}
 	return nil
 }
-
-func (em *EventManager) EventManagerConditionFunctions() map[string]*datamodel.ConditionDynamicFunction {
-	return map[string]*datamodel.ConditionDynamicFunction{
-		"eventCount": {
-			Function: func(params ...any) (any, error) {
-				// Parameter type+count checking is done with the Types signature
-				count, err := em.db.EventCountByName(params[0].(string))
-				if err != nil {
-					return nil, err
-				}
-				return count, nil
-			},
-			Types: []any{new(func(string) int)},
-		},
-		"eventCountWithLimit": {
-			Function: func(params ...any) (any, error) {
-				// Parameter type+count checking is done the Types signature
-				count, err := em.db.EventCountByNameWithLimit(params[0].(string), params[1].(int))
-				if err != nil {
-					return nil, err
-				}
-				return count, nil
-			},
-			Types: []any{new(func(string, int) int)},
-		},
-	}
-}

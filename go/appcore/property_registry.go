@@ -380,7 +380,10 @@ func (pr *propertyRegistry) samplePropertiesForStartup() error {
 	for propName, propConfig := range pr.builtInPropertyTypes {
 		if propConfig.SampleType == datamodel.CMPropertySampleTypeAppStart {
 			propValue, err := pr.propertyValue(propName)
-			if err != nil || propValue == nil {
+			if err == errPropertyNotFound && propConfig.Optional {
+				// Optional property not found, that's fine
+				continue
+			} else if err != nil || propValue == nil {
 				errSet = append(errSet, err)
 			} else {
 				startupProps[propName] = propValue
