@@ -536,3 +536,47 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 		t.Fatal("PropertyHistoryEverHadValue failed")
 	}
 }
+
+func TestPropHistoryRateLimit(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	delay := time.Millisecond * 15
+	original := maxTimeBetweenPropertyHistorySamples
+	maxTimeBetweenPropertyHistorySamples = delay
+	defer func() {
+		maxTimeBetweenPropertyHistorySamples = original
+	}()
+
+	err := db.InsertPropertyHistory("test", "val1", datamodel.CMPropertySampleTypeOnUse)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = db.InsertPropertyHistory("test", "val2", datamodel.CMPropertySampleTypeOnUse)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Immediate write should be rate limited, and only store first value
+	rv, err := db.LatestPropertyHistory("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rv != "val1" {
+		t.Fatal("set failed to rate limit second write")
+	}
+
+	// Delayed, writes should work again
+	time.Sleep(delay + time.Millisecond)
+	err = db.InsertPropertyHistory("test", "val3", datamodel.CMPropertySampleTypeOnUse)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rv, err = db.LatestPropertyHistory("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rv != "val3" {
+		t.Fatal("set failed to block second write")
+	}
+}

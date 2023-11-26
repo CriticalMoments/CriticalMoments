@@ -251,9 +251,40 @@ func DBPropertyTypeIntFromKind(k reflect.Kind) (DBPropertyType, error) {
 	}
 }
 
+func (db *DB) latestPropertyHistoryTime(name string) (*time.Time, error) {
+	var epochTime float64
+	err := db.sqldb.
+		QueryRow(`SELECT created_at FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`, name).
+		Scan(&epochTime)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	_, fractionalSeconds := math.Modf(epochTime)
+	nanoseconds := int64(fractionalSeconds * 1_000_000_000)
+	time := time.Unix(int64(epochTime), nanoseconds)
+	return &time, nil
+}
+
+var maxTimeBetweenPropertyHistorySamples = time.Minute * 5
+
 func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType datamodel.CMPropertySampleType) error {
 	if !db.started {
 		return errors.New("CriticalMoments: DB not started")
+	}
+
+	// Check last update time, and skip if it's in last 5 mins
+	latestHistoryTime, err := db.latestPropertyHistoryTime(name)
+	if err != nil {
+		return err
+	}
+	if latestHistoryTime != nil {
+		if time.Now().Before(latestHistoryTime.Add(maxTimeBetweenPropertyHistorySamples)) {
+			return nil
+		}
 	}
 
 	propKind := datamodel.CMTypeFromValue(value)
