@@ -224,7 +224,7 @@ static CriticalMoments *sharedInstance = nil;
     __block NSString *blockEventName = eventName;
     dispatch_async(_eventQueue, ^{
       NSError *error;
-      [_appcore sendEvent:blockEventName error:&error];
+      [_appcore sendClientEvent:blockEventName error:&error];
 
       if (blockHandler) {
           blockHandler(error);
