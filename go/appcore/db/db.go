@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -252,10 +253,12 @@ func DBPropertyTypeIntFromKind(k reflect.Kind) (DBPropertyType, error) {
 	}
 }
 
+const latestPropHistoryTimeByNameQuery = `SELECT created_at FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+
 func (db *DB) latestPropertyHistoryTime(name string) (*time.Time, error) {
 	var epochTime float64
 	err := db.sqldb.
-		QueryRow(`SELECT created_at FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`, name).
+		QueryRow(latestPropHistoryTimeByNameQuery, name).
 		Scan(&epochTime)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -271,6 +274,8 @@ func (db *DB) latestPropertyHistoryTime(name string) (*time.Time, error) {
 }
 
 var maxTimeBetweenPropertyHistorySamples = time.Minute * 5
+
+const insertPropertyHistorySqlTemplate = `INSERT INTO property_history (name, type, TYPE_VAL, sample_type) VALUES (?, ?, ?, ?)`
 
 func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType datamodel.CMPropertySampleType) error {
 	if !db.started {
@@ -294,27 +299,9 @@ func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType d
 		return err
 	}
 
-	sqlTemplate := ""
-	switch dbType {
-	case DBPropertyTypeString:
-		sqlTemplate = `INSERT INTO property_history (name, type, text_value, sample_type) VALUES (?, ?, ?, ?)`
-	case DBPropertyTypeInt:
-		sqlTemplate = `INSERT INTO property_history (name, type, int_value, sample_type) VALUES (?, ?, ?, ?)`
-	case DBPropertyTypeFloat:
-		sqlTemplate = `INSERT INTO property_history (name, type, real_value, sample_type) VALUES (?, ?, ?, ?)`
-	case DBPropertyTypeBool:
-		sqlTemplate = `INSERT INTO property_history (name, type, numeric_value, sample_type) VALUES (?, ?, ?, ?)`
-	case DBPropertyTypeTime:
-		// Time stored as microseconds, in int column
-		time, ok := value.(time.Time)
-		if !ok {
-			return errors.New("CriticalMoments: Invalid time")
-		}
-		value = time.UnixMicro()
-		sqlTemplate = `INSERT INTO property_history (name, type, int_value, sample_type) VALUES (?, ?, ?, ?)`
-	}
-	if sqlTemplate == "" {
-		return errors.New("CriticalMoments: Unsupported property type")
+	sqlTemplate, value, err := formatSqlForPropHisotryType(value, insertPropertyHistorySqlTemplate)
+	if err != nil {
+		return err
 	}
 
 	_, err = db.sqldb.Exec(sqlTemplate, name, dbType, value, sampleType)
@@ -324,6 +311,8 @@ func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType d
 
 	return nil
 }
+
+const latestPropertyHistoryValueByNameQuery = `SELECT text_value, int_value, real_value, numeric_value, type FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
 	if !db.started {
@@ -336,7 +325,7 @@ func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
 	var numeric_value sql.NullBool
 	var dbType sql.NullInt64
 	err := db.sqldb.
-		QueryRow(`SELECT text_value, int_value, real_value, numeric_value, type FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`, name).
+		QueryRow(latestPropertyHistoryValueByNameQuery, name).
 		Scan(&text_value, &int_value, &real_value, &numeric_value, &dbType)
 
 	if err != nil {
@@ -373,37 +362,21 @@ func (db *DB) LatestPropertyHistory(name string) (interface{}, error) {
 
 	return nil, errors.New("CriticalMoments: Invalid property value")
 }
+
+const propertyHistoryEverHadValueQuery = `SELECT COUNT(*) FROM property_history WHERE name = ? AND TYPE_VAL = ? LIMIT 1`
+
 func (db *DB) PropertyHistoryEverHadValue(name string, value interface{}) (bool, error) {
 	if !db.started {
 		return false, errors.New("CriticalMoments: DB not started")
 	}
 
-	propKind := datamodel.CMTypeFromValue(value)
-	sqlTemplate := ""
-	switch propKind {
-	case reflect.String:
-		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND text_value = ? LIMIT 1`
-	case reflect.Int:
-		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND int_value = ? LIMIT 1`
-	case reflect.Float64:
-		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND real_value = ? LIMIT 1`
-	case reflect.Bool:
-		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND numeric_value = ? LIMIT 1`
-	case datamodel.CMTimeKind:
-		// Time stored as microseconds, in int column
-		time, ok := value.(time.Time)
-		if !ok {
-			return false, errors.New("CriticalMoments: Invalid time")
-		}
-		value = time.UnixMicro()
-		sqlTemplate = `SELECT COUNT(*) FROM property_history WHERE name = ? AND int_value = ? LIMIT 1`
-	}
-	if sqlTemplate == "" {
-		return false, errors.New("CriticalMoments: Unsupported property type")
+	sqlTemplate, value, err := formatSqlForPropHisotryType(value, propertyHistoryEverHadValueQuery)
+	if err != nil {
+		return false, err
 	}
 
 	var count sql.NullInt64
-	err := db.sqldb.QueryRow(sqlTemplate, name, value).Scan(&count)
+	err = db.sqldb.QueryRow(sqlTemplate, name, value).Scan(&count)
 	if err != nil {
 		return false, err
 	}
@@ -464,4 +437,37 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 			Types: []any{new(func(string, interface{}) bool)},
 		},
 	}
+}
+
+func formatSqlForPropHisotryType(val any, sqlTemplate string) (string, any, error) {
+	dbType, err := DBPropertyTypeIntFromKind(datamodel.CMTypeFromValue(val))
+	if err != nil {
+		return "", nil, err
+	}
+
+	column := ""
+	switch dbType {
+	case DBPropertyTypeString:
+		column = "text_value"
+	case DBPropertyTypeInt:
+		column = "int_value"
+	case DBPropertyTypeFloat:
+		column = "real_value"
+	case DBPropertyTypeBool:
+		column = "numeric_value"
+	case DBPropertyTypeTime:
+		// Time stored as microseconds, in int column
+		time, ok := val.(time.Time)
+		if !ok {
+			return "", nil, errors.New("CriticalMoments: Invalid time")
+		}
+		val = time.UnixMicro()
+		column = "int_value"
+	}
+	if column == "" {
+		return "", nil, errors.New("CriticalMoments: Unsupported property type")
+	}
+
+	sql := strings.Replace(sqlTemplate, "TYPE_VAL", column, -1)
+	return sql, val, nil
 }

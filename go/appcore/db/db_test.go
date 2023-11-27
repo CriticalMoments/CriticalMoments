@@ -376,11 +376,18 @@ func TestLatestEventUsesIndex(t *testing.T) {
 }
 
 func TestEventCountLimitUsesIndex(t *testing.T) {
-	testSqlExplainIncludes(eventCountByNameWithLimitQuery, "USING COVERING INDEX events_name_created_at", t, "test", 5)
+	testSqlExplainIncludes(eventCountByNameWithLimitQuery, "USING COVERING INDEX events_name_created_at", t, "test", 5) // add_test_count
 }
 
 func TestEventCountUsesIndex(t *testing.T) {
-	testSqlExplainIncludes(eventCountByNameQuery, "USING COVERING INDEX events_name_created_at", t, "test")
+	testSqlExplainIncludes(eventCountByNameQuery, "USING COVERING INDEX events_name_created_at", t, "test") // add_test_count
+}
+
+func TestPropertyQueriesIndex(t *testing.T) {
+	testSqlExplainIncludes(latestPropHistoryTimeByNameQuery, "USING COVERING INDEX property_history_name_created_at", t, "test")          // add_test_count
+	testSqlExplainIncludes(latestPropertyHistoryValueByNameQuery, "USING INDEX property_history_name_created_at", t, "test", 1, "val", 1) // add_test_count
+	everHadSql := strings.Replace(propertyHistoryEverHadValueQuery, "TYPE_VAL", "text_value", -1)
+	testSqlExplainIncludes(everHadSql, "USING INDEX property_history_name_created_at", t, "test", "val") // add_test_count
 }
 
 func testSqlExplainIncludes(sql string, expectedExplain string, t *testing.T, args ...any) {
