@@ -104,6 +104,7 @@
     [cm setConfigUrl:url.absoluteString];
     error = [cm startReturningError];
     if (error) {
+        NSLog(@"error starting CM: %@", error);
         return nil;
     }
 
@@ -199,23 +200,22 @@
     expectationNotRun.inverted = true;
 
     // tracks that sends event after we start
-    XCTestExpectation *expectationSuccess1 = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectationSuccess1];
+    XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation1];
 
     // Check order of run is order of is in order called
     NSLock *lock = [[NSLock alloc] init];
     NSMutableArray<NSNumber *> *orderRan = [[NSMutableArray alloc] init];
 
     // should run async after start, and not crash
-    [cm sendEvent:DatamodelAppStartBuiltInEvent
+    [cm sendEvent:@"custom_event"
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@1];
             [lock unlock];
             [expectationNotRun fulfill];
-            if (!error) {
-                [expectationSuccess1 fulfill];
-            }
+            XCTAssertNil(error, @"Error sending event before start");
+            [expectation1 fulfill];
           }];
 
     // Shouldn't run yet, even if we wait 1s
@@ -225,30 +225,28 @@
 
     // should run async and not crash
     // tracks that sends event after we start
-    XCTestExpectation *expectationSuccess2 = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectationSuccess2];
+    XCTestExpectation *expectation2 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation2];
     [cm sendEvent:randEventName
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@2];
             [lock unlock];
-            if (!error) {
-                [expectationSuccess2 fulfill];
-            }
+            XCTAssertNil(error, @"failed to send rand event");
+            [expectation2 fulfill];
           }];
 
     // should run async and not crash
-    // should error because this event name is not allowed
-    XCTestExpectation *expectationFail3 = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectationFail3];
-    [cm sendEvent:@"io.criticalmoments.events.built_in.invalid_built_in"
+    // should error because this event name is not allowed from client (built in)
+    XCTestExpectation *expectation3 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation3];
+    [cm sendEvent:DatamodelAppStartBuiltInEvent
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@3];
             [lock unlock];
-            if (error) {
-                [expectationFail3 fulfill];
-            }
+            XCTAssertNotNil(error, @"failed to error on reserved event name");
+            [expectation3 fulfill];
           }];
 
     // both should process
@@ -289,9 +287,8 @@
     [cm performNamedAction:@"reviewAction"
                    handler:^(NSError *_Nullable error) {
                      [expectationNotRun fulfill];
-                     if (!error) {
-                         [expectationSuccess1 fulfill];
-                     }
+                     XCTAssertNil(error, @"review action error");
+                     [expectationSuccess1 fulfill];
                    }];
 
     // Shouldn't run yet, even if we wait 1s
@@ -304,9 +301,8 @@
     [expectations addObject:expectationSuccess2];
     [cm performNamedAction:@"reviewAction"
                    handler:^(NSError *_Nullable error) {
-                     if (!error) {
-                         [expectationSuccess2 fulfill];
-                     }
+                     XCTAssertNil(error, @"review action error");
+                     [expectationSuccess2 fulfill];
                    }];
 
     // should run async, and we expect error since action name not in config
@@ -314,10 +310,8 @@
     [expectations addObject:expectationFail3];
     [cm performNamedAction:@"actionWhichDoesNotExist"
                    handler:^(NSError *_Nullable error) {
-                     if (error) {
-                         // Fulfill on error because this action name *should* error
-                         [expectationFail3 fulfill];
-                     }
+                     XCTAssertNotNil(error, @"missing action did not error");
+                     [expectationFail3 fulfill];
                    }];
 
     // confirm all are run after we start
@@ -442,17 +436,18 @@
 
     [self startCMForTest:cm];
 
-    XCTestExpectation *expectationSuccess = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectationSuccess];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation];
 
     NSTimeZone *tz = NSTimeZone.localTimeZone;
     NSString *condition = [NSString stringWithFormat:@"timezone_gmt_offset == %ld", tz.secondsFromGMT];
     [cm checkNamedCondition:@"nonName4"
                   condition:condition
                     handler:^(bool result, NSError *_Nullable er2) {
-                      if (!er2 && result) {
-                          [expectationSuccess fulfill];
+                      if (er2 || !result) {
+                          XCTAssert(false, @"timezone property failed");
                       }
+                      [expectation fulfill];
                     }];
 
     [self waitForExpectations:expectations timeout:5.0];

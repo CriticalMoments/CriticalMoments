@@ -124,10 +124,18 @@ static CriticalMoments *sharedInstance = nil;
     // Set the data directory to applicationSupport/critical_moments_data
     NSError *error;
     NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
+
+    /*BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
+    if (!success || error) {
+        NSLog(@"error removing existing cache: %@", error);
+        return error;
+    }*/
+
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
                            withIntermediateDirectories:YES
                                             attributes:nil
                                                  error:&error];
+
     if (error) {
         return error;
     }
