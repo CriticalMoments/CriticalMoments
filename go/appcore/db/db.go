@@ -83,12 +83,13 @@ func (db *DB) migrate() error {
 	_, err := db.sqldb.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 			id INTEGER PRIMARY KEY,
-			event_name TEXT NOT NULL,
+			name TEXT NOT NULL,
+			type INTEGER NOT NULL,
 			created_at DATETIME,
 			updated_at DATETIME
 		);
 
-		CREATE INDEX IF NOT EXISTS events_event_name_created_at ON events (event_name, created_at);
+		CREATE INDEX IF NOT EXISTS events_name_created_at ON events (name, created_at);
 
 		CREATE TRIGGER IF NOT EXISTS insert_events_created_at 
 		AFTER INSERT ON events
@@ -142,9 +143,9 @@ func (db *DB) InsertEvent(e *datamodel.Event) error {
 	}
 
 	_, err := db.sqldb.Exec(`
-		INSERT INTO events (event_name)
-		VALUES (?)
-	`, e.Name)
+		INSERT INTO events (name, type)
+		VALUES (?, ?)
+	`, e.Name, e.EventType)
 	if err != nil {
 		return err
 	}
@@ -152,7 +153,7 @@ func (db *DB) InsertEvent(e *datamodel.Event) error {
 	return nil
 }
 
-const eventCountByNameQuery = `SELECT COUNT(*) FROM events WHERE event_name = ?`
+const eventCountByNameQuery = `SELECT COUNT(*) FROM events WHERE name = ?`
 
 func (db *DB) EventCountByName(name string) (int, error) {
 	if !db.started {
@@ -175,7 +176,7 @@ func (db *DB) EventCountByName(name string) (int, error) {
 	return count, nil
 }
 
-const eventCountByNameWithLimitQuery = `SELECT COUNT(*) FROM (SELECT id FROM events WHERE event_name = ? LIMIT ?)`
+const eventCountByNameWithLimitQuery = `SELECT COUNT(*) FROM (SELECT id FROM events WHERE name = ? LIMIT ?)`
 
 func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 	if !db.started {
@@ -198,7 +199,7 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 	return count, nil
 }
 
-const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE event_name = ? ORDER BY created_at DESC LIMIT 1`
+const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	if !db.started {

@@ -187,22 +187,35 @@ func TestSendEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// invalid events should error
-	err = ac.SendEvent("io.criticalmoments.events.built_in.invalid")
+	// built in should error through client API
+	err = ac.SendClientEvent(datamodel.AppStartBuiltInEvent)
 	if err == nil {
 		t.Fatal("invalid build in event did not error")
 	}
-	err = ac.SendEvent("io.criticalmoments.events.well_known.invalid")
+
+	// built in should work thorough internal API
+	err = ac.SendBuiltInEvent(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal("valid build in event errored", err)
+	}
+
+	// well known should fail thorough built in API
+	err = ac.SendBuiltInEvent(datamodel.SignedInEvent)
 	if err == nil {
 		t.Fatal("invalid well known event did not error")
 	}
 
+	// Well known should work though client
+	err = ac.SendClientEvent(datamodel.SignedInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// custom events with no actions should work
-	err = ac.SendEvent("net.scosman.asdf")
+	err = ac.SendClientEvent("net.scosman.asdf")
 	if err != nil {
 		t.Fatal("valid custom event errored", err)
 	}
-
 }
 
 func TestPerformingAction(t *testing.T) {
@@ -218,7 +231,7 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal("last banner action should be nil on new appcore test binding")
 	}
 	// should fire bannerAction1 via a trigger
-	err = ac.SendEvent("custom_event")
+	err = ac.SendClientEvent("custom_event")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -444,9 +457,9 @@ func TestEndToEndEvents(t *testing.T) {
 		t.Fatal("eventCount should be 0")
 	}
 
-	ac.SendEvent("test")
-	ac.SendEvent("test")
-	ac.SendEvent("test2")
+	ac.SendClientEvent("test")
+	ac.SendClientEvent("test")
+	ac.SendClientEvent("test2")
 
 	c, err = datamodel.NewCondition("eventCount('test') == 2 && eventCount('test2') == 1")
 	if err != nil {
@@ -603,5 +616,32 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 	result, err = ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyEverHadValue('builtInString', 'hello world') && !propertyEverHadValue('builtInString', 'hello world2')", t))
 	if err != nil || !result {
 		t.Fatal("Property history by value not working through condition function")
+	}
+}
+func TestAppStartEvent(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := ac.db.EventCountByName(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatal("App start event should not be recorded before start")
+	}
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = ac.db.EventCountByName(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Fatal("App start event should have fired")
 	}
 }

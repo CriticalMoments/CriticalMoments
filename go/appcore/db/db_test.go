@@ -87,7 +87,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migation failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='index' AND name='events_event_name_created_at'")
+	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='index' AND name='events_name_created_at'")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func testSchema(db *DB, t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if v != "events_event_name_created_at" {
+	if v != "events_name_created_at" {
 		t.Fatal("DB migration failed")
 	}
 
@@ -205,8 +205,8 @@ func TestCreatedAtTrigger(t *testing.T) {
 
 	// insert a row into table
 	_, err := db.sqldb.Exec(`
-		INSERT INTO events (event_name)
-		VALUES ('test')
+		INSERT INTO events (name, type)
+		VALUES ('test', 0)
 	`)
 	if err != nil {
 		t.Fatal(err)
@@ -239,8 +239,8 @@ func TestCreatedAtTrigger(t *testing.T) {
 	// update the row after small delay
 	time.Sleep(time.Millisecond * 2)
 	_, err = db.sqldb.Exec(`
-		UPDATE events SET event_name = 'test2'
-		WHERE event_name = 'test'
+		UPDATE events SET name = 'test2'
+		WHERE name = 'test'
 	`)
 	if err != nil {
 		t.Fatal(err)
@@ -279,7 +279,7 @@ func TestInsertAndRetrieve(t *testing.T) {
 	defer db.Close()
 
 	// insert a row into events
-	e, err := datamodel.NewEventWithName("test")
+	e, err := datamodel.NewCustomEventWithName("test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -288,7 +288,7 @@ func TestInsertAndRetrieve(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ct, err := db.LatestEventTimeByName("test")
+	ct, err := db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -305,13 +305,27 @@ func TestInsertAndRetrieve(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ct2, err := db.LatestEventTimeByName("test")
+	ct2, err := db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Confirm latest is sorting correctly
 	if ct2.Compare(*ct) != 1 {
 		t.Fatal("LatestEventTimeByName returned older time")
+	}
+
+	// confirm type is set
+	var name string
+	var eventType int
+	err = db.sqldb.QueryRow(`
+		SELECT name, type FROM events
+		LIMIT 1
+	`).Scan(&name, &eventType)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if name != "test" || eventType != int(datamodel.EventTypeCustom) {
+		t.Fatal("insert failed")
 	}
 }
 
@@ -321,7 +335,7 @@ func TestEventCount(t *testing.T) {
 
 	for i := 1; i < 10; i++ {
 		// insert a row into events
-		e, err := datamodel.NewEventWithName("test")
+		e, err := datamodel.NewCustomEventWithName("test")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -358,15 +372,15 @@ func TestEventCount(t *testing.T) {
 }
 
 func TestLatestEventUsesIndex(t *testing.T) {
-	testSqlExplainIncludes(latestEventTimeByNameQuery, "USING COVERING INDEX events_event_name_created_at", t, "test")
+	testSqlExplainIncludes(latestEventTimeByNameQuery, "USING COVERING INDEX events_name_created_at", t, "test")
 }
 
 func TestEventCountLimitUsesIndex(t *testing.T) {
-	testSqlExplainIncludes(eventCountByNameWithLimitQuery, "USING COVERING INDEX events_event_name_created_at", t, "test", 5)
+	testSqlExplainIncludes(eventCountByNameWithLimitQuery, "USING COVERING INDEX events_name_created_at", t, "test", 5)
 }
 
 func TestEventCountUsesIndex(t *testing.T) {
-	testSqlExplainIncludes(eventCountByNameQuery, "USING COVERING INDEX events_event_name_created_at", t, "test")
+	testSqlExplainIncludes(eventCountByNameQuery, "USING COVERING INDEX events_name_created_at", t, "test")
 }
 
 func testSqlExplainIncludes(sql string, expectedExplain string, t *testing.T, args ...any) {

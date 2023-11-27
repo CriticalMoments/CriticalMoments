@@ -262,6 +262,12 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	}
 
 	ac.started = true
+
+	err = ac.SendBuiltInEvent(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue sending the built in event \"%v\". Continuing as this error is non-fatal: %v\n", datamodel.AppStartBuiltInEvent, err)
+	}
+
 	return nil
 }
 
@@ -327,7 +333,23 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-func (ac *Appcore) SendEvent(name string) (returnErr error) {
+func (ac *Appcore) SendClientEvent(name string) error {
+	event, err := datamodel.NewClientEventWithName(name)
+	if err != nil {
+		return fmt.Errorf("SendEvent error for \"%v\"", name)
+	}
+	return ac.processEvent(event)
+}
+
+func (ac *Appcore) SendBuiltInEvent(name string) error {
+	event, err := datamodel.NewBuiltInEventWithName(name)
+	if err != nil {
+		return fmt.Errorf("SendEvent error for \"%v\"", name)
+	}
+	return ac.processEvent(event)
+}
+
+func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
@@ -339,24 +361,19 @@ func (ac *Appcore) SendEvent(name string) (returnErr error) {
 		return errors.New("Appcore not started")
 	}
 
-	event, err := datamodel.NewEventWithName(name)
-	if err != nil {
-		return fmt.Errorf("SendEvent error for \"%v\"", name)
-	}
-
-	err = ac.db.EventManager().SendEvent(event)
+	err := ac.db.EventManager().SendEvent(event)
 	if err != nil {
 		return err
 	}
 
 	// Perform any actions for this event
-	actions := ac.config.ActionsForEvent(name)
+	actions := ac.config.ActionsForEvent(event.Name)
 	var lastErr error
 	for _, action := range actions {
 		err := ac.PerformAction(action)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", name, err)
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", event.Name, err)
 		}
 	}
 	return lastErr
