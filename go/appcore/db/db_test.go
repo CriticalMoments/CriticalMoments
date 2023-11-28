@@ -72,14 +72,8 @@ func TestDBMigrate(t *testing.T) {
 }
 
 func testSchema(db *DB, t *testing.T) {
-	r, err := db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='table' AND name='events'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var v string
-	err = r.Scan(&v)
+	err := db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='table' AND name='events'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,13 +81,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migation failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='index' AND name='events_name_created_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='index' AND name='events_name_created_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,13 +89,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migration failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='insert_events_created_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='insert_events_created_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,13 +97,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migration failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='update_events_updated_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='update_events_updated_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,13 +105,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migration failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='table' AND name='property_history'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='table' AND name='property_history'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -143,13 +113,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migation failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='index' AND name='property_history_name_created_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='index' AND name='property_history_name_created_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,13 +121,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migration failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='insert_property_history_created_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='insert_property_history_created_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,13 +129,7 @@ func testSchema(db *DB, t *testing.T) {
 		t.Fatal("DB migration failed")
 	}
 
-	r, err = db.sqldb.Query("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='update_property_history_updated_at'")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
-	err = r.Scan(&v)
+	err = db.sqldb.QueryRow("SELECT name FROM sqlite_schema WHERE type='trigger' AND name='update_property_history_updated_at'").Scan(&v)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,18 +165,12 @@ func TestCreatedAtTrigger(t *testing.T) {
 	}
 
 	// select the last row inserted
-	r, err := db.sqldb.Query(`
-		SELECT created_at, updated_at FROM events
-		LIMIT 1
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var c float64
 	var u float64
-	err = r.Scan(&c, &u)
+	err = db.sqldb.QueryRow(`
+		SELECT created_at, updated_at FROM events
+		LIMIT 1
+	`).Scan(&c, &u)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,18 +193,12 @@ func TestCreatedAtTrigger(t *testing.T) {
 	}
 
 	// check created_at has not changed, but updated_at has
-	r, err = db.sqldb.Query(`
-		SELECT created_at, updated_at FROM events
-		LIMIT 1
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var c2 float64
 	var u2 float64
-	err = r.Scan(&c2, &u2)
+	err = db.sqldb.QueryRow(`
+		SELECT created_at, updated_at FROM events
+		LIMIT 1
+	`).Scan(&c2, &u2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -438,18 +378,12 @@ func TestCreatedAtTriggerPropHistory(t *testing.T) {
 	}
 
 	// select the last row inserted
-	r, err := db.sqldb.Query(`
-		SELECT created_at, updated_at FROM property_history
-		LIMIT 1
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var c float64
 	var u float64
-	err = r.Scan(&c, &u)
+	err = db.sqldb.QueryRow(`
+		SELECT created_at, updated_at FROM property_history
+		LIMIT 1
+	`).Scan(&c, &u)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -472,18 +406,12 @@ func TestCreatedAtTriggerPropHistory(t *testing.T) {
 	}
 
 	// check created_at has not changed, but updated_at has
-	r, err = db.sqldb.Query(`
-		SELECT created_at, updated_at FROM property_history 
-		LIMIT 1
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var c2 float64
 	var u2 float64
-	err = r.Scan(&c2, &u2)
+	err = db.sqldb.QueryRow(`
+		SELECT created_at, updated_at FROM property_history 
+		LIMIT 1
+	`).Scan(&c2, &u2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -511,19 +439,13 @@ func TestInsertAndRetrievePropHistory(t *testing.T) {
 	}
 
 	// retrieve and verify
-	r, err := db.sqldb.Query(`
-		SELECT name, text_value, sample_type FROM property_history 
-		LIMIT 1
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	r.Next()
 	var n string
 	var v string
 	var s int
-	err = r.Scan(&n, &v, &s)
+	err = db.sqldb.QueryRow(`
+		SELECT name, text_value, sample_type FROM property_history 
+		LIMIT 1
+	`).Scan(&n, &v, &s)
 	if err != nil {
 		t.Fatal(err)
 	}

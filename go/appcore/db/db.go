@@ -41,12 +41,14 @@ func (db *DB) StartWithPath(dataDir string) error {
 		return errors.New("CriticalMoments: Data directory path does not exist")
 	}
 
+	// WAL mode for better performance/concurrency
 	dbPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataDir)
-
 	sqldb, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return err
 	}
+	// no DB concurrency always a good idea for SQLite. No impact to benchmarks. Do need to be careful to release connections asap
+	sqldb.SetMaxOpenConns(1)
 
 	db.databasePath = dbPath
 	db.sqldb = sqldb
@@ -161,15 +163,8 @@ func (db *DB) EventCountByName(name string) (int, error) {
 		return 0, errors.New("CriticalMoments: DB not started")
 	}
 
-	r, err := db.sqldb.Query(eventCountByNameQuery, name)
-	if err != nil {
-		return 0, err
-	}
-	defer r.Close()
-
-	r.Next()
 	var count int
-	err = r.Scan(&count)
+	err := db.sqldb.QueryRow(eventCountByNameQuery, name).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -184,15 +179,8 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 		return 0, errors.New("CriticalMoments: DB not started")
 	}
 
-	r, err := db.sqldb.Query(eventCountByNameWithLimitQuery, name, limit)
-	if err != nil {
-		return 0, err
-	}
-	defer r.Close()
-
-	r.Next()
 	var count int
-	err = r.Scan(&count)
+	err := db.sqldb.QueryRow(eventCountByNameWithLimitQuery, name, limit).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -207,15 +195,8 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 		return nil, errors.New("CriticalMoments: DB not started")
 	}
 
-	r, err := db.sqldb.Query(latestEventTimeByNameQuery, name)
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-
-	r.Next()
 	var epochTime float64
-	err = r.Scan(&epochTime)
+	err := db.sqldb.QueryRow(latestEventTimeByNameQuery, name).Scan(&epochTime)
 	if err != nil {
 		return nil, err
 	}
