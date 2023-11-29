@@ -8,7 +8,7 @@ This project is a work in progress, and is not ready for use.
 
 # Author
 
-Steve Cosman: https://scosman.net
+Chesterfield Laboratories Inc.
 
 # Trademark
 
@@ -16,6 +16,6 @@ Steve Cosman: https://scosman.net
 
 # License
 
-Copyright (c) 2023 Stephen Cosman.
+Copyright (c) 2023 Chesterfield Laboratories Inc.
 
 All rights reserved. 

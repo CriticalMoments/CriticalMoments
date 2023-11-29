@@ -1,5 +1,5 @@
 
-Copyright (c) 2023 Stephen Cosman.
+Copyright (c) 2023 Chesterfield Laboratories Inc.
 
 All rights reserved. 
 
