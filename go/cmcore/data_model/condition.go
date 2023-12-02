@@ -81,6 +81,7 @@ var AllBuiltInDynamicFunctions = map[string]bool{
 	"canOpenUrl":                 true,
 	"propertyHistoryLatestValue": true,
 	"propertyEverHadValue":       true,
+	"stableRand":                 true,
 }
 
 type ConditionFields struct {
