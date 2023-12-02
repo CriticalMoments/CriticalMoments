@@ -645,3 +645,15 @@ func TestAppStartEvent(t *testing.T) {
 		t.Fatal("App start event should have fired")
 	}
 }
+
+func TestStableRandomOperator(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("stableRand() != 0 && stableRand() != nil && stableRand() == stableRand()", t))
+	if err != nil || !result {
+		t.Fatal("failed to generate consistent stableRand()")
+	}
+}

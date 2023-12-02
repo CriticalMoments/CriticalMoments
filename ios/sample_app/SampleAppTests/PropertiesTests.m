@@ -116,6 +116,7 @@
         @"propertyHistoryLatestValue": @"propertyHistoryLatestValue('platform') == 'iOS' || propertyHistoryLatestValue('platform') == 'iPadOS'", // add_test_count
         @"propertyHistoryLatestValueNil": @"propertyHistoryLatestValue('never_set_prop') == nil", // add_test_count
         @"propertyEverHadValue": @"propertyEverHadValue('app_id', 'io.criticalmoments.sample-app') && !propertyEverHadValue('app_id', 'wrongval') && !propertyEverHadValue('wrongproperty', 'a')", // add_test_count
+        @"stableRand": @"stableRand() == stableRand()", // add_test_count
     };
     // clang-format on
 

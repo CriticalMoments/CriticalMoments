@@ -523,3 +523,24 @@ func TestPropHistoryRateLimit(t *testing.T) {
 		t.Fatal("set failed to block second write")
 	}
 }
+
+func TestStableRandom(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	initialRand, err := db.StableRandom()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if initialRand == 0 {
+		t.Fatal("StableRandom returned 0")
+	}
+
+	nextRand, err := db.StableRandom()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if initialRand != nextRand {
+		t.Fatal("StableRandom returned different values")
+	}
+}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"os"
 	"reflect"
 	"strings"
@@ -280,7 +281,7 @@ func (db *DB) InsertPropertyHistory(name string, value interface{}, sampleType d
 		return err
 	}
 
-	sqlTemplate, value, err := formatSqlForPropHisotryType(value, insertPropertyHistorySqlTemplate)
+	sqlTemplate, value, err := formatSqlForPropHistoryType(value, insertPropertyHistorySqlTemplate)
 	if err != nil {
 		return err
 	}
@@ -351,7 +352,7 @@ func (db *DB) PropertyHistoryEverHadValue(name string, value interface{}) (bool,
 		return false, errors.New("CriticalMoments: DB not started")
 	}
 
-	sqlTemplate, value, err := formatSqlForPropHisotryType(value, propertyHistoryEverHadValueQuery)
+	sqlTemplate, value, err := formatSqlForPropHistoryType(value, propertyHistoryEverHadValueQuery)
 	if err != nil {
 		return false, err
 	}
@@ -417,10 +418,17 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 			},
 			Types: []any{new(func(string, interface{}) bool)},
 		},
+		"stableRand": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				return db.StableRandom()
+			},
+			Types: []any{new(func() int64)},
+		},
 	}
 }
 
-func formatSqlForPropHisotryType(val any, sqlTemplate string) (string, any, error) {
+func formatSqlForPropHistoryType(val any, sqlTemplate string) (string, any, error) {
 	dbType, err := DBPropertyTypeIntFromKind(datamodel.CMTypeFromValue(val))
 	if err != nil {
 		return "", nil, err
@@ -451,4 +459,37 @@ func formatSqlForPropHisotryType(val any, sqlTemplate string) (string, any, erro
 
 	sql := strings.Replace(sqlTemplate, "TYPE_VAL", column, -1)
 	return sql, val, nil
+}
+
+func (db *DB) StableRandom() (int64, error) {
+	newRandom := rand.Int63()
+
+	r, err := db.sqldb.Exec(`
+			INSERT INTO property_history (name, type, int_value, sample_type)
+			  SELECT 'stable_random', ?, ?, ?
+				WHERE NOT EXISTS (SELECT 1 FROM property_history WHERE name = 'stable_random' LIMIT 1);
+	`, DBPropertyTypeInt, newRandom, datamodel.CMPropertySampleTypeDoNotSample)
+	if err != nil {
+		return 0, err
+	}
+	rows, err := r.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	if rows == 1 {
+		return newRandom, nil
+	}
+
+	var existingRandom sql.NullInt64
+	err = db.sqldb.QueryRow(`
+		SELECT int_value FROM property_history WHERE name = 'stable_random' ORDER BY created_at LIMIT 1;
+		`).Scan(&existingRandom)
+	if err != nil {
+		return 0, err
+	}
+	if !existingRandom.Valid {
+		return 0, errors.New("CriticalMoments: unexpected error")
+	}
+
+	return existingRandom.Int64, nil
 }
