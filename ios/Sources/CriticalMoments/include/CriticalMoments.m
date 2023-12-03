@@ -7,6 +7,8 @@
 
 #import "CriticalMoments.h"
 
+#import "../messaging/CMBannerManager.h"
+
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
 
@@ -379,6 +381,10 @@ static CriticalMoments *sharedInstance = nil;
     return true;
 #endif
     return false;
+}
+
+- (void)removeAllBanners {
+    [CMBannerManager.shared removeAllAppWideMessages];
 }
 
 @end

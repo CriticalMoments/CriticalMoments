@@ -7,8 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../messaging/CMBannerManager.h"
-#import "../messaging/CMBannerMessage.h"
 #import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (CriticalMoments *)sharedInstance;
 
+#pragma mark Setup
+
 /**
  Start should be called once you've performed all needed initialization for
  critical moments. Critical moments won't perform actions until it is started.
@@ -37,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
  Initializtion that should be performed before calling start:
 
  - Set critical moments API key (required)
- - Set critical moments config URLs (highly recomended)
- - Setup a default theme from code (optional). Can also be done through config
+ - Set critical moments config URLs (required). See setDevelopmentConfigUrl: and setReleaseConfigUrl:
+ - Setup a default theme from code (optional). Can also be done through config.
  or not at all.
  */
 - (void)start;
@@ -84,10 +84,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setReleaseConfigUrl:(NSString *)urlString;
 
-// TODO: improve docs
-// TODO: enforce naming limits (ascii, no spaces)?
+#pragma mark Events
+
 /**
- Use SendEvent to sent named events to Critical Moments (example:
+ Use SendEvent to sent a named events to Critical Moments (example:
  `user_updated_profile_photo`). These events may trigger actions, or may be used
  in conditions.
 
@@ -95,6 +95,8 @@ NS_ASSUME_NONNULL_BEGIN
  `user_updated_profile_photo`
  */
 - (void)sendEvent:(NSString *)eventName;
+
+#pragma mark Feature Flags / Named Conditions
 
 /**
  Checks a condition string, returning the result of evaluating it.
@@ -128,6 +130,8 @@ each usage independently from remote configuration. Reused names will log warnin
 - (CMTheme *)currentTheme;
 /// Set the current theme for this CM instance
 - (void)setTheme:(CMTheme *)theme;
+
+#pragma mark Properties
 
 /**
  Register a custom or well-known string property for use in the CM condition engine.
@@ -196,6 +200,9 @@ each usage independently from remote configuration. Reused names will log warnin
 // Golang "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)goPing;
+
+/// :nodoc: Private api for sample app.
+- (void)removeAllBanners;
 
 @end
 

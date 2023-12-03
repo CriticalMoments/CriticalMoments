@@ -18,7 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A class to control the theme/style of our UI controls.
 
- To create a custom theme, create a new instance, modify the properties which
+ See our detailed guide to themes: https://docs.criticalmoments.io/actions/themes
+ 
+ Themes can be created in configuration, and it is not required you create them in code.
+ 
+ To create a custom theme in code, create a new instance, modify the properties which
  control style, and make if your current theme with `setCurrentsTheme`. Swift
  example of custom theme:
 
@@ -32,17 +36,14 @@ NS_ASSUME_NONNULL_BEGIN
 // clang-format on
 @interface CMTheme : NSObject
 
-#pragma mark Current Theme
-
-/// Retrieves the current/default theme
+/// :nodoc: Private method. Retrieves the current/default theme.
 + (CMTheme *)current;
 
-#pragma mark Banners
+#pragma mark Dark Mode
 
-/// The background color of banner messages
-@property(nonatomic, readwrite) UIColor *bannerBackgroundColor;
-/// The foreground color of banner messages
-@property(nonatomic, readwrite) UIColor *bannerForegroundColor;
+/// A theme to be used if the user has opted to use iOS's dark mode. If unspecified the primary theme will be used in
+/// both light and dark modes.
+@property(nonatomic, readwrite) CMTheme *_Nullable darkModeTheme;
 
 #pragma mark Colors
 
@@ -60,6 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// Set the primary color for your brand. This is used on buttons, icons, links and more.
 /// Should be legible on backgroundColor.
 - (void)setPrimaryColor:(UIColor *)color;
+
+/// The background color of banner messages
+@property(nonatomic, readwrite) UIColor *bannerBackgroundColor;
+/// The foreground color of banner messages
+@property(nonatomic, readwrite) UIColor *bannerForegroundColor;
 
 #pragma mark Fonts
 
@@ -85,10 +91,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// app's style uses font sizes consistently smaller or larger than the system
 /// default sizes.
 @property(nonatomic, readwrite) float fontScale;
-
-/// A theme to be used if the user has opted to use iOS's dark mode. If unspecified the primary theme will be used in
-/// both light and dark modes.
-@property(nonatomic, readwrite) CMTheme *_Nullable darkModeTheme;
 
 /// Returns a font respecting the theme settings (fontName, scaleForDynamicType,
 /// etc).  Defaults to systemFont.

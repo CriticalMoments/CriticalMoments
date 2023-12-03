@@ -74,6 +74,14 @@
                     "tapActionName": "nested_alert"
                 }
             },
+            "bottom_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "This banner will appear at the bottom! Any banner can specify top or bottom position.",
+                    "preferredPosition": "bottom",
+                    "tapActionName": "nested_alert"
+                }
+            },
             "undismissable_banner": {
                 "actionType": "banner",
                 "actionData": {

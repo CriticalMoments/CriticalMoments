@@ -11,7 +11,7 @@
 
 @import CriticalMoments;
 
-@interface BannerDemoScreen () <CMBannerActionDelegate>
+@interface BannerDemoScreen ()
 @end
 
 @implementation BannerDemoScreen
@@ -34,7 +34,7 @@
     clearAllBanners.subtitle = @"Remove all banners from this app";
     clearAllBanners.skipInUiTesting = true;
     clearAllBanners.actionBlock = ^{
-      [CMBannerManager.shared removeAllAppWideMessages];
+      [CriticalMoments.sharedInstance removeAllBanners];
     };
 
     [self addSection:@"Banner Management"
@@ -72,17 +72,15 @@
     topBanner.title = @"Top Banner";
     topBanner.subtitle = @"Display a banner on the top of the app, in the default theme";
     topBanner.actionCMActionName = @"top_banner";
-
-    CMDemoAction *swapPosition = [[CMDemoAction alloc] init];
-    swapPosition.title = @"Swap banner position";
-    swapPosition.subtitle = @"Swap the banner location between the top and bottom.";
-    [swapPosition addTarget:self action:@selector(swapBannerPosition)];
-    [swapPosition addResetTestTarget:self action:@selector(dismissBanners)];
+    CMDemoAction *bottomBanner = [[CMDemoAction alloc] init];
+    bottomBanner.title = @"Bottom Banner";
+    bottomBanner.subtitle = @"Display a banner on the bottom of the app, in the default theme";
+    bottomBanner.actionCMActionName = @"bottom_banner";
 
     [self addSection:@"Banners Position"
          withActions:@[
              topBanner,
-             swapPosition,
+             bottomBanner,
          ]];
 
     // Display Options
@@ -107,41 +105,10 @@
 
     [self addSection:@"Banners Display Options"
          withActions:@[ customThemeBanner, undismissableBanner, singleLineAction ]];
-
-    // Hardcoded
-
-    CMDemoAction *codeBanner = [[CMDemoAction alloc] init];
-    codeBanner.title = @"Hardcoded banner";
-    codeBanner.subtitle = @"Show a banner using code instead of config. The banner's apearance "
-                          @"and action are hardcoded in this sample app.";
-    [codeBanner addTarget:self action:@selector(showMessageFromCode)];
-    [codeBanner addResetTestTarget:self action:@selector(dismissBanners)];
-
-    [self addSection:@"Banners from Code" withActions:@[ codeBanner ]];
 }
 
 - (void)dismissBanners {
-    [CMBannerManager.shared removeAllAppWideMessages];
-}
-
-- (void)swapBannerPosition {
-    if (CMBannerManager.shared.appWideBannerPosition == CMBannerPositionTop) {
-        CMBannerManager.shared.appWideBannerPosition = CMBannerPositionBottom;
-    } else {
-        CMBannerManager.shared.appWideBannerPosition = CMBannerPositionTop;
-    }
-}
-
-- (void)showMessageFromCode {
-    NSString *messageString = @"This banner is created in code instead of config. The same options "
-                              @"are available in code if you need them.";
-    CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithBody:messageString];
-    bannerMessage.actionDelegate = self;
-    if (@available(iOS 13, *)) {
-        [[CMBannerManager shared] showAppWideMessage:bannerMessage];
-    } else {
-        [self showAlertWithTitle:@"Not Supported" andBody:@"Banners are not supported on iOS 12 or earlier."];
-    }
+    [CriticalMoments.sharedInstance removeAllBanners];
 }
 
 - (void)showAlertWithTitle:(NSString *)title andBody:(NSString *)body {
@@ -156,15 +123,6 @@
 
     UIViewController *rootVC = Utils.keyWindow.rootViewController;
     [rootVC presentViewController:alert animated:YES completion:nil];
-}
-
-#pragma mark CMBannerActionDelegate
-
-- (void)messageAction:(CMBannerMessage *)message {
-    NSString *alertMessage = [NSString stringWithFormat:@"Assign an actionDelegate to make this do whatever "
-                                                        @"you want!\n\nThe banner you tapped said:\"%@\"",
-                                                        message.body];
-    [self showAlertWithTitle:@"Banner Tapped" andBody:alertMessage];
 }
 
 @end

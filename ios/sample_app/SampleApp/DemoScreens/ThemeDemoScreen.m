@@ -192,7 +192,7 @@ static CMTheme *staticCustomTheme = nil;
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.bannerForegroundColor = color;
                    [CriticalMoments.sharedInstance setTheme:customTheme];
-                   [CMBannerManager.shared removeAllAppWideMessages];
+                   [CriticalMoments.sharedInstance removeAllBanners];
                  }];
 }
 
@@ -203,7 +203,7 @@ static CMTheme *staticCustomTheme = nil;
                    CMTheme *customTheme = [ThemeDemoScreen customTheme];
                    customTheme.bannerBackgroundColor = color;
                    [CriticalMoments.sharedInstance setTheme:customTheme];
-                   [CMBannerManager.shared removeAllAppWideMessages];
+                   [CriticalMoments.sharedInstance removeAllBanners];
                  }];
 }
 
@@ -258,7 +258,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.fontName = newFontName;
                                                             [CriticalMoments.sharedInstance setTheme:customTheme];
-                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                            [CriticalMoments.sharedInstance removeAllBanners];
                                                           }];
     [alert addAction:defaultAction];
 
@@ -289,7 +289,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.boldFontName = newBoldFontName;
                                                             [CriticalMoments.sharedInstance setTheme:customTheme];
-                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                            [CriticalMoments.sharedInstance removeAllBanners];
                                                           }];
     [alert addAction:defaultAction];
 
@@ -319,7 +319,7 @@ static CMTheme *staticCustomTheme = nil;
                                                             CMTheme *customTheme = [ThemeDemoScreen customTheme];
                                                             customTheme.fontScale = scale;
                                                             [CriticalMoments.sharedInstance setTheme:customTheme];
-                                                            [CMBannerManager.shared removeAllAppWideMessages];
+                                                            [CriticalMoments.sharedInstance removeAllBanners];
                                                           }];
     [alert addAction:defaultAction];
 
@@ -329,7 +329,7 @@ static CMTheme *staticCustomTheme = nil;
 - (void)resetTheme {
     staticCustomTheme = [[CMTheme alloc] init];
     [CriticalMoments.sharedInstance setTheme:staticCustomTheme];
-    [CMBannerManager.shared removeAllAppWideMessages];
+    [CriticalMoments.sharedInstance removeAllBanners];
 }
 
 - (void)resetCannedTheme {
@@ -357,7 +357,7 @@ static CMTheme *staticCustomTheme = nil;
     customTheme.secondaryTextColor = [UIColor colorWithRed:0.86328125 green:0.86328125 blue:0.86328125 alpha:1.0];
 
     [CriticalMoments.sharedInstance setTheme:customTheme];
-    [CMBannerManager.shared removeAllAppWideMessages];
+    [CriticalMoments.sharedInstance removeAllBanners];
 
     // Pop a modal so the user can see the theme
     [CriticalMoments.sharedInstance performNamedAction:@"headphoneModalExample" handler:nil];
