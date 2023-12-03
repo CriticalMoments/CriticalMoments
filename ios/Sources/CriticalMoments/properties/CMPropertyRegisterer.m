@@ -103,6 +103,8 @@
     [self registerStaticStringProperty:@"locale_language_code" value:locale.languageCode];
     [self registerStaticStringProperty:@"locale_country_code" value:locale.countryCode];
     [self registerStaticStringProperty:@"locale_currency_code" value:locale.currencyCode];
+    CMLanguageDirectionPropertyProvider *ldpp = [[CMLanguageDirectionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"locale_language_direction" value:ldpp];
 
     // Bundle ID
     [self registerStaticStringProperty:@"app_id" value:NSBundle.mainBundle.bundleIdentifier];

@@ -55,6 +55,7 @@
         @"locale_language_code": @"locale_language_code != nil && len(locale_language_code) == 2", // add_test_count
         @"locale_country_code": @"locale_country_code != nil && len(locale_country_code) == 2", // add_test_count
         @"locale_currency_code": @"locale_currency_code != nil && len(locale_currency_code) == 3", // add_test_count
+        @"locale_language_direction": @"locale_language_direction in ['RTL', 'LTR']", // add_test_count
         @"app_id": @"app_id == 'io.criticalmoments.sample-app'", // add_test_count
         @"app_version": @"app_version == '1.0'", // add_test_count
         @"app_install_date": @"app_install_date != nil && app_install_date > unixTimeMilliseconds(1688744356123) && app_install_date < unixTimeMilliseconds(1988744356123)", // add_test_count
