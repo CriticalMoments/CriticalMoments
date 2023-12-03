@@ -101,7 +101,7 @@
         return nil;
     }
 
-    [cm setConfigUrl:url.absoluteString];
+    [cm setDevelopmentConfigUrl:url.absoluteString];
     error = [cm startReturningError];
     if (error) {
         NSLog(@"error starting CM: %@", error);

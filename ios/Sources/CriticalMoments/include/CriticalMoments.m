@@ -12,6 +12,7 @@
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted;
+@property(nonatomic, strong) NSString *releaseConfigUrl, *devConfigUrl;
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
 @property(nonatomic, strong) CMTheme *currentTheme;
@@ -105,6 +106,25 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (NSError *)startReturningError {
+#if DEBUG
+    if (!_releaseConfigUrl) {
+        // Warn the developer if they have not set a release URL
+        NSLog(@"CriticalMoments: you have not set a valid release config url. Critical Moments will not work in "
+              @"release builds/app-store builds. Be sure to set this before releasing your app.");
+    }
+    if (_devConfigUrl) {
+        [self setConfigUrl:_devConfigUrl];
+    } else if (_releaseConfigUrl) {
+        // devConfig is optional. Fall back to release if that's all they set
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#else
+    // Only use the production URL on non debug builds
+    if (_releaseConfigUrl) {
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#endif
+
     // Register the action dispatcher and properties
     if (!self.bindings) {
         self.bindings = [[CMLibBindings alloc] initWithCM:self];
@@ -207,6 +227,24 @@ static CriticalMoments *sharedInstance = nil;
         return nil;
     }
     return apiKey;
+}
+
+- (void)setDevelopmentConfigUrl:(NSString *)urlString {
+    if (![urlString hasPrefix:@"file://"]) {
+        NSLog(@"CriticalMoments: invalid file URL sent to setDevelopmentConfigUrl. The URL must begin with `file://`");
+        return;
+    }
+
+    _devConfigUrl = urlString;
+}
+
+- (void)setReleaseConfigUrl:(NSString *)urlString {
+    if (![urlString hasPrefix:@"https://"]) {
+        NSLog(@"CriticalMoments: invalid URL sent to setProductionConfigUrl. The URL must begin with `https://`");
+        return;
+    }
+
+    _releaseConfigUrl = urlString;
 }
 
 - (void)setConfigUrl:(NSString *)urlString {

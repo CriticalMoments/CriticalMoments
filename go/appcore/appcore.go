@@ -306,7 +306,6 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("CriticalMoments: DEVELOPMENT MODE. Loaded an unsigned config file. This is allowed for local development, but don't forget to sign your config file before releasing to app store.")
 	}
 	if pc.AppId != ac.apiKey.BundleId() {
 		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())

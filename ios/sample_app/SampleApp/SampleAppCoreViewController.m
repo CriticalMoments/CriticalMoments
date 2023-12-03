@@ -55,24 +55,6 @@
         [tabAppearance configureWithOpaqueBackground];
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
-
-    // This key is only valid for this sample app. Do not try to use it for other apps.
-    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuc2FtcGxlLWFwcA==-MEUCIAYpsqXhurTwN6/H2KkKH6x3+kbXR9g/"
-                       @"Lbiq9heKBcyxAiEA5vv972PgKiyN1qxA4grzJY7RYFbk8rHMHDVULDQQ5FM=";
-    [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];
-
-    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
-    [CriticalMoments.sharedInstance setConfigUrl:localConfigUrl.absoluteString];
-
-    /*NSString *webBasedConfigUrl =
-        @"https://storage.googleapis.com/critical-moments-test-cases/"
-        @"demoAppConfig.json?a=123";
-    [CriticalMoments.sharedInstance setConfigUrl:webBasedConfigUrl];*/
-
-    [CriticalMoments.sharedInstance start];
-
-    // Needed to be in app content, not test context
-    [Utils createTestFileUrls];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
