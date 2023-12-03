@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"time"
+
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
 type propertyProvider interface {
 	Value() interface{}
 	Kind() reflect.Kind
+}
+
+func typeFromValue(v interface{}) reflect.Kind {
+	return datamodel.CMTypeFromValue(v)
 }
 
 // Set once properties
@@ -21,9 +28,11 @@ func (s *staticPropertyProvider) Value() interface{} {
 }
 
 func (s *staticPropertyProvider) Kind() reflect.Kind {
-	return reflect.TypeOf(s.value).Kind()
+	return typeFromValue(s.value)
 }
 
+// Nil/pointers not a native type for go-bind, so define constants for nil values.
+// SDK wrapper layer should hide these from the consumer.
 const LibPropertyProviderNilStringValue = "io.criticalmoments.libpropertyprovider.nilstringvalue"
 const LibPropertyProviderNilFloatValue = -math.MaxFloat64
 const LibPropertyProviderNilIntValue = math.MinInt64
@@ -35,6 +44,7 @@ type LibPropertyProvider interface {
 	IntValue() int64
 	StringValue() string
 	FloatValue() float64
+	TimeEpochMilliseconds() int64
 	BoolValue() bool
 }
 
@@ -42,11 +52,12 @@ const (
 	LibPropertyProviderTypeString int = iota
 	LibPropertyProviderTypeInt
 	LibPropertyProviderTypeFloat
+	LibPropertyProviderTypeTime
 	LibPropertyProviderTypeBool
 )
 
-func newLibPropertyProviderWrapper(dpp LibPropertyProvider) dynamicPropertyProviderWrapper {
-	return dynamicPropertyProviderWrapper{
+func newLibPropertyProviderWrapper(dpp LibPropertyProvider) *dynamicPropertyProviderWrapper {
+	return &dynamicPropertyProviderWrapper{
 		propertyProvider: dpp,
 	}
 }
@@ -77,6 +88,12 @@ func (d *dynamicPropertyProviderWrapper) Value() interface{} {
 			return nil
 		}
 		return v
+	case LibPropertyProviderTypeTime:
+		ems := d.propertyProvider.TimeEpochMilliseconds()
+		if ems == LibPropertyProviderNilIntValue {
+			return nil
+		}
+		return time.UnixMilli(ems)
 	}
 	fmt.Println("CriticalMoments: Invalid property type!")
 	return nil
@@ -92,6 +109,8 @@ func (d *dynamicPropertyProviderWrapper) Kind() reflect.Kind {
 		return reflect.Int
 	case LibPropertyProviderTypeString:
 		return reflect.String
+	case LibPropertyProviderTypeTime:
+		return datamodel.CMTimeKind
 	}
 	fmt.Println("CriticalMoments: Invalid property type!")
 	return reflect.String

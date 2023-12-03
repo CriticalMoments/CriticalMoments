@@ -10,6 +10,15 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CMAudioPlayingPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMAudioPortPropertyProvider : NSObject <CMDynamicPropertyProvider>
+
++ (CMAudioPortPropertyProvider *)hasHeadphones;
++ (CMAudioPortPropertyProvider *)hasWiredHeadset;
++ (CMAudioPortPropertyProvider *)hasBtHeadphones;
++ (CMAudioPortPropertyProvider *)hasBtHeadset;
++ (CMAudioPortPropertyProvider *)hasCarAudio;
 
 @end
 

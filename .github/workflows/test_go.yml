@@ -1,0 +1,30 @@
+name: Build and Test Go
+
+on: 
+  push: 
+    paths:
+      - 'go/**'
+
+jobs:
+  build_and_test:
+    name: Build and Test Go
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: go/go.sum
+
+      - name: Setup gomobile
+        run: cd go && go install golang.org/x/mobile/cmd/gomobile && gomobile init && cd ..
+
+      - name: Golang tests
+        run: cd go && go test -v ./... && cd ..
+
+      - name: Golang race condition tests
+        run: cd go && go test -race -vet=off -v ./... && cd ..
+
+      - name: Build go appcore xcframework
+        run: ./go/build_appcore.sh 

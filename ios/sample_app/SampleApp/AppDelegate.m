@@ -7,6 +7,8 @@
 
 #import "AppDelegate.h"
 
+@import CriticalMoments;
+
 #import "Utils.h"
 
 @interface AppDelegate ()
@@ -17,7 +19,26 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+    // This key is only valid for this sample app. Do not try to use it for other apps.
+    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuc2FtcGxlLWFwcA==-MEUCIAYpsqXhurTwN6/H2KkKH6x3+kbXR9g/"
+                       @"Lbiq9heKBcyxAiEA5vv972PgKiyN1qxA4grzJY7RYFbk8rHMHDVULDQQ5FM=";
+    [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];
+
+    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
+    [CriticalMoments.sharedInstance setDevelopmentConfigUrl:localConfigUrl.absoluteString];
+    NSString *webBasedConfigUrl =
+        @"https://storage.googleapis.com/critical-moments-test-cases/sampleAppTestConfig.cmconfig";
+    [CriticalMoments.sharedInstance setReleaseConfigUrl:webBasedConfigUrl];
+    [CriticalMoments.sharedInstance start];
+
+    // Create files for test. Need these to be in app bundle, not test bundle, so creating here.
+    [Utils createTestFileUrls];
+
     return YES;
+}
+
+- (id)cmInstance {
+    return CriticalMoments.sharedInstance;
 }
 
 #pragma mark - UISceneSession lifecycle

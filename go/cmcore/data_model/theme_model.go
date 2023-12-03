@@ -24,6 +24,10 @@ type Theme struct {
 
 	// Dark Mode Theme
 	DarkModeTheme *Theme
+
+	// Fallback Theme Name
+	IsFallthoughTheme bool
+	FallbackThemeName string
 }
 
 // Currently very close to Theme model, but don't want to couple
@@ -47,6 +51,9 @@ type jsonTheme struct {
 
 	// Dark mode theme
 	DarkModeTheme *Theme `json:"darkModeTheme,omitempty"`
+
+	// Fallback Theme Name
+	FallbackThemeName string `json:"fallback,omitempty"`
 }
 
 var (
@@ -109,19 +116,34 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	t.FontName = jt.FontName
 	t.BoldFontName = jt.BoldFontName
 	t.DarkModeTheme = jt.DarkModeTheme
+	t.FallbackThemeName = jt.FallbackThemeName
 
 	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+		// parse time, we can ignore validation issues if fallback present.
+		// the primary config will validate the fallback theme exists and is valid
+		if StrictDatamodelParsing || t.FallbackThemeName == "" {
+			return NewUserPresentableError(validationIssue)
+		}
+		t.IsFallthoughTheme = true
 	}
 
 	return nil
 }
 
-func (t Theme) Validate() bool {
+func (t *Theme) Validate() bool {
 	return t.ValidateReturningUserReadableIssue() == ""
 }
 
-func (t Theme) ValidateReturningUserReadableIssue() string {
+func (t *Theme) ValidateReturningUserReadableIssue() string {
+	// Fallthough themes are valid as long as they have fallback name
+	if t.IsFallthoughTheme && t.FallbackThemeName != "" {
+		return ""
+	}
+
+	return t.ValidateDisallowFallthoughReturningUserReadableIssue()
+}
+
+func (t *Theme) ValidateDisallowFallthoughReturningUserReadableIssue() string {
 	// Check all colors are valid, but allow empty
 	colors := []string{t.BackgroundColor, t.BannerBackgroundColor, t.BannerForegroundColor, t.PrimaryColor, t.PrimaryTextColor, t.SecondaryTextColor}
 	for _, color := range colors {

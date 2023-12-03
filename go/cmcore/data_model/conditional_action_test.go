@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -57,7 +58,7 @@ func TestConditionalActionValidators(t *testing.T) {
 		StrictDatamodelParsing = false
 	}()
 	// Check it calls nested validators. Can't construct a problematic condition without reflection
-	c.Condition.conditionString = "not_a_valid_var > 5"
+	c.Condition.conditionString = "not_a_valid_func() > 5"
 	if c.Validate() {
 		t.Fatal("Conditional action should validate condition validity")
 	}
@@ -115,7 +116,7 @@ func TestJsonParsingInvalidStrictConditionalActionCondition(t *testing.T) {
 	}
 	var ac ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
-	if err != nil || ac.ConditionalAction.Condition.String() != "(fake_var == 'charging' || device_battery_state == 'full')" {
+	if err != nil || ac.ConditionalAction.Condition.String() != "(fakeFunc() == 'charging' || device_battery_state == 'full')" {
 		t.Fatal("should pass non strict validation")
 	}
 	StrictDatamodelParsing = true
@@ -125,5 +126,11 @@ func TestJsonParsingInvalidStrictConditionalActionCondition(t *testing.T) {
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil {
 		t.Fatal("should not pass strict validation")
+	}
+}
+
+func TestCustomReflectTypeDoesNotConflict(t *testing.T) {
+	if CMTimeKind <= reflect.UnsafePointer+100000 {
+		t.Fatal("Custom type should not conflict with built in types")
 	}
 }

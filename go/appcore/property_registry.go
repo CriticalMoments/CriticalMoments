@@ -4,30 +4,33 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/antonmedv/expr"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
+const CustomPropertyPrefix = "custom_"
+
 type propertyRegistry struct {
-	providers              map[string]propertyProvider
-	requiredPropertyTypes  map[string]reflect.Kind
-	wellKnownPropertyTypes map[string]reflect.Kind
-	dynamicFunctionNames   []string
-	dynamicFunctionOps     []expr.Option
-	mapFunctions           map[string]interface{}
-	mapConstants           map[string]interface{}
+	providers            map[string]propertyProvider
+	builtInPropertyTypes map[string]*datamodel.CMPropertyConfig
+	dynamicFunctionNames []string
+	dynamicFunctionOps   []expr.Option
+	mapFunctions         map[string]interface{}
+	mapConstants         map[string]interface{}
+	phm                  *db.PropertyHistoryManager
 }
 
 func newPropertyRegistry() *propertyRegistry {
 	pr := &propertyRegistry{
-		providers:              make(map[string]propertyProvider),
-		requiredPropertyTypes:  datamodel.RequiredPropertyTypes(),
-		wellKnownPropertyTypes: datamodel.WellKnownPropertyTypes(),
-		dynamicFunctionNames:   []string{},
-		dynamicFunctionOps:     []expr.Option{},
+		providers:            make(map[string]propertyProvider),
+		builtInPropertyTypes: datamodel.BuiltInPropertyTypes(),
+		dynamicFunctionNames: []string{},
+		dynamicFunctionOps:   []expr.Option{},
 	}
 
 	// register static/map functions
@@ -46,42 +49,127 @@ func (pr *propertyRegistry) RegisterDynamicFunctions(newFuncs map[string]*datamo
 }
 
 func (pr *propertyRegistry) expectedTypeForKey(key string) reflect.Kind {
-	expectedType, foundType := pr.requiredPropertyTypes[key]
-	if foundType {
-		return expectedType
-	}
-	expectedType, foundType = pr.wellKnownPropertyTypes[key]
-	if foundType {
-		return expectedType
+	config, foundConfig := pr.builtInPropertyTypes[key]
+	if foundConfig {
+		return config.Type
 	}
 	return reflect.Invalid
 }
 
 func (pr *propertyRegistry) addProviderForKey(key string, pp propertyProvider) error {
+	if !validPropertyName(key) {
+		return errors.New("invalid property name: " + key)
+	}
+
 	_, hasCurrent := pr.providers[key]
 	if hasCurrent {
 		fmt.Println("CriticalMoments Warning: Re-registering property provider for key: " + key)
 	}
 
-	expectedType := pr.expectedTypeForKey(key)
-	if expectedType == reflect.Invalid {
-		return errors.New("invalid property registered. Properties must be required or well known. Arbitrary properties are not allowed")
+	isCustom := strings.HasPrefix(key, CustomPropertyPrefix)
+	if !isCustom {
+		expectedType := pr.expectedTypeForKey(key)
+		if expectedType == reflect.Invalid {
+			return errors.New("invalid property registered. Properties must be custom, or built in")
+		}
+
+		if pp.Kind() != expectedType {
+			return errors.New("Property registered of wrong type (does not match expected type): " + key)
+		}
 	}
 
-	validTypes := []reflect.Kind{reflect.Bool, reflect.String, reflect.Int, reflect.Float64}
-	if !slices.Contains(validTypes, expectedType) {
+	// Currently all custom properties are CustomOnSet (and we only support static custom props).
+	// If this changes, should rework this for dynamic custom props or customOnUse
+	if isCustom && pr.phm != nil {
+		val := pp.Value()
+		if val != nil {
+			pr.phm.CustomPropertySet(key, val)
+		}
+	}
+
+	if !slices.Contains(datamodel.ValidPropertyTypes, pp.Kind()) {
 		return errors.New("Invalid property type for key: " + key)
-	}
-
-	if pp.Kind() != expectedType {
-		return errors.New("Property registered of wrong type (does not match expected type): " + key)
 	}
 
 	pr.providers[key] = pp
 	return nil
 }
 
-func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) error {
+func (p *propertyRegistry) registerClientProperty(key string, value interface{}) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in registerClientProperty: %v", r)
+		}
+	}()
+
+	propConfig, isBuiltIn := p.builtInPropertyTypes[key]
+	isWellKnown := false
+	if isBuiltIn {
+		if propConfig.Source == datamodel.CMPropertySourceLib {
+			// Built in CM-Source properties can't be registered by client
+			return errors.New("client cannot register reserved Library built in property: " + key)
+		} else if propConfig.Source == datamodel.CMPropertySourceClient {
+			isWellKnown = true
+			// Well known types must be of correct type
+			if typeFromValue(value) != propConfig.Type {
+				return errors.New("property registered of wrong type (does not match expected type for well known property name): " + key)
+			}
+		}
+	}
+
+	// Nil not supported
+	if value == nil {
+		return errors.New("client cannot register nil property: " + key)
+	}
+
+	// Non well known get prefixed with custom_
+	updatedKey := key
+	if !isWellKnown {
+		updatedKey = CustomPropertyPrefix + key
+	}
+
+	return p.registerStaticPropertyWithSource(updatedKey, datamodel.CMPropertySourceClient, value)
+}
+
+func (p *propertyRegistry) registerClientPropertiesFromJson(jsonData []byte) error {
+	ps, err := newPropertySetFromJson(jsonData)
+	// we process partial results, even if there was an error
+	if ps != nil && ps.values != nil {
+		for k, v := range ps.values {
+			nerr := p.registerClientProperty(k, v)
+			err = errors.Join(err, nerr)
+		}
+	}
+
+	return err
+}
+
+// Library
+func (p *propertyRegistry) registerStaticProperty(key string, value interface{}) (returnErr error) {
+	return p.registerStaticPropertyWithSource(key, datamodel.CMPropertySourceLib, value)
+}
+
+func (p *propertyRegistry) registerStaticPropertyWithSource(key string, source datamodel.CMPropertySource, value interface{}) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in registerStaticProperty: %v", r)
+		}
+	}()
+
+	// Check source matches expected (built in or custom)
+	propConfig, isBuiltIn := p.builtInPropertyTypes[key]
+	if isBuiltIn && propConfig.Source != source {
+		return fmt.Errorf("source mismatch. Attempted to register source of type '%v', but requires '%v'", source, propConfig.Source)
+	}
+	if !isBuiltIn && source != datamodel.CMPropertySourceClient {
+		return errors.New("library attempted to register client source property: " + key)
+	}
+	if !isBuiltIn && !strings.HasPrefix(key, CustomPropertyPrefix) {
+		return errors.New("custom properties must be prefixed with " + CustomPropertyPrefix + ": " + key)
+	}
+
 	s := staticPropertyProvider{
 		value: value,
 	}
@@ -89,18 +177,44 @@ func (p *propertyRegistry) registerStaticProperty(key string, value interface{})
 }
 
 func (p *propertyRegistry) registerLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+	// check key is built in and Source=Library/CM
+	propConfig, isBuiltIn := p.builtInPropertyTypes[key]
+	if !isBuiltIn || propConfig.Source != datamodel.CMPropertySourceLib {
+		return errors.New("Library can not register non built in library sourced property: " + key)
+	}
+
 	dw := newLibPropertyProviderWrapper(dpp)
-	return p.addProviderForKey(key, &dw)
+	return p.addProviderForKey(key, dw)
 }
 
 var errPropertyNotFound = errors.New("property not found")
 
 func (p *propertyRegistry) propertyValue(key string) (interface{}, error) {
 	v, ok := p.providers[key]
+	// Allow custom properties to be accessed without the prefix
+	if !ok {
+		v, ok = p.providers[CustomPropertyPrefix+key]
+	}
 	if !ok {
 		return nil, errPropertyNotFound
 	}
-	return v.Value(), nil
+	value := v.Value()
+	p.trackPropertyHistoryForUsage(key, value)
+	return value, nil
+}
+
+func (p *propertyRegistry) trackPropertyHistoryForUsage(key string, value interface{}) {
+	if p.phm == nil {
+		return
+	}
+
+	propConfig, isBuiltIn := p.builtInPropertyTypes[key]
+	if !isBuiltIn || propConfig.SampleType != datamodel.CMPropertySampleTypeOnUse {
+		// Don't track history for non built in properties, or built in properties that don't have sample type=OnUse
+		return
+	}
+
+	p.phm.UpdateHistoryForPropertyAccessed(key, value)
 }
 
 func (p *propertyRegistry) buildPropertyMapForCondition(fields *datamodel.ConditionFields) (map[string]interface{}, error) {
@@ -204,19 +318,21 @@ func (p *propertyRegistry) evaluateCondition(condition *datamodel.Condition) (re
 }
 
 func (p *propertyRegistry) validateProperties() error {
-	// Check required
-	for propName, expectedKind := range p.requiredPropertyTypes {
-		err := p.validateExpectedProvider(propName, expectedKind, false)
+	// Check built in
+	for propName, config := range p.builtInPropertyTypes {
+		err := p.validateExpectedProvider(propName, config.Type, config.Optional)
 		if err != nil {
 			return err
 		}
 	}
 
-	// check well known
-	for propName, expectedKind := range p.wellKnownPropertyTypes {
-		err := p.validateExpectedProvider(propName, expectedKind, true)
-		if err != nil {
-			return err
+	// validate any others are custom_ prefix
+	for propName := range p.providers {
+		_, isBuiltIn := p.builtInPropertyTypes[propName]
+		if !isBuiltIn {
+			if !strings.HasPrefix(propName, CustomPropertyPrefix) {
+				return fmt.Errorf("property \"%v\" is not a custom property and is not a built in or well known property", propName)
+			}
 		}
 	}
 
@@ -235,5 +351,54 @@ func (p *propertyRegistry) validateExpectedProvider(propName string, expectedKin
 	if provider.Kind() != expectedKind {
 		return fmt.Errorf("property \"%v\" of wrong kind. Expected %v", propName, expectedKind.String())
 	}
+	return nil
+}
+
+func validPropertyName(name string) bool {
+	if name == "" || name == CustomPropertyPrefix {
+		return false
+	}
+
+	// if name is not alphanumeric, or an underscore, return false
+	for _, c := range name {
+		if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || (c >= 'A' && c <= 'Z')) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (pr *propertyRegistry) samplePropertiesForStartup() error {
+	if pr.phm == nil {
+		return errors.New("property history manager not set -- not sampling properties for startup")
+	}
+
+	startupProps := map[string]interface{}{}
+	errSet := []error{}
+
+	for propName, propConfig := range pr.builtInPropertyTypes {
+		if propConfig.SampleType == datamodel.CMPropertySampleTypeAppStart {
+			propValue, err := pr.propertyValue(propName)
+			if err == errPropertyNotFound && propConfig.Optional {
+				// Optional property not found, that's fine
+				continue
+			} else if err != nil || propValue == nil {
+				errSet = append(errSet, err)
+			} else {
+				startupProps[propName] = propValue
+			}
+		}
+	}
+
+	err := pr.phm.TrackPropertyHistoryForStartup(startupProps)
+	if err != nil {
+		return err
+	}
+
+	if len(errSet) > 0 {
+		return errors.Join(errSet...)
+	}
+
 	return nil
 }

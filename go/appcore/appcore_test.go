@@ -1,11 +1,13 @@
 package appcore
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -79,8 +81,12 @@ func (lb *testLibBindings) CanOpenURL(url string) bool {
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
+	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+}
+
+func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	ac := NewAppcore()
-	configPath, err := filepath.Abs("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json")
+	configPath, err := filepath.Abs(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,18 +101,19 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ac.eventManager == nil || ac.cache == nil {
-		t.Fatal("event handler or cache not set")
+	if ac.db == nil || ac.db.EventManager() == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
+		t.Fatal("db, event manager, prop history manager, or cache not setup")
+	}
+	if ac.propertyRegistry.phm != ac.db.PropertyHistoryManager() {
+		t.Fatal("property history manager not set to the correct DB instance via NewAppcore")
 	}
 	lb := testLibBindings{}
 	ac.RegisterLibraryBindings(&lb)
 
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
-	ac.SetTimezoneGMTOffset(-5 * 60 * 60)
-
 	// Clear required properties, for easier setup
-	ac.propertyRegistry.requiredPropertyTypes = map[string]reflect.Kind{}
+	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
 	return ac, nil
 }
 
@@ -115,12 +122,12 @@ func TestAppcoreStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Check it loaded the config (more detailed test of parsing in cmcore)
-	if ac.config.DefaultTheme == nil {
+	if ac.config.DefaultTheme() == nil {
 		t.Fatal("Failed to load config in Appcore setup")
 	}
 }
@@ -131,7 +138,7 @@ func TestAppcoreStartMissingConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.configUrlString = ""
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start without config")
 	}
@@ -146,7 +153,7 @@ func TestAppcoreStartMissingBindings(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.libBindings = nil
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start without bindings")
 	}
@@ -161,7 +168,7 @@ func TestAppcoreStartBadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	ac.configUrlString = "file:///Not/A/Real/Path"
-	err = ac.Start()
+	err = ac.Start(true)
 	if err == nil {
 		t.Fatal("Should not start with bad config")
 	}
@@ -175,27 +182,40 @@ func TestSendEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// invalid events should error
-	err = ac.SendEvent("io.criticalmoments.events.built_in.invalid")
+	// built in should error through client API
+	err = ac.SendClientEvent(datamodel.AppStartBuiltInEvent)
 	if err == nil {
 		t.Fatal("invalid build in event did not error")
 	}
-	err = ac.SendEvent("io.criticalmoments.events.well_known.invalid")
+
+	// built in should work thorough internal API
+	err = ac.SendBuiltInEvent(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal("valid build in event errored", err)
+	}
+
+	// well known should fail thorough built in API
+	err = ac.SendBuiltInEvent(datamodel.SignedInEvent)
 	if err == nil {
 		t.Fatal("invalid well known event did not error")
 	}
 
+	// Well known should work though client
+	err = ac.SendClientEvent(datamodel.SignedInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// custom events with no actions should work
-	err = ac.SendEvent("net.scosman.asdf")
+	err = ac.SendClientEvent("net.scosman.asdf")
 	if err != nil {
 		t.Fatal("valid custom event errored", err)
 	}
-
 }
 
 func TestPerformingAction(t *testing.T) {
@@ -203,7 +223,7 @@ func TestPerformingAction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +231,7 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal("last banner action should be nil on new appcore test binding")
 	}
 	// should fire bannerAction1 via a trigger
-	err = ac.SendEvent("custom_event")
+	err = ac.SendClientEvent("custom_event")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,6 +277,32 @@ func TestPerformingAction(t *testing.T) {
 	if ac.libBindings.(*testLibBindings).lastModal == nil {
 		t.Fatal("modal event didn't fire")
 	}
+
+	err = ac.PerformNamedAction("unknownActionTypeFutureProof")
+	if err == nil || !strings.Contains(err.Error(), "does not support this action type") {
+		t.Fatal("Unknown action didn't error")
+	}
+
+	err = ac.PerformNamedAction("nestedFutureTypeFail")
+	if err == nil || !strings.Contains(err.Error(), "does not support this action type") {
+		t.Fatal("Nested unknown actions didn't error up the stack")
+	}
+
+	// Verify fallback from future to alert, both single level and deep nested
+	fallbackActions := []string{"futureAction", "nestedFutureTypeSuccess"} // add_test_count
+	for _, actionName := range fallbackActions {
+		ac.libBindings.(*testLibBindings).lastAlertAction = nil
+		if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+			t.Fatal("test not initialized")
+		}
+		err = ac.PerformNamedAction(actionName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+			t.Fatal("alert event didn't fire as fallback")
+		}
+	}
 }
 
 func TestConditionalActionDispatching(t *testing.T) {
@@ -264,7 +310,7 @@ func TestConditionalActionDispatching(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -326,7 +372,7 @@ func TestSetDefaultTheme(t *testing.T) {
 	if ac.libBindings.(*testLibBindings).defaultTheme != nil {
 		t.Fatal("Theme should be nil until started")
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -341,7 +387,7 @@ func TestNamedConditions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -394,7 +440,7 @@ func TestEndToEndEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -411,9 +457,9 @@ func TestEndToEndEvents(t *testing.T) {
 		t.Fatal("eventCount should be 0")
 	}
 
-	ac.SendEvent("test")
-	ac.SendEvent("test")
-	ac.SendEvent("test2")
+	ac.SendClientEvent("test")
+	ac.SendClientEvent("test")
+	ac.SendClientEvent("test2")
 
 	c, err = datamodel.NewCondition("eventCount('test') == 2 && eventCount('test2') == 1")
 	if err != nil {
@@ -475,7 +521,7 @@ func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -487,20 +533,127 @@ func TestValidateAllBuiltInFunctionsAreRegistered(t *testing.T) {
 	}
 }
 
-func TestTimezonePropertyEndToEnd(t *testing.T) {
+func TestLoadingSignedConfig(t *testing.T) {
+	// Signed with prod signature
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/signedValid.cmconfig", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.config == nil || ac.config.ConfigVersion != "v1" {
+		t.Fatal("Failed to load signed config")
+	}
+}
+
+func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ac.Start()
+	// Debug=false should not allow unsigned
+	err = ac.Start(false)
+	if err == nil || ac.config != nil {
+		t.Fatal("Should not load json config unless in debug mode", err)
+	}
+	// Debug=true should load unsigned/json
+	err = ac.Start(true)
+	if err != nil || ac.config == nil || ac.config.AppId != "io.criticalmoments.demo" {
+		t.Fatal("Should not load json config unless in debug mode")
+	}
+}
+
+func TestChecksAppId(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/invalid/invalidAppId.json", t)
 	if err != nil {
 		t.Fatal(err)
 	}
-	tz, err := ac.propertyRegistry.propertyValue("timezone_gmt_offset")
+	err = ac.Start(true)
+	if err == nil || !strings.Contains(err.Error(), "this config file isn't valid for this app") {
+		t.Fatal("Allowed loading a config with a bundle ID mismatch")
+	}
+}
+
+func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if tz != -5*60*60 {
-		t.Fatal("Timezone offset incorrect")
+
+	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+	}
+
+	ac.RegisterClientIntProperty("testInt", 42)
+	ac.RegisterStaticStringProperty("builtInString", "hello world")
+	ac.RegisterStaticStringProperty("builtInNever", "never")
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if v, err := ac.db.LatestPropertyHistory("custom_testInt"); err != nil || v != int64(42) {
+		t.Fatal("custom static property not recorded in history")
+	}
+	if v, err := ac.db.LatestPropertyHistory("builtInString"); err != nil || v != "hello world" {
+		t.Fatal("built in static sample_on_start property not recorded in history")
+	}
+	if v, err := ac.db.LatestPropertyHistory("builtInNever"); err != sql.ErrNoRows || v != nil {
+		t.Fatal("built in static sample_never property recorded in history")
+	}
+
+	// Verify property history dynamic function also works
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyHistoryLatestValue('builtInString') == 'hello world' && propertyHistoryLatestValue('builtInNever') == nil && propertyHistoryLatestValue('custom_testInt') == 42", t))
+	if err != nil || !result {
+		t.Fatal("Property history not working through condition function")
+	}
+
+	// Verify property history dynamic value check function also works
+	result, err = ac.propertyRegistry.evaluateCondition(testHelperNewCondition("propertyEverHadValue('builtInString', 'hello world') && !propertyEverHadValue('builtInString', 'hello world2')", t))
+	if err != nil || !result {
+		t.Fatal("Property history by value not working through condition function")
+	}
+}
+func TestAppStartEvent(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := ac.db.EventCountByName(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatal("App start event should not be recorded before start")
+	}
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = ac.db.EventCountByName(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Fatal("App start event should have fired")
+	}
+}
+
+func TestStableRandomOperator(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("stableRand() != 0 && stableRand() != nil && stableRand() == stableRand()", t))
+	if err != nil || !result {
+		t.Fatal("failed to generate consistent stableRand()")
 	}
 }

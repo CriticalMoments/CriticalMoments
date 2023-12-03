@@ -39,6 +39,13 @@ runTest()
   fi
 }
 
+echo "Pulling snapshot test files from Git LFS."
+git lfs pull --include="*" --exclude=""
+if $? -ne 0; then
+  echo "Error pulling snapshot test files from Git LFS. Exiting. Make sure you have git-lfs installed."
+  exit 99
+fi
+
 # iPhone 15 Plus, iOS 17.0
 runTest 'platform=iOS Simulator,OS=17.0,name=iPhone 15 Plus'
 

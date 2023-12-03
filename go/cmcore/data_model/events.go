@@ -2,28 +2,22 @@ package datamodel
 
 import (
 	"fmt"
-	"strings"
 )
 
-type eventTypeEnum string
+type eventTypeEnum int
 
 const (
 	// Built in events only allowed to be fired by SDK
-	eventTypeBuiltIn eventTypeEnum = "builtInEventType"
+	EventTypeBuiltIn eventTypeEnum = 0
 	// well known event type like (is signed in), that apps provide but SDK is aware of
-	eventTypeWellKnown eventTypeEnum = "wellKnownEventType"
+	EventTypeWellKnown eventTypeEnum = 1
 	// Competely custom events from app the SDK is not aware of
-	eventTypeCustom eventTypeEnum = "customEventType"
-)
-
-const (
-	buildInEventNamespace   = "io.criticalmoments.events.built_in."
-	wellKnownEventNamespace = "io.criticalmoments.events.well_known."
+	EventTypeCustom eventTypeEnum = 2
 )
 
 // Enum type would be nice, but doesn't play well with gomobile exports
 const (
-	AppStartBuiltInEvent string = buildInEventNamespace + "app_start"
+	AppStartBuiltInEvent string = "app_start"
 )
 
 var (
@@ -34,7 +28,7 @@ var (
 
 // Enum type would be nice, but doesn't play well with gomobile exports
 const (
-	SignedInEvent string = wellKnownEventNamespace + "signed_in"
+	SignedInEvent string = "signed_in"
 )
 
 var (
@@ -47,17 +41,30 @@ type Event struct {
 	Name string
 
 	// Event type is internal to cmcore
-	eventType eventTypeEnum
+	EventType eventTypeEnum
 }
 
-func NewEventWithName(name string) (*Event, error) {
-	if strings.HasPrefix(name, buildInEventNamespace) {
-		return NewBuiltInEventWithName(name)
+// Clients can send well known or custom events, but not built in
+func NewClientEventWithName(name string) (*Event, error) {
+	if name == "" {
+		return nil, fmt.Errorf("event name required")
 	}
-	if strings.HasPrefix(name, wellKnownEventNamespace) {
-		return NewWellKnownEventWithName(name)
+	if allBuiltInEventTypes[name] {
+		return nil, fmt.Errorf("built in events cannot be fired by client")
 	}
-	return NewCustomEventWithName(name)
+
+	isWellKnown := allWellKnownEventTypes[name]
+	if isWellKnown {
+		return &Event{
+			Name:      name,
+			EventType: EventTypeWellKnown,
+		}, nil
+	} else {
+		return &Event{
+			Name:      name,
+			EventType: EventTypeCustom,
+		}, nil
+	}
 }
 
 func NewBuiltInEventWithName(name string) (*Event, error) {
@@ -65,13 +72,10 @@ func NewBuiltInEventWithName(name string) (*Event, error) {
 	if !allBuiltInEventTypes[name] {
 		return nil, fmt.Errorf("unknown built in event: %v", name)
 	}
-	if !strings.HasPrefix(name, buildInEventNamespace) {
-		return nil, fmt.Errorf("built in event outside namespace: %v", name)
-	}
 
 	e := Event{
 		Name:      name,
-		eventType: eventTypeBuiltIn,
+		EventType: EventTypeBuiltIn,
 	}
 	return &e, nil
 }
@@ -81,25 +85,18 @@ func NewWellKnownEventWithName(name string) (*Event, error) {
 	if !allWellKnownEventTypes[name] {
 		return nil, fmt.Errorf("unknown well known event: %v", name)
 	}
-	if !strings.HasPrefix(name, wellKnownEventNamespace) {
-		return nil, fmt.Errorf("well known event outside namespace: %v", name)
-	}
 
 	e := Event{
 		Name:      name,
-		eventType: eventTypeWellKnown,
+		EventType: EventTypeWellKnown,
 	}
 	return &e, nil
 }
 
 func NewCustomEventWithName(name string) (*Event, error) {
-	if strings.HasPrefix(name, wellKnownEventNamespace) || strings.HasPrefix(name, buildInEventNamespace) {
-		return nil, fmt.Errorf("attempted to log custom event matching built in or well known event: %v", name)
-	}
-
 	e := Event{
 		Name:      name,
-		eventType: eventTypeCustom,
+		EventType: EventTypeCustom,
 	}
 	return &e, nil
 }

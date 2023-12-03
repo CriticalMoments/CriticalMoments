@@ -39,11 +39,11 @@ func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionT
 	return &banner, nil
 }
 
-func (ba BannerAction) Validate() bool {
+func (ba *BannerAction) Validate() bool {
 	return ba.ValidateReturningUserReadableIssue() == ""
 }
 
-func (b BannerAction) ValidateReturningUserReadableIssue() string {
+func (b *BannerAction) ValidateReturningUserReadableIssue() string {
 	if b.Body == "" {
 		return "Banners must have body text"
 	}

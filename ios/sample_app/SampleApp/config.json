@@ -1,5 +1,6 @@
 {
     "configVersion": "v1",
+    "appId": "io.criticalmoments.sample-app",
     "themes": {
         "not_defaultTheme": {
             "bannerBackgroundColor": "#000000",
@@ -70,6 +71,14 @@
                 "actionData": {
                     "body": "This banner will appear at the top! Any banner can specify top or bottom position.",
                     "preferredPosition": "top",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "bottom_banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "This banner will appear at the bottom! Any banner can specify top or bottom position.",
+                    "preferredPosition": "bottom",
                     "tapActionName": "nested_alert"
                 }
             },
@@ -220,7 +229,7 @@
             "conditional_installed_recently": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "app_install_date > now() - hours(1)",
+                    "condition": "app_install_date > now() - duration('1h')",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }

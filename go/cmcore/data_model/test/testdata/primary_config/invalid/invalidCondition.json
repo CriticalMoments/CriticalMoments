@@ -1,5 +1,6 @@
 {
     "configVersion": "v1",
+    "appId": "io.criticalmoments.demo",
     "conditions": {
       "namedConditions": {
         "trueCondition": "true",

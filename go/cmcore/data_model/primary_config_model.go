@@ -1,8 +1,14 @@
 package datamodel
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"strings"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -11,35 +17,37 @@ import (
 var StrictDatamodelParsing = false
 
 type PrimaryConfig struct {
-	// Version number
-	ConfigVersion string
+	// Metadata
+	ContainerVersion string
+	ConfigVersion    string
+	AppId            string
 
 	// Themes
-	DefaultTheme *Theme
-	namedThemes  map[string]Theme
+	defaultTheme *Theme
+	namedThemes  map[string]*Theme
 
 	// Actions
-	namedActions map[string]ActionContainer
+	namedActions map[string]*ActionContainer
 
 	// Triggers
-	namedTriggers map[string]Trigger
+	namedTriggers map[string]*Trigger
 
 	// Conditions
 	namedConditions map[string]*Condition
 }
 
+func (pc *PrimaryConfig) DefaultTheme() *Theme {
+	return pc.themeIteratingFallbacks(pc.defaultTheme)
+}
+
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
-	theme, ok := pc.namedThemes[name]
-	if ok {
-		return &theme
-	}
-	return nil
+	return pc.themeIteratingFallbacks(pc.namedThemes[name])
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
-		return &action
+		return action
 	}
 	return nil
 }
@@ -52,9 +60,9 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-func (pc *PrimaryConfig) ActionsForEvent(eventName string) []ActionContainer {
+func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
 	// TODO P2: don't iterate, use a map
-	actions := make([]ActionContainer, 0)
+	actions := make([]*ActionContainer, 0)
 	for _, trigger := range pc.namedTriggers {
 		if trigger.EventName == eventName {
 			action, ok := pc.namedActions[trigger.ActionName]
@@ -66,9 +74,144 @@ func (pc *PrimaryConfig) ActionsForEvent(eventName string) []ActionContainer {
 	return actions
 }
 
+// Container Decoding
+
+const primaryConfigConfigPemBlock = "CONFIG"
+const primaryConfigHeadPemBlock = "CM"
+const primaryConfigConfigSignatureHeader = "Signature"
+const primaryConfigHeadContainerVersion = "Container-Version"
+
+func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfig, error) {
+	pc := &PrimaryConfig{}
+
+	var rest []byte
+	rest = data
+
+	var configSignature string
+	var configBytes []byte
+
+	for len(rest) > 0 {
+		var block *pem.Block
+		block, rest = pem.Decode(rest)
+		if block == nil {
+			break
+		}
+
+		switch block.Type {
+		case primaryConfigConfigPemBlock:
+			configBytes = block.Bytes
+			configSignature = block.Headers[primaryConfigConfigSignatureHeader]
+			err := json.Unmarshal(block.Bytes, pc)
+			if err != nil {
+				return nil, err
+			}
+		case primaryConfigHeadPemBlock:
+			err := pc.ParseHeadBlock(block)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Validate CM block
+	if pc.ContainerVersion == "" {
+		return nil, NewUserPresentableError("Config file not signed: no valid CM block found in config file")
+	}
+
+	// Validate CONFIG block
+	if len(configBytes) == 0 {
+		return nil, NewUserPresentableError("No CONFIG block found in config file")
+	}
+	err := ValidateSignature(signUtil, configBytes, configSignature)
+	if err != nil {
+		return nil, err
+	}
+	configErr := pc.ValidateReturningUserReadableIssue()
+	if configErr != "" {
+		return nil, NewUserPresentableError(configErr)
+	}
+
+	return pc, nil
+}
+
+func (pc *PrimaryConfig) ParseHeadBlock(b *pem.Block) error {
+	pc.ContainerVersion = b.Headers[primaryConfigHeadContainerVersion]
+	// We bump container version to 2+ when we want to break backwards compatibility.
+	// We try to parse all v1 versions (including new subversions)
+	if pc.ContainerVersion != "v1" && !strings.HasPrefix(pc.ContainerVersion, "v1.") {
+		return NewUserPresentableError("Unsupported container version")
+	}
+	return nil
+}
+
+func ValidateSignature(su *signing.SignUtil, configBytes []byte, sig string) error {
+	if sig == "" {
+		return NewUserPresentableError("Missing Config Signature. Please sign your config at https://criticalmoments.io")
+	}
+	valid, err := su.VerifyMessage(configBytes, sig)
+	if err != nil {
+		return err
+	}
+	if !valid {
+		return NewUserPresentableError("Configuration file invalid. The signature does not match the JSON body. Please re-sign your config at https://criticalmoments.io")
+	}
+
+	return nil
+}
+
+func EncodeConfig(configBytes []byte, su *signing.SignUtil) ([]byte, error) {
+	var b bytes.Buffer
+	r := bufio.NewWriter(&b)
+
+	// Parse the config data to ensure it's valid
+	pc := &PrimaryConfig{}
+	err := json.Unmarshal(configBytes, pc)
+	if err != nil {
+		return nil, err
+	}
+
+	// Header block
+	headerBlock := &pem.Block{
+		Type: primaryConfigHeadPemBlock,
+		Headers: map[string]string{
+			primaryConfigHeadContainerVersion: "v1",
+		},
+		Bytes: []byte{},
+	}
+	err = pem.Encode(r, headerBlock)
+	if err != nil {
+		return nil, err
+	}
+
+	// Config block
+	sig, err := su.SignMessage(configBytes)
+	if err != nil {
+		return nil, err
+	}
+	configBlock := &pem.Block{
+		Type: primaryConfigConfigPemBlock,
+		Headers: map[string]string{
+			primaryConfigConfigSignatureHeader: sig,
+		},
+		Bytes: configBytes,
+	}
+	err = pem.Encode(r, configBlock)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Flush()
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+// JSON
+
 type jsonPrimaryConfig struct {
-	// Version number
 	ConfigVersion string `json:"configVersion"`
+	AppId         string `json:"appId"`
 
 	// Themes
 	ThemesConfig *jsonThemesSection `json:"themes"`
@@ -84,16 +227,16 @@ type jsonPrimaryConfig struct {
 }
 
 type jsonThemesSection struct {
-	DefaultTheme *Theme           `json:"defaultTheme"`
-	NamedThemes  map[string]Theme `json:"namedThemes"`
+	DefaultTheme *Theme            `json:"defaultTheme"`
+	NamedThemes  map[string]*Theme `json:"namedThemes"`
 }
 
 type jsonActionsSection struct {
-	NamedActions map[string]ActionContainer `json:"namedActions"`
+	NamedActions map[string]*ActionContainer `json:"namedActions"`
 }
 
 type jsonTriggersSection struct {
-	NamedTriggers map[string]Trigger `json:"namedTriggers"`
+	NamedTriggers map[string]*Trigger `json:"namedTriggers"`
 }
 
 type jsonConditionsSection struct {
@@ -108,32 +251,33 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
+	pc.AppId = jpc.AppId
 
 	// Themes
 	if jpc.ThemesConfig != nil {
 		if jpc.ThemesConfig.DefaultTheme != nil {
-			pc.DefaultTheme = jpc.ThemesConfig.DefaultTheme
+			pc.defaultTheme = jpc.ThemesConfig.DefaultTheme
 		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
 		}
 	}
 	if pc.namedThemes == nil {
-		pc.namedThemes = make(map[string]Theme)
+		pc.namedThemes = make(map[string]*Theme)
 	}
 
 	// Actions
 	if jpc.ActionsConfig != nil && jpc.ActionsConfig.NamedActions != nil {
 		pc.namedActions = jpc.ActionsConfig.NamedActions
 	} else {
-		pc.namedActions = map[string]ActionContainer{}
+		pc.namedActions = map[string]*ActionContainer{}
 	}
 
 	// Triggers
 	if jpc.TriggerConfig != nil && jpc.TriggerConfig.NamedTriggers != nil {
 		pc.namedTriggers = jpc.TriggerConfig.NamedTriggers
 	} else {
-		pc.namedTriggers = make(map[string]Trigger)
+		pc.namedTriggers = make(map[string]*Trigger)
 	}
 
 	// Conditions
@@ -150,13 +294,41 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (pc PrimaryConfig) Validate() bool {
+func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
+	if t == nil {
+		return nil
+	}
+	// Limit depth of search, to avoid infinite loops
+	for i := 0; i < 50; i++ {
+		if t.ValidateDisallowFallthoughReturningUserReadableIssue() == "" {
+			return t
+		}
+		if t.FallbackThemeName == "" {
+			return nil
+		}
+		nextTheme, ok := pc.namedThemes[t.FallbackThemeName]
+		if !ok {
+			return nil
+		}
+		t = nextTheme
+	}
+
+	return nil
+}
+
+func (pc *PrimaryConfig) Validate() bool {
 	return pc.ValidateReturningUserReadableIssue() == ""
 }
 
-func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
-	if pc.ConfigVersion != "v1" {
+func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
+	// We bump version to 2+ when we want to break backwards compatibility.
+	// We try to parse all v1 versions (including new subversions)
+	if pc.ConfigVersion != "v1" && !strings.HasPrefix(pc.ConfigVersion, "v1.") {
 		return "Config must have a config version of v1"
+	}
+
+	if pc.AppId == "" {
+		return "Config must have an appId"
 	}
 
 	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
@@ -172,14 +344,17 @@ func (pc PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if emptyKeyIssue := pc.validateMapsDontContainEmptyStringReturningUserReadable(); emptyKeyIssue != "" {
 		return emptyKeyIssue
 	}
+	if fallbackNameIssue := pc.validateFallbackNames(); fallbackNameIssue != "" {
+		return fallbackNameIssue
+	}
 
 	// Run nested validations
 	return pc.validateNestedReturningUserReadableIssue()
 }
 
-func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
-	if pc.DefaultTheme != nil {
-		if defaultThemeIssue := pc.DefaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
+func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
+	if pc.defaultTheme != nil {
+		if defaultThemeIssue := pc.defaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
 			return defaultThemeIssue
 		}
 	}
@@ -202,7 +377,7 @@ func (pc PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
+func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {
 	_, themeFound := pc.namedThemes[""]
 	_, actionFound := pc.namedActions[""]
 	_, triggerFound := pc.namedTriggers[""]
@@ -212,7 +387,7 @@ func (pc PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable(
 	return ""
 }
 
-func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	for sourceActionName, action := range pc.namedActions {
 		if action.ActionType == "" || action.actionData == nil {
 			return "Internal issue. Code 15234328"
@@ -232,7 +407,7 @@ func (pc PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 	return ""
 }
 
-func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
+func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() string {
 	// Validate the actions in the trigger actually exist
 	for tName, t := range pc.namedTriggers {
 		_, ok := pc.namedActions[t.ActionName]
@@ -254,6 +429,35 @@ func (pc PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() stri
 			_, ok := pc.namedActions[actionName]
 			if !ok {
 				return fmt.Sprintf("Action \"%v\" specified named action \"%v\", which doesn't exist", sourceActionName, actionName)
+			}
+		}
+	}
+
+	return ""
+}
+
+func (pc *PrimaryConfig) validateFallbackNames() string {
+	for themeName, theme := range pc.namedThemes {
+		if theme.FallbackThemeName != "" {
+			_, ok := pc.namedThemes[theme.FallbackThemeName]
+			if !ok {
+				return fmt.Sprintf("Theme \"%v\" specified fallback theme \"%v\", which doesn't exist", themeName, theme.FallbackThemeName)
+			}
+		}
+	}
+
+	if pc.defaultTheme != nil && pc.defaultTheme.FallbackThemeName != "" {
+		_, ok := pc.namedThemes[pc.defaultTheme.FallbackThemeName]
+		if !ok {
+			return fmt.Sprintf("defaultTheme specified fallback theme \"%v\", which doesn't exist", pc.defaultTheme.FallbackThemeName)
+		}
+	}
+
+	for actionName, action := range pc.namedActions {
+		if action.FallbackActionName != "" {
+			_, ok := pc.namedActions[action.FallbackActionName]
+			if !ok {
+				return fmt.Sprintf("Action \"%v\" specified fallback action \"%v\", which doesn't exist", actionName, action.FallbackActionName)
 			}
 		}
 	}

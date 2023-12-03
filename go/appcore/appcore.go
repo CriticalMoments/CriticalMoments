@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/CriticalMoments/CriticalMoments/go/appcore/events"
+	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
@@ -34,8 +34,8 @@ type Appcore struct {
 	// Cache
 	cache *cache
 
-	// Event handler
-	eventManager *events.EventManager
+	// database
+	db *db.DB
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -45,17 +45,28 @@ type Appcore struct {
 }
 
 func NewAppcore() *Appcore {
-	return &Appcore{
+	ac := &Appcore{
 		propertyRegistry:    newPropertyRegistry(),
 		seenNamedConditions: map[string]string{},
+		db:                  db.NewDB(),
 	}
+	// Connect the property registry to the db/proptery history manager
+	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
+	return ac
 }
 
 // Hopefully no one wants http (no TLS) in 2023... but given the importance of the config file we can't open this up to injection attacks
 const filePrefix = "file://"
 const httpsPrefix = "https://"
 
-func (ac *Appcore) SetConfigUrl(configUrl string) error {
+func (ac *Appcore) SetConfigUrl(configUrl string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetConfigUrl: %v", r)
+		}
+	}()
+
 	if !strings.HasPrefix(configUrl, filePrefix) && !strings.HasPrefix(configUrl, httpsPrefix) {
 		return errors.New("config URL must start with https:// or file://")
 	}
@@ -64,7 +75,18 @@ func (ac *Appcore) SetConfigUrl(configUrl string) error {
 	return nil
 }
 
-func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
+func (ac *Appcore) ConfigUrl() string {
+	return ac.configUrlString
+}
+
+func (ac *Appcore) SetApiKey(apiKey string, bundleID string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetApiKey: %v", r)
+		}
+	}()
+
 	key, err := signing.ParseApiKey(apiKey)
 	if err != nil {
 		return errors.New("invalid API Key. Please make sure you get your key from criticalmoments.io")
@@ -79,26 +101,46 @@ func (ac *Appcore) SetApiKey(apiKey string, bundleID string) error {
 	return nil
 }
 
-func (ac *Appcore) SetDataDirPath(dataDirPath string) error {
+func (ac *Appcore) ApiKey() string {
+	if ac.apiKey == nil {
+		return ""
+	}
+	return ac.apiKey.String()
+}
+
+func (ac *Appcore) SetDataDirPath(dataDirPath string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SetDataDirPath: %v", r)
+		}
+	}()
+
 	cache, err := newCacheWithBaseDir(dataDirPath)
 	if err != nil {
 		return err
 	}
 	ac.cache = cache
 
-	eventManager, err := events.NewEventManager(dataDirPath)
+	err = ac.db.StartWithPath(dataDirPath)
 	if err != nil {
 		return err
 	}
-	ac.eventManager = eventManager
 
-	dbOperations := eventManager.EventManagerConditionFunctions()
+	dbOperations := ac.db.DbConditionFunctions()
 	ac.propertyRegistry.RegisterDynamicFunctions(dbOperations)
 
 	return nil
 }
 
 func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in SetTimezoneGMTOffset: %v\n", r)
+		}
+	}()
+
 	tzName := fmt.Sprintf("UTCOffsetS:%v", gmtOffset)
 	tz := time.FixedZone(tzName, gmtOffset)
 	time.Local = tz
@@ -106,7 +148,14 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	ac.propertyRegistry.registerStaticProperty("timezone_gmt_offset", gmtOffset)
 }
 
-func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) error {
+func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in CheckNamedConditionsCollision: %v", r)
+		}
+	}()
+
 	if name == "" {
 		return nil
 	}
@@ -121,7 +170,15 @@ func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString str
 	return nil
 }
 
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (bool, error) {
+func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (returnResult bool, returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnResult = false
+			returnErr = fmt.Errorf("panic in CheckNamedCondition: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return false, errors.New("Appcore not started")
 	}
@@ -145,6 +202,13 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (boo
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in RegisterLibrayBindings: %v\n", r)
+		}
+	}()
+
 	ac.libBindings = lb
 
 	// connect iOS functions to condition system
@@ -159,7 +223,14 @@ func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
 	})
 }
 
-func (ac *Appcore) Start() error {
+func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in Start: %v", r)
+		}
+	}()
+
 	if ac.started {
 		return errors.New("appcore already started. Start should only be called once")
 	}
@@ -180,10 +251,32 @@ func (ac *Appcore) Start() error {
 		return err
 	}
 
+	err := ac.loadConfig(allowDebugLoad)
+	if err != nil {
+		return err
+	}
+
+	err = ac.propertyRegistry.samplePropertiesForStartup()
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue sampling properties for startup. Continuing as this error is non-fatal: %v\n", err)
+	}
+
+	ac.started = true
+
+	err = ac.SendBuiltInEvent(datamodel.AppStartBuiltInEvent)
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue sending the built in event \"%v\". Continuing as this error is non-fatal: %v\n", datamodel.AppStartBuiltInEvent, err)
+	}
+
+	return nil
+}
+
+func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 	var configFilePath string
 	var err error
+	isFilePath := strings.HasPrefix(ac.configUrlString, filePrefix)
 
-	if strings.HasPrefix(ac.configUrlString, filePrefix) {
+	if isFilePath {
 		// Strip file:// prefix
 		configFilePath = ac.configUrlString[len(filePrefix):]
 	} else if strings.HasPrefix(ac.configUrlString, httpsPrefix) {
@@ -200,24 +293,36 @@ func (ac *Appcore) Start() error {
 	if err != nil {
 		return err
 	}
-	var pc datamodel.PrimaryConfig
-	err = json.Unmarshal(configFileData, &pc)
+
+	pc, err := datamodel.DecodePrimaryConfig(configFileData, signing.SharedSignUtil())
 	if err != nil {
-		return err
+		// If we're in debug mode and the file is local, allow parsing unsigned config files
+		allowParsingUnsigned := allowDebugLoad && isFilePath
+		if !allowParsingUnsigned {
+			return err
+		}
+		pc = &datamodel.PrimaryConfig{}
+		err = json.Unmarshal(configFileData, &pc)
+		if err != nil {
+			return err
+		}
 	}
-	ac.config = &pc
+	if pc.AppId != ac.apiKey.BundleId() {
+		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())
+	}
+	ac.config = pc
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
 	}
 
-	ac.started = true
 	return nil
 }
 
 func (ac *Appcore) postConfigSetup() error {
-	if ac.config.DefaultTheme != nil {
-		err := ac.libBindings.SetDefaultTheme(ac.config.DefaultTheme)
+	dt := ac.config.DefaultTheme()
+	if dt != nil {
+		err := ac.libBindings.SetDefaultTheme(dt)
 		if err != nil {
 			fmt.Println("CriticalMoments: there was an issue setting up the default theme from config")
 			return err
@@ -227,35 +332,60 @@ func (ac *Appcore) postConfigSetup() error {
 	return nil
 }
 
-func (ac *Appcore) SendEvent(name string) error {
+func (ac *Appcore) SendClientEvent(name string) error {
+	event, err := datamodel.NewClientEventWithName(name)
+	if err != nil {
+		return fmt.Errorf("SendEvent error for \"%v\"", name)
+	}
+	return ac.processEvent(event)
+}
+
+func (ac *Appcore) SendBuiltInEvent(name string) error {
+	event, err := datamodel.NewBuiltInEventWithName(name)
+	if err != nil {
+		return fmt.Errorf("SendEvent error for \"%v\"", name)
+	}
+	return ac.processEvent(event)
+}
+
+func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in SendEvent: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
 
-	event, err := datamodel.NewEventWithName(name)
-	if err != nil {
-		return fmt.Errorf("SendEvent error for \"%v\"", name)
-	}
-
-	err = ac.eventManager.SendEvent(event)
+	err := ac.db.EventManager().SendEvent(event)
 	if err != nil {
 		return err
 	}
 
 	// Perform any actions for this event
-	actions := ac.config.ActionsForEvent(name)
+	actions := ac.config.ActionsForEvent(event.Name)
 	var lastErr error
 	for _, action := range actions {
-		err := ac.PerformAction(&action)
+		err := ac.PerformAction(action)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", name, err)
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", event.Name, err)
 		}
 	}
 	return lastErr
 }
 
-func (ac *Appcore) PerformNamedAction(actionName string) error {
+func (ac *Appcore) PerformNamedAction(actionName string) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in PerformNamedAction: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
@@ -266,7 +396,14 @@ func (ac *Appcore) PerformNamedAction(actionName string) error {
 	return ac.PerformAction(action)
 }
 
-func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
+func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in PerformAction: %v", r)
+		}
+	}()
+
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
@@ -286,26 +423,117 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) error {
 	return action.PerformAction(&ad)
 }
 
-func (ac *Appcore) ThemeForName(themeName string) *datamodel.Theme {
+func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			fmt.Printf("CriticalMoments: panic in ThemeForName: %v", r)
+			resultTheme = nil
+		}
+	}()
+
 	if !ac.started {
 		return nil
 	}
 	return ac.config.ThemeWithName(themeName)
 }
 
+var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
+
 // Repeitive, but gomobile doesn't allow for `interface{}`
+// Panic catching is one level down stack here, but still there.
 func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticIntProperty(key string, value int) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
-func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) error {
+func (ac *Appcore) RegisterStaticTimeProperty(key string, value int64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	if value == LibPropertyProviderNilIntValue {
+		return ac.propertyRegistry.registerStaticProperty(key, nil)
+	}
+	timeVal := time.UnixMilli(value)
+	return ac.propertyRegistry.registerStaticProperty(key, timeVal)
+}
+func (ac *Appcore) RegisterClientStringProperty(key string, value string) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientIntProperty(key string, value int) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientFloatProperty(key string, value float64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientProperty(key, value)
+}
+func (ac *Appcore) RegisterClientTimeProperty(key string, value int64) error {
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	if value == LibPropertyProviderNilIntValue {
+		return ac.propertyRegistry.registerClientProperty(key, nil)
+	}
+	timeVal := time.UnixMilli(value)
+	return ac.propertyRegistry.registerClientProperty(key, timeVal)
+}
+
+func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvider) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in RegisterLibPropertyProvider: %v", r)
+		}
+	}()
+
+	if ac.started {
+		return errRegisterAfterStart
+	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
+}
+func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in RegisterClientPropertiesFromJson: %v", r)
+		}
+	}()
+
+	if ac.started {
+		return errRegisterAfterStart
+	}
+	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
 }

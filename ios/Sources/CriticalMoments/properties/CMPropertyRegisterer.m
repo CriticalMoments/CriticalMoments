@@ -104,6 +104,8 @@
     [self registerStaticStringProperty:@"locale_language_code" value:locale.languageCode];
     [self registerStaticStringProperty:@"locale_country_code" value:locale.countryCode];
     [self registerStaticStringProperty:@"locale_currency_code" value:locale.currencyCode];
+    CMLanguageDirectionPropertyProvider *ldpp = [[CMLanguageDirectionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"locale_language_direction" value:ldpp];
 
     // Bundle ID
     [self registerStaticStringProperty:@"app_id" value:NSBundle.mainBundle.bundleIdentifier];
@@ -124,6 +126,10 @@
     [self registerStaticIntProperty:@"screen_width_pixels" value:MIN(screenHeightPixels, screenWidthPixels)];
     [self registerStaticIntProperty:@"screen_height_pixels" value:MAX(screenHeightPixels, screenWidthPixels)];
     [self registerStaticFloatProperty:@"screen_scale" value:UIScreen.mainScreen.scale];
+    CMBrightnessProvider *brpp = [[CMBrightnessProvider alloc] init];
+    [self registerLibPropertyProvider:@"screen_brightness" value:brpp];
+    CMScreenCapturedProvider *scpp = [[CMScreenCapturedProvider alloc] init];
+    [self registerLibPropertyProvider:@"screen_captured" value:scpp];
 
     [self setUserInterfaceIdiom];
 
@@ -179,8 +185,12 @@
 
     // Audio
     CMAudioPlayingPropertyProvider *audioPlayingProvider = [[CMAudioPlayingPropertyProvider alloc] init];
-    bool audio = [audioPlayingProvider boolValue];
     [self registerLibPropertyProvider:@"other_audio_playing" value:audioPlayingProvider];
+    [self registerLibPropertyProvider:@"has_headphones" value:[CMAudioPortPropertyProvider hasHeadphones]];
+    [self registerLibPropertyProvider:@"has_bt_headphones" value:[CMAudioPortPropertyProvider hasBtHeadphones]];
+    [self registerLibPropertyProvider:@"has_bt_headset" value:[CMAudioPortPropertyProvider hasBtHeadset]];
+    [self registerLibPropertyProvider:@"has_wired_headset" value:[CMAudioPortPropertyProvider hasWiredHeadset]];
+    [self registerLibPropertyProvider:@"has_car_audio" value:[CMAudioPortPropertyProvider hasCarAudio]];
 
     // Calls
     CMCallPropertyProvider *callsPP = [[CMCallPropertyProvider alloc] init];
@@ -207,6 +217,18 @@
     [self registerLibPropertyProvider:@"location_region" value:regionpp];
     CMCountryPropertyProvider *countrypp = [[CMCountryPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"location_country" value:countrypp];
+
+    // Approx Location
+    CMApproxCityPropertyProvider *approxCity = [[CMApproxCityPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_city" value:approxCity];
+    CMApproxRegionPropertyProvider *approxRegion = [[CMApproxRegionPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_region" value:approxRegion];
+    CMApproxCountryPropertyProvider *approxCountry = [[CMApproxCountryPropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_country" value:approxCountry];
+    CMApproxLatitudePropertyProvider *approxLat = [[CMApproxLatitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_latitude" value:approxLat];
+    CMApproxLongitudePropertyProvider *approxLong = [[CMApproxLongitudePropertyProvider alloc] init];
+    [self registerLibPropertyProvider:@"location_approx_longitude" value:approxLong];
 
     // Permissions
     CMNotificationPermissionsPropertyProvider *npp = [[CMNotificationPermissionsPropertyProvider alloc] init];

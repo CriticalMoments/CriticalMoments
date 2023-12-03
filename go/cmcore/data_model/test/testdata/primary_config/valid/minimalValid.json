@@ -1,3 +1,4 @@
 {
-    "configVersion": "v1"
+    "configVersion": "v1",
+    "appId": "io.criticalmoments.demo"
 }

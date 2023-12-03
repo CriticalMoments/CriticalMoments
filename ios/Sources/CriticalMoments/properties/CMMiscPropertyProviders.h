@@ -15,4 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMHasWatchPropertyProviders : NSObject <CMDynamicPropertyProvider>
 @end
 
+@interface CMLanguageDirectionPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END

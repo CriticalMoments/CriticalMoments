@@ -30,4 +30,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMCountryPropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
+@interface CMApproxCityPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMApproxCountryPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMApproxRegionPropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMApproxLatitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMApproxLongitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
 NS_ASSUME_NONNULL_END

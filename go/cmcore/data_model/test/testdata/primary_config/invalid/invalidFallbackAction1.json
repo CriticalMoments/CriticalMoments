@@ -1,0 +1,20 @@
+{
+  "configVersion": "v1",
+  "actions": {
+    "namedActions": {
+      "action1": {
+        "actionType": "alert",
+        "actionData": {
+            "title": "For real?"
+        }
+      },
+      "action2": {
+        "actionType": "alert",
+        "fallback": "missing",
+        "actionData": {
+            "title": "For real?"
+        }
+      }
+    }
+  }
+}

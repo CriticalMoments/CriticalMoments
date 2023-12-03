@@ -19,6 +19,5 @@ func (u *UnknownAction) AllEmbeddedActionNames() ([]string, error) {
 }
 
 func (u *UnknownAction) PerformAction(ab ActionBindings) error {
-	fmt.Printf("CriticalMoments: this version of critical moments does not support this action type (\"%v\"). Skipping action.", u.ActionType)
-	return nil
+	return fmt.Errorf("this version of critical moments does not support this action type (\"%v\"). action not performed", u.ActionType)
 }

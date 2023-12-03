@@ -13,11 +13,11 @@
 
 @implementation CMAppInstallDatePropertyProviders
 
-- (int64_t)intValue {
+- (NSDate *)dateValue {
     NSURL *docsFolderUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                    inDomains:NSUserDomainMask] lastObject];
     if (!docsFolderUrl) {
-        return 0;
+        return nil;
     }
 
     NSError *err;
@@ -25,14 +25,14 @@
         objectForKey:NSFileCreationDate];
 
     if (err != nil || appInstallDate == nil) {
-        return 0;
+        return nil;
     }
 
-    return [CMUtils cmTimestampFromDate:appInstallDate];
+    return appInstallDate;
 }
 
 - (CMPropertyProviderType)type {
-    return CMPropertyProviderTypeInt;
+    return CMPropertyProviderTypeTime;
 }
 
 @end
@@ -41,6 +41,36 @@
 
 @property(nonatomic) NSNumber *hasWatch;
 @property(nonatomic, strong) dispatch_group_t waitGroup;
+
+@end
+
+@implementation CMLanguageDirectionPropertyProvider
+
+static NSString *languageDirection;
+
+- (NSString *)stringValue {
+    if (languageDirection) {
+        return languageDirection;
+    }
+
+    // UI Kit calls must be on main.
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+          languageDirection = @"RTL";
+      } else {
+          languageDirection = @"LTR";
+      }
+      dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC));
+
+    return languageDirection;
+}
+
+- (CMPropertyProviderType)type {
+    return CMPropertyProviderTypeString;
+}
 
 @end
 

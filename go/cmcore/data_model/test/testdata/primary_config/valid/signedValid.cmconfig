@@ -1,0 +1,12 @@
+-----BEGIN CM-----
+Container-Version: v1
+additional-future-header: value2
+
+-----END CM-----
+-----BEGIN CONFIG-----
+Signature: MEQCICb0iRj4SYlr0uhp/jvEvYKdX6a6oU0szcKpyy8nfOdBAiBnAoIAfV0rPzVyLIhXEA59oCbx86ZPj74GMutgW72wKg==
+ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50cy5kZW1vIgp9
+-----END CONFIG-----
+-----BEGIN FUTUREBLOCK-----
+aGVsbG8gd29ybGQ=
+-----END FUTUREBLOCK-----

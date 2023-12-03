@@ -9,6 +9,7 @@
 
 #import "DemoViewContoller.h"
 #import "MainDemoScreen.h"
+#import "Utils.h"
 
 #define BANNER_HEIGHT 60.0
 
@@ -54,21 +55,6 @@
         [tabAppearance configureWithOpaqueBackground];
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
-
-    // This key is only valid for this sample app
-    NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuU2FtcGxlQXBw-MEYCIQCOd0JTuuUtgTJkDUsQH0EQMhJ+"
-                       @"kKysBBfjdxZKqgTBDAIhAMo/OGSysVA0iOscz+mKDqY8UizldA8sZj2a3/mAZIzB";
-    [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];
-
-    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
-    [CriticalMoments.sharedInstance setConfigUrl:localConfigUrl.absoluteString];
-
-    /*NSString *webBasedConfigUrl =
-        @"https://storage.googleapis.com/critical-moments-test-cases/"
-        @"demoAppConfig.json?a=123";
-    [CriticalMoments.sharedInstance setConfigUrl:webBasedConfigUrl];*/
-
-    [CriticalMoments.sharedInstance start];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {

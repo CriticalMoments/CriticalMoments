@@ -16,7 +16,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.title = @"Sheet Demos";
+        self.title = @"Modal Demos";
         [self buildSections];
     }
     return self;

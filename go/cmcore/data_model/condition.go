@@ -3,7 +3,6 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strings"
 	"time"
 
@@ -44,80 +43,6 @@ func (c *Condition) String() string {
 	return c.conditionString
 }
 
-func RequiredPropertyTypes() map[string]reflect.Kind {
-	return map[string]reflect.Kind{
-		"platform":                reflect.String,
-		"os_version":              reflect.String,
-		"device_manufacturer":     reflect.String,
-		"device_model":            reflect.String,
-		"device_model_class":      reflect.String,
-		"locale_language_code":    reflect.String,
-		"locale_country_code":     reflect.String,
-		"locale_currency_code":    reflect.String,
-		"app_version":             reflect.String,
-		"user_interface_idiom":    reflect.String,
-		"app_id":                  reflect.String,
-		"screen_width_pixels":     reflect.Int,
-		"screen_height_pixels":    reflect.Int,
-		"screen_width_points":     reflect.Int,
-		"screen_height_points":    reflect.Int,
-		"screen_scale":            reflect.Float64,
-		"device_battery_state":    reflect.String,
-		"device_battery_level":    reflect.Float64,
-		"device_low_power_mode":   reflect.Bool,
-		"device_orientation":      reflect.String,
-		"interface_orientation":   reflect.String,
-		"dark_mode":               reflect.Bool,
-		"network_connection_type": reflect.String,
-		"has_wifi_connection":     reflect.Bool,
-		"has_cell_connection":     reflect.Bool,
-		"has_active_network":      reflect.Bool,
-		"expensive_network":       reflect.Bool,
-		"other_audio_playing":     reflect.Bool,
-		"cm_version":              reflect.String,
-		"foreground":              reflect.Bool,
-		"app_install_date":        reflect.Int,
-		"timezone_gmt_offset":     reflect.Int,
-		"app_state":               reflect.String,
-		"has_watch":               reflect.Bool,
-		"on_call":                 reflect.Bool,
-
-		// Location
-		"location_permission":          reflect.Bool,
-		"location_permission_detailed": reflect.String,
-		"location_latitude":            reflect.Float64,
-		"location_longitude":           reflect.Float64,
-		"location_city":                reflect.String,
-		"location_region":              reflect.String,
-		"location_country":             reflect.String,
-
-		// Permisions
-		"notifications_permission": reflect.String,
-		"microphone_permission":    reflect.String,
-		"camera_permission":        reflect.String,
-		"contacts_permission":      reflect.String,
-		"photo_library_permission": reflect.String,
-		"add_photo_permission":     reflect.String,
-		"calendar_permission":      reflect.String,
-		"reminders_permission":     reflect.String,
-		"bluetooth_permission":     reflect.String,
-	}
-}
-
-func WellKnownPropertyTypes() map[string]reflect.Kind {
-	return map[string]reflect.Kind{
-		"device_model_version": reflect.String,
-		"low_data_mode":        reflect.Bool,
-
-		// Weather only iOS 16+
-		"weather_temperature":          reflect.Float64,
-		"weather_apparent_temperature": reflect.Float64,
-		"weather_condition":            reflect.String,
-		"weather_cloud_cover":          reflect.Float64,
-		"is_daylight":                  reflect.Bool,
-	}
-}
-
 func StaticConditionHelperFunctions() map[string]interface{} {
 	return map[string]interface{}{
 		"versionNumberComponent": conditions.VersionNumberComponent,
@@ -128,6 +53,7 @@ func StaticConditionHelperFunctions() map[string]interface{} {
 		"unixTimeNanoseconds":  conditions.UnixTimeNanoseconds,
 		"unixTimeMilliseconds": conditions.UnixTimeMilliseconds,
 		"unixTimeSeconds":      conditions.UnixTimeSeconds,
+		"formatTime":           conditions.TimeFormat,
 
 		"rand":        conditions.Random,
 		"sessionRand": conditions.SessionRandom,
@@ -145,14 +71,17 @@ func StaticConditionConstantProperties() map[string]interface{} {
 		"RFC1123Z":             time.RFC1123Z,
 		"date_with_tz_format":  conditions.DateWithTzFormat,
 		"date_and_time_format": conditions.DateAndTimeFormat,
-		"date_formant":         conditions.DateFormat,
+		"date_format":          conditions.DateFormat,
 	}
 }
 
 var AllBuiltInDynamicFunctions = map[string]bool{
-	"eventCount":          true,
-	"eventCountWithLimit": true,
-	"canOpenUrl":          true,
+	"eventCount":                 true,
+	"eventCountWithLimit":        true,
+	"canOpenUrl":                 true,
+	"propertyHistoryLatestValue": true,
+	"propertyEverHadValue":       true,
+	"stableRand":                 true,
 }
 
 type ConditionFields struct {
@@ -246,19 +175,7 @@ func (c *Condition) Validate() error {
 	}
 
 	if StrictDatamodelParsing {
-		// Check we support all variables used if strict parsing
-		allValidVariables := make(map[string]reflect.Kind)
-		maps.Copy(allValidVariables, RequiredPropertyTypes())
-		maps.Copy(allValidVariables, WellKnownPropertyTypes())
-		for k, v := range StaticConditionConstantProperties() {
-			allValidVariables[k] = reflect.TypeOf(v).Kind()
-		}
-
-		for _, varName := range fields.Variables {
-			if _, ok := allValidVariables[varName]; !ok {
-				return NewUserPresentableError(fmt.Sprintf("Variable included in condition which isn't recognized: %v", varName))
-			}
-		}
+		// Don't check variable names. We support custom vars so every name is valid
 
 		// Check we support all methods used if strict parsing
 		for _, methodName := range fields.Methods {

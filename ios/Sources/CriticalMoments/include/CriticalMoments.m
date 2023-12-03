@@ -7,11 +7,14 @@
 
 #import "CriticalMoments.h"
 
+#import "../messaging/CMBannerManager.h"
+
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted;
+@property(nonatomic, strong) NSString *releaseConfigUrl, *devConfigUrl;
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
 @property(nonatomic, strong) CMTheme *currentTheme;
@@ -105,6 +108,25 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (NSError *)startReturningError {
+#if DEBUG
+    if (!_releaseConfigUrl) {
+        // Warn the developer if they have not set a release URL
+        NSLog(@"CriticalMoments: you have not set a valid release config url. Critical Moments will not work in "
+              @"release builds/app-store builds. Be sure to set this before releasing your app.");
+    }
+    if (_devConfigUrl) {
+        [self setConfigUrl:_devConfigUrl];
+    } else if (_releaseConfigUrl) {
+        // devConfig is optional. Fall back to release if that's all they set
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#else
+    // Only use the production URL on non debug builds
+    if (_releaseConfigUrl) {
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#endif
+
     // Register the action dispatcher and properties
     if (!self.bindings) {
         self.bindings = [[CMLibBindings alloc] initWithCM:self];
@@ -124,10 +146,18 @@ static CriticalMoments *sharedInstance = nil;
     // Set the data directory to applicationSupport/critical_moments_data
     NSError *error;
     NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
+
+    /*BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
+    if (!success || error) {
+        NSLog(@"error removing existing cache: %@", error);
+        return error;
+    }*/
+
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
                            withIntermediateDirectories:YES
                                             attributes:nil
                                                  error:&error];
+
     if (error) {
         return error;
     }
@@ -136,7 +166,8 @@ static CriticalMoments *sharedInstance = nil;
         return error;
     }
 
-    [_appcore start:&error];
+    bool allowDebugLoad = [self isDebug] && [self urlAllowedForDebugLoad];
+    [_appcore start:allowDebugLoad error:&error];
     if (error) {
         return error;
     }
@@ -145,6 +176,19 @@ static CriticalMoments *sharedInstance = nil;
     [self startQueues];
 
     return nil;
+}
+
+- (bool)urlAllowedForDebugLoad {
+    // Allow any in test cases
+    if ([@"com.apple.dt.xctest.tool" isEqualToString:NSBundle.mainBundle.bundleIdentifier]) {
+        return true;
+    }
+    // Allowed if in main bundle, but not if in data directories (downloaded/external)
+    NSString *mainBundlePath = NSBundle.mainBundle.bundleURL.absoluteString;
+    if (!mainBundlePath) {
+        return false;
+    }
+    return [_appcore.configUrl hasPrefix:mainBundlePath];
 }
 
 - (void)startQueues {
@@ -179,6 +223,32 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+- (nonnull NSString *)getApiKey {
+    NSString *apiKey = [_appcore apiKey];
+    if (apiKey.length == 0) {
+        return nil;
+    }
+    return apiKey;
+}
+
+- (void)setDevelopmentConfigUrl:(NSString *)urlString {
+    if (![urlString hasPrefix:@"file://"]) {
+        NSLog(@"CriticalMoments: invalid file URL sent to setDevelopmentConfigUrl. The URL must begin with `file://`");
+        return;
+    }
+
+    _devConfigUrl = urlString;
+}
+
+- (void)setReleaseConfigUrl:(NSString *)urlString {
+    if (![urlString hasPrefix:@"https://"]) {
+        NSLog(@"CriticalMoments: invalid URL sent to setProductionConfigUrl. The URL must begin with `https://`");
+        return;
+    }
+
+    _releaseConfigUrl = urlString;
+}
+
 - (void)setConfigUrl:(NSString *)urlString {
     NSError *error;
     [_appcore setConfigUrl:urlString error:&error];
@@ -202,7 +272,7 @@ static CriticalMoments *sharedInstance = nil;
     __block NSString *blockEventName = eventName;
     dispatch_async(_eventQueue, ^{
       NSError *error;
-      [_appcore sendEvent:blockEventName error:&error];
+      [_appcore sendClientEvent:blockEventName error:&error];
 
       if (blockHandler) {
           blockHandler(error);
@@ -229,7 +299,7 @@ static CriticalMoments *sharedInstance = nil;
     dispatch_async(_actionQueue, ^{
       NSError *error;
       BOOL result;
-      [_appcore checkNamedCondition:blockName conditionString:blockCondition ret0_:&result error:&error];
+      [_appcore checkNamedCondition:blockName conditionString:blockCondition returnResult:&result error:&error];
 
       if (blockHandler) {
           blockHandler(result, error);
@@ -253,6 +323,39 @@ static CriticalMoments *sharedInstance = nil;
     return [_appcore themeForName:name];
 }
 
+#pragma mark Custom Properties
+
+- (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error {
+    [_appcore registerClientStringProperty:name value:value error:error];
+}
+
+- (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientBoolProperty:name value:value error:error];
+}
+
+- (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientFloatProperty:name value:value error:error];
+}
+
+- (void)registerIntegerProperty:(long long)value
+                         forKey:(NSString *)name
+                          error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientIntProperty:name value:value error:error];
+}
+
+- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    if (!value) {
+        [_appcore registerClientTimeProperty:name value:AppcoreLibPropertyProviderNilIntValue error:error];
+    } else {
+        int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
+        [_appcore registerClientTimeProperty:name value:epochMilliseconds error:error];
+    }
+}
+
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
+    [_appcore registerClientPropertiesFromJson:jsonData error:error];
+}
+
 #pragma mark Current Theme
 
 - (CMTheme *)currentTheme {
@@ -271,6 +374,17 @@ static CriticalMoments *sharedInstance = nil;
     @synchronized(self) {
         _currentTheme = theme;
     }
+}
+
+- (bool)isDebug {
+#if DEBUG
+    return true;
+#endif
+    return false;
+}
+
+- (void)removeAllBanners {
+    [CMBannerManager.shared removeAllAppWideMessages];
 }
 
 @end

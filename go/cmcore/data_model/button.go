@@ -56,11 +56,10 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 		b.Style = ButtonStyleEnumNormal
 	}
 	if !slices.Contains(buttonStyles, b.Style) {
-		errString := fmt.Sprintf("Invalid button style: \"%v\"", b.Style)
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(errString)
+			return NewUserPresentableError(fmt.Sprintf("invalid button style: \"%v\"", b.Style))
 		} else {
-			fmt.Printf("CriticalMoments: %v. Will fallback to normal style.\n", errString)
+			// Backwards compatibility: fallback to normal if this client doesn't recognize the style
 			b.Style = ButtonStyleEnumNormal
 		}
 	}

@@ -115,6 +115,9 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 	if ac.Condition.String() != "platform == 'iOS'" {
 		t.Fatal()
 	}
+	if ac.FallbackActionName != "fallbackName" {
+		t.Fatal("failed to parse fallback action name")
+	}
 	a := ac.AlertAction
 	if a == nil || !a.Validate() {
 		t.Fatal()

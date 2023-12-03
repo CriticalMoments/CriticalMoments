@@ -7,8 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../messaging/CMBannerManager.h"
-#import "../messaging/CMBannerMessage.h"
 #import "../themes/CMTheme.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (CriticalMoments *)sharedInstance;
 
+#pragma mark Setup
+
 /**
  Start should be called once you've performed all needed initialization for
  critical moments. Critical moments won't perform actions until it is started.
@@ -37,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
  Initializtion that should be performed before calling start:
 
  - Set critical moments API key (required)
- - Set critical moments config URLs (highly recomended)
- - Setup a default theme from code (optional). Can also be done through config
+ - Set critical moments config URLs (required). See setDevelopmentConfigUrl: and setReleaseConfigUrl:
+ - Setup a default theme from code (optional). Can also be done through config.
  or not at all.
  */
 - (void)start;
@@ -55,26 +55,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
+/// :nodoc:
+- (nonnull NSString *)getApiKey;
+
 /**
- Set the config URL for critical moments.
+ Set a local development Config URL for critical moments.
 
- We highly recommend https/web URLs, as Critical Moments is particularly useful
- for unexpected/unplanned customer messaging. With a remote URL you can update
- the config to handle these situations. Loading from a file in the bundle is
- supported, but mostly for testing.
+ For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
+ guide for how to create this file: https://docs.criticalmoments.io/quick-start
 
- @param urlString the URL string of the json config file. Can be a local
- `file://` URL or a `https://` URL.
+ This local config file will not be used on release builds / app store builds. You must also set a production config URL
+ with setProductionConfigUrl for those builds.
+
+ @param urlString the URL string of the json config file. Should begin with `file://`
+ */
+- (void)setDevelopmentConfigUrl:(NSString *)urlString;
+
+/**
+ Set the config URL for Critical Moments to be used on release builds / app store builds
+
+ This url should begin with `https://`, and should link to a signed Critical Moments configuration file. See the docs
+ for details: https://docs.criticalmoments.io/config-file
+
+ @param urlString the URL string of the json config file. Should begin with `https://`
  @warning Be sure to secure who can upload files to this URL path. This config
  file can present messages directly to your users, and you should treat security
- seriously, as you would your app update release process or webpage.
+ seriously, as you would your app update release process or webpage secuirty.
  */
-- (void)setConfigUrl:(NSString *)urlString;
+- (void)setReleaseConfigUrl:(NSString *)urlString;
 
-// TODO: improve docs
-// TODO: enforce naming limits (ascii, no spaces)?
+#pragma mark Events
+
 /**
- Use SendEvent to sent named events to Critical Moments (example:
+ Use SendEvent to sent a named events to Critical Moments (example:
  `user_updated_profile_photo`). These events may trigger actions, or may be used
  in conditions.
 
@@ -82,6 +95,8 @@ NS_ASSUME_NONNULL_BEGIN
  `user_updated_profile_photo`
  */
 - (void)sendEvent:(NSString *)eventName;
+
+#pragma mark Feature Flags / Named Conditions
 
 /**
  Checks a condition string, returning the result of evaluating it.
@@ -106,7 +121,7 @@ each usage independently from remote configuration. Reused names will log warnin
                   condition:(NSString *_Nonnull)condition
                     handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
 
-/// :nodoc: TBD if this is a public API or not. For now, it's not.
+/// :nodoc: This API is private, and should not be used
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 #pragma mark Themes
@@ -116,6 +131,68 @@ each usage independently from remote configuration. Reused names will log warnin
 /// Set the current theme for this CM instance
 - (void)setTheme:(CMTheme *)theme;
 
+#pragma mark Properties
+
+/**
+ Register a custom or well-known string property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+/**
+ Register a custom or well-known integer (int64) property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/**
+ Register a custom or well-known boolean property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/**
+ Register a custom or well-known floating point (double) property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/**
+ Register a custom or well-known timestamp property (NSDate) for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ */
+- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error;
+
+/**
+ Register a set of custom or well-known properties from JSON formatted data.
+
+ The JSON object should be a single level JSON object, with string keys and bool, string or number values.
+
+ On an issue, it will skip they problematic key/value pair, but continue on and parse as many supported key/value pairs
+ as possible.
+
+ All JSON number values are parsed into float64 values (including integers).
+
+ @param jsonData The json data, in the format described above
+ @param error Any errors encountered setting these properties. An error does not necessarily indicate that all fields
+ failed, just that some field(s) failed.
+ */
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
+
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)objcPing;
@@ -123,6 +200,9 @@ each usage independently from remote configuration. Reused names will log warnin
 // Golang "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)goPing;
+
+/// :nodoc: Private api for sample app.
+- (void)removeAllBanners;
 
 @end
 

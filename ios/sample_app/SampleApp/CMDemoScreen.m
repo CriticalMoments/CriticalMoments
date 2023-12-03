@@ -11,8 +11,6 @@
 
 @import UIKit;
 @import CriticalMoments;
-// TODO -- shouldn't be able to import Appcore
-@import Appcore;
 
 @interface CMDemoAction ()
 

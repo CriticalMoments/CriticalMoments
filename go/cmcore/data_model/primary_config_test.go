@@ -3,8 +3,119 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
+
+var testContainer = `
+-----BEGIN CM-----
+Container-Version: v1
+additional-future-header: value2
+
+-----END CM-----
+-----BEGIN CONFIG-----
+Signature: MD0CHQDVjg2+dxUL47DvlctnjAcObzCKvvM6mp2tT507Ahwsvr2Zs5vgE8BSgai6XIMGaFL3CZshtgFubvpq
+ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50cy5zYW1wbGUtYXBwIgp9
+-----END CONFIG-----
+-----BEGIN FUTUREBLOCK-----
+aGVsbG8gd29ybGQ=
+-----END FUTUREBLOCK-----
+`
+
+var testPrivKey = "MGgCAQEEHOEUmigOOoZ+STQ1jkYuXRN2hXLbxLKTvKdlXEygBwYFK4EEACGhPAM6AASDljuXqf/dic4vnAfRtqFsl/fQANciY+xACkgOOE9MGgvu+XIfTOqsqagLJ6ZUedbZus5FUa4awQ=="
+var testPubKey = "ME4wEAYHKoZIzj0CAQYFK4EEACEDOgAEg5Y7l6n/3YnOL5wH0bahbJf30ADXImPsQApIDjhPTBoL7vlyH0zqrKmoCyemVHnW2brORVGuGsE="
+
+func TestContainer(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig([]byte(testContainer), su)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if pc.ContainerVersion != "v1" {
+		t.Fatal("Failed to parse container version")
+	}
+	if pc.AppId != "io.criticalmoments.sample-app" {
+		t.Fatal("Failed to parse app id")
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version from JSON")
+	}
+
+}
+
+func TestContainerVersionCheck(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	subversion := strings.Replace(testContainer, "Container-Version: v1", "Container-Version: v1.2", 1)
+	pc, err := DecodePrimaryConfig([]byte(subversion), su)
+	if err != nil || pc == nil {
+		t.Fatal(err)
+	}
+
+	v2 := strings.Replace(testContainer, "Container-Version: v1", "Container-Version: v2", 1)
+	pc, err = DecodePrimaryConfig([]byte(v2), su)
+	if err == nil || pc != nil {
+		t.Fatal("Failed to error on containerVersion = v2")
+	}
+}
+
+func TestContainerInvalidSig(t *testing.T) {
+	// Signature is correct format, and signed by correct key, but does not match this body
+	var testContainerInvalidSig = `
+-----BEGIN CM-----
+Container-Version: v1
+aGVsbG8gd29ybGQ=
+-----END CM-----
+-----BEGIN CONFIG-----
+Signature: MD4CHQDWjw/kUoBUF5C4M1rLtYSHdcpkLBkH0vGYfSrRAh0AyV/+yosj2C2hqybZEsWYU/x4bPeP2soQF+2cIQ==
+ewogICAgImNvbmZpZ1ZlcnNpb24iOiAidjEiLAogICAgImFwcElkIjogImlvLmNyaXRpY2FsbW9tZW50cy5zYW1wbGUtYXBwIgp9
+-----END CONFIG-----
+`
+
+	su, err := signing.NewSignUtilWithSerializedPublicKey(testPubKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig([]byte(testContainerInvalidSig), su)
+	if err == nil || pc != nil {
+		t.Fatal("Failed to error on pc with invalid sig")
+	}
+}
+
+func TestContainerEncode(t *testing.T) {
+	su, err := signing.NewSignUtilWithSerializedPrivateKey(testPrivKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Invalid
+	_, err = EncodeConfig([]byte("not json"), su)
+	if err == nil {
+		t.Fatal("Failed to error on invalid json")
+	}
+
+	// Valid
+	c := []byte("{\"configVersion\": \"v1\",\"appId\": \"io.criticalmoments.demo\"}")
+	b, err := EncodeConfig(c, su)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := DecodePrimaryConfig(b, su)
+	if err != nil || pc == nil {
+		t.Fatal("Failed to decode encoded config", err)
+	}
+	if pc.ContainerVersion != "v1" || pc.ConfigVersion != "v1" || pc.AppId != "io.criticalmoments.demo" {
+		t.Fatal("Failed to decode encoded config")
+	}
+}
 
 func testHelperBuildMaxPrimaryConfig(t *testing.T) *PrimaryConfig {
 	return testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/maximalValid.json")
@@ -39,10 +150,10 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Themes
-	if pc.DefaultTheme == nil || pc.DefaultTheme.BannerBackgroundColor != "#ffffff" {
+	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not parsed")
 	}
-	if len(pc.namedThemes) != 2 {
+	if len(pc.namedThemes) != 3 {
 		t.Fatal("Wrong number of named themes")
 	}
 	blueTheme := pc.ThemeWithName("blueTheme")
@@ -53,9 +164,13 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if greenTheme == nil || greenTheme.BannerBackgroundColor != "#0000ff" {
 		t.Fatal("Named theme not parsed")
 	}
+	futureThemeWithFallback := pc.ThemeWithName("futureThemeWithFallback")
+	if futureThemeWithFallback != blueTheme {
+		t.Fatal("Theme that fails validation should fallback")
+	}
 
 	// Actions
-	if len(pc.namedActions) != 11 {
+	if len(pc.namedActions) != 14 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -103,6 +218,21 @@ func TestPrimaryConfigJson(t *testing.T) {
 	ma := pc.ActionWithName("modalAction")
 	if ma.ModalAction == nil || len(ma.ModalAction.Content.Sections) != 1 {
 		t.Fatal("failed to parse modal action")
+	}
+	fa := pc.ActionWithName("futureAction")
+	_, ok = fa.actionData.(*UnknownAction)
+	if fa.ActionType != "future_action_type" || !ok || fa.FallbackActionName != "alertAction" {
+		t.Fatal("unknown action failed to parse. Old client will break for future config files.")
+	}
+	nfa := pc.ActionWithName("nestedFutureTypeFail")
+	_, ok = nfa.actionData.(*UnknownAction)
+	if nfa.ActionType != "future_action_type" || !ok || nfa.FallbackActionName != "unknownActionTypeFutureProof" {
+		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
+	}
+	nfas := pc.ActionWithName("nestedFutureTypeSuccess")
+	_, ok = nfas.actionData.(*UnknownAction)
+	if nfas.ActionType != "future_action_type" || !ok || nfas.FallbackActionName != "futureAction" {
+		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
 	}
 
 	// Triggers
@@ -211,7 +341,7 @@ func TestInvalidConfigVersionTheme(t *testing.T) {
 func TestNoDefaultTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
-	pc.DefaultTheme = nil
+	pc.defaultTheme = nil
 	if !pc.Validate() {
 		t.Fatal("Not allowing nil default theme, which should be allowed")
 	}
@@ -224,7 +354,7 @@ func TestNoNamedThemes(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named themes map is nil, and validated")
 	}
-	pc.namedThemes = make(map[string]Theme)
+	pc.namedThemes = make(map[string]*Theme)
 	if pc.Validate() {
 		t.Fatal("Named themes map is empty, and an action uses a missing named theme, but it improperly validated")
 	}
@@ -245,7 +375,7 @@ func TestNoNamedTriggers(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named triggers map is nil, and validated")
 	}
-	pc.namedTriggers = make(map[string]Trigger)
+	pc.namedTriggers = make(map[string]*Trigger)
 	if !pc.Validate() {
 		t.Fatal("empty triggers map should be allowed")
 	}
@@ -258,7 +388,7 @@ func TestNoNamedActions(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("Named actions map is nil, and validated")
 	}
-	pc.namedActions = map[string]ActionContainer{}
+	pc.namedActions = map[string]*ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("empty map should fail since still triggers referencing them")
 	}
@@ -273,19 +403,19 @@ func TestNoNamedActions(t *testing.T) {
 func TestEmptyKey(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
-	pc.namedActions[""] = ActionContainer{}
+	pc.namedActions[""] = &ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
 	delete(pc.namedActions, "")
 
-	pc.namedThemes[""] = Theme{}
+	pc.namedThemes[""] = &Theme{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
 	delete(pc.namedThemes, "")
 
-	pc.namedTriggers[""] = Trigger{}
+	pc.namedTriggers[""] = &Trigger{}
 	if pc.Validate() {
 		t.Fatal("Allowed empty key")
 	}
@@ -302,7 +432,7 @@ func TestBreakNestedValidationActions(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.namedActions["invalidAction"] = ActionContainer{}
+	pc.namedActions["invalidAction"] = &ActionContainer{}
 	if pc.Validate() {
 		t.Fatal("actions not re-validated")
 	}
@@ -314,7 +444,7 @@ func TestBreakNestedValidationTriggers(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.namedTriggers["invalidTrigger"] = Trigger{}
+	pc.namedTriggers["invalidTrigger"] = &Trigger{}
 	if pc.Validate() {
 		t.Fatal("trigger not re-validated")
 	}
@@ -326,15 +456,15 @@ func TestBreakNestedTheme(t *testing.T) {
 		t.Fatal()
 	}
 
-	pc.DefaultTheme = &Theme{} // invalid
+	pc.defaultTheme = &Theme{} // invalid
 	if pc.Validate() {
 		t.Fatal("default theme not re-validated")
 	}
-	pc.DefaultTheme = nil // valid
+	pc.defaultTheme = nil // valid
 	if !pc.Validate() {
 		t.Fatal()
 	}
-	pc.namedThemes["newInvalidTheme"] = Theme{}
+	pc.namedThemes["newInvalidTheme"] = &Theme{}
 	if pc.Validate() {
 		t.Fatal("named themes not re-validated")
 	}
@@ -385,10 +515,13 @@ func TestMinValidConfig(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version")
 	}
+	if pc.AppId != "io.criticalmoments.demo" {
+		t.Fatal("Failed to parse config version")
+	}
 }
 
 func TestOddballValidConfig(t *testing.T) {
-	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballValid.json")
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballvalid.json")
 	if !pc.Validate() {
 		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}
@@ -428,5 +561,45 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 	err = strictDecoder.Decode(&strictPc)
 	if err == nil {
 		t.Fatal("Strict parsing ignored extra field")
+	}
+}
+func TestFallbackNameChecks(t *testing.T) {
+	invalidJson := []string{
+		"invalidFallbackAction1.json",
+		"invalidFallbackTheme2.json", // add_test_count
+		"invalidFallbackTheme1.json", // add_test_count
+	}
+
+	for _, invalidFile := range invalidJson {
+		testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/" + invalidFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pc := PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err == nil {
+			t.Fatal("Failed to disallow invalid fallback")
+		}
+	}
+}
+
+func TestFallbackDefaultTheme(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/valid/validFallbackDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc := PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pc.DefaultTheme() == nil {
+		t.Fatal("Failed to fallback to default theme")
+	}
+	if pc.DefaultTheme() != pc.ThemeWithName("fbTheme") {
+		t.Fatal("Failed to fallback to named theme")
+	}
+	if pc.ThemeWithName("missingName") != nil {
+		t.Fatal("missing name not nil")
 	}
 }

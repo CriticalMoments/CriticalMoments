@@ -60,7 +60,6 @@
     // 2) the system's default action, unless prevent default (eg: dismiss modal)
 
     if (self.model.actionName.length > 0) {
-        NSError *error;
         [CriticalMoments.sharedInstance performNamedAction:self.model.actionName
                                                    handler:^(NSError *_Nullable error) {
                                                      if (error) {
