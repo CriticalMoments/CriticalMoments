@@ -2,6 +2,8 @@
 
 # CriticalMoments
 
+### [Read the docs →](https://docs.criticalmoments.io/)
+
 ## 🏗️ Coming Soon 🏗️
 
 This project is a work in progress, and is not ready for use.
