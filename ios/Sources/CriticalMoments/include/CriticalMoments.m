@@ -80,25 +80,6 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
-#if DEBUG
-    if (!_releaseConfigUrl) {
-        // Warn the developer if they have not set a release URL
-        NSLog(@"CriticalMoments: you have not set a valid release config url. Critical Moments will not work in "
-              @"release builds/app-store builds. Be sure to set this before releasing your app.");
-    }
-    if (_devConfigUrl) {
-        [self setConfigUrl:_devConfigUrl];
-    } else if (_releaseConfigUrl) {
-        // devConfig is optional. Fall back to release if that's all they set
-        [self setConfigUrl:_releaseConfigUrl];
-    }
-#else
-    // Only use the production URL on non debug builds
-    if (_releaseConfigUrl) {
-        [self setConfigUrl:_releaseConfigUrl];
-    }
-#endif
-
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -125,6 +106,25 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (NSError *)startReturningError {
+#if DEBUG
+    if (!_releaseConfigUrl) {
+        // Warn the developer if they have not set a release URL
+        NSLog(@"CriticalMoments: you have not set a valid release config url. Critical Moments will not work in "
+              @"release builds/app-store builds. Be sure to set this before releasing your app.");
+    }
+    if (_devConfigUrl) {
+        [self setConfigUrl:_devConfigUrl];
+    } else if (_releaseConfigUrl) {
+        // devConfig is optional. Fall back to release if that's all they set
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#else
+    // Only use the production URL on non debug builds
+    if (_releaseConfigUrl) {
+        [self setConfigUrl:_releaseConfigUrl];
+    }
+#endif
+
     // Register the action dispatcher and properties
     if (!self.bindings) {
         self.bindings = [[CMLibBindings alloc] initWithCM:self];
