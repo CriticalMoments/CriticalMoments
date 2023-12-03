@@ -59,20 +59,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (nonnull NSString *)getApiKey;
 
 /**
- Set the config URL for critical moments.
+ Set a local development Config URL for critical moments.
 
- We highly recommend https/web URLs, as Critical Moments is particularly useful
- for unexpected/unplanned customer messaging. With a remote URL you can update
- the config to handle these situations. Loading from a file in the bundle is
- supported, but mostly for testing.
+ For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
+ guide for how to create this file: https://docs.criticalmoments.io/quick-start
 
- @param urlString the URL string of the json config file. Can be a local
- `file://` URL or a `https://` URL.
+ This local config file will not be used on release builds / app store builds. You must also set a production config URL
+ with setProductionConfigUrl for those builds.
+
+ @param urlString the URL string of the json config file. Should begin with `file://`
+ */
+- (void)setDevelopmentConfigUrl:(NSString *)urlString;
+
+/**
+ Set the config URL for Critical Moments to be used on release builds / app store builds
+
+ This url should begin with `https://`, and should link to a signed Critical Moments configuration file. See the docs
+ for details: https://docs.criticalmoments.io/config-file
+
+ @param urlString the URL string of the json config file. Should begin with `https://`
  @warning Be sure to secure who can upload files to this URL path. This config
  file can present messages directly to your users, and you should treat security
- seriously, as you would your app update release process or webpage.
+ seriously, as you would your app update release process or webpage secuirty.
  */
-- (void)setConfigUrl:(NSString *)urlString;
+- (void)setReleaseConfigUrl:(NSString *)urlString;
 
 // TODO: improve docs
 // TODO: enforce naming limits (ascii, no spaces)?

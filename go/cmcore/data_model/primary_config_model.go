@@ -115,7 +115,7 @@ func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfi
 
 	// Validate CM block
 	if pc.ContainerVersion == "" {
-		return nil, NewUserPresentableError("No valid CM block found in config file")
+		return nil, NewUserPresentableError("Config file not signed: no valid CM block found in config file")
 	}
 
 	// Validate CONFIG block
