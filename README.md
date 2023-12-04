@@ -50,7 +50,7 @@ Connecting "this" to "that" is done via a cloud based [configuration file](https
 
 While Critical Moments gives you an deep array of data to target users and optimize, the data never leaves the user's device. Conditional statements are evaluated locally.&#x20;
 
-With Critical Moments, powerful targeting and optimization doesn't have to mean compromizing user privacy.
+With Critical Moments, powerful targeting and optimization doesn't have to mean compromising user privacy.
 
 ## Author
 
