@@ -160,11 +160,16 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"low_data_mode":        optionalPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
 
 		// Weather - optional as only iOS 16+
-		"weather_temperature":          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_apparent_temperature": optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_condition":            optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
-		"weather_cloud_cover":          optionalPropertyConfig(reflect.Float32, CMPropertySampleTypeOnUse),
-		"is_daylight":                  optionalPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
+		"weather_temperature":                          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_apparent_temperature":                 optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_condition":                            optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_cloud_cover":                          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"is_daylight":                                  optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_temperature":          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_apparent_temperature": optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_condition":            optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_cloud_cover":          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"approx_location_is_daylight":                  optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
 
 		// Well known properties - client should provide
 		"user_signup_date": wellKnownPropertyConfig(CMTimeKind, CMPropertySampleTypeOnCustomSet),

@@ -103,6 +103,8 @@
         @"location_approx_region": @"location_approx_region == nil || len (location_approx_region ?? '') > 0", // add_test_count
         @"location_approx_country": @"location_approx_country == nil || len (location_approx_country ?? '') > 0", // add_test_count
         
+        // Weather -- tested in library, as app needs entitlement to call service
+        
         @"contacts_permission": @"contacts_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"camera_permission": @"camera_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"microphone_permission": @"microphone_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count

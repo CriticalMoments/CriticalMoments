@@ -9,6 +9,7 @@
 #import "../include/CriticalMoments.h"
 
 @import CoreLocation;
+@import CriticalMomentsSwift;
 
 @interface GeoIpPlace : NSObject
 @property(nonatomic, strong) NSString *city, *region, *isoCountryCode;
@@ -419,6 +420,240 @@ static CMLocationCache *sharedInstance = nil;
 
 - (CMPropertyProviderType)type {
     return CMPropertyProviderTypeFloat;
+}
+
+@end
+
+#pragma mark Weather
+
+typedef NS_ENUM(NSInteger, CMWeatherProperty) {
+    CMWeatherPropertyCondition,
+    CMWeatherPropertyTemperature,
+    CMWeatherPropertyApparentTemperature,
+    CMWeatherPropertyCloudCover,
+    CMWeatherPropertyIsDaylight,
+};
+
+API_AVAILABLE(ios(16.0))
+@interface CMWeatherCacheItem : NSObject
+@property(nonatomic, strong) CMWeatherFetch *weather;
+@property(nonatomic, strong) NSDate *date;
+@property(nonatomic, strong) CLLocation *location;
+@end
+
+@implementation CMWeatherCacheItem
+@end
+
+API_AVAILABLE(ios(16.0))
+@interface CMWeatherCache : NSObject
+@property(nonatomic, strong) NSMutableArray<CMWeatherCacheItem *> *cachedWeather;
+@property(nonatomic, strong) NSDate *lastErrorTime;
+@end
+
+@implementation CMWeatherCache
+
+API_AVAILABLE(ios(16.0))
+static CMWeatherCache *sharedWeatherCache = nil;
++ (CMWeatherCache *)sharedInstance {
+    if (sharedWeatherCache) {
+        return sharedWeatherCache;
+    }
+    @synchronized(CMWeatherCache.class) {
+        if (!sharedWeatherCache) {
+            sharedWeatherCache = [[self alloc] init];
+        }
+        return sharedWeatherCache;
+    }
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.cachedWeather = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (CMWeatherFetch *)getWeatherWithLocaion:(CLLocation *)location {
+    if (!location) {
+        return nil;
+    }
+
+    // one at a time, so we can use cache for next property
+    @synchronized(self) {
+        // Check the cache
+        NSDate *now = [[NSDate alloc] init];
+        for (CMWeatherCacheItem *cacheItem in self.cachedWeather) {
+            // Cache for 20 mins, but then remove item
+            if ([cacheItem.date compare:[now dateByAddingTimeInterval:(-60 * 20)]] == NSOrderedAscending) {
+                [self.cachedWeather removeObject:cacheItem];
+                continue;
+            }
+
+            // Weather cache hit within 1km and 20 mins
+            CLLocationDistance distanceInMeters = [location distanceFromLocation:cacheItem.location];
+            if (distanceInMeters < 1000) {
+                return cacheItem.weather;
+            }
+        }
+
+        // Fail fast if errored in last 30s. Don't want to make repeated requests if we know network is down
+        // or weather service doesn't work.
+        if (self.lastErrorTime &&
+            [self.lastErrorTime compare:[now dateByAddingTimeInterval:-30]] == NSOrderedDescending) {
+            return nil;
+        }
+
+        CMWeatherFetch *weather = [self requestWeatherWithLocaion:location];
+        if (weather) {
+            CMWeatherCacheItem *cacheItem = [[CMWeatherCacheItem alloc] init];
+            cacheItem.weather = weather;
+            cacheItem.date = now;
+            cacheItem.location = location;
+            [self.cachedWeather addObject:cacheItem];
+            return weather;
+        }
+        return nil;
+    }
+}
+
+- (CMWeatherFetch *)requestWeatherWithLocaion:(CLLocation *)location {
+    CMWeatherFetch *weatherFetch = [[CMWeatherFetch alloc] init];
+    __block BOOL success = false;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    [weatherFetch LoadWeatherWithLocation:location
+                        completionHandler:^(BOOL complete) {
+                          success = complete;
+                          if (!complete) {
+                              self.lastErrorTime = [[NSDate alloc] init]; // now
+                          }
+                          dispatch_semaphore_signal(sem);
+                        }];
+    dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 10.0 * NSEC_PER_SEC));
+
+    if (success) {
+        return weatherFetch;
+    }
+    return nil;
+}
+
+@end
+
+@interface CMWeatherPropertyProvider ()
+@property(nonatomic) CMWeatherProperty property;
+@property(nonatomic) BOOL approxAccuracy;
+@end
+
+@implementation CMWeatherPropertyProvider
+
++ (NSDictionary<NSString *, CMWeatherPropertyProvider *> *)allWeatherProviders {
+    return @{
+        @"weather_temperature" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyTemperature
+                                                                          forApproxAccuracy:false],
+        @"weather_apparent_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyApparentTemperature
+                                                     forApproxAccuracy:false],
+        @"weather_condition" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCondition
+                                                                        forApproxAccuracy:false],
+        @"weather_cloud_cover" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCloudCover
+                                                                          forApproxAccuracy:false],
+        @"is_daylight" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyIsDaylight
+                                                                  forApproxAccuracy:false],
+        @"weather_approx_location_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyTemperature
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_apparent_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyApparentTemperature
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_condition" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCondition
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_cloud_cover" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCloudCover
+                                                     forApproxAccuracy:true],
+        @"approx_location_is_daylight" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyIsDaylight
+                                                     forApproxAccuracy:true],
+    };
+}
+
+static CLLocation *testLocationOverride = nil;
++ (void)setTestLocationOverride:(CLLocation *)location {
+    testLocationOverride = location;
+}
+
+- (instancetype)initWithWeatherProperty:(CMWeatherProperty)property forApproxAccuracy:(BOOL)approxAccuracy {
+    self = [super init];
+    if (self) {
+        self.property = property;
+        self.approxAccuracy = approxAccuracy;
+    }
+    return self;
+}
+
+- (CMWeatherFetch *)getWeather {
+    CLLocation *location;
+    if (testLocationOverride) {
+        location = testLocationOverride;
+    } else if (self.approxAccuracy) {
+        GeoIpPlace *place = [CMLocationCache.shared getApproxLocation];
+        if (place && place.latitude && place.longitude) {
+            location = [[CLLocation alloc] initWithLatitude:place.latitude.doubleValue
+                                                  longitude:place.longitude.doubleValue];
+        }
+    } else {
+        location = [CMLocationCache.shared getLocationBlocking];
+    }
+
+    if (!location) {
+        return nil;
+    }
+
+    return [CMWeatherCache.sharedInstance getWeatherWithLocaion:location];
+}
+
+- (CMPropertyProviderType)type {
+    switch (self.property) {
+    case CMWeatherPropertyCondition:
+        return CMPropertyProviderTypeString;
+    case CMWeatherPropertyTemperature:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyApparentTemperature:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyCloudCover:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyIsDaylight:
+        return CMPropertyProviderTypeString;
+    }
+}
+
+- (NSString *)stringValue {
+    if (self.property == CMWeatherPropertyCondition) {
+        return [self getWeather].Condition;
+    } else if (self.property == CMWeatherPropertyIsDaylight) {
+        NSNumber *isDaylight = [self getWeather].IsDaylight;
+        if (!isDaylight) {
+            return @"unknown";
+        } else if (isDaylight.boolValue) {
+            return @"daylight";
+        } else {
+            return @"not_daylight";
+        }
+    }
+    return nil;
+}
+
+- (NSNumber *)nillableFloatValue {
+    switch (self.property) {
+    case CMWeatherPropertyTemperature:
+        return [self getWeather].Temperature;
+    case CMWeatherPropertyApparentTemperature:
+        return [self getWeather].ApparentTemperature;
+    case CMWeatherPropertyCloudCover:
+        return [self getWeather].CloudCover;
+    default:
+        return nil;
+    }
 }
 
 @end

@@ -17,7 +17,6 @@
 #import "CMNetworkingPropertyProvider.h"
 #import "CMPermissionsPropertyProvider.h"
 #import "CMViewPropertyProvider.h"
-#import "CMWeatherPropertyProvider.h"
 
 #import <sys/utsname.h>
 
@@ -264,11 +263,13 @@
     [self registerLibPropertyProvider:@"bluetooth_permission" value:btpp];
 
     // Weather
-    NSDictionary<NSString *, CMWeatherPropertyProvider *> *weatherProviders =
-        [CMWeatherPropertyProvider allWeatherProviders];
-    for (NSString *conditionName in weatherProviders.keyEnumerator) {
-        CMWeatherPropertyProvider *provider = weatherProviders[conditionName];
-        [self registerLibPropertyProvider:conditionName value:provider];
+    if (@available(iOS 16.0, *)) {
+        NSDictionary<NSString *, CMWeatherPropertyProvider *> *weatherProviders =
+            [CMWeatherPropertyProvider allWeatherProviders];
+        for (NSString *conditionName in weatherProviders.keyEnumerator) {
+            CMWeatherPropertyProvider *provider = weatherProviders[conditionName];
+            [self registerLibPropertyProvider:conditionName value:provider];
+        }
     }
 }
 
