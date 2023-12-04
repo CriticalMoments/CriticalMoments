@@ -5,9 +5,10 @@
 //  Created by Steve Cosman on 2023-10-18.
 //
 
-import Foundation
-
+#if canImport(WeatherKit)
 import WeatherKit
+#endif
+
 import CoreLocation
 
 @objc
