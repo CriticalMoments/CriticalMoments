@@ -504,7 +504,7 @@ static CMWeatherCache *sharedWeatherCache = nil;
             return nil;
         }
 
-        CMWeatherFetch *weather = [self requestWeatherWithLocaion:location];
+        CMWeatherFetch *weather = [self requestWeatherWithLocation:location];
         if (weather) {
             CMWeatherCacheItem *cacheItem = [[CMWeatherCacheItem alloc] init];
             cacheItem.weather = weather;
@@ -517,7 +517,7 @@ static CMWeatherCache *sharedWeatherCache = nil;
     }
 }
 
-- (CMWeatherFetch *)requestWeatherWithLocaion:(CLLocation *)location {
+- (CMWeatherFetch *)requestWeatherWithLocation:(CLLocation *)location {
     CMWeatherFetch *weatherFetch = [[CMWeatherFetch alloc] init];
     __block BOOL success = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
@@ -539,6 +539,7 @@ static CMWeatherCache *sharedWeatherCache = nil;
 
 @end
 
+API_AVAILABLE(ios(16.0))
 @interface CMWeatherPropertyProvider ()
 @property(nonatomic) CMWeatherProperty property;
 @property(nonatomic) BOOL approxAccuracy;
