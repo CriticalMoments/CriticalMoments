@@ -13,30 +13,29 @@ final class CriticalMomentsTests: XCTestCase {
         XCTAssertEqual("swiftPong", pingResponse, "swiftPing method failure, we have basic test issues")
     }
     
+    @available(iOS 16.0, *)
     func testWeatherProvider() async throws {
-        if #available(iOS 16.0, *) {
-            let ws = CMWeatherFetch()
-            let toronto = CLLocation(latitude: 43.651070, longitude:-79.347015)
-            let success = await ws.LoadWeather(location: toronto)
-            XCTAssert(success, "weather call failed")
-            
-            let temp = ws.Temperature()
-            XCTAssert(temp!.doubleValue > -40.0 && temp!.doubleValue < 50.0, "temp out of range")
-            
-            let appTemp = ws.ApparentTemperature()
-            XCTAssert(appTemp!.doubleValue > -40.0 && appTemp!.doubleValue < 50.0, "temp out of range")
-            
-            let condition = ws.Condition()
-            XCTAssertNotNil(condition)
-            XCTAssert(condition!.count > 0)
-            
-            let cloudCover = ws.CloudCover()
-            XCTAssertNotNil(cloudCover)
-            XCTAssert(cloudCover!.doubleValue >= 0.0 && cloudCover!.doubleValue <= 1.0)
-            
-            let isDaylight = ws.IsDaylight()
-            XCTAssertNotNil(isDaylight)
-        }
+        let ws = CMWeatherFetch()
+        let toronto = CLLocation(latitude: 43.651070, longitude:-79.347015)
+        let success = await ws.LoadWeather(location: toronto)
+        XCTAssert(success, "weather call failed")
+        
+        let temp = ws.Temperature()
+        XCTAssert(temp!.doubleValue > -40.0 && temp!.doubleValue < 50.0, "temp out of range")
+        
+        let appTemp = ws.ApparentTemperature()
+        XCTAssert(appTemp!.doubleValue > -40.0 && appTemp!.doubleValue < 50.0, "temp out of range")
+        
+        let condition = ws.Condition()
+        XCTAssertNotNil(condition)
+        XCTAssert(condition!.count > 0)
+        
+        let cloudCover = ws.CloudCover()
+        XCTAssertNotNil(cloudCover)
+        XCTAssert(cloudCover!.doubleValue >= 0.0 && cloudCover!.doubleValue <= 1.0)
+        
+        let isDaylight = ws.IsDaylight()
+        XCTAssertNotNil(isDaylight)
     }
     
 }
