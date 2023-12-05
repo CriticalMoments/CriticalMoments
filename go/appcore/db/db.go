@@ -407,7 +407,7 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 			},
 			Types: []any{new(func(string) interface{})},
 		},
-		"propertyEverHadValue": {
+		"propertyEver": {
 			Function: func(params ...any) (any, error) {
 				// Parameter type+count checking is done the Types signature
 				value, err := db.PropertyHistoryEverHadValue(params[0].(string), params[1])
