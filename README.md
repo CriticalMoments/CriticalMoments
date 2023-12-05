@@ -2,6 +2,7 @@
 
 # CriticalMoments
 
+### [Our Homepage →](https://beta.criticalmoments.io/)
 ### [Read the docs →](https://docs.criticalmoments.io/)
 
 ## 🏗️ Coming Soon 🏗️
