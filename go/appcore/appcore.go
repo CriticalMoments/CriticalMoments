@@ -296,15 +296,22 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 
 	pc, err := datamodel.DecodePrimaryConfig(configFileData, signing.SharedSignUtil())
 	if err != nil {
-		// If we're in debug mode and the file is local, allow parsing unsigned config files
-		allowParsingUnsigned := allowDebugLoad && isFilePath
-		if !allowParsingUnsigned {
-			return err
-		}
-		pc = &datamodel.PrimaryConfig{}
-		err = json.Unmarshal(configFileData, &pc)
-		if err != nil {
-			return err
+		if len(configFileData) == 2 && string(configFileData) == "{}" {
+			// Special case: empty config does not require signing.
+			pc = &datamodel.PrimaryConfig{
+				AppId: ac.apiKey.BundleId(),
+			}
+		} else {
+			// If we're in debug mode and the file is local, allow parsing unsigned config files
+			allowParsingUnsigned := allowDebugLoad && isFilePath
+			if !allowParsingUnsigned {
+				return err
+			}
+			pc = &datamodel.PrimaryConfig{}
+			err = json.Unmarshal(configFileData, &pc)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	if pc.AppId != ac.apiKey.BundleId() {

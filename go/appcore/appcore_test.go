@@ -548,6 +548,18 @@ func TestLoadingSignedConfig(t *testing.T) {
 	}
 }
 
+func TestLoadingEmptyUnsignedConfig(t *testing.T) {
+	// Signed special case: empty without signature should work
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/emptyValid.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
