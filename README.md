@@ -1,4 +1,5 @@
 [![Release Tests](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml)
+[![Test Case Count](https://img.shields.io/badge/Test_Case_Count-1713-brightgreen?logo=github&labelColor=32383f&logoColor=969da4)](https://github.com/CriticalMoments/CriticalMoments/blob/main/test_count.sh)
 
 # CriticalMoments
 
