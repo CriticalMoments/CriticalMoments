@@ -72,10 +72,12 @@
     topBanner.title = @"Top Banner";
     topBanner.subtitle = @"Display a banner on the top of the app, in the default theme";
     topBanner.actionCMActionName = @"top_banner";
+    [topBanner addResetTestTarget:self action:@selector(dismissBanners)];
     CMDemoAction *bottomBanner = [[CMDemoAction alloc] init];
     bottomBanner.title = @"Bottom Banner";
     bottomBanner.subtitle = @"Display a banner on the bottom of the app, in the default theme";
     bottomBanner.actionCMActionName = @"bottom_banner";
+    [bottomBanner addResetTestTarget:self action:@selector(dismissBanners)];
 
     [self addSection:@"Banners Position"
          withActions:@[
