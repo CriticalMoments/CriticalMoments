@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define CM_LIB_VERSION_NUMBER_STRING @"0.8.0-beta"
+#define CM_LIB_VERSION_NUMBER_STRING @"0.8.1-beta"
 
 @import UIKit;
 
