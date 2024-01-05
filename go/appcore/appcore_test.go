@@ -79,6 +79,12 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 func (lb *testLibBindings) CanOpenURL(url string) bool {
 	return false
 }
+func (lb *testLibBindings) AppVersion() string {
+	return "1.2.3"
+}
+func (lb *testLibBindings) CMVersion() string {
+	return "2.3.4"
+}
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
@@ -697,5 +703,25 @@ func TestStableRandomOperator(t *testing.T) {
 	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("stableRand() != 0 && stableRand() != nil && stableRand() == stableRand()", t))
 	if err != nil || !result {
 		t.Fatal("failed to generate consistent stableRand()")
+	}
+}
+
+func TestMinConfigVersionChecks(t *testing.T) {
+	tests := map[string]bool{
+		"../cmcore/data_model/test/testdata/primary_config/invalid/appVersionTooLow.json":   false,
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLow.json":    false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalid.json":   false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnough.json":  true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/appVersionHighEnough.json": true,  // add_test_count
+	}
+	for path, shouldPass := range tests {
+		ac, err := buildTestAppCoreWithPath(path, t)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ac.Start(true)
+		if (err == nil) != shouldPass {
+			t.Fatalf("Config version check failed for %v", path)
+		}
 	}
 }

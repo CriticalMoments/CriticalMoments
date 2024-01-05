@@ -11,6 +11,7 @@ import (
 	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
@@ -317,10 +318,28 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 	if pc.AppId != ac.apiKey.BundleId() {
 		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())
 	}
+	if err = ac.isClientTooOldForConfig(pc); err != nil {
+		return err
+	}
 	ac.config = pc
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (ac *Appcore) isClientTooOldForConfig(pc *datamodel.PrimaryConfig) error {
+	if pc.MinAppVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.AppVersion(), pc.MinAppVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the App (%v) is too old for this config file. The minimum version is %v", ac.libBindings.AppVersion(), pc.MinAppVersion)
+		}
+	}
+	if pc.MinCMVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.CMVersion(), pc.MinCMVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersion)
+		}
 	}
 
 	return nil

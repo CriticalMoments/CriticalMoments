@@ -1,6 +1,8 @@
 {
     "configVersion": "v1",
     "appId": "io.criticalmoments.demo",
+    "minAppVersion": "1.0.0",
+    "minCMVersion": "0.8.0",
     "themes": {
         "defaultTheme": {
             "bannerBackgroundColor": "#ffffff",

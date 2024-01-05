@@ -6,52 +6,52 @@ import (
 )
 
 func TestVersionParsing(t *testing.T) {
-	v, err := versionFromVersionString("v1")
+	v, err := VersionFromVersionString("v1")
 	if err != nil || v == nil || v.components[0] != 1 || len(v.components) != 1 {
 		t.Fatal("Failed to parse version string v1")
 	}
 
-	v, err = versionFromVersionString("v1-beta")
+	v, err = VersionFromVersionString("v1-beta")
 	if err != nil || v == nil || v.components[0] != 1 || len(v.components) != 1 || v.postfix != "-beta" {
 		t.Fatal("Failed to parse version string v1")
 	}
 
-	v, err = versionFromVersionString("1.a.b")
+	v, err = VersionFromVersionString("1.a.b")
 	if err == nil || v != nil {
 		t.Fatal("Failed to error on invalid version string 1.a.b")
 	}
 
-	v, err = versionFromVersionString("")
+	v, err = VersionFromVersionString("")
 	if err == nil || v != nil {
 		t.Fatal("Failed to error on invalid version string empty")
 	}
 
-	v, err = versionFromVersionString("v")
+	v, err = VersionFromVersionString("v")
 	if err == nil || v != nil {
 		t.Fatal("Failed to error on invalid version string v")
 	}
 
-	v, err = versionFromVersionString("-beta")
+	v, err = VersionFromVersionString("-beta")
 	if err == nil || v != nil {
 		t.Fatal("Failed to error on invalid version string -beta")
 	}
 
-	v, err = versionFromVersionString("v-beta")
+	v, err = VersionFromVersionString("v-beta")
 	if err == nil || v != nil {
 		t.Fatal("Failed to error on invalid version string v-beta")
 	}
 
-	v, err = versionFromVersionString("1.2.3")
+	v, err = VersionFromVersionString("1.2.3")
 	if err != nil || v.components[0] != 1 || v.components[1] != 2 || v.components[2] != 3 || len(v.components) != 3 || v.postfix != "" {
 		t.Fatal("Failed to parse version string 1.2.3")
 	}
 
-	v, err = versionFromVersionString("v1.2.3")
+	v, err = VersionFromVersionString("v1.2.3")
 	if err != nil || v.components[0] != 1 || v.components[1] != 2 || v.components[2] != 3 || len(v.components) != 3 || v.postfix != "" {
 		t.Fatal("Failed to parse version string v1.2.3")
 	}
 
-	v, err = versionFromVersionString("v1.2.3-alpha.12-2")
+	v, err = VersionFromVersionString("v1.2.3-alpha.12-2")
 	if err != nil || v.components[0] != 1 || v.components[1] != 2 || v.components[2] != 3 || len(v.components) != 3 || v.postfix != "-alpha.12-2" {
 		t.Fatal("Failed to parse version string v1.2.3")
 	}

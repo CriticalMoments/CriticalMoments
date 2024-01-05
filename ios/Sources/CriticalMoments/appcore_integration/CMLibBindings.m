@@ -139,6 +139,15 @@
     return NO;
 }
 
+- (NSString *_Nonnull)appVersion {
+    NSString *appVersion = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    return appVersion;
+}
+
+- (NSString *_Nonnull)cmVersion {
+    return CM_LIB_VERSION_NUMBER_STRING;
+}
+
 - (void)openLinkInEmbeddedBrowser:(NSURL *)url {
     dispatch_async(dispatch_get_main_queue(), ^{
       SFSafariViewController *safariVc = [[SFSafariViewController alloc] initWithURL:url];

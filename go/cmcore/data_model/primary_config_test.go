@@ -148,6 +148,12 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("invalid config version parse")
 	}
+	if pc.MinAppVersion != "1.0.0" {
+		t.Fatal("invalid min app version parse")
+	}
+	if pc.MinCMVersion != "0.8.0" {
+		t.Fatal("invalid min cm version parse")
+	}
 
 	// Themes
 	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
@@ -608,5 +614,30 @@ func TestFallbackDefaultTheme(t *testing.T) {
 	}
 	if pc.ThemeWithName("missingName") != nil {
 		t.Fatal("missing name not nil")
+	}
+}
+
+func TestMinAppAndClientVersionNumberValidation(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+
+	pc.MinAppVersion = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinAppVersion")
+	}
+	pc.MinAppVersion = ""
+	pc.MinCMVersion = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinCMVersion")
+	}
+	pc.MinAppVersion = "1.2.3.4.5"
+	pc.MinCMVersion = "v34.234234.234.1123.32"
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}
 }
