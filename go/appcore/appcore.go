@@ -372,14 +372,28 @@ func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 		return err
 	}
 
-	// Perform any actions for this event
-	actions := ac.config.ActionsForEvent(event.Name)
+	return ac.performActionsForEvent(event.Name)
+}
+
+func (ac *Appcore) performActionsForEvent(eventName string) error {
+	triggers := ac.config.TriggersForEvent(eventName)
 	var lastErr error
-	for _, action := range actions {
-		err := ac.PerformAction(action)
+	for _, trigger := range triggers {
+		if trigger.Condition != nil {
+			conditionResult, err := ac.propertyRegistry.evaluateCondition(trigger.Condition)
+			if err != nil {
+				// return an error, but don't stop processing
+				lastErr = err
+				continue
+			}
+			if !conditionResult {
+				continue
+			}
+		}
+		err := ac.PerformNamedAction(trigger.ActionName)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", event.Name, err)
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", eventName, err)
 		}
 	}
 	return lastErr

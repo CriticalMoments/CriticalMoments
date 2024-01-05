@@ -236,7 +236,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Triggers
-	if len(pc.namedTriggers) != 2 {
+	if len(pc.namedTriggers) != 4 {
 		t.Fatal("Wrong trigger count")
 	}
 	trigger1 := pc.namedTriggers["trigger1"]
@@ -246,6 +246,14 @@ func TestPrimaryConfigJson(t *testing.T) {
 	trigger2 := pc.namedTriggers["trigger_alert"]
 	if trigger2.ActionName != "alertAction" || trigger2.EventName != "custom_event_alert" {
 		t.Fatal("Trigger 2 parsing failed")
+	}
+	trigger3 := pc.namedTriggers["conditional_trigger_true"]
+	if trigger3.ActionName != "alertAction" || trigger3.EventName != "custom_event_conditional_true" || trigger3.Condition.String() != "2 > 1" {
+		t.Fatal("Trigger 3 parsing failed")
+	}
+	trigger4 := pc.namedTriggers["conditional_trigger_false"]
+	if trigger4.ActionName != "alertAction" || trigger4.EventName != "custom_event_conditional_false" || trigger4.Condition.String() != "2 > 3" {
+		t.Fatal("Trigger 4 parsing failed")
 	}
 
 	// Conditions
@@ -393,10 +401,9 @@ func TestNoNamedActions(t *testing.T) {
 		t.Fatal("empty map should fail since still triggers referencing them")
 	}
 
-	delete(pc.namedTriggers, "trigger1")
-	delete(pc.namedTriggers, "trigger_alert")
+	pc.namedTriggers = make(map[string]*Trigger)
 	if !pc.Validate() {
-		t.Fatal("empty actions should be allowed")
+		t.Fatal("empty actions should be allowed when no triggers reference them")
 	}
 }
 
@@ -496,13 +503,13 @@ func TestPcAccessors(t *testing.T) {
 		t.Fatal("Couldn't find action by name")
 	}
 
-	actions := pc.ActionsForEvent("nada")
-	if len(actions) > 0 {
+	triggers := pc.TriggersForEvent("nada")
+	if len(triggers) > 0 {
 		t.Fatal("Found a action that doesn't exist")
 	}
 
-	actions = pc.ActionsForEvent("custom_event")
-	if len(actions) != 1 || actions[0].ActionType != ActionTypeEnumBanner {
+	triggers = pc.TriggersForEvent("custom_event")
+	if len(triggers) != 1 || pc.ActionWithName(triggers[0].ActionName).ActionType != ActionTypeEnumBanner {
 		t.Fatal("Didn't find action from event")
 	}
 }

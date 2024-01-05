@@ -60,18 +60,14 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
-	// TODO P2: don't iterate, use a map
-	actions := make([]*ActionContainer, 0)
+func (pc *PrimaryConfig) TriggersForEvent(eventName string) []*Trigger {
+	triggers := make([]*Trigger, 0)
 	for _, trigger := range pc.namedTriggers {
 		if trigger.EventName == eventName {
-			action, ok := pc.namedActions[trigger.ActionName]
-			if ok {
-				actions = append(actions, action)
-			}
+			triggers = append(triggers, trigger)
 		}
 	}
-	return actions
+	return triggers
 }
 
 // Container Decoding

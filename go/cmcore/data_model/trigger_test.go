@@ -43,15 +43,21 @@ func TestTriggerParsingValidTrigger(t *testing.T) {
 	if trigger.EventName != "my_event" {
 		t.Fatal()
 	}
+	if trigger.Condition.conditionString != "3 > 2" {
+		t.Fatal()
+	}
 	if !trigger.Validate() {
 		t.Fatal()
 	}
 }
 
 func TestTriggerParsingInvalidTrigger(t *testing.T) {
-	testFileData, _ := os.ReadFile("./test/testdata/triggers/invalid/empty.json")
+	testFileData, err := os.ReadFile("./test/testdata/triggers/invalid/empty.json")
+	if err != nil {
+		t.Fatal()
+	}
 	var trigger Trigger
-	err := json.Unmarshal(testFileData, &trigger)
+	err = json.Unmarshal(testFileData, &trigger)
 	if err == nil {
 		t.Fatal("allowed invalid empty trigger")
 	}
@@ -60,5 +66,22 @@ func TestTriggerParsingInvalidTrigger(t *testing.T) {
 	}
 	if trigger.Validate() {
 		t.Fatal("validated empty trigger")
+	}
+}
+func TestTriggerParsingInvalidConditionTrigger(t *testing.T) {
+	testFileData, err := os.ReadFile("./test/testdata/triggers/invalid/invalidTriggerCondition.json")
+	if err != nil {
+		t.Fatal()
+	}
+	var trigger Trigger
+	err = json.Unmarshal(testFileData, &trigger)
+	if err == nil {
+		t.Fatal("allowed invalid condition in trigger")
+	}
+	if trigger.ActionName != "my_action" || trigger.EventName != "my_event" {
+		t.Fatal("trigger parse issue")
+	}
+	if trigger.Validate() {
+		t.Fatal("validated trigger with invalid condition")
 	}
 }

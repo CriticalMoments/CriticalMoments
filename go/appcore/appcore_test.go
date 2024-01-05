@@ -305,7 +305,7 @@ func TestPerformingAction(t *testing.T) {
 	}
 }
 
-func TestConditionalActionDispatching(t *testing.T) {
+func TestConditionalActionAndTriggerDispatching(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
@@ -361,6 +361,36 @@ func TestConditionalActionDispatching(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).lastLinkAction == nil {
 		t.Fatal("last action should not be nil after condition run 3")
+	}
+
+	ac.libBindings.(*testLibBindings).lastAlertAction = nil
+	ac.libBindings.(*testLibBindings).lastLinkAction = nil
+	err = ac.SendClientEvent("custom_event_conditional_false")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+
+	err = ac.SendClientEvent("custom_event_conditional_true")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil after trigger")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+		t.Fatal("last alert action should be fired when condition true")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil after trigger")
 	}
 }
 
