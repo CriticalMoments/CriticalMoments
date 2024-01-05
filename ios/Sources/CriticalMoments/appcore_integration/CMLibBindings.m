@@ -71,7 +71,6 @@
         return NO;
     }
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -87,7 +86,6 @@
       [alert showAlert];
     });
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -106,7 +104,6 @@
           [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
       }
     });
-    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -122,7 +119,6 @@
       }
     });
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -132,7 +128,7 @@
       [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 
-    return NO;
+    return YES;
 }
 
 - (BOOL)canOpenURL:(NSString *_Nullable)urlString {
