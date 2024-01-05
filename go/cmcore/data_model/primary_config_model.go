@@ -41,7 +41,11 @@ func (pc *PrimaryConfig) DefaultTheme() *Theme {
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
-	return pc.themeIteratingFallbacks(pc.namedThemes[name])
+	theme, ok := pc.namedThemes[name]
+	if !ok {
+		return nil
+	}
+	return pc.themeIteratingFallbacks(theme)
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
