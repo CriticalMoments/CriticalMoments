@@ -11,6 +11,7 @@
 
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
+#import "../utils/CMUtils.h"
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted;
@@ -344,12 +345,8 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
-    if (!value) {
-        [_appcore registerClientTimeProperty:name value:AppcoreLibPropertyProviderNilIntValue error:error];
-    } else {
-        int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
-        [_appcore registerClientTimeProperty:name value:epochMilliseconds error:error];
-    }
+    int64_t goTime = [CMUtils dateToGoTime:value];
+    [_appcore registerClientTimeProperty:name value:goTime error:error];
 }
 
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {

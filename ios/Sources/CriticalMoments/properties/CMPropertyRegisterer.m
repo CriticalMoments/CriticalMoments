@@ -77,6 +77,13 @@
     [self processError:error];
 }
 
+- (void)registerStaticTimeProperty:(NSString *)key value:(NSDate *)value {
+    NSError *error;
+    int64_t goTime = [CMUtils dateToGoTime:value];
+    [_appcore registerStaticTimeProperty:key value:goTime error:&error];
+    [self processError:error];
+}
+
 - (void)registerLibPropertyProvider:(NSString *)key value:(id<CMDynamicPropertyProvider>)value {
     NSError *error;
     // Wrap the CMDynamicPropertyProvider to implement the appcore interface
@@ -105,6 +112,10 @@
     [self registerStaticStringProperty:@"locale_currency_code" value:locale.currencyCode];
     CMLanguageDirectionPropertyProvider *ldpp = [[CMLanguageDirectionPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"locale_language_direction" value:ldpp];
+
+    // Session start time
+    NSDate *now = [[NSDate alloc] init];
+    [self registerStaticTimeProperty:@"session_start_time" value:now];
 
     // Bundle ID
     [self registerStaticStringProperty:@"app_id" value:NSBundle.mainBundle.bundleIdentifier];

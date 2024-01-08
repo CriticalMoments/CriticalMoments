@@ -7,6 +7,8 @@
 
 #import "CMUtils.h"
 
+@import Appcore;
+
 @implementation CMUtils
 
 /// Parse hex codes in format #ffffff to UIColor
@@ -72,6 +74,15 @@
 
 + (bool)isiPad {
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
+}
+
++ (int64_t)dateToGoTime:(NSDate *)value {
+    if (!value) {
+        return AppcoreLibPropertyProviderNilIntValue;
+    } else {
+        int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
+        return epochMilliseconds;
+    }
 }
 
 @end
