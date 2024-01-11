@@ -9,8 +9,8 @@ import Foundation
 // on our GH actions https://github.com/CriticalMoments/CriticalMoments/actions
 var appcoreTarget = Target.binaryTarget(
     name: "Appcore",
-    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.2.2-beta/Appcore.xcframework.zip",
-    checksum: "7fe2ff30233cb80e4d06ab3ef690f34c1757afa5711189c880616466991754f5")
+    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.8.0-beta/Appcore.xcframework.zip",
+    checksum: "45ee96b2143ef9fe38d1bc47f5b8464f7fed5a9371b5a5b59b51dec39a059b4f")
 
 // If this device has built the appcore framework locally, use that. This is primarily for development.
 // We highly recommend end users use the production binary.
@@ -20,12 +20,27 @@ let filePath = #filePath
 let endOfPath = filePath.count - "Package.swift".count - 1
 let dirPath = String(filePath[...String.Index.init(utf16Offset: endOfPath, in: filePath)])
 let infoPath = dirPath + "go/appcore/build/Appcore.xcframework/Info.plist"
+
+var cmTarget = Target.target(name: "CriticalMoments",
+                             dependencies: ["Appcore"],
+                             path: "ios/Sources/CriticalMoments",
+                             publicHeadersPath:"include")
+
 if (FileManager.default.fileExists(atPath: infoPath))
 {
     print("Using Local Appcore Build From: " + infoPath);
     appcoreTarget = Target.binaryTarget(
         name: "Appcore",
         path: "go/appcore/build/Appcore.xcframework")
+
+    // For local development, increase error checking level.
+    // Unsafe flags are not allowed with SPM distribution
+    // but CI will still check these compile time errors.
+    cmTarget.cSettings = [
+        .unsafeFlags(["-Werror=return-type",
+                     "-Werror=unused-variable",
+                     "-Werror"]),
+    ]
 }
 
 let package = Package(
@@ -38,23 +53,7 @@ let package = Package(
             targets: ["CriticalMoments"]),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "CriticalMomentsSwift",
-            path: "ios/Sources/CriticalMomentsSwift"),
-        .target(
-            name: "CriticalMoments",
-            dependencies: ["Appcore", "CriticalMomentsSwift"],
-            path: "ios/Sources/CriticalMoments",
-            publicHeadersPath:"include",
-            cSettings: [
-                .unsafeFlags([
-                    "-Werror=return-type",
-                    "-Werror=unused-variable",
-                    "-Werror"
-                ]),
-            ]),
+        cmTarget,
         appcoreTarget,
         .testTarget(
             name: "CriticalMomentsSwiftTests",

@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define CM_LIB_VERSION_NUMBER_STRING @"0.2.4-beta"
+#define CM_LIB_VERSION_NUMBER_STRING @"0.8.1-beta"
 
 @import UIKit;
 
@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
 + (long long)cmTimestampFromDate:(NSDate *)date;
 + (bool)isiPad;
++ (int64_t)dateToGoTime:(NSDate *)value;
 
 @end
 

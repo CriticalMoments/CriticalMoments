@@ -79,6 +79,12 @@ func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
 func (lb *testLibBindings) CanOpenURL(url string) bool {
 	return false
 }
+func (lb *testLibBindings) AppVersion() string {
+	return "1.2.3"
+}
+func (lb *testLibBindings) CMVersion() string {
+	return "2.3.4"
+}
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
@@ -305,7 +311,7 @@ func TestPerformingAction(t *testing.T) {
 	}
 }
 
-func TestConditionalActionDispatching(t *testing.T) {
+func TestConditionalActionAndTriggerDispatching(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
@@ -361,6 +367,36 @@ func TestConditionalActionDispatching(t *testing.T) {
 	}
 	if ac.libBindings.(*testLibBindings).lastLinkAction == nil {
 		t.Fatal("last action should not be nil after condition run 3")
+	}
+
+	ac.libBindings.(*testLibBindings).lastAlertAction = nil
+	ac.libBindings.(*testLibBindings).lastLinkAction = nil
+	err = ac.SendClientEvent("custom_event_conditional_false")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+
+	err = ac.SendClientEvent("custom_event_conditional_true")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil after trigger")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+		t.Fatal("last alert action should be fired when condition true")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil after trigger")
 	}
 }
 
@@ -548,6 +584,18 @@ func TestLoadingSignedConfig(t *testing.T) {
 	}
 }
 
+func TestLoadingEmptyUnsignedConfig(t *testing.T) {
+	// Signed special case: empty without signature should work
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/emptyValid.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
@@ -655,5 +703,25 @@ func TestStableRandomOperator(t *testing.T) {
 	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("stableRand() != 0 && stableRand() != nil && stableRand() == stableRand()", t))
 	if err != nil || !result {
 		t.Fatal("failed to generate consistent stableRand()")
+	}
+}
+
+func TestMinConfigVersionChecks(t *testing.T) {
+	tests := map[string]bool{
+		"../cmcore/data_model/test/testdata/primary_config/invalid/appVersionTooLow.json":   false,
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLow.json":    false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalid.json":   false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnough.json":  true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/appVersionHighEnough.json": true,  // add_test_count
+	}
+	for path, shouldPass := range tests {
+		ac, err := buildTestAppCoreWithPath(path, t)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ac.Start(true)
+		if (err == nil) != shouldPass {
+			t.Fatalf("Config version check failed for %v", path)
+		}
 	}
 }

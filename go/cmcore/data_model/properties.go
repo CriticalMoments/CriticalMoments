@@ -120,6 +120,7 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"has_watch":                 requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
 		"screen_brightness":         requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeAppStart),
 		"screen_captured":           requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),
+		"session_start_time":        requiredPropertyConfig(CMTimeKind, CMPropertySampleTypeDoNotSample),
 
 		// Audio
 		"other_audio_playing": requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),
@@ -172,6 +173,25 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"approx_location_is_daylight":                  optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
 
 		// Well known properties - client should provide
-		"user_signup_date": wellKnownPropertyConfig(CMTimeKind, CMPropertySampleTypeOnCustomSet),
+		"user_signup_date":      wellKnownPropertyConfig(CMTimeKind, CMPropertySampleTypeOnCustomSet),
+		"user_signed_in":        wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"have_user_email":       wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"user_email_validated":  wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"have_user_phone":       wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"user_age":              wellKnownPropertyConfig(reflect.Int, CMPropertySampleTypeOnCustomSet),
+		"user_approx_age":       wellKnownPropertyConfig(reflect.Int, CMPropertySampleTypeOnCustomSet),
+		"user_pronouns":         wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
+		"user_gender":           wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
+		"user_inferred_gender":  wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
+		"has_paid_subscription": wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"ever_subscribed":       wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"has_purchased":         wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"purchase_count":        wellKnownPropertyConfig(reflect.Int, CMPropertySampleTypeOnCustomSet),
+		"total_purchase_value":  wellKnownPropertyConfig(reflect.Float64, CMPropertySampleTypeOnCustomSet),
+		"referral_source":       wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
+		"referral_id":           wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
+		"user_was_referred":     wellKnownPropertyConfig(reflect.Bool, CMPropertySampleTypeOnCustomSet),
+		"user_referral_count":   wellKnownPropertyConfig(reflect.Int, CMPropertySampleTypeOnCustomSet),
+		"session_source":        wellKnownPropertyConfig(reflect.String, CMPropertySampleTypeOnCustomSet),
 	}
 }

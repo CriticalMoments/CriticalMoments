@@ -1,6 +1,8 @@
 {
     "configVersion": "v1",
     "appId": "io.criticalmoments.demo",
+    "minAppVersion": "1.0.0",
+    "minCMVersion": "0.8.0",
     "themes": {
         "defaultTheme": {
             "bannerBackgroundColor": "#ffffff",
@@ -152,6 +154,16 @@
             "trigger_alert": {
                 "eventName": "custom_event_alert",
                 "actionName": "alertAction"
+            },
+            "conditional_trigger_true": {
+                "eventName": "custom_event_conditional_true",
+                "actionName": "alertAction",
+                "condition": "2 > 1"
+            },
+            "conditional_trigger_false": {
+                "eventName": "custom_event_conditional_false",
+                "actionName": "alertAction",
+                "condition": "2 > 3"
             }
         }
     },

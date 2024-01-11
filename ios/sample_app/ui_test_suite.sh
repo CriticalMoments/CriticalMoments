@@ -47,7 +47,7 @@ if $? -ne 0; then
 fi
 
 # iPhone 15 Plus, iOS 17.0
-runTest 'platform=iOS Simulator,OS=17.0,name=iPhone 15 Plus'
+runTest 'platform=iOS Simulator,OS=17.0.1,name=iPhone 15 Plus'
 
 # iPhone 14 Pro, 16.4
 runTest 'platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro'
@@ -63,7 +63,8 @@ echo "Warning: not running on iPhone 11, 13.7. Simulator not supported in xcode 
 runTest 'platform=iOS Simulator,OS=15.5,name=iPhone 6s Plus'
 
 # normal iPad (8th gen), ios 14.5
-runTest 'platform=iOS Simulator,OS=14.5,name=iPad (8th generation)'
+echo "Warning: not running on iPad (8th gen), ios 14.5. Simulator not supported in xcode 15+"
+#runTest 'platform=iOS Simulator,OS=14.5,name=iPad (8th generation)'
 
 echo "All Simulator Tests Passed! But you arn't done yet!"
 echo " - Manually: Run manual sanity check on iPhone 6 hardware, running iOS 12. No automation because snapshot test library does not compile to ios 12" 

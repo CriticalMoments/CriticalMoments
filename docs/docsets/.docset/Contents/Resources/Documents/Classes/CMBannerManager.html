@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CMBannerManager Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/objc/Class/CMBannerManager" class="dashAnchor"></a>
+
+    <a title="CMBannerManager Class Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          CriticalMoments 0.1.4-beta Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">CriticalMoments Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      CMBannerManager Class Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/CMBannerManager.html">CMBannerManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/CMBannerMessage.html">CMBannerMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/CMTheme.html">CMTheme</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/CriticalMoments.html">CriticalMoments</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CMBannerPosition.html">CMBannerPosition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CMBannerActionDelegate.html">CMBannerActionDelegate</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>CMBannerManager</h1>
+              <div class="declaration">
+                <div class="language">
+                  <p class="aside-title">Objective-C</p>
+                  <pre class="highlight objective_c"><code><span class="k">@interface</span> <span class="nc">CMBannerManager</span> <span class="p">:</span> <span class="nc">NSObject</span></code></pre>
+
+                </div>
+                <div class="language">
+                  <p class="aside-title">Swift</p>
+                  <pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">CMBannerManager</span> <span class="p">:</span> <span class="kt">NSObject</span></code></pre>
+
+                </div>
+              </div>
+            <p>Manages the presentation of banner messages across your app.</p>
+
+<p>Example usage Swift:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">message</span> <span class="o">=</span> <span class="kt">CMBannerMessage</span><span class="o">.</span><span class="nf">init</span><span class="p">(</span><span class="nv">body</span><span class="p">:</span> <span class="s">"Important msg"</span><span class="p">)</span>
+<span class="kt">CMBannerManager</span><span class="o">.</span><span class="nf">shared</span><span class="p">()</span><span class="o">.</span><span class="nf">showAppWideMessage</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre>
+
+<p>Example usage Objective-C:</p>
+<pre class="highlight objective_c"><code><span class="n">CMBannerMessage</span><span class="o">*</span> <span class="n">bannerMessage</span> <span class="o">=</span> <span class="p">[[</span><span class="n">CMBannerMessage</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithBody</span><span class="p">:</span><span class="s">@"Important msg"</span><span class="p">];</span>
+<span class="p">[</span><span class="n">CMBannerManager</span><span class="p">.</span><span class="n">shared</span> <span class="nf">showAppWideMessage</span><span class="p">:</span><span class="n">bannerMessage</span><span class="p">];</span>
+</code></pre>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Shared%20Instance"></a>
+                <a name="//apple_ref/objc/Section/Shared Instance" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Shared%20Instance"></a>
+                  <h3 class="section-name"><span>Shared Instance</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager(cm)shared"></a>
+                    <a name="//apple_ref/objc/Method/+shared" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager(cm)shared">+shared</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A shared instance reference. You should only use a single instance of
+CMBannerManager per app. This <code>shared</code> instance is available for convenience,
+but you can also create and maintain your own instance if you prefer.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">CMBannerManager</span> <span class="o">*</span><span class="p">)</span><span class="n">shared</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">shared</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">CMBannerManager</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a shared instance of CMBannerManager</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Banner%20Position"></a>
+                <a name="//apple_ref/objc/Section/Banner Position" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Banner%20Position"></a>
+                  <h3 class="section-name"><span>Banner Position</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager(py)appWideBannerPosition"></a>
+                    <a name="//apple_ref/objc/Property/appWideBannerPosition" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager(py)appWideBannerPosition">appWideBannerPosition</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set this to configure if the banner messages are presented at the top or bottom
+of your app.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Be sure to test your app renders well with the chosen position. The
+banner manager will add to your root view controller&rsquo;s
+<code>additionalSafeAreaInsets</code> to make room for the banner; if you&rsquo;ve hard coded
+offsets, for example the notch or dyamic island, then your app layout may be a
+bit strange. If you encounter issues, you should adapt use apple layout guides
+/ safe-area-insets for any offsets, which will solve most of these issues and
+help on future hardware.
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    CMBannerPosition enumeration
+
+</div><div class="aside aside-see">
+    <p class="aside-title">See</p>
+    CMBannerMessage.bannerPosition to set the position of a specific message
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n"><a href="../Enums/CMBannerPosition.html">CMBannerPosition</a></span> <span class="n">appWideBannerPosition</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">appWideBannerPosition</span><span class="p">:</span> <span class="kt"><a href="../Enums/CMBannerPosition.html">CMBannerPosition</a></span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Displaying%20and%20removing%20banners"></a>
+                <a name="//apple_ref/objc/Section/Displaying and removing banners" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Displaying%20and%20removing%20banners"></a>
+                  <h3 class="section-name"><span>Displaying and removing banners</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager(im)showAppWideMessage:"></a>
+                    <a name="//apple_ref/objc/Method/-showAppWideMessage:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager(im)showAppWideMessage:">-showAppWideMessage:<wbr></a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Shows a banner across your entire application, shifting the root viewcontroller
+of your key window. If called multiple times, will include UI to iterate though
+multiple banners.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">showAppWideMessage</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n"><a href="../Classes/CMBannerMessage.html">CMBannerMessage</a></span> <span class="o">*</span><span class="p">)</span><span class="nv">message</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">showAppWideMessage</span><span class="p">(</span><span class="n">_</span> <span class="nv">message</span><span class="p">:</span> <span class="kt"><a href="../Classes/CMBannerMessage.html">CMBannerMessage</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the CMBannerMessage to present</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager(im)removeAppWideMessage:"></a>
+                    <a name="//apple_ref/objc/Method/-removeAppWideMessage:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager(im)removeAppWideMessage:">-removeAppWideMessage:<wbr></a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Removes a previously presented banner message.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">removeAppWideMessage</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n"><a href="../Classes/CMBannerMessage.html">CMBannerMessage</a></span> <span class="o">*</span><span class="p">)</span><span class="nv">message</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">removeAppWideMessage</span><span class="p">(</span><span class="n">_</span> <span class="nv">message</span><span class="p">:</span> <span class="kt"><a href="../Classes/CMBannerMessage.html">CMBannerMessage</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the CMBannerMessage to remove</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CMBannerManager(im)removeAllAppWideMessages"></a>
+                    <a name="//apple_ref/objc/Method/-removeAllAppWideMessages" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CMBannerManager(im)removeAllAppWideMessages">-removeAllAppWideMessages</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Removes all  previously presented banner messages.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">removeAllAppWideMessages</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">removeAllAppWideMessages</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2023 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2023-10-02)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

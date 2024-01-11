@@ -28,12 +28,32 @@ var (
 
 // Enum type would be nice, but doesn't play well with gomobile exports
 const (
-	SignedInEvent string = "signed_in"
+	SignedInEvent         string = "signed_in"
+	LogOutEvent           string = "log_out"
+	SignUpEvent           string = "sign_up"
+	InAppPurchaseEvent    string = "in_app_purchase"
+	SubscribeEvent        string = "subscribe"
+	UnsubscribeEvent      string = "unsubscribe"
+	SearchEvent           string = "search"
+	TutorialCompleteEvent string = "tutorial_complete"
+	AddToCartEvent        string = "add_to_cart"
+	PhysicalPurchaseEvent string = "physical_purchase"
+	LevelUpEvent          string = "level_up"
 )
 
 var (
 	allWellKnownEventTypes = map[string]bool{
-		SignedInEvent: true,
+		SignedInEvent:         true,
+		LogOutEvent:           true,
+		SignUpEvent:           true,
+		InAppPurchaseEvent:    true,
+		SubscribeEvent:        true,
+		UnsubscribeEvent:      true,
+		SearchEvent:           true,
+		TutorialCompleteEvent: true,
+		AddToCartEvent:        true,
+		PhysicalPurchaseEvent: true,
+		LevelUpEvent:          true,
 	}
 )
 

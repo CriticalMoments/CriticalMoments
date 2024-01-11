@@ -11,6 +11,7 @@ import (
 	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
@@ -296,24 +297,49 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 
 	pc, err := datamodel.DecodePrimaryConfig(configFileData, signing.SharedSignUtil())
 	if err != nil {
-		// If we're in debug mode and the file is local, allow parsing unsigned config files
-		allowParsingUnsigned := allowDebugLoad && isFilePath
-		if !allowParsingUnsigned {
-			return err
-		}
-		pc = &datamodel.PrimaryConfig{}
-		err = json.Unmarshal(configFileData, &pc)
-		if err != nil {
-			return err
+		if len(configFileData) == 2 && string(configFileData) == "{}" {
+			// Special case: empty config does not require signing.
+			pc = &datamodel.PrimaryConfig{
+				AppId: ac.apiKey.BundleId(),
+			}
+		} else {
+			// If we're in debug mode and the file is local, allow parsing unsigned config files
+			allowParsingUnsigned := allowDebugLoad && isFilePath
+			if !allowParsingUnsigned {
+				return err
+			}
+			pc = &datamodel.PrimaryConfig{}
+			err = json.Unmarshal(configFileData, &pc)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	if pc.AppId != ac.apiKey.BundleId() {
 		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())
 	}
+	if err = ac.isClientTooOldForConfig(pc); err != nil {
+		return err
+	}
 	ac.config = pc
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (ac *Appcore) isClientTooOldForConfig(pc *datamodel.PrimaryConfig) error {
+	if pc.MinAppVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.AppVersion(), pc.MinAppVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the App (%v) is too old for this config file. The minimum version is %v", ac.libBindings.AppVersion(), pc.MinAppVersion)
+		}
+	}
+	if pc.MinCMVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.CMVersion(), pc.MinCMVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersion)
+		}
 	}
 
 	return nil
@@ -365,14 +391,28 @@ func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 		return err
 	}
 
-	// Perform any actions for this event
-	actions := ac.config.ActionsForEvent(event.Name)
+	return ac.performActionsForEvent(event.Name)
+}
+
+func (ac *Appcore) performActionsForEvent(eventName string) error {
+	triggers := ac.config.TriggersForEvent(eventName)
 	var lastErr error
-	for _, action := range actions {
-		err := ac.PerformAction(action)
+	for _, trigger := range triggers {
+		if trigger.Condition != nil {
+			conditionResult, err := ac.propertyRegistry.evaluateCondition(trigger.Condition)
+			if err != nil {
+				// return an error, but don't stop processing
+				lastErr = err
+				continue
+			}
+			if !conditionResult {
+				continue
+			}
+		}
+		err := ac.PerformNamedAction(trigger.ActionName)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", event.Name, err)
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", eventName, err)
 		}
 	}
 	return lastErr

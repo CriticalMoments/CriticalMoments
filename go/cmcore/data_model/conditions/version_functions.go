@@ -12,7 +12,7 @@ type versionNumber struct {
 	postfix    string
 }
 
-func versionFromVersionString(s string) (*versionNumber, error) {
+func VersionFromVersionString(s string) (*versionNumber, error) {
 	if s == "" {
 		return nil, errors.New("invalid version: empty string")
 	}
@@ -51,7 +51,7 @@ func versionFromVersionString(s string) (*versionNumber, error) {
 
 func VersionNumberComponent(versionString string, index int) interface{} {
 	// Parse string in format "16.4.1" to get a specific component
-	v, err := versionFromVersionString(versionString)
+	v, err := VersionFromVersionString(versionString)
 	if err != nil || v == nil {
 		fmt.Printf("CriticalMoments: Invalid version number format: \"%v\"\n", versionString)
 		return nil
@@ -88,11 +88,11 @@ func versionCompareExpecting(a string, b string, target int) bool {
 // 1: a > b
 // -1: a < b
 func versionCompare(a string, b string) (int, error) {
-	av, err := versionFromVersionString(a)
+	av, err := VersionFromVersionString(a)
 	if err != nil {
 		return 0, err
 	}
-	bv, err := versionFromVersionString(b)
+	bv, err := VersionFromVersionString(b)
 	if err != nil {
 		return 0, err
 	}

@@ -18,4 +18,8 @@ type LibBindings interface {
 
 	// Condition functions
 	CanOpenURL(url string) bool
+
+	// Version numbers
+	AppVersion() string
+	CMVersion() string
 }

@@ -1,7 +1,9 @@
 [![Release Tests](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg)](https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml)
+[![Test Case Count](https://img.shields.io/badge/Test_Case_Count-1725-brightgreen?logo=github&labelColor=32383f&logoColor=969da4)](https://github.com/CriticalMoments/CriticalMoments/blob/main/test_count.sh)
 
 # CriticalMoments
 
+### [Our Homepage →](https://beta.criticalmoments.io/)
 ### [Read the docs →](https://docs.criticalmoments.io/)
 
 ## 🏗️ Coming Soon 🏗️
@@ -50,7 +52,7 @@ Connecting "this" to "that" is done via a cloud based [configuration file](https
 
 While Critical Moments gives you an deep array of data to target users and optimize, the data never leaves the user's device. Conditional statements are evaluated locally.&#x20;
 
-With Critical Moments, powerful targeting and optimization doesn't have to mean compromizing user privacy.
+With Critical Moments, powerful targeting and optimization doesn't have to mean compromising user privacy.
 
 ## Author
 

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
@@ -21,6 +22,9 @@ type PrimaryConfig struct {
 	ContainerVersion string
 	ConfigVersion    string
 	AppId            string
+
+	MinCMVersion  string
+	MinAppVersion string
 
 	// Themes
 	defaultTheme *Theme
@@ -41,7 +45,11 @@ func (pc *PrimaryConfig) DefaultTheme() *Theme {
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
-	return pc.themeIteratingFallbacks(pc.namedThemes[name])
+	theme, ok := pc.namedThemes[name]
+	if !ok {
+		return nil
+	}
+	return pc.themeIteratingFallbacks(theme)
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
@@ -60,18 +68,14 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
-	// TODO P2: don't iterate, use a map
-	actions := make([]*ActionContainer, 0)
+func (pc *PrimaryConfig) TriggersForEvent(eventName string) []*Trigger {
+	triggers := make([]*Trigger, 0)
 	for _, trigger := range pc.namedTriggers {
 		if trigger.EventName == eventName {
-			action, ok := pc.namedActions[trigger.ActionName]
-			if ok {
-				actions = append(actions, action)
-			}
+			triggers = append(triggers, trigger)
 		}
 	}
-	return actions
+	return triggers
 }
 
 // Container Decoding
@@ -212,6 +216,8 @@ func EncodeConfig(configBytes []byte, su *signing.SignUtil) ([]byte, error) {
 type jsonPrimaryConfig struct {
 	ConfigVersion string `json:"configVersion"`
 	AppId         string `json:"appId"`
+	MinAppVersion string `json:"minAppVersion"`
+	MinCMVersion  string `json:"minCMVersion"`
 
 	// Themes
 	ThemesConfig *jsonThemesSection `json:"themes"`
@@ -252,6 +258,8 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 
 	pc.ConfigVersion = jpc.ConfigVersion
 	pc.AppId = jpc.AppId
+	pc.MinAppVersion = jpc.MinAppVersion
+	pc.MinCMVersion = jpc.MinCMVersion
 
 	// Themes
 	if jpc.ThemesConfig != nil {
@@ -329,6 +337,17 @@ func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
 
 	if pc.AppId == "" {
 		return "Config must have an appId"
+	}
+
+	if pc.MinAppVersion != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinAppVersion); err != nil {
+			return fmt.Sprintf("Config had invalid minAppVersion: %v", pc.MinAppVersion)
+		}
+	}
+	if pc.MinCMVersion != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinCMVersion); err != nil {
+			return fmt.Sprintf("Config had invalid minCMVersion: %v", pc.MinCMVersion)
+		}
 	}
 
 	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
