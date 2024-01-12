@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (long long)cmTimestampFromDate:(NSDate *)date;
 + (bool)isiPad;
 + (int64_t)dateToGoTime:(NSDate *)value;
++ (NSDictionary *)fetchCmApiSyncronous:(NSString *)urlString error:(NSError **)error;
 
 @end
 

@@ -47,10 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMApproxLongitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
 @end
 
-API_AVAILABLE(ios(16.0))
 @interface CMWeatherPropertyProvider : NSObject <CMDynamicPropertyProvider>
+
 + (NSDictionary<NSString *, CMWeatherPropertyProvider *> *)allWeatherProviders;
 + (void)setTestLocationOverride:(CLLocation *_Nullable)location;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -6,6 +6,7 @@
 //
 
 #import "CMUtils.h"
+#import "../include/CriticalMoments.h"
 
 @import Appcore;
 
@@ -83,6 +84,63 @@
         int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
         return epochMilliseconds;
     }
+}
+
++ (NSDictionary *)fetchCmApiSyncronous:(NSString *)urlString error:(NSError **)error {
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:url];
+    // TODO P2 - don't use shared instance here, move API into CM instance for testing
+    NSString *apiKey = [CriticalMoments.sharedInstance getApiKey];
+    [req setValue:apiKey forHTTPHeaderField:@"X-CM-Api-Key"];
+
+    __block NSDictionary *jsonDict;
+    __block NSError *statusErr;
+
+    dispatch_semaphore_t approxSem = dispatch_semaphore_create(0);
+    [[[NSURLSession sharedSession]
+        dataTaskWithRequest:req
+          completionHandler:^(NSData *data, NSURLResponse *response, NSError *reqErr) {
+            NSHTTPURLResponse *httpResp;
+            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                httpResp = (NSHTTPURLResponse *)response;
+            }
+            if (httpResp.statusCode != 200) {
+                statusErr = [[NSError alloc] initWithDomain:@"io.criticalmoments"
+                                                       code:21345123532
+                                                   userInfo:@{@"message" : @"API Status Code != 200"}];
+                // continue to parse JSON for error message
+            }
+            if (!reqErr && data.length > 0 && httpResp) {
+                NSError *error = nil;
+                id jsonObj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                if (!error && [jsonObj isKindOfClass:[NSDictionary class]]) {
+                    jsonDict = (NSDictionary *)jsonObj;
+                }
+            }
+            dispatch_semaphore_signal(approxSem);
+          }] resume];
+    dispatch_semaphore_wait(approxSem, dispatch_time(DISPATCH_TIME_NOW, 10.0 * NSEC_PER_SEC));
+
+    // copy point in time pointer because of async semaphore above
+    NSDictionary *returnDict = jsonDict;
+    if (returnDict && returnDict[@"errorMessage"] != nil) {
+        *error = [[NSError alloc] initWithDomain:@"io.criticalmoments"
+                                            code:3784523948
+                                        userInfo:@{@"message" : returnDict[@"errorMessage"]}];
+        return nil;
+    }
+    if (statusErr) {
+        *error = statusErr;
+        return nil;
+    }
+    if (!returnDict) {
+        *error = [[NSError alloc] initWithDomain:@"io.criticalmoments"
+                                            code:2348790234
+                                        userInfo:@{@"message" : @"API timeout or invalid content"}];
+        return nil;
+    }
+
+    return returnDict;
 }
 
 @end

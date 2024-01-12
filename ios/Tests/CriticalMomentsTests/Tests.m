@@ -464,50 +464,60 @@
     [self waitForExpectations:expectations timeout:5.0];
 }
 
-- (void)testWeatherProvider {
-    if (@available(iOS 16, *)) {
-        CriticalMoments *cm = [self buildAndStartCMForTest];
-        XCTAssert(cm, @"Startup issue");
-        @try {
-            // Toronto
-            [CMWeatherPropertyProvider setTestLocationOverride:[[CLLocation alloc] initWithLatitude:43.651070
-                                                                                          longitude:-79.347015]];
+- (void)testWeatherProviderCases:(NSArray<NSString *> *)weatherTests {
+    CriticalMoments *cm = [self buildAndStartCMForTest];
+    // TODO P2: global in test not ideal
+    [CriticalMoments.sharedInstance setApiKey:TEST_API_KEY error:nil];
+    XCTAssert(cm, @"Startup issue");
+    @try {
+        // Toronto
+        [CMWeatherPropertyProvider setTestLocationOverride:[[CLLocation alloc] initWithLatitude:43.651070
+                                                                                      longitude:-79.347015]];
 
-            NSArray<NSString *> *weatherTests = @[
-                @"weather_temperature >= -40.0 && weather_temperature <= 50.0",
-                @"weather_apparent_temperature >= -40.0 && weather_apparent_temperature <= 50.0", // add_test_count
-                @"weather_condition != nil && len(weather_condition) > 0",                        // add_test_count
-                @"weather_cloud_cover >= 0.0 && weather_cloud_cover <= 1.0",                      // add_test_count
-                @"is_daylight in ['unknown', 'daylight', 'not_daylight']",                        // add_test_count
-                @"weather_approx_location_temperature >= -40.0 && weather_approx_location_temperature <= 50.0", // add_test_count
-                @"weather_approx_location_apparent_temperature >= -40.0 && weather_approx_location_apparent_temperature <= 50.0", // add_test_count
-                @"weather_approx_location_condition != nil && len(weather_approx_location_condition) > 0", // add_test_count
-                @"weather_approx_location_cloud_cover >= 0.0 && weather_approx_location_cloud_cover <= 1.0", // add_test_count
-                @"approx_location_is_daylight in ['unknown', 'daylight', 'not_daylight']", // add_test_count
-            ];
+        NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
-            NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+        for (NSString *condition in weatherTests) {
 
-            for (NSString *condition in weatherTests) {
-
-                XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
-                [expectations addObject:expectation];
-                [cm checkNamedCondition:condition
-                              condition:condition
-                                handler:^(bool result, NSError *error) {
-                                  if (!result || error) {
-                                      XCTAssert(false, @"Weather test failed: %@", condition);
-                                  }
-                                  [expectation fulfill];
-                                }];
-            }
-
-            [self waitForExpectations:expectations timeout:15.0];
-
-        } @finally {
-            [CMWeatherPropertyProvider setTestLocationOverride:nil];
+            XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
+            [expectations addObject:expectation];
+            [cm checkNamedCondition:condition
+                          condition:condition
+                            handler:^(bool result, NSError *error) {
+                              if (!result || error) {
+                                  XCTAssert(false, @"Weather test failed: %@", condition);
+                              }
+                              [expectation fulfill];
+                            }];
         }
+
+        [self waitForExpectations:expectations timeout:15.0];
+    } @finally {
+        [CMWeatherPropertyProvider setTestLocationOverride:nil];
     }
+}
+
+- (void)testWeatherProviderAccurate {
+    NSArray<NSString *> *weatherTests = @[
+        @"weather_temperature >= -40.0 && weather_temperature <= 50.0",
+        @"weather_apparent_temperature >= -40.0 && weather_apparent_temperature <= 50.0", // add_test_count
+        @"weather_condition != nil && len(weather_condition) > 0",                        // add_test_count
+        @"weather_cloud_cover >= 0.0 && weather_cloud_cover <= 1.0",                      // add_test_count
+        @"is_daylight in ['unknown', 'daylight', 'not_daylight']",                        // add_test_count
+    ];
+
+    [self testWeatherProviderCases:weatherTests];
+}
+
+- (void)testWeatherProviderApproximate {
+    NSArray<NSString *> *weatherTests = @[
+        @"weather_approx_location_temperature >= -40.0 && weather_approx_location_temperature <= 50.0",
+        @"weather_approx_location_apparent_temperature >= -40.0 && weather_approx_location_apparent_temperature <= 50.0", // add_test_count
+        @"weather_approx_location_condition != nil && len(weather_approx_location_condition) > 0",   // add_test_count
+        @"weather_approx_location_cloud_cover >= 0.0 && weather_approx_location_cloud_cover <= 1.0", // add_test_count
+        @"approx_location_is_daylight in ['unknown', 'daylight', 'not_daylight']",                   // add_test_count
+    ];
+
+    [self testWeatherProviderCases:weatherTests];
 }
 
 @end

@@ -56,10 +56,6 @@ let package = Package(
         cmTarget,
         appcoreTarget,
         .testTarget(
-            name: "CriticalMomentsSwiftTests",
-            dependencies: ["CriticalMomentsSwift"],
-            path: "ios/Tests/CriticalMomentsSwiftTests"),
-        .testTarget(
             name: "CriticalMomentsTests",
             dependencies: ["CriticalMoments"],
             path: "ios/Tests/CriticalMomentsTests",
