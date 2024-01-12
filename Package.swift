@@ -20,12 +20,27 @@ let filePath = #filePath
 let endOfPath = filePath.count - "Package.swift".count - 1
 let dirPath = String(filePath[...String.Index.init(utf16Offset: endOfPath, in: filePath)])
 let infoPath = dirPath + "go/appcore/build/Appcore.xcframework/Info.plist"
+
+var cmTarget = Target.target(name: "CriticalMoments",
+                             dependencies: ["Appcore"],
+                             path: "ios/Sources/CriticalMoments",
+                             publicHeadersPath:"include")
+
 if (FileManager.default.fileExists(atPath: infoPath))
 {
     print("Using Local Appcore Build From: " + infoPath);
     appcoreTarget = Target.binaryTarget(
         name: "Appcore",
         path: "go/appcore/build/Appcore.xcframework")
+
+    // For local development, increase error checking level.
+    // Unsafe flags are not allowed with SPM distribution
+    // but CI will still check these compile time errors.
+    cmTarget.cSettings = [
+        .unsafeFlags(["-Werror=return-type",
+                     "-Werror=unused-variable",
+                     "-Werror"]),
+    ]
 }
 
 let package = Package(
@@ -38,20 +53,7 @@ let package = Package(
             targets: ["CriticalMoments"]),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "CriticalMoments",
-            dependencies: ["Appcore"],
-            path: "ios/Sources/CriticalMoments",
-            publicHeadersPath:"include",
-            cSettings: [
-                .unsafeFlags([
-                    "-Werror=return-type",
-                    "-Werror=unused-variable",
-                    "-Werror"
-                ]),
-            ]),
+        cmTarget,
         appcoreTarget,
         .testTarget(
             name: "CriticalMomentsTests",
