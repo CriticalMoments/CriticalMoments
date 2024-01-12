@@ -31,6 +31,18 @@
     horizontalCondition.actionCMActionName = @"conditional_landscape";
     [horizontalCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
+    CMDemoAction *warmCondition = [[CMDemoAction alloc] init];
+    warmCondition.title = @"Current Temperature";
+    warmCondition.subtitle = @"Is it over 20 degrees celcius outside?\n\n(weather_approx_location_temperature > 20)";
+    warmCondition.actionCMActionName = @"conditional_warm";
+    [warmCondition addResetTestTarget:self action:@selector(dismissAlerts)];
+
+    CMDemoAction *cloudyCondition = [[CMDemoAction alloc] init];
+    cloudyCondition.title = @"Cloud Cover";
+    cloudyCondition.subtitle = @"Is it cloudy outside?\n\n(weather_approx_location_cloud_cover > 0.5)";
+    cloudyCondition.actionCMActionName = @"conditional_cloudy";
+    [cloudyCondition addResetTestTarget:self action:@selector(dismissAlerts)];
+
     CMDemoAction *flatCondition = [[CMDemoAction alloc] init];
     flatCondition.title = @"Device position";
     flatCondition.subtitle = @"Condition it true if device is laying flat on a "
@@ -55,6 +67,13 @@
     chargingCondition.actionCMActionName = @"conditional_charging";
     [chargingCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
+    CMDemoAction *geoCondition = [[CMDemoAction alloc] init];
+    geoCondition.title = @"Permissionless Location";
+    geoCondition.subtitle = @"This device in Canada currently? Checked using IP address, without needing location/GPS "
+                            @"permissions.\n\n(location_approx_country == 'CA')";
+    geoCondition.actionCMActionName = @"conditional_canada";
+    [geoCondition addResetTestTarget:self action:@selector(dismissAlerts)];
+
     CMDemoAction *dateCondition = [[CMDemoAction alloc] init];
     dateCondition.title = @"Installed app in last hour";
     dateCondition.subtitle =
@@ -63,7 +82,10 @@
     [dateCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
     [self addSection:@"Simple conditions"
-         withActions:@[ horizontalCondition, flatCondition, wifiConditon, chargingCondition, dateCondition ]];
+         withActions:@[
+             horizontalCondition, warmCondition, cloudyCondition, flatCondition, wifiConditon, chargingCondition,
+             geoCondition, dateCondition
+         ]];
 
     CMDemoAction *compoundCondition = [[CMDemoAction alloc] init];
     compoundCondition.title = @"Combining conditions";
