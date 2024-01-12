@@ -6,7 +6,7 @@
 //
 
 #import "CMLocationPropertyProvider.h"
-#import "../include/CriticalMoments.h"
+#import "../utils/CMUtils.h"
 
 @import CoreLocation;
 
@@ -162,49 +162,44 @@ static CMLocationCache *sharedInstance = nil;
             return nil;
         }
 
-        NSURL *url = [NSURL URLWithString:@"https://api.criticalmoments.io/geo_ip"];
-        NSMutableURLRequest *req = [[NSMutableURLRequest alloc] initWithURL:url];
-        NSString *apiKey = [CriticalMoments.sharedInstance getApiKey];
-        [req setValue:apiKey forHTTPHeaderField:@"X-CM-Api-Key"];
+        NSError *error;
+        NSDictionary *jsonResp = [CMUtils fetchCmApiSyncronous:@"https://api.criticalmoments.io/geo_ip" error:&error];
 
-        dispatch_semaphore_t approxSem = dispatch_semaphore_create(0);
-        [[[NSURLSession sharedSession] dataTaskWithRequest:req
-                                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *reqErr) {
-                                           NSHTTPURLResponse *httpResp;
-                                           GeoIpPlace *newPlace;
-                                           if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-                                               httpResp = (NSHTTPURLResponse *)response;
-                                           }
-                                           if (!reqErr && data.length > 0 && httpResp && httpResp.statusCode == 200) {
-                                               NSError *error = nil;
-                                               id jsonObj = [NSJSONSerialization JSONObjectWithData:data
-                                                                                            options:0
-                                                                                              error:&error];
-                                               if (!error && [jsonObj isKindOfClass:[NSDictionary class]]) {
-                                                   NSDictionary *jsonResp = (NSDictionary *)jsonObj;
-                                                   newPlace = [[GeoIpPlace alloc] init];
-                                                   newPlace.city = jsonResp[@"city"];
-                                                   newPlace.region = jsonResp[@"region"];
-                                                   newPlace.isoCountryCode = jsonResp[@"country"];
-                                                   newPlace.latitude = jsonResp[@"latitude"];
-                                                   newPlace.longitude = jsonResp[@"longitude"];
-                                               }
-                                           }
+        GeoIpPlace *newPlace;
+        if (!error) {
+            newPlace = [self parseGeoPlaceFromJson:jsonResp];
+            if (newPlace) {
+                self.lastGeoIpTimestamp = [[NSDate alloc] init];
+                self.geoIpPlace = newPlace;
+            }
+        }
 
-                                           if (newPlace) {
-                                               self.geoIpPlace = newPlace;
-                                               self.lastGeoIpTimestamp = [[NSDate alloc] init];
-                                           } else {
-                                               self.lastGeoIpErrorTimestamp = [[NSDate alloc] init];
-                                           }
-
-                                           dispatch_semaphore_signal(approxSem);
-                                         }] resume];
-        dispatch_semaphore_wait(approxSem, dispatch_time(DISPATCH_TIME_NOW, 10.0 * NSEC_PER_SEC));
+        if (!newPlace) {
+            self.lastGeoIpErrorTimestamp = [[NSDate alloc] init];
+        }
+        return newPlace;
     }
 
     // May still be nil but at this point we're out of ways to get it
     return [self getGeoIpPlaceFromCache];
+}
+
+- (GeoIpPlace *)parseGeoPlaceFromJson:(NSDictionary *)json {
+    if ((json[@"city"] && ![json[@"city"] isKindOfClass:[NSString class]]) ||
+        (json[@"country"] && ![json[@"country"] isKindOfClass:[NSString class]]) ||
+        (json[@"region"] && ![json[@"region"] isKindOfClass:[NSString class]]) ||
+        (json[@"latitude"] && ![json[@"latitude"] isKindOfClass:[NSNumber class]]) ||
+        (json[@"longitude"] && ![json[@"longitude"] isKindOfClass:[NSNumber class]])) {
+        return nil;
+    }
+
+    GeoIpPlace *newPlace = [[GeoIpPlace alloc] init];
+    newPlace.city = json[@"city"];
+    newPlace.region = json[@"region"];
+    newPlace.isoCountryCode = json[@"country"];
+    newPlace.latitude = json[@"latitude"];
+    newPlace.longitude = json[@"longitude"];
+    return newPlace;
 }
 
 - (CLPlacemark *)reverseGeocode {
@@ -419,6 +414,256 @@ static CMLocationCache *sharedInstance = nil;
 
 - (CMPropertyProviderType)type {
     return CMPropertyProviderTypeFloat;
+}
+
+@end
+
+#pragma mark Weather
+
+static CLLocation *testLocationOverride = nil;
+
+typedef NS_ENUM(NSInteger, CMWeatherProperty) {
+    CMWeatherPropertyCondition,
+    CMWeatherPropertyTemperature,
+    CMWeatherPropertyApparentTemperature,
+    CMWeatherPropertyCloudCover,
+    CMWeatherPropertyIsDaylight,
+};
+
+@interface CMWeatherCacheItem : NSObject
+@property(nonatomic, strong) NSString *condition;
+@property(nonatomic, strong) NSNumber *temperature, *apparentTemperature, *cloudCover, *daylight;
+@property(nonatomic, strong) NSDate *date;
+@property(nonatomic) bool approximate;
+@end
+
+@implementation CMWeatherCacheItem
+@end
+
+@interface CMWeatherCache : NSObject
+@property(nonatomic, strong) NSMutableArray<CMWeatherCacheItem *> *cachedWeather;
+@property(nonatomic, strong) NSDate *lastErrorTimeApproximate, *lastErrorTimeAccurate;
+@end
+
+@implementation CMWeatherCache
+
+static CMWeatherCache *sharedWeatherCache = nil;
++ (CMWeatherCache *)sharedInstance {
+    if (sharedWeatherCache) {
+        return sharedWeatherCache;
+    }
+    @synchronized(CMWeatherCache.class) {
+        if (!sharedWeatherCache) {
+            sharedWeatherCache = [[self alloc] init];
+        }
+        return sharedWeatherCache;
+    }
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.cachedWeather = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (NSDate *)lastErrorTime:(bool)approximate {
+    if (approximate) {
+        return self.lastErrorTimeApproximate;
+    }
+    return self.lastErrorTimeAccurate;
+}
+
+- (CMWeatherCacheItem *)getCachedWeatherForApproxLoc:(bool)approximate {
+    // one at a time, so we can use cache for next property
+    @synchronized(self) {
+        // Check the cache
+        NSDate *now = [[NSDate alloc] init];
+        for (CMWeatherCacheItem *cacheItem in self.cachedWeather) {
+            if (!approximate && cacheItem.approximate) {
+                // don't return approx value to non-approx prop (other way around okay)
+                continue;
+            }
+
+            // Weather cache hit within 20 mins
+            if ([cacheItem.date compare:[now dateByAddingTimeInterval:(-60 * 20)]] == NSOrderedAscending) {
+                [self.cachedWeather removeObject:cacheItem];
+            } else {
+                return cacheItem;
+            }
+        }
+
+        // Fail fast if errored in last 30s. Don't want to make repeated requests if we know network is down
+        // or weather service doesn't work in this location.
+        NSDate *lastErrorTime = [self lastErrorTime:approximate];
+        if (lastErrorTime && [lastErrorTime compare:[now dateByAddingTimeInterval:-30]] == NSOrderedDescending) {
+            return nil;
+        }
+
+        CMWeatherCacheItem *weather = [self fetchWeatherForApproximate:approximate];
+        if (weather) {
+            [self.cachedWeather addObject:weather];
+            return weather;
+        }
+    }
+
+    return nil;
+}
+
+- (CMWeatherCacheItem *)fetchWeatherForApproximate:(bool)approximate {
+    NSError *error;
+    NSString *url;
+    if (approximate) {
+        url = @"https://api.criticalmoments.io/weather_by_ip";
+    } else {
+        CLLocation *location;
+        if (testLocationOverride) {
+            location = testLocationOverride;
+        } else {
+            location = [CMLocationCache.shared getLocationBlocking];
+        }
+
+        if (!location) {
+            return nil;
+        }
+
+        url = [NSString stringWithFormat:@"https://api.criticalmoments.io/weather?lat=%f&long=%f",
+                                         location.coordinate.latitude, location.coordinate.longitude];
+    }
+
+    NSDictionary *jsonResp = [CMUtils fetchCmApiSyncronous:url error:&error];
+
+    if (error) {
+        if (approximate) {
+            self.lastErrorTimeApproximate = [[NSDate alloc] init];
+        } else {
+            self.lastErrorTimeAccurate = [[NSDate alloc] init];
+        }
+        return nil;
+    }
+
+    return [self weatherFromJson:jsonResp approximate:approximate];
+}
+
+- (CMWeatherCacheItem *)weatherFromJson:(id)json approximate:(bool)approximate {
+    if (![json[@"condition"] isKindOfClass:[NSString class]] ||
+        ![json[@"temperature"] isKindOfClass:[NSNumber class]] ||
+        ![json[@"apparentTemperature"] isKindOfClass:[NSNumber class]] ||
+        ![json[@"cloudCoverage"] isKindOfClass:[NSNumber class]] ||
+        ![json[@"daylight"] isKindOfClass:[NSNumber class]]) {
+        return nil;
+    }
+    CMWeatherCacheItem *weather = [[CMWeatherCacheItem alloc] init];
+    weather.date = [[NSDate alloc] init]; // now
+    weather.approximate = approximate;
+    weather.condition = json[@"condition"];
+    weather.temperature = json[@"temperature"];
+    weather.apparentTemperature = json[@"apparentTemperature"];
+    weather.cloudCover = json[@"cloudCoverage"];
+    weather.daylight = json[@"daylight"];
+    return weather;
+}
+
+@end
+
+@interface CMWeatherPropertyProvider ()
+@property(nonatomic) CMWeatherProperty property;
+@property(nonatomic) BOOL approxAccuracy;
+@end
+
+@implementation CMWeatherPropertyProvider
+
++ (NSDictionary<NSString *, CMWeatherPropertyProvider *> *)allWeatherProviders {
+    return @{
+        @"weather_temperature" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyTemperature
+                                                                          forApproxAccuracy:false],
+        @"weather_apparent_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyApparentTemperature
+                                                     forApproxAccuracy:false],
+        @"weather_condition" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCondition
+                                                                        forApproxAccuracy:false],
+        @"weather_cloud_cover" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCloudCover
+                                                                          forApproxAccuracy:false],
+        @"is_daylight" : [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyIsDaylight
+                                                                  forApproxAccuracy:false],
+        @"weather_approx_location_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyTemperature
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_apparent_temperature" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyApparentTemperature
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_condition" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCondition
+                                                     forApproxAccuracy:true],
+        @"weather_approx_location_cloud_cover" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyCloudCover
+                                                     forApproxAccuracy:true],
+        @"approx_location_is_daylight" :
+            [[CMWeatherPropertyProvider alloc] initWithWeatherProperty:CMWeatherPropertyIsDaylight
+                                                     forApproxAccuracy:true],
+    };
+}
+
++ (void)setTestLocationOverride:(CLLocation *)location {
+    testLocationOverride = location;
+}
+
+- (instancetype)initWithWeatherProperty:(CMWeatherProperty)property forApproxAccuracy:(BOOL)approxAccuracy {
+    self = [super init];
+    if (self) {
+        self.property = property;
+        self.approxAccuracy = approxAccuracy;
+    }
+    return self;
+}
+
+- (CMWeatherCacheItem *)getWeather {
+    return [CMWeatherCache.sharedInstance getCachedWeatherForApproxLoc:self.approxAccuracy];
+}
+
+- (CMPropertyProviderType)type {
+    switch (self.property) {
+    case CMWeatherPropertyCondition:
+        return CMPropertyProviderTypeString;
+    case CMWeatherPropertyTemperature:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyApparentTemperature:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyCloudCover:
+        return CMPropertyProviderTypeFloat;
+    case CMWeatherPropertyIsDaylight:
+        return CMPropertyProviderTypeString;
+    }
+}
+
+- (NSString *)stringValue {
+    if (self.property == CMWeatherPropertyCondition) {
+        return [self getWeather].condition;
+    } else if (self.property == CMWeatherPropertyIsDaylight) {
+        NSNumber *isDaylight = [self getWeather].daylight;
+        if (!isDaylight) {
+            return @"unknown";
+        } else if (isDaylight.boolValue) {
+            return @"daylight";
+        } else {
+            return @"not_daylight";
+        }
+    }
+    return nil;
+}
+
+- (NSNumber *)nillableFloatValue {
+    switch (self.property) {
+    case CMWeatherPropertyTemperature:
+        return [self getWeather].temperature;
+    case CMWeatherPropertyApparentTemperature:
+        return [self getWeather].apparentTemperature;
+    case CMWeatherPropertyCloudCover:
+        return [self getWeather].cloudCover;
+    default:
+        return nil;
+    }
 }
 
 @end

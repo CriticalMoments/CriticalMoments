@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E0368DB22AF7FE4600A513B7 /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0368DB12AF7FE4600A513B7 /* testConfig.json */; };
-		E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */; };
-		E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E62ACBAD4100A879AD /* SnapshotTesting */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
@@ -18,6 +16,7 @@
 		E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E692A0D73F10069E5BD /* LinkDemoScreen.m */; };
 		E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E742A0DC0170069E5BD /* SnapshotTests.m */; };
 		E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */; };
+		E06691422B50C4F700FCFBAF /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E06691412B50C4F700FCFBAF /* SnapshotTesting */; };
 		E069BFB12A217A9E00A4B65E /* ConditionsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */; };
 		E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774A29F9B202001521F4 /* CMDemoScreen.m */; };
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
@@ -104,9 +103,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */,
 				E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */,
-				E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */,
+				E06691422B50C4F700FCFBAF /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,9 +245,8 @@
 			);
 			name = SampleAppTests;
 			packageProductDependencies = (
-				E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */,
-				E03977E62ACBAD4100A879AD /* SnapshotTesting */,
 				E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */,
+				E06691412B50C4F700FCFBAF /* SnapshotTesting */,
 			);
 			productName = SampleAppTests;
 			productReference = E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */;
@@ -679,12 +676,7 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = CriticalMoments;
 		};
-		E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = InlineSnapshotTesting;
-		};
-		E03977E62ACBAD4100A879AD /* SnapshotTesting */ = {
+		E06691412B50C4F700FCFBAF /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
