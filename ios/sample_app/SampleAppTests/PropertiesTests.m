@@ -156,8 +156,33 @@
     AppDelegate *aad = (AppDelegate *)ad;
     CriticalMoments *cm = [aad cmInstance];
 
-    // Response varries on... location, so manual testing required.
-    XCTSkipIf(true, @"skipping location test as it expected results vary by location.");
+    NSString *condition =
+        @"(location_approx_city == nil || len(location_approx_city) > 0) && (location_approx_country == nil || "
+        @"len(location_approx_country) > 0) && location_approx_country == 'CA' && (location_approx_region == nil || "
+        @"len(location_approx_region) > 0) && (location_approx_latitude == nil || abs(location_approx_latitude) <= 90) "
+        @"&& (location_approx_longitude == nil || abs(location_approx_longitude) <= 180)";
+
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation1];
+    [cm checkNamedCondition:@"locCondition"
+                  condition:condition
+                    handler:^(bool result, NSError *error) {
+                      if (!result || error) {
+                          XCTAssert(false, "approx location condition failed to return");
+                      }
+                      [expectation1 fulfill];
+                    }];
+
+    [self waitForExpectations:expectations timeout:5.0];
+}
+
+// Not included in test plan, so not run by default. But helpful for development.
+- (void)testGeoIpLocationToronto {
+    id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
+    AppDelegate *aad = (AppDelegate *)ad;
+    CriticalMoments *cm = [aad cmInstance];
 
     NSString *condition =
         @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'ON' "

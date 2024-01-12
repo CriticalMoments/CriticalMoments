@@ -15,19 +15,13 @@
     {
       "target" : {
         "containerPath" : "container:..\/..",
-        "identifier" : "CriticalMomentsSwiftTests",
-        "name" : "CriticalMomentsSwiftTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:..\/..",
         "identifier" : "CriticalMomentsTests",
         "name" : "CriticalMomentsTests"
       }
     },
     {
       "skippedTests" : [
+        "PropertiesTests\/testGeoIpLocationToronto",
         "SnapshotTests"
       ],
       "target" : {
