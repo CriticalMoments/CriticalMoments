@@ -160,17 +160,17 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"device_model_version": optionalPropertyConfig(reflect.String, CMPropertySampleTypeAppStart),
 		"low_data_mode":        optionalPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
 
-		// Weather - optional as only iOS 16+
-		"weather_temperature":                          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_apparent_temperature":                 optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_condition":                            optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
-		"weather_cloud_cover":                          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"is_daylight":                                  optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
-		"weather_approx_location_temperature":          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_approx_location_apparent_temperature": optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"weather_approx_location_condition":            optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
-		"weather_approx_location_cloud_cover":          optionalPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
-		"approx_location_is_daylight":                  optionalPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		// Weather
+		"weather_temperature":                          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_apparent_temperature":                 requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_condition":                            requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_cloud_cover":                          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"is_daylight":                                  requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_temperature":          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_apparent_temperature": requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_condition":            requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_cloud_cover":          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"approx_location_is_daylight":                  requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
 
 		// Well known properties - client should provide
 		"user_signup_date":      wellKnownPropertyConfig(CMTimeKind, CMPropertySampleTypeOnCustomSet),
