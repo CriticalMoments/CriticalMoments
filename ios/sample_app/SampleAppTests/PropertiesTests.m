@@ -158,7 +158,7 @@
 
     NSString *condition =
         @"(location_approx_city == nil || len(location_approx_city) > 0) && (location_approx_country == nil || "
-        @"len(location_approx_country) > 0) && location_approx_country == 'CA' && (location_approx_region == nil || "
+        @"len(location_approx_country) > 0) && (location_approx_region == nil || "
         @"len(location_approx_region) > 0) && (location_approx_latitude == nil || abs(location_approx_latitude) <= 90) "
         @"&& (location_approx_longitude == nil || abs(location_approx_longitude) <= 180)";
 
