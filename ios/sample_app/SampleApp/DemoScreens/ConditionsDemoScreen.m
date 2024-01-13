@@ -33,13 +33,14 @@
 
     CMDemoAction *warmCondition = [[CMDemoAction alloc] init];
     warmCondition.title = @"Current Temperature";
-    warmCondition.subtitle = @"Is it over 20 degrees celcius outside?\n\n(weather_approx_location_temperature > 20)";
+    warmCondition.subtitle =
+        @"Condition true if it over 20 degrees celcius outside.\n\n(weather_approx_location_temperature > 20)";
     warmCondition.actionCMActionName = @"conditional_warm";
     [warmCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
     CMDemoAction *cloudyCondition = [[CMDemoAction alloc] init];
     cloudyCondition.title = @"Cloud Cover";
-    cloudyCondition.subtitle = @"Is it cloudy outside?\n\n(weather_approx_location_cloud_cover > 0.5)";
+    cloudyCondition.subtitle = @"Condition true if it cloudy outside.\n\n(weather_approx_location_cloud_cover > 0.5)";
     cloudyCondition.actionCMActionName = @"conditional_cloudy";
     [cloudyCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
@@ -69,8 +70,9 @@
 
     CMDemoAction *geoCondition = [[CMDemoAction alloc] init];
     geoCondition.title = @"Permissionless Location";
-    geoCondition.subtitle = @"This device in Canada currently? Checked using IP address, without needing location/GPS "
-                            @"permissions.\n\n(location_approx_country == 'CA')";
+    geoCondition.subtitle =
+        @"Condition true if this device is in Canada currently. Checked using IP address, without needing location/GPS "
+        @"permissions.\n\n(location_approx_country == 'CA')";
     geoCondition.actionCMActionName = @"conditional_canada";
     [geoCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
