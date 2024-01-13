@@ -113,10 +113,6 @@
     CMLanguageDirectionPropertyProvider *ldpp = [[CMLanguageDirectionPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"locale_language_direction" value:ldpp];
 
-    // Session start time
-    NSDate *now = [[NSDate alloc] init];
-    [self registerStaticTimeProperty:@"session_start_time" value:now];
-
     // Bundle ID
     [self registerStaticStringProperty:@"app_id" value:NSBundle.mainBundle.bundleIdentifier];
 

@@ -119,7 +119,14 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
 	// Clear required properties, for easier setup
-	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
+	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+		"session_start_time": {
+			Type:       datamodel.CMTimeKind,
+			Source:     datamodel.CMPropertySourceLib,
+			Optional:   false,
+			SampleType: datamodel.CMPropertySampleTypeDoNotSample,
+		},
+	}
 	return ac, nil
 }
 
@@ -631,8 +638,9 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 	}
 
 	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
-		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
-		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"builtInString":      {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"builtInNever":       {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 	}
 
 	ac.RegisterClientIntProperty("testInt", 42)
