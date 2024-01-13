@@ -197,6 +197,12 @@
                     "url": "critical-moments-sampleapp:main"
                 }
             },
+            "deeplink_music_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "music://music.apple.com/library"
+                }
+            },
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
