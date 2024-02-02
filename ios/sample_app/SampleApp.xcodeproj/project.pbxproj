@@ -10,6 +10,8 @@
 		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E0368DB22AF7FE4600A513B7 /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0368DB12AF7FE4600A513B7 /* testConfig.json */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
+		E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */; };
+		E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA82B6D8267006EA449 /* InfoHeader.m */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
 		E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */; };
@@ -49,6 +51,10 @@
 		E0368DB12AF7FE4600A513B7 /* testConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = testConfig.json; path = ../../Tests/CriticalMomentsTests/TestResources/testConfig.json; sourceTree = "<group>"; };
 		E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSnapshotTests.swift; sourceTree = "<group>"; };
 		E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SampleAppTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConversionDemoScreen.h; sourceTree = "<group>"; };
+		E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConversionDemoScreen.m; sourceTree = "<group>"; };
+		E03F9BA72B6D8267006EA449 /* InfoHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoHeader.h; sourceTree = "<group>"; };
+		E03F9BA82B6D8267006EA449 /* InfoHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfoHeader.m; sourceTree = "<group>"; };
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
@@ -128,6 +134,8 @@
 				E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */,
 				E0DD1D182A3A1B4B0059CC38 /* SheetDemoScreen.h */,
 				E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */,
+				E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */,
+				E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */,
 			);
 			path = DemoScreens;
 			sourceTree = "<group>";
@@ -175,6 +183,8 @@
 				E07B774F29FA0144001521F4 /* Utils.h */,
 				E07B775029FA0144001521F4 /* Utils.m */,
 				E0446E632A0970A10069E5BD /* config.json */,
+				E03F9BA72B6D8267006EA449 /* InfoHeader.h */,
+				E03F9BA82B6D8267006EA449 /* InfoHeader.m */,
 			);
 			path = SampleApp;
 			sourceTree = "<group>";
@@ -328,9 +338,11 @@
 				E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */,
 				E07B775129FA0144001521F4 /* Utils.m in Sources */,
 				E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */,
+				E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */,
 				E0B545FF29F407C3002A25A8 /* main.m in Sources */,
 				E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */,
 				E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */,
+				E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */,
 				E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */,
 				E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */,
 				E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */,

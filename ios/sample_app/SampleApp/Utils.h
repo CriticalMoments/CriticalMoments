@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (UINavigationController *)appNavControl;
 + (void)createTestFileUrls;
 + (BOOL)verifyTestFileUrls;
++ (UIColor *)colorFromHexString:(NSString *)hexString;
 
 @end
 

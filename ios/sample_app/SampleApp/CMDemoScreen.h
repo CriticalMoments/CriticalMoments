@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMDemoScreen : NSObject
 
 @property(nonatomic, readwrite) NSString *title;
+@property(nonatomic, readwrite) NSString *infoText, *buttonLink, *buttonTitle;
 
 - (NSArray<CMDemoSection *> *)sections;
 

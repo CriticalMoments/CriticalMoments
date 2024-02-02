@@ -7,11 +7,14 @@
 
 #import "DemoViewContoller.h"
 
+#import "InfoHeader.h"
+
 #define DEMO_CELL_REUSE_ID @"io.criticalmoments.sample_app.demo_cell"
 
 @interface DemoViewContoller () <UITableViewDataSource, UITableViewDelegate>
 
-@property(nonatomic) CMDemoScreen *screen;
+@property(nonatomic, strong) CMDemoScreen *screen;
+@property(nonatomic, strong) InfoHeader *header;
 
 @end
 
@@ -21,6 +24,7 @@
     self = [super init];
     if (self) {
         self.screen = screen;
+        self.header = [InfoHeader headerWithScreen:self.screen];
     }
     return self;
 }
@@ -38,6 +42,15 @@
 
 - (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
     return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
+}
+
+- (void)viewWillLayoutSubviews {
+    // Delay adding until had broader layout to size
+    if (!self.tableView.tableHeaderView) {
+        self.tableView.tableHeaderView = self.header;
+    }
+    CGSize size = [self.header systemLayoutSizeFittingSize:self.view.frame.size];
+    self.header.frame = CGRectMake(0, 0, self.view.frame.size.width, size.height);
 }
 
 #pragma mark UITableViewDelegate
