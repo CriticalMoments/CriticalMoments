@@ -13,13 +13,13 @@
     self = [super init];
     if (self) {
         self.title = @"Conversions & Journey";
-        self.infoText = @"It's important to help users discover the amazing features your app has to offer. This makes "
-                        @"them much more likely to become long term users (activation, retention), and satisfied users "
-                        @"(subscribe/buy, higher ratings, lower churn).\n\nAsking users to subscribe or buy before "
-                        @"they have experienced the core value of your app, is a sure fire way to get them to decline "
-                        @"or even leave for good.\n\nThese examples walk through the user journey of a fictional “todo "
-                        @"list” app. In the early steps, we nudge our the user to discover the app and its key "
-                        @"features/value-prop. Once they have we attempt to get them to subscribe and review.";
+        self.infoText = @"Asking users to subscribe or buy before "
+                        @"they have experienced the core value of your app is a sure fire way to get them to decline, "
+                        @"or even worse, leave for good.\n\nCritical Moments helps you create a user journey:\n1) "
+                        @"Ensure they discover and use the core features of your app\n2) After they have seen value, "
+                        @"ask them to subscribe or buy.\n3) Once they are loyal, ask them to review.\n\nThe example "
+                        @"below walk through the user journey of a fictional “todo "
+                        @"list” app.";
         [self buildSections];
     }
     return self;
