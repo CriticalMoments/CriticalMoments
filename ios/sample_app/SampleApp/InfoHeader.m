@@ -14,6 +14,7 @@
 + (instancetype)headerWithScreen:(CMDemoScreen *)screen {
     InfoHeader *header = [[InfoHeader alloc] init];
     header.preservesSuperviewLayoutMargins = YES;
+    header.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     NSMutableArray<NSLayoutConstraint *> *constraints = [[NSMutableArray alloc] init];
     UIView *lastItem;
 
@@ -21,7 +22,7 @@
         UILabel *infoLabel = [[UILabel alloc] init];
         infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
         [header addSubview:infoLabel];
-        infoLabel.numberOfLines = -1;
+        infoLabel.numberOfLines = 0;
         infoLabel.text = screen.infoText;
         if (@available(iOS 13.0, *)) {
             infoLabel.textColor = [UIColor secondaryLabelColor];
@@ -61,8 +62,6 @@
 
             [constraints addObjectsFromArray:@[
                 [button.leadingAnchor constraintEqualToAnchor:header.layoutMarginsGuide.leadingAnchor],
-                //[button.widthAnchor constraintEqualToConstant:200],
-                //[button.trailingAnchor constraintEqualToAnchor:header.layoutMarginsGuide.trailingAnchor],
             ]];
             lastItem = button;
         }

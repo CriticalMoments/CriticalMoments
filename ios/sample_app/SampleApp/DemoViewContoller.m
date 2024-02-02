@@ -45,12 +45,17 @@
 }
 
 - (void)viewWillLayoutSubviews {
-    // Delay adding until had broader layout to size
     if (!self.tableView.tableHeaderView) {
+        // Delay adding until had broader layout to size
         self.tableView.tableHeaderView = self.header;
     }
     CGSize size = [self.header systemLayoutSizeFittingSize:self.view.frame.size];
-    self.header.frame = CGRectMake(0, 0, self.view.frame.size.width, size.height);
+    if (self.view.frame.size.width != self.header.frame.size.width || size.height != self.header.frame.size.height) {
+        self.header.frame = CGRectMake(0, 0, self.view.frame.size.width, size.height);
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.tableView reloadData];
+        });
+    }
 }
 
 #pragma mark UITableViewDelegate
