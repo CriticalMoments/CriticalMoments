@@ -10,6 +10,7 @@
 #import "AlertDemoScreen.h"
 #import "BannerDemoScreen.h"
 #import "ConditionsDemoScreen.h"
+#import "ConversionDemoScreen.h"
 #import "LinkDemoScreen.h"
 #import "SheetDemoScreen.h"
 #import "ThemeDemoScreen.h"
@@ -20,12 +21,21 @@
     self = [super init];
     if (self) {
         self.title = @"Critical Moments";
+        self.infoText = @"Explore demos of the Critial Moments SDK";
+        self.buttonLink = @"https://docs.criticalmoments.io";
         [self buildSections];
     }
     return self;
 }
 
 - (void)buildSections {
+    CMDemoAction *conversionDemo = [[CMDemoAction alloc] init];
+    conversionDemo.title = @"Conversion & User Journey";
+    conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
+    conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
+
+    [self addSection:@"Use Case Examples" withActions:@[ conversionDemo ]];
+
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";
     conditionDemos.subtitle = @"Evaluate powerful conditions at runtime";

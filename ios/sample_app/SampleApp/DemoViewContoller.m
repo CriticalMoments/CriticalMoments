@@ -7,11 +7,14 @@
 
 #import "DemoViewContoller.h"
 
+#import "InfoHeader.h"
+
 #define DEMO_CELL_REUSE_ID @"io.criticalmoments.sample_app.demo_cell"
 
 @interface DemoViewContoller () <UITableViewDataSource, UITableViewDelegate>
 
-@property(nonatomic) CMDemoScreen *screen;
+@property(nonatomic, strong) CMDemoScreen *screen;
+@property(nonatomic, strong) InfoHeader *header;
 
 @end
 
@@ -21,6 +24,7 @@
     self = [super init];
     if (self) {
         self.screen = screen;
+        self.header = [InfoHeader headerWithScreen:self.screen];
     }
     return self;
 }
@@ -38,6 +42,20 @@
 
 - (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
     return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
+}
+
+- (void)viewWillLayoutSubviews {
+    if (!self.tableView.tableHeaderView) {
+        // Delay adding until had broader layout to size
+        self.tableView.tableHeaderView = self.header;
+    }
+    CGSize size = [self.header systemLayoutSizeFittingSize:self.view.frame.size];
+    if (self.view.frame.size.width != self.header.frame.size.width || size.height != self.header.frame.size.height) {
+        self.header.frame = CGRectMake(0, 0, self.view.frame.size.width, size.height);
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.tableView reloadData];
+        });
+    }
 }
 
 #pragma mark UITableViewDelegate
@@ -68,7 +86,16 @@
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
     cell.detailTextLabel.numberOfLines = 10;
+    cell.hidden = action.skipInUI;
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CMDemoAction *action = [self actionForIndexPath:indexPath];
+    if (action.skipInUI) {
+        return 0;
+    }
+    return -1; // dynamic
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {

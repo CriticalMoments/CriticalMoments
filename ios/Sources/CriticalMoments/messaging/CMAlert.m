@@ -40,12 +40,6 @@
 }
 
 - (void)showAlert {
-    // TODO -- main thread
-    UIViewController *topController = CMUtils.topViewController;
-    if (!topController) {
-        NSLog(@"CriticalMoments: can't find top vc for presenting alert");
-    }
-
     DatamodelAlertAction *dataModel = self.dataModel;
     NSString *title = dataModel.title.length > 0 ? dataModel.title : nil;
     NSString *message = dataModel.message.length > 0 ? dataModel.message : nil;
@@ -62,16 +56,6 @@
     }
 
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
-
-    // if popoverPresentationController is present, we need to set these or it
-    // will crash. However, this shouldn't be present in any case we know of,
-    // since we don't use action sheet look on iPad
-    if (alert.popoverPresentationController) {
-        alert.popoverPresentationController.permittedArrowDirections = 0;
-        alert.popoverPresentationController.sourceRect =
-            CGRectMake(topController.view.center.x, topController.view.center.y, 0, 0);
-        alert.popoverPresentationController.sourceView = topController.view;
-    }
 
     if (dataModel.showCancelButton) {
         NSString *cancelString = [CMUtils uiKitLocalizedStringForKey:@"Cancel"];
@@ -107,7 +91,24 @@
         }
     }
 
-    [topController presentViewController:alert animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      UIViewController *rootController = CMUtils.keyWindow.rootViewController;
+      if (!rootController) {
+          NSLog(@"CriticalMoments: can't find root vc for presenting alert");
+      }
+
+      // if popoverPresentationController is present, we need to set these or it
+      // will crash. However, this shouldn't be present in any case we know of,
+      // since we don't use action sheet look on iPad
+      if (alert.popoverPresentationController) {
+          alert.popoverPresentationController.permittedArrowDirections = 0;
+          alert.popoverPresentationController.sourceRect =
+              CGRectMake(rootController.view.center.x, rootController.view.center.y, 0, 0);
+          alert.popoverPresentationController.sourceView = rootController.view;
+      }
+
+      [rootController presentViewController:alert animated:YES completion:nil];
+    });
 }
 
 - (NSArray<CMCustomAlertButton *> *)customButtonActions {
