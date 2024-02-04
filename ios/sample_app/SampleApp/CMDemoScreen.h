@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, readwrite) NSString *title;
 @property(nonatomic, readwrite) NSString *subtitle;
-@property(nonatomic, readwrite) bool skipInUiTesting;
+@property(nonatomic, readwrite) bool skipInUiTesting, skipInUI;
 
 // Only should use one of these
 @property(nonatomic, readwrite) id<DemoActionDelegate> actionDelegate;

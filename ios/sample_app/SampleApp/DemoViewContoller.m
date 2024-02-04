@@ -86,7 +86,16 @@
     cell.textLabel.text = action.title;
     cell.detailTextLabel.text = action.subtitle;
     cell.detailTextLabel.numberOfLines = 10;
+    cell.hidden = action.skipInUI;
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CMDemoAction *action = [self actionForIndexPath:indexPath];
+    if (action.skipInUI) {
+        return 0;
+    }
+    return -1; // dynamic
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
