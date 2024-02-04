@@ -37,6 +37,174 @@
     },
     "actions": {
         "namedActions": {
+            "journey_goal_1": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') == 0",
+                    "passedActionName": "journey_goal_1_nudge",
+                    "failedActionName": "journey_goal_failed"
+                }
+            },
+            "journey_goal_1_nudge": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Learn how to create your first list →",
+                    "tapActionName": "journey_goal_1_tap"
+                }
+            },
+            "journey_goal_1_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real Todo list app, you could connect the banner tap to your 'Create New List' experience with a deeplink."
+                }
+            },
+            "journey_goal_2": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') < 2",
+                    "passedActionName": "journey_goal_2_nudge",
+                    "failedActionName": "journey_goal_failed"
+                }
+            },
+            "journey_goal_2_nudge": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "list.bullet.rectangle.portrait.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Create tasks to start organizing your life!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "This copy could explain to users how to add tasks, and the buttons below could deeplink into that UI in your app.\n\nThis modal UI is fully native, remotely updatable, and themeable.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Take me there",
+                                    "style": "large",
+                                    "actionName": "journey_goal_2_tap"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "journey_goal_2_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real Todo list app, you could connect the button tap to your 'Add Task to List' experience with a deeplink."
+                }
+            },
+            "journey_goal_3": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') >= 2 && eventCount('completed_task') > 0",
+                    "passedActionName": "journey_goal_3_nudge",
+                    "failedActionName": "journey_goal_failed"
+                }
+            },
+            "journey_goal_3_nudge": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": false,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "note.text.badge.plus",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Try Pro to get even more!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "This UI should explain the benefits of the Pro plan, and allow the user to purchase a subscription. You can write your own, or use our modal UI system.\n\nThis modal UI is fully native, remotely updatable, and themeable.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Try Free Trial",
+                                    "style": "large",
+                                    "actionName": "journey_goal_2_tap"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "journey_goal_2_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real Todo list app, you could connect the button tap to your 'Add Task to List' experience with an app deeplink."
+                }
+            },
+            "journey_goal_failed": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User not currently at this goal",
+                    "message": "The user has either already completed this goal, or not yet reached this stage of the user journey.\n\nTry earlier or later demos steps."
+                }
+            },
+            "journey_goal_simulated": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User Action Simulated",
+                    "message": "We've simulated the user completeing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
+                }
+            },
             "short_banner": {
                 "actionType": "banner",
                 "actionData": {
@@ -455,7 +623,7 @@
                                     "style": "large"
                                 },
                                 {
-                                    "title": "Now Now",
+                                    "title": "Not Now",
                                     "style": "info"
                                 }
                             ]
@@ -685,7 +853,23 @@
             "bannerTestTrigger": {
                 "eventName": "show_banner",
                 "actionName": "custom_theme_banner"
+            },
+            "created_list_simulated": {
+                "eventName": "created_list",
+                "actionName": "journey_goal_simulated"
+            },
+            "created_list_item_simulated": {
+                "eventName": "created_list_item",
+                "actionName": "journey_goal_simulated"
+            },
+            "subscribe_trigger": {
+                "eventName": "completed_task",
+                "actionName": "journey_goal_3"
             }
+        }
+    },
+    "conditions": {
+        "namedConditions": {
         }
     }
 }

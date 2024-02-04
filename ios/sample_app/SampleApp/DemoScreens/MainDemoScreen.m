@@ -34,7 +34,7 @@
     conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
     conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
 
-    [self addSection:@"Use Case Demos" withActions:@[ conversionDemo ]];
+    [self addSection:@"Use Case Examples" withActions:@[ conversionDemo ]];
 
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";
