@@ -111,4 +111,5 @@
 
     [CriticalMoments.sharedInstance removeAllBanners];
 }
+
 @end

@@ -67,6 +67,13 @@
                     "failedActionName": "journey_goal_failed"
                 }
             },
+            "journey_goal_3_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real app, you could connect the 'Try Free Trial' button to your purchase experience."
+                }
+            },
             "journey_goal_2_nudge": {
                 "actionType": "modal",
                 "actionData": {
@@ -173,7 +180,7 @@
                                 {
                                     "title": "Try Free Trial",
                                     "style": "large",
-                                    "actionName": "journey_goal_2_tap"
+                                    "actionName": "journey_goal_3_tap"
                                 },
                                 {
                                     "title": "Not Now",
@@ -203,6 +210,167 @@
                 "actionData": {
                     "title": "User Action Simulated",
                     "message": "We've simulated the user completeing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
+                }
+            },
+            "app_out_of_date": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "arrow.down.circle.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "App Update Recommended"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best expereince",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Update Now",
+                                    "style": "large",
+                                    "actionName": "update_app_action"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "outage_modal": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "exclamationmark.icloud.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Temporary Interruption"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "We're currently expereincing a temporary issue with our service. Your data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "OK",
+                                    "style": "large"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "update_app_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://testflight.apple.com/join/uSwscwu0"
+                }
+            },
+            "product_announcement": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "New Feature: Explore Collaboration Tools →",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "legal_update": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "We've updated our terms of service and privacy policy →",
+                    "tapActionName": "tos"
+                }
+            },
+            "tos": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io/legal",
+                    "useEmbeddedBrowser": true
+                }
+            },
+            "app_review_simple": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Enjoying Critical Moments?",
+                    "message": "If you’re enjoying Critical Moments, we would greatly appreciate an app review!\n\nIf you are having an issue, our Help Docs and support team are here to help!",
+                    "showOkButton": false,
+                    "showCancelButton": false,
+                    "customButtons": [
+                        {
+                            "label": "Rate Us",
+                            "actionName": "app_review_faux",
+                            "style": "primary"
+                        },
+                        {
+                            "label": "Help, Feedback & Contact Us",
+                            "actionName": "docs_page"
+                        },
+                        {
+                            "label": "Not Now"
+                        }
+                    ]
+                }
+            },
+            "docs_page": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://docs.criticalmoments.io/support",
+                    "useEmbeddedBrowser": true
+                }
+            },
+            "app_review_faux": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "System App Review",
+                    "message": "Now we would typically show a system app review prompt. For this demo app that's not possible as it's distributed via TestFlight, but it would work in a real app."
                 }
             },
             "short_banner": {
