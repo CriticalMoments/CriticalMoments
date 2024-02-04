@@ -12,6 +12,7 @@
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
 		E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */; };
 		E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA82B6D8267006EA449 /* InfoHeader.m */; };
+		E03F9BAC2B6F30D1006EA449 /* MessagingDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
 		E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */; };
@@ -55,6 +56,8 @@
 		E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConversionDemoScreen.m; sourceTree = "<group>"; };
 		E03F9BA72B6D8267006EA449 /* InfoHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoHeader.h; sourceTree = "<group>"; };
 		E03F9BA82B6D8267006EA449 /* InfoHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfoHeader.m; sourceTree = "<group>"; };
+		E03F9BAA2B6F30D1006EA449 /* MessagingDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessagingDemoScreen.h; sourceTree = "<group>"; };
+		E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessagingDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
@@ -136,6 +139,8 @@
 				E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */,
 				E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */,
 				E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */,
+				E03F9BAA2B6F30D1006EA449 /* MessagingDemoScreen.h */,
+				E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */,
 			);
 			path = DemoScreens;
 			sourceTree = "<group>";
@@ -330,6 +335,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E03F9BAC2B6F30D1006EA449 /* MessagingDemoScreen.m in Sources */,
 				E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */,
 				E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */,
 				E0DD1D1A2A3A1B4B0059CC38 /* SheetDemoScreen.m in Sources */,

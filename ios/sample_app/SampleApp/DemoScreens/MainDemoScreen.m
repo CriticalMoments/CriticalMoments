@@ -12,6 +12,7 @@
 #import "ConditionsDemoScreen.h"
 #import "ConversionDemoScreen.h"
 #import "LinkDemoScreen.h"
+#import "MessagingDemoScreen.h"
 #import "SheetDemoScreen.h"
 #import "ThemeDemoScreen.h"
 
@@ -29,12 +30,17 @@
 }
 
 - (void)buildSections {
+    CMDemoAction *messagingDemo = [[CMDemoAction alloc] init];
+    messagingDemo.title = @"User Messaging";
+    messagingDemo.subtitle = @"Communicate with the right user, at the right moment";
+    messagingDemo.actionNextScreen = [[MessagingDemoScreen alloc] init];
+
     CMDemoAction *conversionDemo = [[CMDemoAction alloc] init];
     conversionDemo.title = @"Conversion & User Journey";
     conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
     conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
 
-    [self addSection:@"Use Case Examples" withActions:@[ conversionDemo ]];
+    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, conversionDemo ]];
 
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";
