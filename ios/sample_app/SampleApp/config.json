@@ -568,6 +568,22 @@
                     "failedActionName": "conditional_false_alert"
                 }
             },
+            "conditional_dark_mode": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "dark_mode",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_ipad": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(device_model_class == 'iPad')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
             "conditional_warm": {
                 "actionType": "conditional_action",
                 "actionData": {

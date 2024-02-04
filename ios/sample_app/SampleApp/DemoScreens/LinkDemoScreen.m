@@ -15,6 +15,8 @@
     self = [super init];
     if (self) {
         self.title = @"Link Demos";
+        self.infoText = @"Launch web links or app deep links";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/open-link";
         [self buildSections];
     }
     return self;
