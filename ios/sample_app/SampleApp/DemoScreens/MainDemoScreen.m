@@ -11,6 +11,7 @@
 #import "BannerDemoScreen.h"
 #import "ConditionsDemoScreen.h"
 #import "ConversionDemoScreen.h"
+#import "FeatureFlagsDemoScreen.h"
 #import "LinkDemoScreen.h"
 #import "MessagingDemoScreen.h"
 #import "SheetDemoScreen.h"
@@ -40,7 +41,14 @@
     conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
     conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
 
-    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, conversionDemo ]];
+    CMDemoAction *flagsDemo = [[CMDemoAction alloc] init];
+    flagsDemo.title = @"Smart Feature Flags";
+    flagsDemo.subtitle = @"Feature flags that can update their state based on over 100 live device conditions, user "
+                         @"engagement history, and progressive rollouts/rollbacks.";
+    flagsDemo.skipInUiTesting = YES;
+    flagsDemo.actionNextScreen = [[FeatureFlagsDemoScreen alloc] init];
+
+    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, conversionDemo, flagsDemo ]];
 
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";
