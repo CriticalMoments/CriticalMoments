@@ -46,7 +46,6 @@
     conditionDemos.title = @"Conditions";
     conditionDemos.subtitle = @"Evaluate powerful conditions at runtime";
     conditionDemos.actionNextScreen = [[ConditionsDemoScreen alloc] init];
-    conditionDemos.skipInUiTesting = true;
 
     [self addSection:@"Conditions" withActions:@[ conditionDemos ]];
 
