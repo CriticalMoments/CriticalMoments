@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)createTestFileUrls;
 + (BOOL)verifyTestFileUrls;
 + (UIColor *)colorFromHexString:(NSString *)hexString;
++ (NSError *)deleteDatabase;
 
 @end
 

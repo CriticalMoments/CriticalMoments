@@ -87,4 +87,22 @@ static NSURL *bundleUrl = nil;
     return [[UIColor alloc] initWithRed:red green:green blue:blue alpha:1.0];
 }
 
++ (NSError *)deleteDatabase {
+    // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
+    // guarunteed to work over time, not is deleting the database file a good idea.
+    NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
+                                                                 inDomains:NSUserDomainMask] lastObject];
+
+    // Set the data directory to applicationSupport/critical_moments_data
+    NSError *error;
+    NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
+
+    BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
+    if (!success || error) {
+        NSLog(@"error removing existing cache: %@", error);
+        return error;
+    }
+    return nil;
+}
+
 @end

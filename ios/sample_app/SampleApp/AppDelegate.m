@@ -19,6 +19,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+    // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
+    // guarunteed to work over time, nor is deleting the database file a good idea.
+    [Utils deleteDatabase];
+
     // This key is only valid for this sample app. Do not try to use it for other apps.
     NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtby1hcHA=-MEQCIFSYDKeKMwiLOJ9bsoNACtSxRbJEWh91kpE47biWR/"
                        @"9BAiB9xT4UUj88Jw0fMjCGMA89NM/j0sHGzuhOST4VIIyS6A==";
