@@ -17,6 +17,8 @@
     self = [super init];
     if (self) {
         self.title = @"Alert Demos";
+        self.infoText = @"Provide information or give user's a choice";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/alerts";
         [self buildSections];
     }
     return self;

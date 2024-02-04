@@ -15,6 +15,9 @@
     self = [super init];
     if (self) {
         self.title = @"Conditions Demos";
+        self.infoText = @"Powerful conditions for targeting, with over 100 properties";
+        self.buttonLink = @"https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions";
+
         [self buildSections];
     }
     return self;

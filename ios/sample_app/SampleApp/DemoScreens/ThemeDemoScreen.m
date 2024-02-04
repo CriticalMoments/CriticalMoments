@@ -39,6 +39,8 @@ static CMTheme *staticCustomTheme = nil;
     self = [super init];
     if (self) {
         self.title = @"Theme Config";
+        self.infoText = @"Apply your brand and app's style";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/themes";
         [self buildSections];
     }
     return self;

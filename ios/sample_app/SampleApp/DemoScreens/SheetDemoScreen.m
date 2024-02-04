@@ -17,6 +17,8 @@
     self = [super init];
     if (self) {
         self.title = @"Modal Demos";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/modals";
+        self.infoText = @"Announcements, decisions, and more. Powerful and beautiful messaging with native modal UI";
         [self buildSections];
     }
     return self;
