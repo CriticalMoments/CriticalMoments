@@ -120,7 +120,7 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 
 	// Clear required properties, for easier setup
 	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
-		"session_start_time": {
+		"app_start_time": {
 			Type:       datamodel.CMTimeKind,
 			Source:     datamodel.CMPropertySourceLib,
 			Optional:   false,
@@ -638,9 +638,9 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 	}
 
 	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
-		"builtInString":      {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
-		"builtInNever":       {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
-		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"builtInString":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"builtInNever":   {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"app_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 	}
 
 	ac.RegisterClientIntProperty("testInt", 42)

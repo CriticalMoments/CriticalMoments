@@ -120,7 +120,7 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"has_watch":                 requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
 		"screen_brightness":         requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeAppStart),
 		"screen_captured":           requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),
-		"session_start_time":        requiredPropertyConfig(CMTimeKind, CMPropertySampleTypeDoNotSample),
+		"app_start_time":            requiredPropertyConfig(CMTimeKind, CMPropertySampleTypeDoNotSample),
 
 		// Audio
 		"other_audio_playing": requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),

@@ -249,7 +249,7 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 		return errors.New("the SDK must register a cache directory before calling start")
 	}
 
-	err := ac.RegisterStaticTimeProperty("session_start_time", time.Now().UnixMilli())
+	err := ac.RegisterStaticTimeProperty("app_start_time", time.Now().UnixMilli())
 	if err != nil {
 		return err
 	}
