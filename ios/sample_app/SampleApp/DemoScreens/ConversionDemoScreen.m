@@ -22,8 +22,8 @@
                         @"Ensure they discover your core features\n2) After seeing value, ask them to subscribe or "
                         @"buy\n3) Once they are loyal, ask them to review.\n\nThe example "
                         @"below walk through the user journey of a fictional “todo "
-                        @"list” app, including UI nudges for users to progress if they get stuck.\n\nTo restart the "
-                        @"demo user journey, kill and relaunch this demo app, which will clear user progress.";
+                        @"list” app, including UI nudges for users to progress if they get stuck.\n\nProgress will "
+                        @"reset each time you launch this demo app.";
         [self buildSections];
     }
     return self;

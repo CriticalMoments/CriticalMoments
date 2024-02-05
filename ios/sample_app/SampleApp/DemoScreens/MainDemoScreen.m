@@ -33,7 +33,7 @@
 - (void)buildSections {
     CMDemoAction *messagingDemo = [[CMDemoAction alloc] init];
     messagingDemo.title = @"User Messaging";
-    messagingDemo.subtitle = @"Communicate with the right user, at the right moment";
+    messagingDemo.subtitle = @"Communicate with the right user, at the right moment.";
     messagingDemo.actionNextScreen = [[MessagingDemoScreen alloc] init];
 
     CMDemoAction *conversionDemo = [[CMDemoAction alloc] init];
@@ -43,12 +43,11 @@
 
     CMDemoAction *flagsDemo = [[CMDemoAction alloc] init];
     flagsDemo.title = @"Smart Feature Flags";
-    flagsDemo.subtitle = @"Feature flags that can update their state based on over 100 live device conditions, user "
-                         @"engagement history, and progressive rollouts/rollbacks.";
+    flagsDemo.subtitle = @"Conditional feature flags which update state based on client conditions.";
     flagsDemo.skipInUiTesting = YES;
     flagsDemo.actionNextScreen = [[FeatureFlagsDemoScreen alloc] init];
 
-    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, conversionDemo, flagsDemo ]];
+    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, flagsDemo, conversionDemo ]];
 
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";

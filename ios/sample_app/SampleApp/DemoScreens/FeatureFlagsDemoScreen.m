@@ -15,11 +15,7 @@
     self = [super init];
     if (self) {
         self.title = @"Feature Flags";
-        self.infoText =
-            @"This page shows demos of features flags. The titles contain the value of each flag.\n\n • The value of "
-            @"the flag can update based on the current "
-            @"device state\n • The value of the flag can update based on user actions in app\n • The flag values and "
-            @"conditional string can be updated remotely over the air without app store updates";
+        self.infoText = @"This page shows demos of features flags. The titles contain the value of each flag.";
         self.buttonLink = @"https://docs.criticalmoments.io/feature-flags/conditional-feature-flags";
         [self buildSections];
     }
@@ -54,12 +50,11 @@
                       CMDemoAction *action = [[CMDemoAction alloc] init];
                       action.title = result ? @"AB Test Group: A" : @"AB Test Group: B";
                       action.subtitle =
-                          @"Condition: randForKey('experiment5', stableRand()) % 100 < 25 && "
-                          @"!(is_pro_user ?? false)\n\nEach user is assigned to an AB test group; they "
-                          @"have a 25% chance of being in A, and a 75% chance of being in group B. It will be stable "
-                          @"across app launches. Users "
-                          @"with pro accounts are excluded from AB testing.\n\nThis can be remotely updated to "
-                          @"increase the percentage, or rollout either expereince to all users.";
+                          @"Split users into AB tests including: 1) random asignment, 2) filtering by user properties "
+                          @"(is_pro_user), 3) filtering by built-in properties (is_ipad, app_install_date), and much "
+                          @"more. These can be remotely updated to rollout or rollback.\n\nExample: "
+                          @"randForKey('experiment5', stableRand()) % 100 < 25 && "
+                          @"!(is_pro_user ?? false)";
                       [self addSection:@"AB Testing" withActions:@[ action ]];
                     }];
 
@@ -74,11 +69,10 @@
                       CMDemoAction *action = [[CMDemoAction alloc] init];
                       action.title = result ? @"Offer: Explore European Vacation Deals"
                                             : @"Offer: Explore Caribbean Vacation Deals";
-                      action.subtitle =
-                          @"Show different offers to "
-                          @"different users based on local weather. Caribbean offers when cold, and Europe offers when "
-                          @"warm.\n\nCondition: (weather_approx_location_temperature > 10)";
-                      [self addSection:@"Live Weather Flag" withActions:@[ action ]];
+                      action.subtitle = @"Show different offers to "
+                                        @"different users based on local weather. Caribbean when cold, and Europe when "
+                                        @"warm.\n\nCondition: (weather_approx_location_temperature > 10)";
+                      [self addSection:@"Live Weather Example" withActions:@[ action ]];
                     }];
 
     [CriticalMoments.sharedInstance
@@ -94,7 +88,7 @@
                           result ? @"Feature Flag: Enabled in Code" : @"Feature Flag: Disabled with Remote Override";
                       action.subtitle =
                           @"This feature was enabled in code, but should be remotely disabled via cloud update. This "
-                          @"can be useful for fixing issues in shipped builds, or rolling out successful experiments.";
+                          @"can be useful for fixing unexpected issues, or rolling out successful experiments.";
                       [self addSection:@"Remote Update" withActions:@[ action ]];
                     }];
 
