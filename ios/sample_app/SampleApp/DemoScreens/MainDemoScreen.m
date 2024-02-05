@@ -37,7 +37,7 @@
     messagingDemo.actionNextScreen = [[MessagingDemoScreen alloc] init];
 
     CMDemoAction *conversionDemo = [[CMDemoAction alloc] init];
-    conversionDemo.title = @"Conversion & User Journey";
+    conversionDemo.title = @"User Journey & Optimize Converion Rate";
     conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
     conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
 

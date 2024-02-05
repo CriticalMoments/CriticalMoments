@@ -294,7 +294,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 3,
                                     "pageSectionData": {
-                                        "bodyText": "We're currently expereincing a temporary issue with our service. Your data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
+                                        "bodyText": "We're currently expereincing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
                                         "scaleFactor": 1.3
                                     }
                                 }
@@ -325,7 +325,7 @@
             "legal_update": {
                 "actionType": "banner",
                 "actionData": {
-                    "body": "We've updated our terms of service and privacy policy →",
+                    "body": "New EU data regulations. Learn how we protect your data →",
                     "tapActionName": "tos"
                 }
             },
@@ -369,8 +369,8 @@
             "app_review_faux": {
                 "actionType": "alert",
                 "actionData": {
-                    "title": "System App Review",
-                    "message": "Now we would typically show a system app review prompt. For this demo app that's not possible as it's distributed via TestFlight, but it would work in a real app."
+                    "title": "Review Critical Moments",
+                    "message": "\n★★★★★\n\nThis isn't a real review prompt as this demo app is distributed via TestFlight, but it would work in a real app."
                 }
             },
             "short_banner": {
