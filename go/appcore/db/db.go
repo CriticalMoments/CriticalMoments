@@ -198,7 +198,9 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 
 	var epochTime float64
 	err := db.sqldb.QueryRow(latestEventTimeByNameQuery, name).Scan(&epochTime)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -391,6 +393,21 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 				return count, nil
 			},
 			Types: []any{new(func(string, int) int)},
+		},
+		"latestEventTime": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				time, err := db.LatestEventTimeByName(params[0].(string))
+				if err != nil {
+					return nil, err
+				}
+				if time == nil {
+					return nil, nil
+				}
+				// Time values not passed by reference
+				return *time, nil
+			},
+			Types: []any{new(func(string) interface{})},
 		},
 		"propertyHistoryLatestValue": {
 			Function: func(params ...any) (any, error) {

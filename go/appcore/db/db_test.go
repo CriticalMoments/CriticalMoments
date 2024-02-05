@@ -218,6 +218,15 @@ func TestInsertAndRetrieve(t *testing.T) {
 	db := testBuildTestDb(t)
 	defer db.Close()
 
+	// request before rows exist
+	ct, err := db.LatestEventTimeByName("event_not_in_db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ct != nil {
+		t.Fatal("LatestEventTimeByName didn't return nil")
+	}
+
 	// insert a row into events
 	e, err := datamodel.NewCustomEventWithName("test")
 	if err != nil {
@@ -228,11 +237,11 @@ func TestInsertAndRetrieve(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ct, err := db.LatestEventTimeByName(e.Name)
+	ct, err = db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if t == nil {
+	if ct == nil {
 		t.Fatal("LatestEventTimeByName returned nil")
 	}
 	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {

@@ -99,7 +99,7 @@ static NSURL *bundleUrl = nil;
 
     BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
     if (!success || error) {
-        NSLog(@"error removing existing cache: %@", error);
+        // Errors okay. Fresh start won't have a cache yet.
         return error;
     }
     return nil;

@@ -106,6 +106,7 @@
         
         // Weather -- tested in library
         
+        // Permissions
         @"contacts_permission": @"contacts_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"camera_permission": @"camera_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"microphone_permission": @"microphone_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
@@ -121,6 +122,10 @@
         @"propertyHistoryLatestValueNil": @"propertyHistoryLatestValue('never_set_prop') == nil", // add_test_count
         @"propertyEver": @"propertyEver('app_id', 'io.criticalmoments.demo-app') && !propertyEver('app_id', 'wrongval') && !propertyEver('wrongproperty', 'a')", // add_test_count
         @"stableRand": @"stableRand() == stableRand()", // add_test_count
+        @"last_event_time": @"latestEventTime('app_start') < now() && latestEventTime('fake_event') == nil", // add_test_count
+        
+        // Events
+        @"app_start": @"now() > latestEventTime('app_start') && now() - duration('5m') < latestEventTime('app_start')", // add_test_count
     };
     // clang-format on
 
