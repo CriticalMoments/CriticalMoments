@@ -11,6 +11,7 @@
 
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
+#import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
 
 @interface CriticalMoments ()
@@ -19,6 +20,7 @@
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
 @property(nonatomic, strong) CMTheme *currentTheme;
+@property(nonatomic, strong) CMNotificationObserver *notificationObserver;
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @end
@@ -29,6 +31,7 @@
     self = [super init];
     if (self) {
         _appcore = AppcoreNewAppcore();
+        _notificationObserver = [[CMNotificationObserver alloc] initWithCm:self];
 
         // Event queue is serial to preserve event order
         dispatch_queue_attr_t eventQueueAttr =
@@ -83,6 +86,9 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
+    // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
+    [self.notificationObserver start];
+
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -147,12 +153,6 @@ static CriticalMoments *sharedInstance = nil;
     // Set the data directory to applicationSupport/critical_moments_data
     NSError *error;
     NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
-
-    /*BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
-    if (!success || error) {
-        NSLog(@"error removing existing cache: %@", error);
-        return error;
-    }*/
 
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
                            withIntermediateDirectories:YES
@@ -265,15 +265,22 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)sendEvent:(NSString *)eventName {
-    [self sendEvent:eventName handler:nil];
+    [self sendEvent:eventName builtIn:false handler:nil];
 }
 
-- (void)sendEvent:(NSString *)eventName handler:(void (^)(NSError *_Nullable error))handler {
+- (void)sendEvent:(NSString *)eventName builtIn:(bool)builtIn handler:(void (^)(NSError *_Nullable error))handler {
     __block void (^blockHandler)(NSError *_Nullable error) = handler;
     __block NSString *blockEventName = eventName;
     dispatch_async(_eventQueue, ^{
       NSError *error;
-      [_appcore sendClientEvent:blockEventName error:&error];
+      if (builtIn) {
+          [_appcore sendBuiltInEvent:blockEventName error:&error];
+      } else {
+          [_appcore sendClientEvent:blockEventName error:&error];
+      }
+      if (error) {
+          NSLog(@"CriticalMoments: Error sending event. %@", error.localizedDescription);
+      }
 
       if (blockHandler) {
           blockHandler(error);

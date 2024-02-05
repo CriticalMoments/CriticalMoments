@@ -21,8 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 // Internal only -- use start in product
 - (NSError *)startReturningError;
 
-// Internal only -- for testing
-- (void)sendEvent:(NSString *)eventName handler:(void (^)(NSError *_Nullable error))handler;
+// Internal only -- for testing and built in event
+- (void)sendEvent:(NSString *)eventName
+          builtIn:(bool)builtIn
+          handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 /// :nodoc: access named themes
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name;

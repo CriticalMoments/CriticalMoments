@@ -210,6 +210,7 @@
 
     // should run async after start, and not crash
     [cm sendEvent:@"custom_event"
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@1];
@@ -229,6 +230,7 @@
     XCTestExpectation *expectation2 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation2];
     [cm sendEvent:randEventName
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@2];
@@ -242,6 +244,7 @@
     XCTestExpectation *expectation3 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation3];
     [cm sendEvent:DatamodelAppStartBuiltInEvent
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@3];

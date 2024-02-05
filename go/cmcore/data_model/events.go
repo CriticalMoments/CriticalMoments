@@ -17,12 +17,20 @@ const (
 
 // Enum type would be nice, but doesn't play well with gomobile exports
 const (
-	AppStartBuiltInEvent string = "app_start"
+	AppStartBuiltInEvent             string = "app_start"
+	SessionStartBuiltInEvent         string = "session_start"
+	AppEnteredForgroundBuiltInEvent  string = "app_entered_forground"
+	AppEnteredBackgroundBuiltInEvent string = "app_entered_background"
+	AppTerminatedBuiltInEvent        string = "app_terminated"
 )
 
 var (
 	allBuiltInEventTypes = map[string]bool{
-		AppStartBuiltInEvent: true,
+		AppStartBuiltInEvent:             true,
+		SessionStartBuiltInEvent:         true,
+		AppEnteredForgroundBuiltInEvent:  true,
+		AppEnteredBackgroundBuiltInEvent: true,
+		AppTerminatedBuiltInEvent:        true,
 	}
 )
 
