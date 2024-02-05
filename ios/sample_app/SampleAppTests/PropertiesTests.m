@@ -126,7 +126,7 @@
         
         // Events
         @"app_start": @"now() > latestEventTime('app_start') && now() - duration('5m') < latestEventTime('app_start')", // add_test_count
-        @"app_entered_forground": @"now() > latestEventTime('app_entered_forground') && now() - duration('5m') < latestEventTime('app_entered_forground')", // add_test_count
+        @"app_entered_foreground": @"now() > latestEventTime('app_entered_foreground') && now() - duration('5m') < latestEventTime('app_entered_foreground')", // add_test_count
         @"app_entered_background": @"latestEventTime('app_entered_background') == nil || (now() > latestEventTime('app_entered_background') && now() - duration('5m') < latestEventTime('app_entered_background'))", // add_test_count
     };
     // clang-format on

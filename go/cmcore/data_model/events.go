@@ -19,7 +19,7 @@ const (
 const (
 	AppStartBuiltInEvent             string = "app_start"
 	SessionStartBuiltInEvent         string = "session_start"
-	AppEnteredForgroundBuiltInEvent  string = "app_entered_forground"
+	AppEnteredForgroundBuiltInEvent  string = "app_entered_foreground"
 	AppEnteredBackgroundBuiltInEvent string = "app_entered_background"
 	AppTerminatedBuiltInEvent        string = "app_terminated"
 )
