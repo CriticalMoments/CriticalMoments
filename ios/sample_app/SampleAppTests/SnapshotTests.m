@@ -111,7 +111,8 @@
             } else {
                 // Take screenshot and diff
                 UIImage *screenshot = [self screenshotWindow:[Utils keyWindow]];
-                NSString *testName = [self buildNameForDeviceAndAction:action.title withWindow:[Utils keyWindow]];
+                NSString *actionSnapshotName = action.snapshotTitle ? action.snapshotTitle : action.title;
+                NSString *testName = [self buildNameForDeviceAndAction:actionSnapshotName withWindow:[Utils keyWindow]];
                 CMSnapshotWrapper *w = [[CMSnapshotWrapper alloc] init];
                 [w assertSnapshotImageOf:screenshot named:testName];
             }

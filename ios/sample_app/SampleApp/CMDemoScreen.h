@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMDemoAction : NSObject
 
-@property(nonatomic, readwrite) NSString *title;
+@property(nonatomic, readwrite) NSString *title, *snapshotTitle;
 @property(nonatomic, readwrite) NSString *subtitle;
 @property(nonatomic, readwrite) bool skipInUiTesting, skipInUI;
 

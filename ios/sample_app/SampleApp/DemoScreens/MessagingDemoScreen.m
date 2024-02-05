@@ -57,6 +57,7 @@
 
     CMDemoAction *productAnnouncement = [[CMDemoAction alloc] init];
     productAnnouncement.title = @"Announcements";
+    productAnnouncement.snapshotTitle = @"Product Announcements";
     productAnnouncement.subtitle = @"Examples of conditionally targeted announcements:\n • New watch app? Announce "
                                    @"to users with an Watch\n • Check local "
                                    @"weather and offer a 'Rainy day special'\n • Black friday discount banner appears "
@@ -66,6 +67,7 @@
 
     CMDemoAction *tos = [[CMDemoAction alloc] init];
     tos.title = @"Handle the Unexpected";
+    tos.snapshotTitle = @"Legal Updates";
     tos.subtitle = @"Remotely push updates to the appriopiate users, even for unexpected/unplanned changes.\n\nExample "
                    @"condition: locale_country_code IN ['DE', 'FR', 'RO'...]";
     tos.actionCMActionName = @"legal_update";
