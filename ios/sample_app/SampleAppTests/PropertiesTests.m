@@ -74,7 +74,8 @@
         @"has_watch": @"has_watch in [true, false]", // add_test_count
         @"foreground": @"foreground in [true, false]", // add_test_count
         @"app_state": @"app_state in ['active', 'inactive', 'background', 'unknown']", // add_test_count
-        @"app_start_time": @"now() > app_start_time && now() - duration('5m') < app_start_time", // add_test_count
+        @"app_start_time": @"now() >= app_start_time && now() - duration('5m') < app_start_time", // add_test_count
+        @"session_start_time": @"now() >= session_start_time && now() - duration('5m') < session_start_time", // add_test_count
         
         // Audio
         @"has_headphones": @"has_headphones in [true,false]", // add_test_count
@@ -128,6 +129,7 @@
         @"app_start": @"now() > latestEventTime('app_start') && now() - duration('5m') < latestEventTime('app_start')", // add_test_count
         @"app_entered_foreground": @"now() > latestEventTime('app_entered_foreground') && now() - duration('5m') < latestEventTime('app_entered_foreground')", // add_test_count
         @"app_entered_background": @"latestEventTime('app_entered_background') == nil || (now() > latestEventTime('app_entered_background') && now() - duration('5m') < latestEventTime('app_entered_background'))", // add_test_count
+        @"session_start": @"(now() > latestEventTime('session_start') && now() - duration('5m') < latestEventTime('session_start'))", // add_test_count
     };
     // clang-format on
 

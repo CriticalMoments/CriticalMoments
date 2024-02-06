@@ -19,7 +19,7 @@ const (
 const (
 	AppStartBuiltInEvent             string = "app_start"
 	SessionStartBuiltInEvent         string = "session_start"
-	AppEnteredForgroundBuiltInEvent  string = "app_entered_foreground"
+	AppEnteredForegroundBuiltInEvent string = "app_entered_foreground"
 	AppEnteredBackgroundBuiltInEvent string = "app_entered_background"
 	AppTerminatedBuiltInEvent        string = "app_terminated"
 )
@@ -28,7 +28,7 @@ var (
 	allBuiltInEventTypes = map[string]bool{
 		AppStartBuiltInEvent:             true,
 		SessionStartBuiltInEvent:         true,
-		AppEnteredForgroundBuiltInEvent:  true,
+		AppEnteredForegroundBuiltInEvent: true,
 		AppEnteredBackgroundBuiltInEvent: true,
 		AppTerminatedBuiltInEvent:        true,
 	}

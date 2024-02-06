@@ -35,8 +35,9 @@ type Appcore struct {
 	// Cache
 	cache *cache
 
-	// database
-	db *db.DB
+	// database and events
+	db           *db.DB
+	eventManager *EventManager
 
 	// Properties
 	propertyRegistry *propertyRegistry
@@ -50,6 +51,7 @@ func NewAppcore() *Appcore {
 		propertyRegistry:    newPropertyRegistry(),
 		seenNamedConditions: map[string]string{},
 		db:                  db.NewDB(),
+		eventManager:        &EventManager{},
 	}
 	// Connect the property registry to the db/proptery history manager
 	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
@@ -253,6 +255,10 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	if err != nil {
 		return err
 	}
+	err = ac.propertyRegistry.addProviderForKey("session_start_time", SessionStartTimePropertyProvider{eventManager: ac.eventManager})
+	if err != nil {
+		return err
+	}
 
 	if err := ac.propertyRegistry.validateProperties(); err != nil {
 		return err
@@ -391,8 +397,11 @@ func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
+	if ac.eventManager == nil {
+		return errors.New("Appcore EM not started")
+	}
 
-	err := ac.db.EventManager().SendEvent(event)
+	err := ac.eventManager.SendEvent(event, ac)
 	if err != nil {
 		return err
 	}

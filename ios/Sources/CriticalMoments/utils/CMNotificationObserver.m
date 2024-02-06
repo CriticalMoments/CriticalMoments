@@ -58,7 +58,7 @@
           [self.cm sendEvent:DatamodelAppEnteredBackgroundBuiltInEvent builtIn:true handler:nil];
       } else {
           // Forground == inactive or active states
-          [self.cm sendEvent:DatamodelAppEnteredForgroundBuiltInEvent builtIn:true handler:nil];
+          [self.cm sendEvent:DatamodelAppEnteredForegroundBuiltInEvent builtIn:true handler:nil];
       }
       self.started = true;
     });
@@ -73,7 +73,7 @@
     if (UIApplicationDidEnterBackgroundNotification == notification.name) {
         [self.cm sendEvent:DatamodelAppEnteredBackgroundBuiltInEvent builtIn:true handler:nil];
     } else if (UIApplicationWillEnterForegroundNotification == notification.name) {
-        [self.cm sendEvent:DatamodelAppEnteredForgroundBuiltInEvent builtIn:true handler:nil];
+        [self.cm sendEvent:DatamodelAppEnteredForegroundBuiltInEvent builtIn:true handler:nil];
     } else if (UIApplicationWillTerminateNotification == notification.name) {
         [self.cm sendEvent:DatamodelAppTerminatedBuiltInEvent builtIn:true handler:nil];
     }

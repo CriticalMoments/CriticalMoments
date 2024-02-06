@@ -43,6 +43,20 @@ func TestUrlValidation(t *testing.T) {
 	}
 }
 
+func buildTestBuiltInProps(propTypes map[string]*datamodel.CMPropertyConfig) map[string]*datamodel.CMPropertyConfig {
+	// These are populated by Appcore, so should be included even if not used in test
+	props := map[string]*datamodel.CMPropertyConfig{
+		"app_start_time":     {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+	}
+
+	for k, v := range propTypes {
+		props[k] = v
+	}
+
+	return props
+}
+
 type testLibBindings struct {
 	lastBannerAction *datamodel.BannerAction
 	lastAlertAction  *datamodel.AlertAction
@@ -107,7 +121,7 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ac.db == nil || ac.db.EventManager() == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
+	if ac.db == nil || ac.eventManager == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
 		t.Fatal("db, event manager, prop history manager, or cache not setup")
 	}
 	if ac.propertyRegistry.phm != ac.db.PropertyHistoryManager() {
@@ -119,14 +133,7 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
 	// Clear required properties, for easier setup
-	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
-		"app_start_time": {
-			Type:       datamodel.CMTimeKind,
-			Source:     datamodel.CMPropertySourceLib,
-			Optional:   false,
-			SampleType: datamodel.CMPropertySampleTypeDoNotSample,
-		},
-	}
+	ac.propertyRegistry.builtInPropertyTypes = buildTestBuiltInProps(map[string]*datamodel.CMPropertyConfig{})
 	return ac, nil
 }
 
@@ -637,11 +644,10 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
-		"builtInString":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
-		"builtInNever":   {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
-		"app_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
-	}
+	ac.propertyRegistry.builtInPropertyTypes = buildTestBuiltInProps(map[string]*datamodel.CMPropertyConfig{
+		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
+		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+	})
 
 	ac.RegisterClientIntProperty("testInt", 42)
 	ac.RegisterStaticStringProperty("builtInString", "hello world")

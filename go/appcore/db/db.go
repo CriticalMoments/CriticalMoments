@@ -20,7 +20,6 @@ type DB struct {
 	sqldb        *sql.DB
 	started      bool
 
-	eventManager           *EventManager
 	propertyHistoryManager *PropertyHistoryManager
 }
 
@@ -29,9 +28,6 @@ func NewDB() *DB {
 		started: false,
 	}
 
-	db.eventManager = &EventManager{
-		db: &db,
-	}
 	db.propertyHistoryManager = newPropertyHistoryManager(&db)
 
 	return &db
@@ -66,10 +62,6 @@ func (db *DB) StartWithPath(dataDir string) error {
 func (db *DB) Close() error {
 	db.started = false
 	return db.sqldb.Close()
-}
-
-func (db *DB) EventManager() *EventManager {
-	return db.eventManager
 }
 
 func (db *DB) PropertyHistoryManager() *PropertyHistoryManager {
