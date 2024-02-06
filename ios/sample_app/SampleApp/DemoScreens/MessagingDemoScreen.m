@@ -19,7 +19,7 @@
         self.infoText =
             @"For these demos:\n\n • All UI "
             @"is native and themeable\n • Messages can be triggered by user actions\n • Messages can be "
-            @"conditional based on device state and user behaviour history\n • UI, conditions, and trigger are "
+            @"conditional based on device state and user behaviour history\n • UI, conditions, and triggers are "
             @"created in config, which can remotely be updated without app store updates";
         self.buttonLink = @"https://docs.criticalmoments.io/actions/actions-overview";
         [self buildSections];

@@ -21,7 +21,7 @@
                         @"or even worse, leave for good.\n\nCritical Moments helps you create a user journey:\n1) "
                         @"Ensure they discover your core features\n2) After seeing value, ask them to subscribe or "
                         @"buy\n3) Once they are loyal, ask them to review.\n\nThe example "
-                        @"below walk through the user journey of a fictional “todo "
+                        @"below walks through the user journey of a fictional “todo "
                         @"list” app, including UI nudges for users to progress if they get stuck.\n\nProgress will "
                         @"reset each time you launch this demo app.";
         [self buildSections];

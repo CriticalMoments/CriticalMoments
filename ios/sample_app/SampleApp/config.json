@@ -42,7 +42,7 @@
                 "actionData": {
                     "condition": "eventCount('created_list') == 0",
                     "passedActionName": "journey_goal_1_nudge",
-                    "failedActionName": "journey_goal_failed"
+                    "failedActionName": "journey_goal_1_complete"
                 }
             },
             "journey_goal_1_nudge": {
@@ -59,12 +59,26 @@
                     "message": "If this was a real Todo list app, you could connect the banner tap to your 'Create New List' experience with a deeplink."
                 }
             },
+            "journey_goal_1_complete": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Goal Already Completed",
+                    "message": "The user has already created a list, and moved onto a later step of the user journey."
+                }
+            },
             "journey_goal_2": {
                 "actionType": "conditional_action",
                 "actionData": {
                     "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') < 2",
                     "passedActionName": "journey_goal_2_nudge",
-                    "failedActionName": "journey_goal_failed"
+                    "failedActionName": "journey_goal_2_complete"
+                }
+            },
+            "journey_goal_2_complete": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Goal Already Completed",
+                    "message": "The user has already added 2 taks to lists, and moved onto a later step of the user journey."
                 }
             },
             "journey_goal_3_tap": {
