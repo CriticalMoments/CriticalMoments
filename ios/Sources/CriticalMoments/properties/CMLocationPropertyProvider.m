@@ -528,8 +528,14 @@ static CMWeatherCache *sharedWeatherCache = nil;
             return nil;
         }
 
+        // Add up to 1km of noise. Weather doesn't need precise lat long
+        CLLocation *privateLocation = [CMUtils noiseLocation:location maxNoise:1000];
+        if (!privateLocation) {
+            return nil;
+        }
+
         url = [NSString stringWithFormat:@"https://api.criticalmoments.io/weather?lat=%f&long=%f",
-                                         location.coordinate.latitude, location.coordinate.longitude];
+                                         privateLocation.coordinate.latitude, privateLocation.coordinate.longitude];
     }
 
     NSDictionary *jsonResp = [CMUtils fetchCmApiSyncronous:url error:&error];

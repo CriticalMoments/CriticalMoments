@@ -10,6 +10,7 @@
 #define CM_LIB_VERSION_NUMBER_STRING @"0.8.1-beta"
 
 @import UIKit;
+@import CoreLocation;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (bool)isiPad;
 + (int64_t)dateToGoTime:(NSDate *)value;
 + (NSDictionary *)fetchCmApiSyncronous:(NSString *)urlString error:(NSError **)error;
++ (CLLocation *)noiseLocation:(CLLocation *)loc maxNoise:(int)distanceInMeters;
 
 @end
 

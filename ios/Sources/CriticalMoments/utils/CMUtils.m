@@ -143,4 +143,35 @@
     return returnDict;
 }
 
+#define MAX_BEARING (2.0 * M_PI)
+
++ (CLLocation *)noiseLocation:(CLLocation *)location maxNoise:(int)distanceInMeters {
+    // random bearing and distance offset
+    float distanceMeters = ((float)arc4random() / UINT32_MAX) * distanceInMeters;
+    float radianBearing = ((float)arc4random() / UINT32_MAX) * MAX_BEARING;
+
+    const double distRadians = distanceMeters / (6372797.6); // earth radius in meters
+
+    float lat1 = location.coordinate.latitude * M_PI / 180.0;
+    float lon1 = location.coordinate.longitude * M_PI / 180.0;
+
+    float lat2 = asin(sin(lat1) * cos(distRadians) + cos(lat1) * sin(distRadians) * cos(radianBearing));
+    float lon2 =
+        lon1 + atan2(sin(radianBearing) * sin(distRadians) * cos(lat1), cos(distRadians) - sin(lat1) * sin(lat2));
+
+    CLLocationDegrees finalLat = lat2 * 180.0 / M_PI;
+    if (finalLat > 90.0) {
+        finalLat = 90.0;
+    } else if (finalLat < -90.0) {
+        finalLat = -90.0;
+    }
+    CLLocationDegrees finalLong = lon2 * 180.0 / M_PI;
+    if (finalLong > 180.0) {
+        finalLong = 180.0;
+    } else if (finalLong < -180.0) {
+        finalLong = -180.0;
+    }
+    return [[CLLocation alloc] initWithLatitude:finalLat longitude:finalLong];
+}
+
 @end
