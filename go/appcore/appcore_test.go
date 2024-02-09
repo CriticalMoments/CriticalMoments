@@ -722,11 +722,14 @@ func TestStableRandomOperator(t *testing.T) {
 
 func TestMinConfigVersionChecks(t *testing.T) {
 	tests := map[string]bool{
-		"../cmcore/data_model/test/testdata/primary_config/invalid/appVersionTooLow.json":   false,
-		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLow.json":    false, // add_test_count
-		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalid.json":   false, // add_test_count
-		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnough.json":  true,  // add_test_count
-		"../cmcore/data_model/test/testdata/primary_config/valid/appVersionHighEnough.json": true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/appVersionTooLow.json":     false,
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLow.json":      false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalid.json":     false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnough.json":    true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/appVersionHighEnough.json":   true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLowInt.json":   false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalidInt.json":  false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnoughInt.json": true,  // add_test_count
 	}
 	for path, shouldPass := range tests {
 		ac, err := buildTestAppCoreWithPath(path, t)

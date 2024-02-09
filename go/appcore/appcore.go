@@ -353,6 +353,11 @@ func (ac *Appcore) isClientTooOldForConfig(pc *datamodel.PrimaryConfig) error {
 			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersion)
 		}
 	}
+	if pc.MinCMVersionInternal != "" {
+		if conditions.VersionLessThan(ac.libBindings.CMVersion(), pc.MinCMVersionInternal) {
+			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersionInternal)
+		}
+	}
 
 	return nil
 }

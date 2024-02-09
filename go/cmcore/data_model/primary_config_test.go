@@ -154,6 +154,9 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if pc.MinCMVersion != "0.8.0" {
 		t.Fatal("invalid min cm version parse")
 	}
+	if pc.MinCMVersionInternal != "0.7.0" {
+		t.Fatal("invalid min cm version parse")
+	}
 
 	// Themes
 	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
@@ -635,8 +638,16 @@ func TestMinAppAndClientVersionNumberValidation(t *testing.T) {
 	if pc.Validate() {
 		t.Fatal("failed to validate MinCMVersion")
 	}
+
+	pc.MinCMVersion = ""
+	pc.MinCMVersionInternal = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinCMVersionInternal")
+	}
+
 	pc.MinAppVersion = "1.2.3.4.5"
 	pc.MinCMVersion = "v34.234234.234.1123.32"
+	pc.MinCMVersionInternal = "v34.234234.234.1123.32"
 	if !pc.Validate() {
 		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}

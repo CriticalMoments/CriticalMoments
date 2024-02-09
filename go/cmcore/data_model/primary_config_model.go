@@ -23,8 +23,9 @@ type PrimaryConfig struct {
 	ConfigVersion    string
 	AppId            string
 
-	MinCMVersion  string
-	MinAppVersion string
+	MinCMVersion         string // for SDK users
+	MinCMVersionInternal string // for internal use
+	MinAppVersion        string
 
 	// Themes
 	defaultTheme *Theme
@@ -214,10 +215,11 @@ func EncodeConfig(configBytes []byte, su *signing.SignUtil) ([]byte, error) {
 // JSON
 
 type jsonPrimaryConfig struct {
-	ConfigVersion string `json:"configVersion"`
-	AppId         string `json:"appId"`
-	MinAppVersion string `json:"minAppVersion"`
-	MinCMVersion  string `json:"minCMVersion"`
+	ConfigVersion        string `json:"configVersion"`
+	AppId                string `json:"appId"`
+	MinAppVersion        string `json:"minAppVersion"`
+	MinCMVersion         string `json:"minCMVersion"`
+	MinCMVersionInternal string `json:"minCMVersionInternal"`
 
 	// Themes
 	ThemesConfig *jsonThemesSection `json:"themes"`
@@ -260,6 +262,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	pc.AppId = jpc.AppId
 	pc.MinAppVersion = jpc.MinAppVersion
 	pc.MinCMVersion = jpc.MinCMVersion
+	pc.MinCMVersionInternal = jpc.MinCMVersionInternal
 
 	// Themes
 	if jpc.ThemesConfig != nil {
@@ -347,6 +350,11 @@ func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
 	if pc.MinCMVersion != "" {
 		if _, err := conditions.VersionFromVersionString(pc.MinCMVersion); err != nil {
 			return fmt.Sprintf("Config had invalid minCMVersion: %v", pc.MinCMVersion)
+		}
+	}
+	if pc.MinCMVersionInternal != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinCMVersionInternal); err != nil {
+			return fmt.Sprintf("Config had invalid minCMVersionInternal: %v", pc.MinCMVersionInternal)
 		}
 	}
 
