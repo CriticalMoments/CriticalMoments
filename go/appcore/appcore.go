@@ -370,6 +370,12 @@ func (ac *Appcore) postConfigSetup() error {
 			fmt.Println("CriticalMoments: there was an issue setting up the default theme from config")
 			return err
 		}
+	} else if ac.config.LibraryThemeName != "" {
+		err := ac.libBindings.SetDefaultThemeByLibaryThemeName(ac.config.LibraryThemeName)
+		if err != nil {
+			// Non critical error. We can continue with default theme
+			fmt.Println("CriticalMoments: there was an issue setting up the default library theme from config")
+		}
 	}
 
 	return nil

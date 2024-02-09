@@ -8,6 +8,7 @@
             "fontName": "AvenirNext-Regular",
             "boldFontName": "AvenirNext-Bold"
         },
+        "defaultThemeName": "system",
         "namedThemes": {
             "blackAndWhiteTheme": {
                 "bannerBackgroundColor": "#000000",

@@ -88,10 +88,12 @@
 - (UIButton *)buildNewStyleButtonWithDataModel:(DatamodelButton *)model {
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *c;
+        bool primaryColorBackground;
         if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.buttonSize = UIButtonConfigurationSizeLarge;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
+            primaryColorBackground = true;
         } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
             c = UIButtonConfiguration.tintedButtonConfiguration;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
@@ -109,6 +111,17 @@
             // normal and any other value
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
+            primaryColorBackground = true;
+        }
+        if (primaryColorBackground) {
+            // System uses white text by default, but if theme uses a bright primary color, use the background color
+            // instead Background and primary require legibility in docs
+            CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
+            [c.baseBackgroundColor getRed:&red green:&green blue:&blue alpha:&alpha];
+            double luminance = (0.299 * red + 0.587 * green + 0.114 * blue);
+            if (luminance > 0.7294117647) {
+                c.baseForegroundColor = [self.theme backgroundColor];
+            }
         }
 
         // custom font (font, and size for info-small)

@@ -56,6 +56,40 @@ type jsonTheme struct {
 	FallbackThemeName string `json:"fallback,omitempty"`
 }
 
+// These themes provided by libary level, depend on the system
+var libraryThemeNames map[string]bool = map[string]bool{
+	"system":       true,
+	"system_light": true,
+	"system_dark":  true,
+}
+
+var builtInThemes map[string]*Theme = map[string]*Theme{
+	"elegant": {
+		BannerBackgroundColor:      "#000000",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#000000",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontName:                   "AvenirNext-Regular",
+		BoldFontName:               "AvenirNext-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: true,
+		DarkModeTheme: &Theme{
+			BannerBackgroundColor:      "#ffffff",
+			BannerForegroundColor:      "#000000",
+			PrimaryColor:               "#ffffff",
+			BackgroundColor:            "#000000",
+			PrimaryTextColor:           "#ffffff",
+			SecondaryTextColor:         "#dddddd",
+			FontName:                   "AvenirNext-Regular",
+			BoldFontName:               "AvenirNext-Bold",
+			FontScale:                  1.0,
+			ScaleFontForUserPreference: true,
+		},
+	},
+}
+
 var (
 	// For integration tests through to clients
 	testTheme = Theme{

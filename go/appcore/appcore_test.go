@@ -63,6 +63,7 @@ type testLibBindings struct {
 	lastLinkAction   *datamodel.LinkAction
 	reviewCount      int
 	defaultTheme     *datamodel.Theme
+	libThemeName     string
 	lastModal        *datamodel.ModalAction
 }
 
@@ -80,6 +81,10 @@ func (lb *testLibBindings) ShowLink(l *datamodel.LinkAction) error {
 }
 func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
 	lb.defaultTheme = theme
+	return nil
+}
+func (lb *testLibBindings) SetDefaultThemeByLibaryThemeName(name string) error {
+	lb.libThemeName = name
 	return nil
 }
 func (lb *testLibBindings) ShowReviewPrompt() error {
@@ -429,6 +434,31 @@ func TestSetDefaultTheme(t *testing.T) {
 	defaultTheme := ac.libBindings.(*testLibBindings).defaultTheme
 	if defaultTheme == nil && defaultTheme.BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not set after start")
+	}
+	if ac.libBindings.(*testLibBindings).libThemeName != "" {
+		t.Fatal("Default theme set after start")
+	}
+}
+
+func TestSetDefaultLibraryTheme(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/builtInLibraryTheme.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).defaultTheme != nil {
+		t.Fatal("Theme should be nil until started")
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defaultThemeName := ac.libBindings.(*testLibBindings).libThemeName
+	if defaultThemeName != "system_dark" {
+		t.Fatal("Default theme not set after start")
+	}
+	defaultTheme := ac.libBindings.(*testLibBindings).defaultTheme
+	if defaultTheme != nil {
+		t.Fatal("Default theme set after start")
 	}
 }
 

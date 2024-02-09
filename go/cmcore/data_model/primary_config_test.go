@@ -162,7 +162,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not parsed")
 	}
-	if len(pc.namedThemes) != 3 {
+	if len(pc.namedThemes) != 4 {
 		t.Fatal("Wrong number of named themes")
 	}
 	blueTheme := pc.ThemeWithName("blueTheme")
@@ -617,6 +617,59 @@ func TestFallbackDefaultTheme(t *testing.T) {
 	}
 	if pc.ThemeWithName("missingName") != nil {
 		t.Fatal("missing name not nil")
+	}
+}
+
+func TestDefaultThemeSelection(t *testing.T) {
+	// Strict mode
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/valid/builtInLibraryTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc := PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pc.DefaultTheme() != nil {
+		t.Fatal("Libary theme should not set default")
+	}
+	if pc.LibraryThemeName != "system_dark" {
+		t.Fatal("Failed to parse library theme name")
+	}
+
+	testFileData, err = os.ReadFile("./test/testdata/primary_config/valid/builtInDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc = PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Also checks ThemeWithName works on built in themes
+	if pc.DefaultTheme() != pc.ThemeWithName("elegant") {
+		t.Fatal("Libary theme should not set default")
+	}
+	if pc.LibraryThemeName != "" {
+		t.Fatal("Set Library theme name when not needed")
+	}
+
+	// named config based default tested in maximal valid test case
+
+	testFileData, err = os.ReadFile("./test/testdata/primary_config/invalid/invalidDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc = PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("Failed to error on invalid default theme")
 	}
 }
 

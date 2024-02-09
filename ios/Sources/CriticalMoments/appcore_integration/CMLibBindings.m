@@ -49,8 +49,20 @@
         *error = [NSError errorWithDomain:@"CMIOS" code:81263223 userInfo:nil];
         return NO;
     }
-    [self.cm setTheme:theme];
 
+    [self.cm setTheme:theme];
+    return YES;
+}
+
+- (BOOL)setDefaultThemeByLibaryThemeName:(NSString *_Nullable)themeName
+                                   error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    CMTheme *theme = [CMTheme libaryThemeByName:themeName];
+    if (!theme) {
+        *error = [NSError errorWithDomain:@"CMIOS" code:902834902384 userInfo:nil];
+        return NO;
+    }
+
+    [self.cm setTheme:theme];
     return YES;
 }
 

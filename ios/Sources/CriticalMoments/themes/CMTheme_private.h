@@ -9,6 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// :nodoc: Test Theme for e2e testing
 + (CMTheme *)testTheme;
 
+/// :nodoc:
++ (CMTheme *)libaryThemeByName:(NSString *)name;
+
 /**
  :nodoc:
  @param acTheme The appcore theme to convert to CMTheme

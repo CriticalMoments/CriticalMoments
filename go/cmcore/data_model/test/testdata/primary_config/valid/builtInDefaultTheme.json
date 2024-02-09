@@ -1,0 +1,7 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "themes": {
+    "defaultThemeName": "elegant"
+  }
+}

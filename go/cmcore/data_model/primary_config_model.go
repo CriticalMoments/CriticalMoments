@@ -28,8 +28,9 @@ type PrimaryConfig struct {
 	MinAppVersion        string
 
 	// Themes
-	defaultTheme *Theme
-	namedThemes  map[string]*Theme
+	defaultTheme     *Theme
+	LibraryThemeName string
+	namedThemes      map[string]*Theme
 
 	// Actions
 	namedActions map[string]*ActionContainer
@@ -47,10 +48,16 @@ func (pc *PrimaryConfig) DefaultTheme() *Theme {
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
 	theme, ok := pc.namedThemes[name]
-	if !ok {
-		return nil
+	if ok {
+		return pc.themeIteratingFallbacks(theme)
 	}
-	return pc.themeIteratingFallbacks(theme)
+
+	theme, ok = builtInThemes[name]
+	if ok {
+		return pc.themeIteratingFallbacks(theme)
+	}
+
+	return nil
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
@@ -235,8 +242,8 @@ type jsonPrimaryConfig struct {
 }
 
 type jsonThemesSection struct {
-	DefaultTheme *Theme            `json:"defaultTheme"`
-	NamedThemes  map[string]*Theme `json:"namedThemes"`
+	DefaultThemeName string            `json:"defaultThemeName"`
+	NamedThemes      map[string]*Theme `json:"namedThemes"`
 }
 
 type jsonActionsSection struct {
@@ -266,11 +273,26 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 
 	// Themes
 	if jpc.ThemesConfig != nil {
-		if jpc.ThemesConfig.DefaultTheme != nil {
-			pc.defaultTheme = jpc.ThemesConfig.DefaultTheme
-		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
+		}
+		if jpc.ThemesConfig.DefaultThemeName != "" {
+			isLibaryTheme := libraryThemeNames[jpc.ThemesConfig.DefaultThemeName]
+			appcoreBuiltInTheme := builtInThemes[jpc.ThemesConfig.DefaultThemeName]
+			namedDefaultTheme := pc.namedThemes[jpc.ThemesConfig.DefaultThemeName]
+
+			// Priority order: named, libary, cmcore built-in
+			if namedDefaultTheme != nil {
+				pc.defaultTheme = namedDefaultTheme
+			} else if isLibaryTheme {
+				pc.LibraryThemeName = jpc.ThemesConfig.DefaultThemeName
+			} else if appcoreBuiltInTheme != nil {
+				pc.defaultTheme = appcoreBuiltInTheme
+			} else if StrictDatamodelParsing {
+				return NewUserPresentableError("Default theme specified in config doesn't exist")
+			} else {
+				fmt.Println("CriticalMoments: WARNING - Default theme specified in config doesn't exist. Will fallback to system default theme.")
+			}
 		}
 	}
 	if pc.namedThemes == nil {

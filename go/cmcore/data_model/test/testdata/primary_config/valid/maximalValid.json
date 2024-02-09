@@ -5,14 +5,7 @@
     "minCMVersion": "0.8.0",
     "minCMVersionInternal": "0.7.0",
     "themes": {
-        "defaultTheme": {
-            "bannerBackgroundColor": "#ffffff",
-            "bannerForegroundColor": "#000000",
-            "fontScale": 1.1,
-            "fontName": "AvenirNext-Regular",
-            "boldFontName": "AvenirNext-Bold",
-            "scaleFontForUserPreference": false
-        },
+        "defaultThemeName": "baseTheme",
         "namedThemes": {
             "blueTheme": {
                 "bannerBackgroundColor": "#00ff00",
@@ -33,6 +26,14 @@
             "futureThemeWithFallback": {
                 "bannerBackgroundColor": "invalidNewColorFormat",
                 "fallback": "blueTheme"
+            },
+            "baseTheme": {
+              "bannerBackgroundColor": "#ffffff",
+              "bannerForegroundColor": "#000000",
+              "fontScale": 1.1,
+              "fontName": "AvenirNext-Regular",
+              "boldFontName": "AvenirNext-Bold",
+              "scaleFontForUserPreference": false
             }
         }
     },

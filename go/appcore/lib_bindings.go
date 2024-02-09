@@ -8,6 +8,7 @@ import (
 type LibBindings interface {
 	// Themes
 	SetDefaultTheme(theme *datamodel.Theme) error
+	SetDefaultThemeByLibaryThemeName(themeName string) error
 
 	// Actions
 	ShowBanner(banner *datamodel.BannerAction) error
