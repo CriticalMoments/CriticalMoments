@@ -60,6 +60,10 @@ func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
 	return nil
 }
 
+func (pc *PrimaryConfig) IncludesCustomThemes() bool {
+	return len(pc.namedThemes) > 0
+}
+
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
 	action, ok := pc.namedActions[name]
 	if ok {
