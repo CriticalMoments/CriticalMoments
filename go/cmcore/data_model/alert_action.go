@@ -223,6 +223,10 @@ func (a *AlertAction) AllEmbeddedActionNames() ([]string, error) {
 	return alertActions, nil
 }
 
+func (l *AlertAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{}, nil
+}
+
 func (a *AlertAction) PerformAction(ab ActionBindings) error {
 	return ab.ShowAlert(a)
 }

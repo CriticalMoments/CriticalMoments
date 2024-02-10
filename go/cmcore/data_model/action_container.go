@@ -70,6 +70,7 @@ type ActionBindings interface {
 type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
+	AllEmbeddedConditions() ([]*Condition, error)
 	ValidateReturningUserReadableIssue() string
 	PerformAction(ActionBindings) error
 }

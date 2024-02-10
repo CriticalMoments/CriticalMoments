@@ -46,7 +46,6 @@ func TestContainer(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version from JSON")
 	}
-
 }
 
 func TestContainerVersionCheck(t *testing.T) {
@@ -134,6 +133,21 @@ func testHelperBuilPrimaryConfigFromFile(t *testing.T, filePath string) *Primary
 	return &pc
 }
 
+func testAllConditionsContainsCondition(t *testing.T, pc *PrimaryConfig, c *Condition) {
+	all, err := pc.AllConditions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, cond := range all {
+		// Pointer check, check actual instance returned in case string matches
+		if cond == c {
+			return
+		}
+	}
+	t.Fatalf("Failed to find condition in all conditions: %v", c.String())
+}
+
 func TestPrimaryConfigJson(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
@@ -202,18 +216,22 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if failConditionAction == nil || failConditionAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse alert action with failing condition")
 	}
+	testAllConditionsContainsCondition(t, pc, failConditionAction.Condition)
 	ca1 := pc.ActionWithName("conditionalWithTrueCondition")
 	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition.String() != "2 > 1" {
 		t.Fatal("Didn't parse conditional action 1")
 	}
+	testAllConditionsContainsCondition(t, pc, ca1.ConditionalAction.Condition)
 	ca2 := pc.ActionWithName("conditionalWithFalseCondition")
 	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse conditional action 2")
 	}
+	testAllConditionsContainsCondition(t, pc, ca2.ConditionalAction.Condition)
 	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")
 	if ca3.ConditionalAction == nil || ca3.ConditionalAction.FailedActionName != "" {
 		t.Fatal("Didn't parse conditional action 3")
 	}
+	testAllConditionsContainsCondition(t, pc, ca3.ConditionalAction.Condition)
 	ua := pc.ActionWithName("unknownActionTypeFutureProof")
 	_, ok := ua.actionData.(*UnknownAction)
 	if ua.ActionType != "unknown_future_type" || !ok {
@@ -260,10 +278,12 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if trigger3.ActionName != "alertAction" || trigger3.EventName != "custom_event_conditional_true" || trigger3.Condition.String() != "2 > 1" {
 		t.Fatal("Trigger 3 parsing failed")
 	}
+	testAllConditionsContainsCondition(t, pc, trigger3.Condition)
 	trigger4 := pc.namedTriggers["conditional_trigger_false"]
 	if trigger4.ActionName != "alertAction" || trigger4.EventName != "custom_event_conditional_false" || trigger4.Condition.String() != "2 > 3" {
 		t.Fatal("Trigger 4 parsing failed")
 	}
+	testAllConditionsContainsCondition(t, pc, trigger4.Condition)
 
 	// Conditions
 	if len(pc.namedConditions) != 3 {
@@ -273,14 +293,17 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if c1 == nil || c1.String() != "true" {
 		t.Fatal("Issue with true condition")
 	}
+	testAllConditionsContainsCondition(t, pc, c1)
 	c2 := pc.ConditionWithName("falseCondition")
 	if c2 == nil || c2.String() != "false" {
 		t.Fatal("Issue with true condition")
 	}
+	testAllConditionsContainsCondition(t, pc, c2)
 	c3 := pc.ConditionWithName("complexCondition")
 	if c3 == nil || c3.String() != "4 > 3 && os_version =='123'" {
 		t.Fatal("complex condition failed")
 	}
+	testAllConditionsContainsCondition(t, pc, c3)
 	c3Var, err := c3.ExtractIdentifiers()
 	if err != nil || len(c3Var.Variables) != 1 || c3Var.Variables[0] != "os_version" {
 		t.Fatal("complex condition failed to parse")

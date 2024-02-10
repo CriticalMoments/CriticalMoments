@@ -82,6 +82,10 @@ func (m *ModalAction) AllEmbeddedActionNames() ([]string, error) {
 	return embeddedActions, nil
 }
 
+func (m *ModalAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{}, nil
+}
+
 func (m *ModalAction) PerformAction(ab ActionBindings) error {
 	return ab.ShowModal(m)
 }

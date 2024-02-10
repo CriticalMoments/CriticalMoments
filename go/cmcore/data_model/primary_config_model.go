@@ -517,3 +517,30 @@ func (pc *PrimaryConfig) validateFallbackNames() string {
 
 	return ""
 }
+
+func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
+	all := make([]*Condition, 0)
+	for _, c := range pc.namedConditions {
+		all = append(all, c)
+	}
+
+	for _, a := range pc.namedActions {
+		if a.Condition != nil {
+			all = append(all, a.Condition)
+		}
+		actionConditions, err := a.actionData.AllEmbeddedConditions()
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, actionConditions...)
+	}
+
+	for _, t := range pc.namedTriggers {
+		condition := t.Condition
+		if condition != nil {
+			all = append(all, condition)
+		}
+	}
+
+	return all, nil
+}

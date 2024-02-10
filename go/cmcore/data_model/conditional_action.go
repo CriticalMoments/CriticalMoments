@@ -74,6 +74,10 @@ func (c *ConditionalAction) AllEmbeddedActionNames() ([]string, error) {
 	return conditionActions, nil
 }
 
+func (ca *ConditionalAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{ca.Condition}, nil
+}
+
 func (c *ConditionalAction) PerformAction(ab ActionBindings) error {
 	return ab.PerformConditionalAction(c)
 }
