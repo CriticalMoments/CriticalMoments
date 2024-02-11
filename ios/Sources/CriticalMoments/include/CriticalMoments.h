@@ -126,9 +126,13 @@ each usage independently from remote configuration. Reused names will log warnin
 
 #pragma mark Themes
 
-/// Fetch the current theme for this CM instance
+// Fetch the current theme for this CM instance
+// Private, only for internal use (demo app).
+/// :nodoc:
 - (CMTheme *)currentTheme;
-/// Set the current theme for this CM instance
+// Set the current theme for this CM instance.
+// Private, only for internal use (demo app).
+/// :nodoc:
 - (void)setTheme:(CMTheme *)theme;
 
 #pragma mark Properties

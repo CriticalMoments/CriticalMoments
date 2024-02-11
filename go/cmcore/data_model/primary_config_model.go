@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
@@ -441,6 +442,7 @@ func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable
 }
 
 func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+	allBuiltInThemeNames := AllBuiltInThemeNames()
 	for sourceActionName, action := range pc.namedActions {
 		if action.ActionType == "" || action.actionData == nil {
 			return "Internal issue. Code 15234328"
@@ -450,9 +452,15 @@ func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 			return fmt.Sprintf("Internal issue for action \"%v\". Code: 88456198", sourceActionName)
 		}
 		for _, themeName := range themeList {
-			_, ok := pc.namedThemes[themeName]
-			if !ok {
-				return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, themeName)
+			isBuiltIn := slices.Contains(allBuiltInThemeNames, themeName)
+			_, hasNamedTheme := pc.namedThemes[themeName]
+			if !hasNamedTheme && !isBuiltIn {
+				// New built in names may be added later. Older devices should ignore unknown names.
+				if StrictDatamodelParsing {
+					return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, themeName)
+				} else {
+					fmt.Println("CriticalMoments: WARNING - Action specified named theme that doesn't exist. Will fallback to system default theme.")
+				}
 			}
 		}
 	}

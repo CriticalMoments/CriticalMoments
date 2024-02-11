@@ -54,7 +54,8 @@
                 "actionData": {
                     "body": "Hello world 2, but on a banner!",
                     "maxLineCount": 1,
-                    "showDismissButton": false
+                    "showDismissButton": false,
+                    "themeName": "elegant"
                 }
             },
             "alertAction": {

@@ -1,0 +1,19 @@
+{
+    "configVersion": "v1",
+    "appId": "io.criticalmoments.demo",
+    "actions": {
+      "namedActions": {
+        "bannerAction1": {
+            "actionType": "banner",
+            "actionData": {
+                "body": "Hello world, but on a banner!",
+                "themeName": "future_theme",
+                "showDismissButton": false
+            }
+        }
+      }
+    },
+    "themes": {
+      "defaultThemeName": "future_theme"
+    }
+}

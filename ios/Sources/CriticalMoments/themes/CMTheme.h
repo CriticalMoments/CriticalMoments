@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define CM_MAX_TEXT_WIDTH 672
 
 // clang-format off
-/**
+/*
  A class to control the theme/style of our UI controls.
 
  See our detailed guide to themes: https://docs.criticalmoments.io/actions/themes
@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  CMTheme.setCurrent(customTheme)
  ```
  */
+/// :nodoc: CMThemes are done in config
 // clang-format on
 @interface CMTheme : NSObject
 

@@ -200,9 +200,15 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if bannerAction1 == nil || bannerAction1.BannerAction.Body != "Hello world, but on a banner!" {
 		t.Fatal("Didn't parse banner action 1")
 	}
+	if bannerAction1.BannerAction.CustomThemeName != "blueTheme" {
+		t.Fatal("Didn't parse banner action 1 theme")
+	}
 	bannerAction2 := pc.ActionWithName("bannerAction2")
 	if bannerAction2 == nil || bannerAction2.BannerAction.Body != "Hello world 2, but on a banner!" {
 		t.Fatal("Didn't parse banner action 2")
+	}
+	if bannerAction2.BannerAction.CustomThemeName != "elegant" {
+		t.Fatal("Didn't parse banner action 2 theme")
 	}
 	alertAction := pc.ActionWithName("alertAction")
 	if alertAction == nil || alertAction.AlertAction.Title != "Alert title" {
@@ -389,6 +395,10 @@ func TestNoDefaultTheme(t *testing.T) {
 
 func TestNoNamedThemes(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
 
 	pc.namedThemes = nil
 	if pc.Validate() {
@@ -693,6 +703,39 @@ func TestDefaultThemeSelection(t *testing.T) {
 	err = json.Unmarshal(testFileData, &pc)
 	if err == nil {
 		t.Fatal("Failed to error on invalid default theme")
+	}
+}
+
+func TestFutureBuiltInTheme(t *testing.T) {
+	testFiles := []string{
+		"./test/testdata/primary_config/valid/futureBuiltInActionTheme.json",
+		"./test/testdata/primary_config/valid/futureBuiltInTheme.json", // add_test_count
+	}
+	for _, file := range testFiles {
+		StrictDatamodelParsing = false
+		testFileData, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Non strict should allow unknown theme names, could be future built in
+		pc := PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Strict mode
+		StrictDatamodelParsing = true
+		defer func() {
+			StrictDatamodelParsing = false
+		}()
+
+		// strict mode should not allow unknown theme names
+		pc = PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err == nil {
+			t.Fatal("allowed unknown theme name in strict mode")
+		}
 	}
 }
 
