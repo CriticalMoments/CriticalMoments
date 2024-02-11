@@ -552,3 +552,11 @@ func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
 
 	return all, nil
 }
+
+func (pc *PrimaryConfig) AllActions() []*ActionContainer {
+	all := make([]*ActionContainer, 0)
+	for _, a := range pc.namedActions {
+		all = append(all, a)
+	}
+	return all
+}

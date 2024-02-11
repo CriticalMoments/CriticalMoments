@@ -267,6 +267,9 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if nfas.ActionType != "future_action_type" || !ok || nfas.FallbackActionName != "futureAction" {
 		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
 	}
+	if len(pc.AllActions()) != len(pc.namedActions) {
+		t.Fatal("all actions count mismatch")
+	}
 
 	// Triggers
 	if len(pc.namedTriggers) != 4 {
