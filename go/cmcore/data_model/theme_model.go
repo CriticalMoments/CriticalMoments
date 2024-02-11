@@ -3,7 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
-	"slices"
+
+	"golang.org/x/exp/slices"
 )
 
 type Theme struct {
