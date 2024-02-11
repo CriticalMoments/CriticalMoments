@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 )
 
 type Theme struct {
@@ -64,7 +65,7 @@ var libraryThemeNames map[string]bool = map[string]bool{
 }
 
 var builtInThemes map[string]*Theme = map[string]*Theme{
-	"elegant": {
+	"elegant_light": {
 		BannerBackgroundColor:      "#000000",
 		BannerForegroundColor:      "#ffffff",
 		PrimaryColor:               "#000000",
@@ -75,19 +76,70 @@ var builtInThemes map[string]*Theme = map[string]*Theme{
 		BoldFontName:               "AvenirNext-Bold",
 		FontScale:                  1.0,
 		ScaleFontForUserPreference: true,
-		DarkModeTheme: &Theme{
-			BannerBackgroundColor:      "#ffffff",
-			BannerForegroundColor:      "#000000",
-			PrimaryColor:               "#ffffff",
-			BackgroundColor:            "#000000",
-			PrimaryTextColor:           "#ffffff",
-			SecondaryTextColor:         "#dddddd",
-			FontName:                   "AvenirNext-Regular",
-			BoldFontName:               "AvenirNext-Bold",
-			FontScale:                  1.0,
-			ScaleFontForUserPreference: true,
-		},
 	},
+	"elegant_dark": {
+		BannerBackgroundColor:      "#ffffff",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#ffffff",
+		BackgroundColor:            "#000000",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#dddddd",
+		FontName:                   "AvenirNext-Regular",
+		BoldFontName:               "AvenirNext-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: true,
+	},
+	// terminal MIT source: https://github.com/altercation/solarized
+	"terminal_light": {
+		BannerBackgroundColor:      "#fdf6e3",
+		BannerForegroundColor:      "#859900",
+		PrimaryColor:               "#859900",
+		BackgroundColor:            "#fdf6e3",
+		PrimaryTextColor:           "#859900",
+		SecondaryTextColor:         "#b58900",
+		FontName:                   "Courier",
+		BoldFontName:               "Courier-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"terminal_dark": {
+		BannerBackgroundColor:      "#001e27",
+		BannerForegroundColor:      "#6cbe6c",
+		PrimaryColor:               "#6cbe6c",
+		BackgroundColor:            "#001e27",
+		PrimaryTextColor:           "#6cbe6c",
+		SecondaryTextColor:         "#51ef84",
+		FontName:                   "Courier",
+		BoldFontName:               "Courier-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+}
+
+var combinedThemeNames []string = []string{
+	"terminal",
+	"elegant",
+}
+
+func builtInThemeByName(name string) (*Theme, error) {
+	builtIn, ok := builtInThemes[name]
+	if ok {
+		return builtIn, nil
+	}
+
+	if slices.Contains(combinedThemeNames, name) {
+		darkTheme, darkOk := builtInThemes[name+"_dark"]
+		lightTheme, lightOk := builtInThemes[name+"_light"]
+		if darkOk && lightOk {
+			// copy and return combined
+			d := *darkTheme
+			l := *lightTheme
+			l.DarkModeTheme = &d
+			return &l, nil
+		}
+	}
+
+	return nil, NewUserPresentableError(fmt.Sprintf("Theme name '%v' is not valid. Check the spelling and try again.", name))
 }
 
 var (

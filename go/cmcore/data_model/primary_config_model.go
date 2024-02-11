@@ -52,8 +52,8 @@ func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
 		return pc.themeIteratingFallbacks(theme)
 	}
 
-	theme, ok = builtInThemes[name]
-	if ok {
+	theme, err := builtInThemeByName(name)
+	if theme != nil && err == nil {
 		return pc.themeIteratingFallbacks(theme)
 	}
 
@@ -282,7 +282,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		}
 		if jpc.ThemesConfig.DefaultThemeName != "" {
 			isLibaryTheme := libraryThemeNames[jpc.ThemesConfig.DefaultThemeName]
-			appcoreBuiltInTheme := builtInThemes[jpc.ThemesConfig.DefaultThemeName]
+			appcoreBuiltInTheme, _ := builtInThemeByName(jpc.ThemesConfig.DefaultThemeName)
 			namedDefaultTheme := pc.namedThemes[jpc.ThemesConfig.DefaultThemeName]
 
 			// Priority order: named, libary, cmcore built-in
