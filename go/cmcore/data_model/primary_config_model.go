@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"slices"
 	"strings"
 
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
+	"golang.org/x/exp/slices"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
