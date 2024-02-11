@@ -3,11 +3,8 @@ package datamodel
 import "testing"
 
 func TestBuiltInThemesValid(t *testing.T) {
-	themeNames := combinedThemeNames
+	themeNames := AllBuiltInThemeNames()
 
-	for themeName := range builtInThemes {
-		themeNames = append(themeNames, themeName)
-	}
 	if len(themeNames) != 6 {
 		t.Fatal("Incorrect number of themes")
 	}

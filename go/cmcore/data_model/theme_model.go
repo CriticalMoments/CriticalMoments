@@ -122,6 +122,14 @@ var combinedThemeNames []string = []string{
 	"elegant",
 }
 
+func AllBuiltInThemeNames() []string {
+	themeNames := combinedThemeNames
+	for themeName := range builtInThemes {
+		themeNames = append(themeNames, themeName)
+	}
+	return themeNames
+}
+
 func builtInThemeByName(name string) (*Theme, error) {
 	builtIn, ok := builtInThemes[name]
 	if ok {
