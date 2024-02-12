@@ -175,6 +175,26 @@ var builtInThemes map[string]*Theme = map[string]*Theme{
 		FontScale:                  1.0,
 		ScaleFontForUserPreference: false,
 	},
+	"aqua_dark": {
+		BannerBackgroundColor:      "#65c0a6",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#65c0a6",
+		BackgroundColor:            "#5063ec",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#d9e3f2",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"aqua_light": {
+		BannerBackgroundColor:      "#5063ec",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#65c0a6",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#4253ce",
+		SecondaryTextColor:         "#5063ec",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
 }
 
 var combinedThemeNames []string = []string{
@@ -183,6 +203,7 @@ var combinedThemeNames []string = []string{
 	"jazzy",
 	"honey",
 	"sea",
+	"aqua",
 }
 
 func AllBuiltInThemeNames() []string {
