@@ -72,7 +72,15 @@
                 "actionData": {
                     "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') < 2",
                     "passedActionName": "journey_goal_2_nudge",
-                    "failedActionName": "journey_goal_2_complete"
+                    "failedActionName": "journey_goal_2_fail"
+                }
+            },
+            "journey_goal_2_fail": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0",
+                    "passedActionName": "journey_goal_2_complete",
+                    "failedActionName": "journey_goal_prior_step"
                 }
             },
             "journey_goal_2_complete": {
@@ -80,6 +88,13 @@
                 "actionData": {
                     "title": "Goal Already Completed",
                     "message": "The user has already added 2 taks to lists, and moved onto a later step of the user journey."
+                }
+            },
+            "journey_goal_prior_step": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User is on earlier goal",
+                    "message": "The user has not reached this goal. Try earlier goals."
                 }
             },
             "journey_goal_3_tap": {
@@ -152,7 +167,7 @@
                 "actionData": {
                     "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') >= 2 && eventCount('completed_task') > 0",
                     "passedActionName": "journey_goal_3_nudge",
-                    "failedActionName": "journey_goal_failed"
+                    "failedActionName": "journey_goal_prior_step"
                 }
             },
             "journey_goal_3_nudge": {
