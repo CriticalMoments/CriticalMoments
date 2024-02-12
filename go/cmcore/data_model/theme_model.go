@@ -135,12 +135,54 @@ var builtInThemes map[string]*Theme = map[string]*Theme{
 		FontScale:                  1.0,
 		ScaleFontForUserPreference: false,
 	},
+	"honey_dark": {
+		BannerBackgroundColor:      "#f4d42b",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#000000",
+		BackgroundColor:            "#f4d42b",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"honey_light": {
+		BannerBackgroundColor:      "#f4d42b",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#ebc603",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"sea_dark": {
+		BannerBackgroundColor:      "#ffffff",
+		BannerForegroundColor:      "#112c5d",
+		PrimaryColor:               "#ffffff",
+		BackgroundColor:            "#112c5d",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#8eabdc",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"sea_light": {
+		BannerBackgroundColor:      "#112c5d",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#112c5d",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#112c5d",
+		SecondaryTextColor:         "#244278",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
 }
 
 var combinedThemeNames []string = []string{
 	"terminal",
 	"elegant",
 	"jazzy",
+	"honey",
+	"sea",
 }
 
 func AllBuiltInThemeNames() []string {
