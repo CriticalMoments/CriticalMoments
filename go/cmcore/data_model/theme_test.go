@@ -5,7 +5,7 @@ import "testing"
 func TestBuiltInThemesValid(t *testing.T) {
 	themeNames := AllBuiltInThemeNames()
 
-	if len(themeNames) != 6 {
+	if len(themeNames) != 9 {
 		t.Fatal("Incorrect number of themes")
 	}
 

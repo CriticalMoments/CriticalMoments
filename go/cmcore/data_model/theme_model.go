@@ -115,11 +115,32 @@ var builtInThemes map[string]*Theme = map[string]*Theme{
 		FontScale:                  1.0,
 		ScaleFontForUserPreference: false,
 	},
+	"jazzy_dark": {
+		BannerBackgroundColor:      "#3d088c",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#c1316d",
+		BackgroundColor:            "#3d088c",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#e2deed",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"jazzy_light": {
+		BannerBackgroundColor:      "#3d088c",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#c1316d",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#3d088c",
+		SecondaryTextColor:         "#64478d",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
 }
 
 var combinedThemeNames []string = []string{
 	"terminal",
 	"elegant",
+	"jazzy",
 }
 
 func AllBuiltInThemeNames() []string {
