@@ -11,6 +11,7 @@
 
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
+#import "../themes/CMTheme_private.h"
 #import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
 
@@ -374,9 +375,25 @@ static CriticalMoments *sharedInstance = nil;
     return _currentTheme;
 }
 
+// Private/Internal: Only for demo app usage
 - (void)setTheme:(CMTheme *)theme {
     @synchronized(self) {
         _currentTheme = theme;
+    }
+}
+
+// Private/Internal: Only for demo app usage
+- (void)setBuiltInTheme:(NSString *)themeName {
+    CMTheme *libTheme = [CMTheme libaryThemeByName:themeName];
+    if (libTheme) {
+        [self setTheme:libTheme];
+        return;
+    }
+
+    DatamodelTheme *dmTheme = [self themeFromConfigByName:themeName];
+    if (dmTheme) {
+        CMTheme *theme = [CMTheme themeFromAppcoreTheme:dmTheme];
+        [self setTheme:theme];
     }
 }
 

@@ -134,6 +134,10 @@ each usage independently from remote configuration. Reused names will log warnin
 // Private, only for internal use (demo app).
 /// :nodoc:
 - (void)setTheme:(CMTheme *)theme;
+// Set the current theme for this CM instance to a built in theme
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (void)setBuiltInTheme:(NSString *)themeName;
 
 #pragma mark Properties
 

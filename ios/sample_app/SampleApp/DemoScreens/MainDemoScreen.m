@@ -9,6 +9,7 @@
 
 #import "AlertDemoScreen.h"
 #import "BannerDemoScreen.h"
+#import "BuiltInThemesDemoScreen.h"
 #import "ConditionsDemoScreen.h"
 #import "ConversionDemoScreen.h"
 #import "FeatureFlagsDemoScreen.h"
@@ -79,12 +80,18 @@
 
     [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction, sheetAction ]];
 
+    CMDemoAction *builtInThemes = [[CMDemoAction alloc] init];
+    builtInThemes.title = @"Built In Themes";
+    builtInThemes.subtitle = @"Try our built in themes.";
+    builtInThemes.actionNextScreen = [[BuiltInThemesDemoScreen alloc] init];
+
     CMDemoAction *themeAction = [[CMDemoAction alloc] init];
-    themeAction.title = @"Edit Theme";
-    themeAction.subtitle = @"Modify the colors, font and style of UI elements.";
+    themeAction.title = @"Custom Themes";
+    themeAction.snapshotTitle = @"Edit Theme";
+    themeAction.subtitle = @"Modify the colors, font and style of our UI elements.";
     themeAction.actionNextScreen = [[ThemeDemoScreen alloc] init];
 
-    [self addSection:@"Themes / Style" withActions:@[ themeAction ]];
+    [self addSection:@"Themes / Style" withActions:@[ builtInThemes, themeAction ]];
 }
 
 @end

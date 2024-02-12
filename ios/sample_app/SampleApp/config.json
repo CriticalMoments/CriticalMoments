@@ -449,6 +449,52 @@
                     "tapActionName": "nested_alert"
                 }
             },
+            "theme_modal": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "circle.hexagongrid.circle",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Theme changed!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "You've updated the default theme for the demo app.\n\nExplore other demos like modals and banners to see how the theme impacts Critical Moments UI.\n\nYou can reset to the system theme using the option at the top of the Themes demo screens.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "OK",
+                                    "style": "large"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
             "show_notice_alert": {
                 "actionType": "alert",
                 "actionData": {

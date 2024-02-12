@@ -26,6 +26,7 @@
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
 		E07B775129FA0144001521F4 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775329FA04FF001521F4 /* MainDemoScreen.m */; };
+		E0AB830A2B7A79700003EDE2 /* BuiltInThemesDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */; };
 		E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
 		E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545F029F407C2002A25A8 /* SceneDelegate.m */; };
 		E0B545F729F407C2002A25A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0B545F529F407C2002A25A8 /* Main.storyboard */; };
@@ -83,6 +84,8 @@
 		E07B775229FA04FF001521F4 /* MainDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainDemoScreen.h; sourceTree = "<group>"; };
 		E07B775329FA04FF001521F4 /* MainDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainDemoScreen.m; sourceTree = "<group>"; };
 		E089CE482A361F0D00BD2BB9 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+		E0AB83082B7A79700003EDE2 /* BuiltInThemesDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BuiltInThemesDemoScreen.h; sourceTree = "<group>"; };
+		E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BuiltInThemesDemoScreen.m; sourceTree = "<group>"; };
 		E0B545E929F407C2002A25A8 /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B545EC29F407C2002A25A8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E0B545ED29F407C2002A25A8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -138,6 +141,8 @@
 				E07B775329FA04FF001521F4 /* MainDemoScreen.m */,
 				E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */,
 				E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */,
+				E0AB83082B7A79700003EDE2 /* BuiltInThemesDemoScreen.h */,
+				E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */,
 				E0DD1D182A3A1B4B0059CC38 /* SheetDemoScreen.h */,
 				E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */,
 				E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */,
@@ -352,6 +357,7 @@
 				E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */,
 				E0B545FF29F407C3002A25A8 /* main.m in Sources */,
 				E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */,
+				E0AB830A2B7A79700003EDE2 /* BuiltInThemesDemoScreen.m in Sources */,
 				E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */,
 				E03F9BAF2B7017F8006EA449 /* FeatureFlagsDemoScreen.m in Sources */,
 				E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */,
