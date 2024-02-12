@@ -27,6 +27,19 @@
     return self;
 }
 
++ (NSDictionary<NSString *, NSString *> *)themeDescriptions {
+    return @{
+        @"elegant" : @"A black and white theme, using a modern font (Avenir Next).",
+        @"aqua" : @"A blue/green theme, using default system font.",
+        @"jazzy" : @"A purple/pink theme, using default system font.",
+        @"sea" : @"A deep blue theme, using default system font.",
+        @"honey" : @"A yellow/black theme, using default system font.",
+        @"terminal" : @"A theme mirroing the look of a system terminal, using a monospace font.",
+        @"system" : @"A theme that matches the system look. Uses the default system font, default system colors, and "
+                    @"your app's accent color."
+    };
+}
+
 - (void)buildSections {
 
     // General
@@ -46,30 +59,19 @@
 
     [self addSection:@"Reset" withActions:@[ resetThemeAction, longBannerAction ]];
 
-    // Built In Themes
-    NSDictionary *themes = @{
-        @"elegant" : @"A black and white theme, using a modern font (Avenir Next).",
-        @"aqua" : @"A blue/green theme, using default system font.",
-        @"jazzy" : @"A purple/pink theme, using default system font.",
-        @"sea" : @"A deep blue theme, using default system font.",
-        @"honey" : @"A yellow/black theme, using default system font.",
-        @"terminal" : @"A theme mirroing the look of a system terminal, using a monospace font.",
-        @"system" : @"A theme that matches the system look. Uses the default system font, default system colors, and "
-                    @"your app's accent color."
-    };
-
     NSArray<NSString *> *postFixes = @[ @"", @"_dark", @"_light" ];
     NSDictionary *sectionTitles = @{
         @"" : @"Respect System Light/Dark Mode",
         @"_light" : @"Force Light Mode",
         @"_dark" : @"Force Dark Mode",
     };
+    NSDictionary *themeDescriptions = [BuiltInThemesDemoScreen themeDescriptions];
+
     for (NSString *postfix in postFixes) {
         NSMutableArray<CMDemoAction *> *builtInThemeActions = [[NSMutableArray alloc] init];
-
-        for (NSString *themeClass in themes) {
+        for (NSString *themeClass in themeDescriptions) {
             NSString *themeName = [NSString stringWithFormat:@"%@%@", themeClass, postfix];
-            NSString *themeDescription = themes[themeClass];
+            NSString *themeDescription = themeDescriptions[themeClass];
 
             CMDemoAction *builtInTheme = [[CMDemoAction alloc] init];
             builtInTheme.title = [NSString stringWithFormat:@"'%@' Theme", themeName];

@@ -397,6 +397,11 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+// Private/Internal: Only for demo app usage
+- (int)builtInBaseThemeCount {
+    return (int)DatamodelBaseThemeCount();
+}
+
 - (bool)isDebug {
 #if DEBUG
     return true;

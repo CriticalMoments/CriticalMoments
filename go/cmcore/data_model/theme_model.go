@@ -214,6 +214,10 @@ func AllBuiltInThemeNames() []string {
 	return themeNames
 }
 
+func BaseThemeCount() int {
+	return len(combinedThemeNames) + (len(libraryThemeNames) / 3)
+}
+
 func builtInThemeByName(name string) (*Theme, error) {
 	builtIn, ok := builtInThemes[name]
 	if ok {

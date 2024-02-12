@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BuiltInThemesDemoScreen : CMDemoScreen
 
++ (NSDictionary<NSString *, NSString *> *)themeDescriptions;
+
 @end
 
 NS_ASSUME_NONNULL_END

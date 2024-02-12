@@ -138,6 +138,9 @@ each usage independently from remote configuration. Reused names will log warnin
 // Private, only for internal use (demo app).
 /// :nodoc:
 - (void)setBuiltInTheme:(NSString *)themeName;
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (int)builtInBaseThemeCount;
 
 #pragma mark Properties
 

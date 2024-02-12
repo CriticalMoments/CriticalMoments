@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import "../SampleApp/AppDelegate.h"
+#import "../SampleApp/DemoScreens/BuiltInThemesDemoScreen.h"
 #import "../SampleApp/Utils.h"
 @import CriticalMoments;
 
@@ -63,6 +64,13 @@
     }
 
     [self waitForExpectations:expectations timeout:20.0];
+}
+
+- (void)testThemeCount {
+    NSDictionary *themeDescriptions = [BuiltInThemesDemoScreen themeDescriptions];
+    int expected = [CriticalMoments.sharedInstance builtInBaseThemeCount];
+    XCTAssert(themeDescriptions.count == expected, @"Expected %d themes in demo app, got %lu", expected,
+              (unsigned long)themeDescriptions.count);
 }
 
 - (void)testBundleCheck {

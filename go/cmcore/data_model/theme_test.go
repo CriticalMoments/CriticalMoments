@@ -5,7 +5,14 @@ import "testing"
 func TestBuiltInThemesValid(t *testing.T) {
 	themeNames := AllBuiltInThemeNames()
 
-	if len(themeNames) != 18 {
+	// test no typos
+	if len(themeNames) != len(builtInThemes)+len(combinedThemeNames) {
+		t.Fatal("Incorrect number of themes")
+	}
+	if len(builtInThemes) != 2*len(combinedThemeNames) {
+		t.Fatal("Incorrect number of themes")
+	}
+	if BaseThemeCount() != len(combinedThemeNames)+1 { // +1 for "system"
 		t.Fatal("Incorrect number of themes")
 	}
 
