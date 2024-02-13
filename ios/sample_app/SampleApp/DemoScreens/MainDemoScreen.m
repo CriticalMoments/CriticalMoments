@@ -78,7 +78,7 @@
     sheetAction.subtitle = @"UI to display announcements or other information in sheets which overlay the entire app.";
     sheetAction.actionNextScreen = [[SheetDemoScreen alloc] init];
 
-    [self addSection:@"Actions" withActions:@[ bannersAction, alertAction, linksAction, sheetAction ]];
+    [self addSection:@"Actions" withActions:@[ sheetAction, bannersAction, alertAction, linksAction ]];
 
     CMDemoAction *builtInThemes = [[CMDemoAction alloc] init];
     builtInThemes.title = @"Built In Themes";
