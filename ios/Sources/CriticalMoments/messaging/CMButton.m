@@ -55,9 +55,13 @@
 }
 
 - (void)buttonTapped:(UIButton *)target {
-    // two actions fire:
-    // 1) the model's named action, if it exists
-    // 2) the system's default action, unless prevent default (eg: dismiss modal)
+    // two actions fire. Important that #1 is first, as the second may need "topViewController".
+    // 1) the system's default action, unless prevent default (eg: dismiss modal)
+    // 2) the model's named action, if it exists
+
+    if (!self.model.preventDefault && self.defaultAction) {
+        self.defaultAction();
+    }
 
     if (self.model.actionName.length > 0) {
         [CriticalMoments.sharedInstance performNamedAction:self.model.actionName
@@ -66,10 +70,6 @@
                                                          NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
                                                      }
                                                    }];
-    }
-
-    if (!self.model.preventDefault && self.defaultAction) {
-        self.defaultAction();
     }
 }
 

@@ -92,8 +92,8 @@
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-      UIViewController *rootController = CMUtils.keyWindow.rootViewController;
-      if (!rootController) {
+      UIViewController *topController = CMUtils.topViewController;
+      if (!topController) {
           NSLog(@"CriticalMoments: can't find root vc for presenting alert");
       }
 
@@ -103,11 +103,11 @@
       if (alert.popoverPresentationController) {
           alert.popoverPresentationController.permittedArrowDirections = 0;
           alert.popoverPresentationController.sourceRect =
-              CGRectMake(rootController.view.center.x, rootController.view.center.y, 0, 0);
-          alert.popoverPresentationController.sourceView = rootController.view;
+              CGRectMake(topController.view.center.x, topController.view.center.y, 0, 0);
+          alert.popoverPresentationController.sourceView = topController.view;
       }
 
-      [rootController presentViewController:alert animated:YES completion:nil];
+      [topController presentViewController:alert animated:YES completion:nil];
     });
 }
 

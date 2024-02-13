@@ -880,7 +880,8 @@
                             "buttons": [
                                 {
                                     "title": "Take me there",
-                                    "style": "large"
+                                    "style": "large",
+                                    "actionName": "nested_alert"
                                 },
                                 {
                                     "title": "Not Now",

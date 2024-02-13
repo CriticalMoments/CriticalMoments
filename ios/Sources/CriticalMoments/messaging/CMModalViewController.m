@@ -105,10 +105,15 @@
 }
 
 - (void)dismissSheet {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      UIViewController *pvc = self.presentingViewController;
-      [pvc dismissViewControllerAnimated:YES completion:nil];
-    });
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self dismissSheet];
+        });
+        return;
+    }
+
+    UIViewController *pvc = self.presentingViewController;
+    [pvc dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

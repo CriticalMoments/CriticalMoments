@@ -52,7 +52,8 @@
 + (UIViewController *)topViewController {
     UIViewController *vc = [CMUtils keyWindow].rootViewController;
 
-    for (UIViewController *nextPresented = vc.presentedViewController; nextPresented;
+    // Find top VC, unless it's in the process of being dismissed
+    for (UIViewController *nextPresented = vc.presentedViewController; nextPresented && !nextPresented.beingDismissed;
          nextPresented = vc.presentedViewController) {
         vc = nextPresented;
     }
