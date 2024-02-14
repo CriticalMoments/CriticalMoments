@@ -526,6 +526,10 @@ func (pc *PrimaryConfig) validateFallbackNames() string {
 	return ""
 }
 
+func (pc *PrimaryConfig) NamedConditionCount() int {
+	return len(pc.namedConditions)
+}
+
 func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
 	all := make([]*Condition, 0)
 	for _, c := range pc.namedConditions {

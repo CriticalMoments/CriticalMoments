@@ -298,6 +298,9 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if len(pc.namedConditions) != 3 {
 		t.Fatal("Wrong condition count")
 	}
+	if pc.NamedConditionCount() != 3 {
+		t.Fatal("Named condition count mismatch")
+	}
 	c1 := pc.ConditionWithName("trueCondition")
 	if c1 == nil || c1.String() != "true" {
 		t.Fatal("Issue with true condition")
