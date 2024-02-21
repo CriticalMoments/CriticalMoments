@@ -83,10 +83,6 @@
         @"has_bt_headset": @"has_bt_headset in [true,false]", // add_test_count
         @"has_wired_headset": @"has_wired_headset in [true,false]", // add_test_count
         @"has_car_audio": @"has_car_audio in [true,false]", // add_test_count
-
-        @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
-        @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
-        @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count
         
         @"timezone_gmt_offset": @"timezone_gmt_offset != nil && timezone_gmt_offset <= 24*60*60 && timezone_gmt_offset >= -24*60*60", // add_test_count
         @"location_permission": @"location_permission in [true,false]", // add_test_count
@@ -119,11 +115,28 @@
         @"bluetooth_permission": @"bluetooth_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         
         // Functions
+        // These are tested in more depth in appcore, but e2e tests here
         @"propertyHistoryLatestValue": @"propertyHistoryLatestValue('platform') == 'iOS' || propertyHistoryLatestValue('platform') == 'iPadOS'", // add_test_count
+        @"propertyHistoryLatestValueCurrent": @"propertyHistoryLatestValue('platform') == platform", // add_test_count
         @"propertyHistoryLatestValueNil": @"propertyHistoryLatestValue('never_set_prop') == nil", // add_test_count
         @"propertyEver": @"propertyEver('app_id', 'io.criticalmoments.demo-app') && !propertyEver('app_id', 'wrongval') && !propertyEver('wrongproperty', 'a')", // add_test_count
         @"stableRand": @"stableRand() == stableRand()", // add_test_count
         @"last_event_time": @"latestEventTime('app_start') < now() && latestEventTime('fake_event') == nil", // add_test_count
+        @"canOpenUrl": @"!canOpenUrl('not_a_real_app://') && canOpenUrl('https://criticalmoments.io') && canOpenUrl('app-settings:')", // add_test_count
+        @"eventCount": @"eventCount('app_start') >= 1 && eventCount('never') == 0", // add_test_count
+        @"eventCountWithLimit": @"eventCountWithLimit('app_start',1) == 1 && eventCount('never') == 0", // add_test_count
+        @"versionNumberComponent": @"versionNumberComponent('16.3.1.2', 1) == 3", // add_test_count
+        @"versionGreaterThan": @"versionGreaterThan('10.2', '9.9.9')", // add_test_count
+        @"versionLessThan": @"versionLessThan('9.9.9', '10.2')", // add_test_count
+        @"versionEqual": @"versionEqual('9.9.9', 'v9.9.9')", // add_test_count
+        @"unixTimeNanoseconds": @"unixTimeSeconds(1708550686000000000) < now() && unixTimeNanoseconds(1708550686000000000) > now() - duration('175000h')", // add_test_count
+        @"unixTimeMilliseconds": @"unixTimeMilliseconds(1708550686000) < now() && unixTimeMilliseconds(1708550686000) > now() - duration('175000h')", // add_test_count
+        @"unixTimeSeconds": @"unixTimeSeconds(1708550686) < now() && unixTimeSeconds(1708550686) > now() - duration('175000h')", // add_test_count
+        @"formatTime": @"formatTime(unixTimeSeconds(1708550686), 'year') == 2024", // add_test_count
+        @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
+        @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
+        @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count
+        @"constantProps": @"RFC3339 == '2006-01-02T15:04:05.999999999Z07:00' && date_format == '2006-01-02'", // add_test_count
         
         // Events
         @"app_start": @"now() > latestEventTime('app_start') && now() - duration('5m') < latestEventTime('app_start')", // add_test_count
