@@ -1,11 +1,13 @@
 # Security Policy
 
+We take security bugs seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
+
 ## Supported Versions
 
-v0.81+
+We're accepting vulnerability reports on v0.81 and newer.
 
 ## Reporting a Vulnerability
 
-Please report any vulnerabilities via GitHub ("Report a vulnerability" button): https://github.com/CriticalMoments/CriticalMoments/security
+To report a security issue, please create a GitHub Security Advisory: https://github.com/criticalmoments/criticalmoments/security/advisories/new
 
-This allows us to privately fix and publish the fix before public disclosure. We'll communicate with you over email about the status of the vulnerability, and fix timeline.
+We'll communicate with you over email about the status of the vulnerability, and fix timeline.
