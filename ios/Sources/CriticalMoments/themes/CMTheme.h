@@ -37,8 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 // clang-format on
 @interface CMTheme : NSObject
 
-/// :nodoc: Private method. Retrieves the current/default theme.
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
 + (CMTheme *)current;
+#endif
 
 #pragma mark Dark Mode
 

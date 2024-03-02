@@ -55,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
-/// :nodoc:
-- (nonnull NSString *)getApiKey;
-
 /**
  Set a local development Config URL for critical moments.
 
@@ -128,8 +125,10 @@ currently equivalent) will make it impossible to override each usage independent
                            handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
 #endif
 
-/// :nodoc: This API is private, and should not be used
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
+/// :nodoc: This API is private, and should not be used. Use events + triggers
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
+#endif
 
 #pragma mark Themes
 
@@ -213,6 +212,7 @@ currently equivalent) will make it impossible to override each usage independent
  */
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)objcPing;
@@ -223,6 +223,7 @@ currently equivalent) will make it impossible to override each usage independent
 
 /// :nodoc: Private api for sample app.
 - (void)removeAllBanners;
+#endif
 
 @end
 

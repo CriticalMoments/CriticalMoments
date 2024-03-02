@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 // _private header prevents exposing these to public SDK.
 
 /**
- :nodoc:
+ Create with AC data model
  @param bannerData The appcore datamodel for this banner
  */
 - (instancetype)initWithAppcoreDataModel:(DatamodelBannerAction *)bannerData;

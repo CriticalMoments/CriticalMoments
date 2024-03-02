@@ -15,10 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMImageView : UIView
 
-/// :nodoc:
 - (instancetype)initWithDatamodel:(DatamodelImage *)model andTheme:(CMTheme *)theme;
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
 @end

@@ -15,10 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMModalViewController : UIViewController
 
-/// :nodoc:
 - (instancetype)initWithDatamodel:(DatamodelModalAction *)model;
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
 @end

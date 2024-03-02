@@ -27,17 +27,22 @@ NS_ASSUME_NONNULL_BEGIN
           builtIn:(bool)builtIn
           handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
-/// :nodoc: access named themes
+/// Access named themes
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name;
 
-// Set the current theme for this CM instance.
-// Private, only for internal use (demo app).
-/// :nodoc:
+/// Set the current theme for this CM instance.
+/// Private, only for internal use (demo app).
 - (void)setTheme:(CMTheme *)theme;
-// Fetch the current theme for this CM instance
-// Private, only for internal use (demo app).
-/// :nodoc:
+
+/// Fetch the current theme for this CM instance
+/// Private, only for internal use (demo app).
 - (CMTheme *)currentTheme;
+
+/// Get API Key
+- (nonnull NSString *)getApiKey;
+
+/// This API is private, and should not be used externally. Use events + triggers to fire named events.
+- (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 @end
 

@@ -49,7 +49,6 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 
 #pragma mark Initializers
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
 /**

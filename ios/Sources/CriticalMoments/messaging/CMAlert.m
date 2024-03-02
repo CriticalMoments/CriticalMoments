@@ -10,6 +10,7 @@
 
 @import UIKit;
 
+#import "../CriticalMoments_private.h"
 #import "../include/CriticalMoments.h"
 #import "../utils/CMUtils.h"
 

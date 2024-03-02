@@ -6,6 +6,7 @@
 //
 
 #import "CMBannerMessage.h"
+#import "../CriticalMoments_private.h"
 #import "../include/CriticalMoments.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"

@@ -14,12 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 // _private header prevents exposing these to public SDK.
 
 /**
- :nodoc:
+ Create ObjC alert with data model from AC
  @param alertDataModel The appcore datamodel for this alert
  */
 - (instancetype)initWithAppcoreDataModel:(DatamodelAlertAction *)alertDataModel;
 
-/// :nodoc:
 - (void)showAlert;
 
 @end

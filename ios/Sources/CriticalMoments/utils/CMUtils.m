@@ -6,6 +6,7 @@
 //
 
 #import "CMUtils.h"
+#import "../CriticalMoments_private.h"
 #import "../include/CriticalMoments.h"
 
 @import Appcore;

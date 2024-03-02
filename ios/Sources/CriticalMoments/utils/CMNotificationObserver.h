@@ -13,13 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMNotificationObserver : NSObject
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
-/// :nodoc:
 - (instancetype)initWithCm:(CriticalMoments *)cm;
 
-/// :nodoc:
 - (void)start;
 
 @end

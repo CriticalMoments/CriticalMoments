@@ -6,7 +6,9 @@
 //
 
 #import "CMButton.h"
+
 #import "../CriticalMoments_private.h"
+#import "../themes/CMTheme_private.h"
 
 // Align to default and size=small OS buttons
 #define CM_OS_BUTTON_FONT_SIZE 17.0

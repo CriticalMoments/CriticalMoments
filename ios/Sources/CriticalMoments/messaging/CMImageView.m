@@ -7,6 +7,7 @@
 
 #import "CMImageView.h"
 
+#import "../themes/CMTheme_private.h"
 #import "../utils/CMUtils.h"
 
 #define CM_DEFAULT_IMAGE_SIZE 50

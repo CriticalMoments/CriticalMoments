@@ -7,6 +7,7 @@
 
 #import "CMPageView.h"
 
+#import "../themes/CMTheme_private.h"
 #import "../utils/CMUtils.h"
 #import "CMButton.h"
 #import "CMGradientView.h"
