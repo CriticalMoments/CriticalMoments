@@ -5,6 +5,7 @@
 //  Created by Steve Cosman on 2023-09-29.
 //
 
+#import "../CriticalMoments_private.h"
 #import "include/CriticalMoments.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,6 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc: access named themes
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name;
+
+// Set the current theme for this CM instance.
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (void)setTheme:(CMTheme *)theme;
+// Fetch the current theme for this CM instance
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (CMTheme *)currentTheme;
 
 @end
 

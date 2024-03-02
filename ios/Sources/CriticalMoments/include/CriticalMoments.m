@@ -289,26 +289,33 @@ static CriticalMoments *sharedInstance = nil;
     });
 }
 
-- (void)checkNamedCondition:(NSString *)name
-                  condition:(NSString *)condition
-                    handler:(void (^)(bool, NSError *_Nullable))handler {
-#if DEBUG
-    NSError *collisionError;
-    [_appcore checkNamedConditionCollision:name conditionString:condition error:&collisionError];
-    if (collisionError != nil) {
-        NSLog(@"\nWARNING: CriticalMoments\nWARNING: CriticalMoments\nIssue with checkNamedCondition usage. Note: this "
-              @"error log is only shown when debugger attached.\n%@\n\n",
-              collisionError.localizedDescription);
-    }
-#endif
-
+- (void)checkNamedCondition:(NSString *)name handler:(void (^)(bool, NSError *_Nullable))handler {
     __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
     __block NSString *blockName = name;
-    __block NSString *blockCondition = condition;
     dispatch_async(_actionQueue, ^{
       NSError *error;
       BOOL result;
-      [_appcore checkNamedCondition:blockName conditionString:blockCondition returnResult:&result error:&error];
+      [_appcore checkNamedCondition:blockName returnResult:&result error:&error];
+
+      if (blockHandler) {
+          blockHandler(result, error);
+      }
+    });
+}
+
+// Private, only for internal use (demo app).
+// Do not use this in any other apps. Will always return error.
+- (void)checkInternalTestCondition:(NSString *_Nonnull)conditionString
+                           handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler {
+    __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
+    __block NSString *blockCondition = conditionString;
+    dispatch_async(_actionQueue, ^{
+      NSError *error;
+      BOOL result;
+      [_appcore checkTestCondition:blockCondition returnResult:&result error:&error];
+      if (error) {
+          NSLog(@"CriticalMoments: error in test func %@", error);
+      }
 
       if (blockHandler) {
           blockHandler(result, error);

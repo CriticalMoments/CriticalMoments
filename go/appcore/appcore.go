@@ -41,17 +41,13 @@ type Appcore struct {
 
 	// Properties
 	propertyRegistry *propertyRegistry
-
-	// Dev Mode namedCondition conflict check
-	seenNamedConditions map[string]string
 }
 
 func NewAppcore() *Appcore {
 	ac := &Appcore{
-		propertyRegistry:    newPropertyRegistry(),
-		seenNamedConditions: map[string]string{},
-		db:                  db.NewDB(),
-		eventManager:        &EventManager{},
+		propertyRegistry: newPropertyRegistry(),
+		db:               db.NewDB(),
+		eventManager:     &EventManager{},
 	}
 	// Connect the property registry to the db/proptery history manager
 	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
@@ -151,29 +147,39 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	ac.propertyRegistry.registerStaticProperty("timezone_gmt_offset", gmtOffset)
 }
 
-func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) (returnErr error) {
+// Internal use only
+func (ac *Appcore) CheckTestCondition(conditionString string) (returnResult bool, returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
-			returnErr = fmt.Errorf("panic in CheckNamedConditionsCollision: %v", r)
+			returnResult = false
+			returnErr = fmt.Errorf("panic in CheckTestCondition: %v", r)
 		}
 	}()
 
-	if name == "" {
-		return nil
+	appId, err := ac.propertyRegistry.propertyValue("app_id")
+	if err != nil || appId == nil {
+		return false, errors.New("CheckTestCondition only available in the test app. No app ID")
 	}
-	// in debug mode, track each built-in condition we see, and make sure the developer isn't reusing names
-	// If they use the same name twice for different things, they won't be able to override in the future
-	priorSeen := ac.seenNamedConditions[name]
-	if priorSeen == "" {
-		ac.seenNamedConditions[name] = conditionString
-	} else if priorSeen != conditionString {
-		return fmt.Errorf("the named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition", name, priorSeen, conditionString)
+	appIdString, ok := appId.(string)
+	if !ok || (appIdString != "io.criticalmoments.demo-app" &&
+		appIdString != "com.apple.dt.xctest.tool") {
+		return false, errors.New("CheckTestCondition only available in the test app")
 	}
-	return nil
+
+	if ac.libBindings == nil || !ac.libBindings.IsTestBuild() {
+		return false, errors.New("CheckTestCondition only available on a test build")
+	}
+
+	cond, err := datamodel.NewCondition(conditionString)
+	if err != nil {
+		return false, err
+	}
+
+	return ac.propertyRegistry.evaluateCondition(cond)
 }
 
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (returnResult bool, returnErr error) {
+func (ac *Appcore) CheckNamedCondition(name string) (returnResult bool, returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
@@ -193,12 +199,7 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (ret
 	condition := ac.config.ConditionWithName(name)
 
 	if condition == nil {
-		// Use provided condition, since config doesn't have an override
-		pCond, err := datamodel.NewCondition(conditionString)
-		if err != nil {
-			return false, err
-		}
-		condition = pCond
+		return false, fmt.Errorf("CheckNamedCondition: no condition found named '%v'", name)
 	}
 
 	return ac.propertyRegistry.evaluateCondition(condition)

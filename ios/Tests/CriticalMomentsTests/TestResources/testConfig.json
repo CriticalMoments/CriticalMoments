@@ -16,7 +16,9 @@
     },
     "conditions": {
         "namedConditions": {
-            "overrideToTrue": "true"
+            "invalidCondition": "fake_var > 6",
+            "trueCondition": "true",
+            "falseCondition": "false"
         }
     },
     "actions": {

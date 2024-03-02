@@ -52,15 +52,14 @@
 
         XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
         [expectations addObject:expectation];
-        [cm checkNamedCondition:name
-                      condition:condition
-                        handler:^(bool result, NSError *_Nullable error) {
-                          if (error != nil) {
-                              XCTAssert(false, @"CanOpenUrl test failed with error: %@", error);
-                          }
-                          XCTAssertTrue(result, @"CanOpenUrl test did pass for condition check: %@", name);
-                          [expectation fulfill];
-                        }];
+        [cm checkInternalTestCondition:condition
+                               handler:^(bool result, NSError *_Nullable error) {
+                                 if (error != nil) {
+                                     XCTAssert(false, @"CanOpenUrl test failed with error: %@", error);
+                                 }
+                                 XCTAssertTrue(result, @"CanOpenUrl test did pass for condition check: %@", name);
+                                 [expectation fulfill];
+                               }];
     }
 
     [self waitForExpectations:expectations timeout:20.0];

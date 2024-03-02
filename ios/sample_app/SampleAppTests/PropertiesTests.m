@@ -159,15 +159,15 @@
         // Expectations are only used to wait -- actual assets in the callback
         XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
         [expectations addObject:expectation];
-        [cm checkNamedCondition:name
-                      condition:condition
-                        handler:^(bool result, NSError *_Nullable error) {
-                          if (error != nil) {
-                              XCTAssert(false, @"Property test failed with error: %@", error);
-                          }
-                          XCTAssertTrue(result, @"Property test did not return true for condition check: %@", name);
-                          [expectation fulfill];
-                        }];
+        [cm checkInternalTestCondition:condition
+                               handler:^(bool result, NSError *_Nullable error) {
+                                 if (error != nil) {
+                                     XCTAssert(false, @"Property test failed with error: %@", error);
+                                 }
+                                 XCTAssertTrue(result, @"Property test did not return true for condition check: %@",
+                                               name);
+                                 [expectation fulfill];
+                               }];
     }
 
     [self waitForExpectations:expectations timeout:20];
@@ -178,24 +178,22 @@
     AppDelegate *aad = (AppDelegate *)ad;
     CriticalMoments *cm = [aad cmInstance];
 
-    NSString *condition =
-        @"(location_approx_city == nil || len(location_approx_city) > 0) && (location_approx_country == nil || "
-        @"len(location_approx_country) > 0) && (location_approx_region == nil || "
-        @"len(location_approx_region) > 0) && (location_approx_latitude == nil || abs(location_approx_latitude) <= 90) "
-        @"&& (location_approx_longitude == nil || abs(location_approx_longitude) <= 180)";
+    NSString *condition = @"len(location_approx_city ?? 'unknown') > 0 && "
+                          @"len(location_approx_country ?? 'unknown') > 0 && "
+                          @"len(location_approx_region ?? 'unknown') > 0 && abs(location_approx_latitude ?? 0.0) <= 90 "
+                          @"&& abs(location_approx_longitude ?? 0.0) <= 180";
 
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation1];
-    [cm checkNamedCondition:@"locCondition"
-                  condition:condition
-                    handler:^(bool result, NSError *error) {
-                      if (!result || error) {
-                          XCTAssert(false, "approx location condition failed to return");
-                      }
-                      [expectation1 fulfill];
-                    }];
+    [cm checkInternalTestCondition:condition
+                           handler:^(bool result, NSError *error) {
+                             if (!result || error) {
+                                 XCTAssert(false, "approx location condition failed to return");
+                             }
+                             [expectation1 fulfill];
+                           }];
 
     [self waitForExpectations:expectations timeout:5.0];
 }
@@ -207,21 +205,21 @@
     CriticalMoments *cm = [aad cmInstance];
 
     NSString *condition =
-        @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'ON' "
+        @"(location_approx_city == 'Toronto' || location_approx_city == 'North York') && location_approx_country == "
+        @"'CA' && location_approx_region == 'ON' "
         @"&& abs(location_approx_latitude - 43.651070) < 0.5 && abs(location_approx_longitude - -79.347015) < 0.5";
 
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation1];
-    [cm checkNamedCondition:@"locCondition"
-                  condition:condition
-                    handler:^(bool result, NSError *error) {
-                      if (!result || error) {
-                          XCTAssert(false, "approx location condition failed to return");
-                      }
-                      [expectation1 fulfill];
-                    }];
+    [cm checkInternalTestCondition:condition
+                           handler:^(bool result, NSError *error) {
+                             if (!result || error) {
+                                 XCTAssert(false, "approx location condition failed to return");
+                             }
+                             [expectation1 fulfill];
+                           }];
 
     [self waitForExpectations:expectations timeout:5.0];
 }

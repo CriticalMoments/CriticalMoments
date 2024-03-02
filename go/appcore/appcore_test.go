@@ -104,6 +104,9 @@ func (lb *testLibBindings) AppVersion() string {
 func (lb *testLibBindings) CMVersion() string {
 	return "2.3.4"
 }
+func (lb *testLibBindings) IsTestBuild() bool {
+	return true
+}
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
@@ -472,49 +475,48 @@ func TestNamedConditions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// conditions without overrides should use provided condition
-	r, err := ac.CheckNamedCondition("newCondition1", "false")
-	if err != nil || r {
-		t.Fatal("false conditions failed")
-	}
-	r, err = ac.CheckNamedCondition("newCondition2", "true")
-	if err != nil || !r {
-		t.Fatal("false conditions failed")
+	// conditions without config file entry should return false
+	r, err := ac.CheckNamedCondition("conditionNotInConfig")
+	if err == nil || r {
+		t.Fatal("missing named condition should error and return false")
 	}
 
-	// falseCondition should override provided string
-	r, err = ac.CheckNamedCondition("falseCondition", "true")
+	// falseCondition should return false
+	r, err = ac.CheckNamedCondition("falseCondition")
 	if err != nil || r {
 		t.Fatal("false conditions failed")
 	}
 
-	// trueCondition should override provided string
-	r, err = ac.CheckNamedCondition("trueCondition", "false")
+	// trueCondition should return true
+	r, err = ac.CheckNamedCondition("trueCondition")
 	if err != nil || !r {
 		t.Fatal("false conditions failed")
 	}
 
 	// Check name check
-	_, err = ac.CheckNamedCondition("", "false")
+	_, err = ac.CheckNamedCondition("")
 	if err == nil {
 		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
 	}
-
-	// Check debug mode checker
-	dmerr := ac.CheckNamedConditionCollision("uniqueName", "false")
-	if dmerr != nil {
-		t.Fatal("dev mode condition failed")
-	}
-	dmerr = ac.CheckNamedConditionCollision("uniqueName", "false")
-	if dmerr != nil {
-		t.Fatal("dev mode condition second time errored, but should pass with same condition")
-	}
-	dmerr = ac.CheckNamedConditionCollision("uniqueName", "true")
-	if dmerr == nil {
-		t.Fatal("unque condition with new value should return a dev warning")
-	}
-
 }
+
+func TestInternalTestConditions(t *testing.T) {
+	// ensure CheckTestCondition is false+error for incorrect bundle ID.
+	// Other tests done in objc layer
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := ac.CheckTestCondition("true")
+	if err == nil || r {
+		t.Fatal("Test condition failed to block invalid test bundle")
+	}
+}
+
 func TestEndToEndEvents(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {

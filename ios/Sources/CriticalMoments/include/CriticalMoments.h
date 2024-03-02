@@ -99,33 +99,41 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Feature Flags / Named Conditions
 
 /**
- Checks a condition string, returning the result of evaluating it.
+ Checks a named condition string, returning the result of evaluating it. The provided name is used to lookup a condition
+in the config file's namedConditions section.
 
- A name is provided so that you can remotely override the condition string using a cloud based config file.
+ Configuration documentation: https://docs.criticalmoments.io/conditional-targeting/named-conditions
 
  The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
 can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
 the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
 
- @param name A name for this condition. Must be provided and can not be an empty string.
- The name allows you to override the hardcoded condition string remotely from the cloud-hosted
- CM config file later if needed.
- @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
-options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
+ @param name The name of this condition. Must be provided and can not be an empty string.
+ The name is used as a lookup the condition-string of a namedCondition in the config file.
  @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occured evaluating the condition. The boolean value is false for any error.
- @warning Be sure to provide a unique name to each condition you use. Reusing names will make it impossible to override
-each usage independently from remote configuration. Reused names will log warnings in the debug console.
+returns any errors occured evaluating the condition. The boolean value is false for any error, including if the
+condition is not found in the config.
+ @warning Be sure to provide a unique name to each use case. Reusing names (even if the current conditional logic is
+currently equivalent) will make it impossible to override each usage independently from remote configuration.
  */
 - (void)checkNamedCondition:(NSString *_Nonnull)name
-                  condition:(NSString *_Nonnull)condition
                     handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
+// Private, only for internal use (demo app/testing).
+// Evaluate a condition from a conditional-string
+// Do not use this in any other apps. It's against the TOS, and will always return an error.
+/// :nodoc:
+- (void)checkInternalTestCondition:(NSString *_Nonnull)conditionString
+                           handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+#endif
 
 /// :nodoc: This API is private, and should not be used
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 #pragma mark Themes
 
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Fetch the current theme for this CM instance
 // Private, only for internal use (demo app).
 /// :nodoc:
@@ -141,6 +149,7 @@ each usage independently from remote configuration. Reused names will log warnin
 // Private, only for internal use (demo app).
 /// :nodoc:
 - (int)builtInBaseThemeCount;
+#endif
 
 #pragma mark Properties
 

@@ -23,4 +23,7 @@ type LibBindings interface {
 	// Version numbers
 	AppVersion() string
 	CMVersion() string
+
+	// Check if test build
+	IsTestBuild() bool
 }

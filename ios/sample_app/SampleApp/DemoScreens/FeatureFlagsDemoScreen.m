@@ -24,15 +24,15 @@
 
 - (void)buildSections {
     [CriticalMoments.sharedInstance
-        checkNamedCondition:@"featureForPhonesNewOs"
-                  condition:@"device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
+        checkNamedCondition:@"is_iphone_with_recent_os"
                     handler:^(_Bool result, NSError *_Nullable error) {
                       if (error != nil) {
                           NSLog(@"Issue with feature flag: %@", error);
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"State: Is Phone with iOS 17+" : @"State: Is NOT Phone with iOS 17+";
+                      action.title = result ? @"Device Targeting: Is Phone with Recent iOS"
+                                            : @"State: Is NOT Phone with Recent iOS";
                       action.subtitle =
                           @"This feature flag will change state, depending on which device and OS it's run "
                           @"on.\n\nCondition: device_model_class == 'iPhone' &&\n!versionLessThan(os_version, '17.0')";
@@ -40,15 +40,14 @@
                     }];
 
     [CriticalMoments.sharedInstance
-        checkNamedCondition:@"abTestGroupForExperimentFive"
-                  condition:@"(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)"
+        checkNamedCondition:@"ab_test_group_for_experiment_five"
                     handler:^(_Bool result, NSError *_Nullable error) {
                       if (error != nil) {
                           NSLog(@"Issue with feature flag: %@", error);
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"AB Test Group: A" : @"AB Test Group: B";
+                      action.title = result ? @"AB Test Group: User in A" : @"AB Test Group: User in B";
                       action.subtitle =
                           @"Split users into AB tests including: 1) random asignment, 2) filtering by user properties "
                           @"(is_pro_user), 3) filtering by built-in properties (is_ipad, app_install_date), and much "
@@ -59,8 +58,7 @@
                     }];
 
     [CriticalMoments.sharedInstance
-        checkNamedCondition:@"weatherExample"
-                  condition:@"(weather_approx_location_temperature > 20)"
+        checkNamedCondition:@"weather_warm"
                     handler:^(_Bool result, NSError *_Nullable error) {
                       if (error != nil) {
                           NSLog(@"Issue with feature flag: %@", error);
@@ -76,25 +74,7 @@
                     }];
 
     [CriticalMoments.sharedInstance
-        checkNamedCondition:@"custom_feature_1"
-                  condition:@"true"
-                    handler:^(_Bool result, NSError *_Nullable error) {
-                      if (error != nil) {
-                          NSLog(@"Issue with feature flag: %@", error);
-                          return;
-                      }
-                      CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title =
-                          result ? @"Feature Flag: Enabled in Code" : @"Feature Flag: Disabled with Remote Override";
-                      action.subtitle =
-                          @"This feature was enabled in code, but should be remotely disabled via cloud update. This "
-                          @"can be useful for fixing unexpected issues, or rolling out successful experiments.";
-                      [self addSection:@"Remote Update" withActions:@[ action ]];
-                    }];
-
-    [CriticalMoments.sharedInstance
-        checkNamedCondition:@"app_launced_several_times"
-                  condition:@"app_install_date < now() - duration('10m')"
+        checkNamedCondition:@"app_not_recently_installed"
                     handler:^(_Bool result, NSError *_Nullable error) {
                       if (error != nil) {
                           NSLog(@"Issue with feature flag: %@", error);

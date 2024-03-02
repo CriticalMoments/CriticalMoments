@@ -64,6 +64,7 @@ let package = Package(
             ],
             cSettings: [
                 .headerSearchPath("../../Sources/CriticalMoments"),
+                .define("IS_CRITICAL_MOMENTS_INTERNAL", to:"1")
             ]
         ),
     ],

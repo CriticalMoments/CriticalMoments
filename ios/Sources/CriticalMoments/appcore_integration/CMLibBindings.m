@@ -7,6 +7,7 @@
 
 #import "CMLibBindings.h"
 
+#import "../CriticalMoments_private.h"
 #import "../messaging/CMAlert.h"
 #import "../messaging/CMAlert_private.h"
 #import "../messaging/CMBannerManager.h"
@@ -169,6 +170,17 @@
       }
       [topController presentViewController:safariVc animated:YES completion:nil];
     });
+}
+
+// Only used in testing, so while this could break over time, CI will catch it and it
+// won't impact production apps.
+- (BOOL)isTestBuild {
+    bool testEnv = [[[NSProcessInfo processInfo] environment] objectForKey:@"XCTestConfigurationFilePath"] != nil;
+    if (testEnv) {
+        return true;
+    }
+
+    return false;
 }
 
 @end
