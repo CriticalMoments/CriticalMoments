@@ -487,7 +487,18 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr e
 	ad := actionDispatcher{
 		appcore: ac,
 	}
-	return action.PerformAction(&ad)
+	actionErr := action.PerformAction(&ad)
+	ac.sendEventForPerformedAction(action, actionErr)
+	return actionErr
+}
+
+func (ac *Appcore) sendEventForPerformedAction(action *datamodel.ActionContainer, err error) {
+	actionName := ac.config.NameForActionContainer(action)
+	if err == nil {
+		ac.SendClientEvent(fmt.Sprintf("action:%v", actionName))
+	} else {
+		ac.SendClientEvent(fmt.Sprintf("action_error:%v", actionName))
+	}
 }
 
 func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme) {
