@@ -332,6 +332,15 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (pc *PrimaryConfig) NameForActionContainer(c *ActionContainer) string {
+	for name, action := range pc.namedActions {
+		if action == c {
+			return name
+		}
+	}
+	return ""
+}
+
 func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	if t == nil {
 		return nil
