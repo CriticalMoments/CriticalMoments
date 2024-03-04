@@ -202,7 +202,24 @@ func (ac *Appcore) CheckNamedCondition(name string) (returnResult bool, returnEr
 		return false, fmt.Errorf("CheckNamedCondition: no condition found named '%v'", name)
 	}
 
-	return ac.propertyRegistry.evaluateCondition(condition)
+	condResult, condErr := ac.propertyRegistry.evaluateCondition(condition)
+	ac.logEventForNamedCondition(condition, condResult, condErr)
+	return condResult, condErr
+}
+
+func (ac *Appcore) logEventForNamedCondition(condition *datamodel.Condition, result bool, err error) {
+	name := ac.config.NameForCondition(condition)
+	if name == "" {
+		return
+	}
+
+	if err != nil {
+		ac.SendClientEvent(fmt.Sprintf("ff_error:%v", name))
+	} else if result {
+		ac.SendClientEvent(fmt.Sprintf("ff_true:%v", name))
+	} else {
+		ac.SendClientEvent(fmt.Sprintf("ff_false:%v", name))
+	}
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
@@ -494,6 +511,10 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr e
 
 func (ac *Appcore) sendEventForPerformedAction(action *datamodel.ActionContainer, err error) {
 	actionName := ac.config.NameForActionContainer(action)
+	if actionName == "" {
+		return
+	}
+
 	if err == nil {
 		ac.SendClientEvent(fmt.Sprintf("action:%v", actionName))
 	} else {

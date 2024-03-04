@@ -267,6 +267,13 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal("last banner action should be nil on new appcore test binding")
 	}
 
+	latestAlertTime, err := ac.db.LatestEventTimeByName("action:alertAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestAlertTime != nil {
+		t.Fatal("Alert action should not have fired yet")
+	}
 	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
 		t.Fatal("last alert action should be nil on new appcore test binding")
 	}
@@ -284,7 +291,14 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal(err)
 	}
 	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
-		t.Fatal("alert event didn't fire")
+		t.Fatal("alert didn't fire")
+	}
+	latestAlertTime, err = ac.db.LatestEventTimeByName("action:alertAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestAlertTime == nil {
+		t.Fatal("Alert action should have fired now")
 	}
 
 	err = ac.PerformNamedAction("reviewAction")
@@ -481,16 +495,46 @@ func TestNamedConditions(t *testing.T) {
 		t.Fatal("missing named condition should error and return false")
 	}
 
+	falseConditionEvent := "ff_false:falseCondition"
+	latestFalseTime, err := ac.db.LatestEventTimeByName(falseConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestFalseTime != nil {
+		t.Fatal("false condition should not have fired yet")
+	}
 	// falseCondition should return false
 	r, err = ac.CheckNamedCondition("falseCondition")
 	if err != nil || r {
 		t.Fatal("false conditions failed")
 	}
+	latestFalseTime, err = ac.db.LatestEventTimeByName(falseConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestFalseTime == nil {
+		t.Fatal("false condition should have fired")
+	}
 
+	trueConditionEvent := "ff_true:trueCondition"
+	latestTrueTime, err := ac.db.LatestEventTimeByName(trueConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestTrueTime != nil {
+		t.Fatal("true condition should not have fired yet")
+	}
 	// trueCondition should return true
 	r, err = ac.CheckNamedCondition("trueCondition")
 	if err != nil || !r {
 		t.Fatal("false conditions failed")
+	}
+	latestTrueTime, err = ac.db.LatestEventTimeByName(trueConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestTrueTime == nil {
+		t.Fatal("true condition should have fired")
 	}
 
 	// Check name check

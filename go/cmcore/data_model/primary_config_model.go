@@ -341,6 +341,15 @@ func (pc *PrimaryConfig) NameForActionContainer(c *ActionContainer) string {
 	return ""
 }
 
+func (pc *PrimaryConfig) NameForCondition(c *Condition) string {
+	for name, condition := range pc.namedConditions {
+		if condition == c {
+			return name
+		}
+	}
+	return ""
+}
+
 func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	if t == nil {
 		return nil
