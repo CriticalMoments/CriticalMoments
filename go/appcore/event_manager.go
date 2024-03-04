@@ -10,14 +10,24 @@ import (
 
 type EventManager struct {
 	lastSessionStartTime *time.Time
+	logEvents            bool
 }
 
 func (em *EventManager) SendEvent(e *datamodel.Event, ac *Appcore) error {
 	em.processEvent(e, ac)
 	err := ac.db.InsertEvent(e)
+
 	if err != nil {
+		if em.logEvents {
+			fmt.Printf("CriticalMoments: Error saving event: %v\n", err)
+		}
 		return err
 	}
+
+	if em.logEvents {
+		fmt.Printf("CriticalMoments: Event: %v\n", e.Name)
+	}
+
 	return nil
 }
 

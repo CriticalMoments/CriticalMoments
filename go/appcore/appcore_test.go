@@ -774,3 +774,18 @@ func TestMinConfigVersionChecks(t *testing.T) {
 		}
 	}
 }
+
+func TestSetLogEvents(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ac.eventManager.logEvents {
+		t.Fatal("logEvents should be false by default")
+	}
+	ac.SetLogEvents(true)
+	if !ac.eventManager.logEvents {
+		t.Fatal("logEvents should be true after setting")
+	}
+}

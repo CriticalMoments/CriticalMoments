@@ -265,6 +265,10 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+- (void)setLogEvents:(bool)logEvents {
+    [self.appcore setLogEvents:logEvents];
+}
+
 - (void)sendEvent:(NSString *)eventName {
     [self sendEvent:eventName builtIn:false handler:nil];
 }

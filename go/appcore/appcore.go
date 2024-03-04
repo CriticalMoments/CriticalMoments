@@ -505,6 +505,10 @@ func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme)
 	return ac.config.ThemeWithName(themeName)
 }
 
+func (ac *Appcore) SetLogEvents(logEvents bool) {
+	ac.eventManager.logEvents = logEvents
+}
+
 var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
 
 // Repeitive, but gomobile doesn't allow for `interface{}`
@@ -591,6 +595,7 @@ func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvid
 	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }
+
 func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do

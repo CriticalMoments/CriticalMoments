@@ -28,6 +28,10 @@
                        @"9BAiB9xT4UUj88Jw0fMjCGMA89NM/j0sHGzuhOST4VIIyS6A==";
     [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];
 
+#ifdef DEBUG
+    [CriticalMoments.sharedInstance setLogEvents:true];
+#endif
+
     NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
     [CriticalMoments.sharedInstance setDevelopmentConfigUrl:localConfigUrl.absoluteString];
     NSString *webBasedConfigUrl =
