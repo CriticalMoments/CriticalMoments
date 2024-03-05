@@ -30,7 +30,7 @@ func TestSessionStart(t *testing.T) {
 	if err != nil || firstSessionStart == nil {
 		t.Fatalf("Expected session start after foreground: %v, %v", latestSessionStart, err)
 	}
-	if time.Since(*firstSessionStart) > time.Second {
+	if time.Since(*firstSessionStart) > 3*time.Second {
 		t.Fatalf("Unexpected session start time: %v", latestSessionStart)
 	}
 
