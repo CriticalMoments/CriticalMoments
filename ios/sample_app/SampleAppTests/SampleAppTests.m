@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import "../SampleApp/AppDelegate.h"
+#import "../SampleApp/DemoScreens/BuiltInThemesDemoScreen.h"
 #import "../SampleApp/Utils.h"
 @import CriticalMoments;
 
@@ -51,18 +52,24 @@
 
         XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
         [expectations addObject:expectation];
-        [cm checkNamedCondition:name
-                      condition:condition
-                        handler:^(bool result, NSError *_Nullable error) {
-                          if (error != nil) {
-                              XCTAssert(false, @"CanOpenUrl test failed with error: %@", error);
-                          }
-                          XCTAssertTrue(result, @"CanOpenUrl test did pass for condition check: %@", name);
-                          [expectation fulfill];
-                        }];
+        [cm checkInternalTestCondition:condition
+                               handler:^(bool result, NSError *_Nullable error) {
+                                 if (error != nil) {
+                                     XCTAssert(false, @"CanOpenUrl test failed with error: %@", error);
+                                 }
+                                 XCTAssertTrue(result, @"CanOpenUrl test did pass for condition check: %@", name);
+                                 [expectation fulfill];
+                               }];
     }
 
     [self waitForExpectations:expectations timeout:20.0];
+}
+
+- (void)testThemeCount {
+    NSDictionary *themeDescriptions = [BuiltInThemesDemoScreen themeDescriptions];
+    int expected = [CriticalMoments.sharedInstance builtInBaseThemeCount];
+    XCTAssert(themeDescriptions.count == expected, @"Expected %d themes in demo app, got %lu", expected,
+              (unsigned long)themeDescriptions.count);
 }
 
 - (void)testBundleCheck {

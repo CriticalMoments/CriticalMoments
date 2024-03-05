@@ -53,7 +53,7 @@
     return theme;
 }
 
-#pragma mark Named Themes From Appcore
+#pragma mark Named Themes
 
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName {
     DatamodelTheme *appcoreTheme = [CriticalMoments.sharedInstance themeFromConfigByName:themeName];
@@ -69,6 +69,58 @@
 + (CMTheme *)testTheme {
     DatamodelTheme *appcoreTheme = DatamodelTestTheme();
     return [CMTheme themeFromAppcoreTheme:appcoreTheme];
+}
+
++ (CMTheme *)systemThemeForTraitCollectionTheme:(UITraitCollection *)tc API_AVAILABLE(ios(13)) {
+    CMTheme *t = [[CMTheme alloc] init];
+    // Do not switch based on dark/light mode
+    t.darkModeTheme = nil;
+
+    t.backgroundColor = [[UIColor systemBackgroundColor] resolvedColorWithTraitCollection:tc];
+    t.primaryTextColor = [[UIColor labelColor] resolvedColorWithTraitCollection:tc];
+    t.secondaryTextColor = [[UIColor secondaryLabelColor] resolvedColorWithTraitCollection:tc];
+    return t;
+}
+
++ (CMTheme *)systemDarkTheme {
+    if (@available(iOS 13.0, *)) {
+        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark];
+        return [CMTheme systemThemeForTraitCollectionTheme:tc];
+    }
+
+    // Still work on iOS 12
+    CMTheme *t = [[CMTheme alloc] init];
+    t.backgroundColor = [UIColor blackColor];
+    t.primaryTextColor = [UIColor whiteColor];
+    t.secondaryTextColor = [UIColor systemGrayColor];
+    return t;
+}
+
++ (CMTheme *)systemLightTheme {
+    if (@available(iOS 13.0, *)) {
+        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+        return [CMTheme systemThemeForTraitCollectionTheme:tc];
+    }
+
+    // Still work on iOS 12
+    CMTheme *t = [[CMTheme alloc] init];
+    t.backgroundColor = [UIColor whiteColor];
+    t.primaryTextColor = [UIColor blackColor];
+    t.secondaryTextColor = [UIColor systemGrayColor];
+    return t;
+}
+
++ (CMTheme *)libaryThemeByName:(NSString *)name {
+    if ([@"system" isEqualToString:name]) {
+        return [[CMTheme alloc] init];
+    }
+    if ([@"system_dark" isEqualToString:name]) {
+        return [CMTheme systemDarkTheme];
+    }
+    if ([@"system_light" isEqualToString:name]) {
+        return [CMTheme systemLightTheme];
+    }
+    return nil;
 }
 
 #pragma mark Appcore interop

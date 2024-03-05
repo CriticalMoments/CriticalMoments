@@ -7,6 +7,8 @@
 
 #import "CMBaseDynamicPropertyProvider.h"
 
+@import CoreLocation;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CMLocationPermissionsPropertyProvider : NSObject <CMDynamicPropertyProvider>
@@ -43,6 +45,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CMApproxLongitudePropertyProvider : NSObject <CMDynamicPropertyProvider>
+@end
+
+@interface CMWeatherPropertyProvider : NSObject <CMDynamicPropertyProvider>
+
++ (NSDictionary<NSString *, CMWeatherPropertyProvider *> *)allWeatherProviders;
++ (void)setTestLocationOverride:(CLLocation *_Nullable)location;
+
 @end
 
 NS_ASSUME_NONNULL_END

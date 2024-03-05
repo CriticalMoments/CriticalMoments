@@ -58,20 +58,21 @@ type jsonActionContainer struct {
 // To be implemented by client libaray (eg: iOS SDK or Appcore)
 type ActionBindings interface {
 	// Actions
-	ShowBanner(banner *BannerAction) error
-	ShowAlert(alert *AlertAction) error
+	ShowBanner(banner *BannerAction, actionName string) error
+	ShowAlert(alert *AlertAction, actionName string) error
 	ShowLink(link *LinkAction) error
 	PerformConditionalAction(conditionalAction *ConditionalAction) error
 	PerformNamedAction(name string) error
 	ShowReviewPrompt() error
-	ShowModal(modal *ModalAction) error
+	ShowModal(modal *ModalAction, actionName string) error
 }
 
 type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
+	AllEmbeddedConditions() ([]*Condition, error)
 	ValidateReturningUserReadableIssue() string
-	PerformAction(ActionBindings) error
+	PerformAction(ab ActionBindings, actionName string) error
 }
 
 var (
@@ -143,11 +144,11 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
 	return ac.actionData.ValidateReturningUserReadableIssue()
 }
 
-func (ac *ActionContainer) PerformAction(ab ActionBindings) error {
+func (ac *ActionContainer) PerformAction(ab ActionBindings, actionName string) error {
 	if ac.actionData == nil {
 		return errors.New("attempted to perform action without AD interface")
 	}
-	err := ac.actionData.PerformAction(ab)
+	err := ac.actionData.PerformAction(ab, actionName)
 
 	if err != nil && ac.FallbackActionName != "" {
 		err = ab.PerformNamedAction(ac.FallbackActionName)

@@ -15,6 +15,8 @@
     self = [super init];
     if (self) {
         self.title = @"Link Demos";
+        self.infoText = @"Launch web links or app deep links";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/open-link";
         [self buildSections];
     }
     return self;
@@ -45,12 +47,19 @@
     openSettingsLink.actionCMActionName = @"settings_link_action";
 
     CMDemoAction *openMainScreenLink = [[CMDemoAction alloc] init];
-    openMainScreenLink.title = @"Open deeplink";
+    openMainScreenLink.title = @"Open deeplink (this app)";
     openMainScreenLink.subtitle = @"Open an app deeplink into this sample app's main screen";
     openMainScreenLink.skipInUiTesting = true;
     openMainScreenLink.actionCMActionName = @"main_screen_deeplink_action";
 
-    [self addSection:@"App deep links" withActions:@[ openSettingsLink, openMainScreenLink ]];
+    CMDemoAction *openMusicLink = [[CMDemoAction alloc] init];
+    openMusicLink.title = @"Open deeplink (another app)";
+    openMusicLink.subtitle = @"Open an app deeplink into the Apple Music app, going to the library tab.\n\nNote: this "
+                             @"action won't do anything if you are on a simulator, or uninstalled Apple Music app.";
+    openMusicLink.skipInUiTesting = true;
+    openMusicLink.actionCMActionName = @"deeplink_music_action";
+
+    [self addSection:@"App deep links" withActions:@[ openSettingsLink, openMainScreenLink, openMusicLink ]];
 }
 
 @end

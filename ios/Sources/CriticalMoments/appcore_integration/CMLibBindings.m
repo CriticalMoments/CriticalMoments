@@ -7,6 +7,7 @@
 
 #import "CMLibBindings.h"
 
+#import "../CriticalMoments_private.h"
 #import "../messaging/CMAlert.h"
 #import "../messaging/CMAlert_private.h"
 #import "../messaging/CMBannerManager.h"
@@ -49,12 +50,26 @@
         *error = [NSError errorWithDomain:@"CMIOS" code:81263223 userInfo:nil];
         return NO;
     }
-    [self.cm setTheme:theme];
 
+    [self.cm setTheme:theme];
     return YES;
 }
 
-- (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)setDefaultThemeByLibaryThemeName:(NSString *_Nullable)themeName
+                                   error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    CMTheme *theme = [CMTheme libaryThemeByName:themeName];
+    if (!theme) {
+        *error = [NSError errorWithDomain:@"CMIOS" code:902834902384 userInfo:nil];
+        return NO;
+    }
+
+    [self.cm setTheme:theme];
+    return YES;
+}
+
+- (BOOL)showBanner:(DatamodelBannerAction *)banner
+        actionName:(NSString *)actionName
+             error:(NSError *_Nullable __autoreleasing *)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
         return NO;
@@ -63,6 +78,10 @@
     if (@available(iOS 13, *)) {
         dispatch_async(dispatch_get_main_queue(), ^{
           CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
+          bannerMessage.completionEventSender = self.cm;
+          if (actionName.length > 0) {
+              bannerMessage.bannerName = actionName;
+          }
           [[CMBannerManager shared] showAppWideMessage:bannerMessage];
         });
     } else {
@@ -71,12 +90,12 @@
         return NO;
     }
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
-- (BOOL)showAlert:(DatamodelAlertAction *_Nullable)alertDataModel
-            error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showAlert:(DatamodelAlertAction *)alertDataModel
+       actionName:(NSString *)actionName
+            error:(NSError *_Nullable __autoreleasing *)error {
     if (!alertDataModel) {
         *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
         return NO;
@@ -84,10 +103,13 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
       CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
+      if (actionName.length > 0) {
+          alert.alertName = actionName;
+      }
+      alert.completionEventSender = self.cm;
       [alert showAlert];
     });
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
@@ -106,11 +128,11 @@
           [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
       }
     });
-    // TODO: what is the bool return here?
     return YES;
 }
 
 - (BOOL)showReviewPrompt:(NSError *_Nullable __autoreleasing *)error {
+    __block CriticalMoments *blockCM = self.cm;
     dispatch_async(dispatch_get_main_queue(), ^{
       if (@available(iOS 14.0, *)) {
           UIWindowScene *scene = [CMUtils keyWindow].windowScene;
@@ -120,19 +142,26 @@
       } else {
           [SKStoreReviewController requestReview];
       }
+
+      [blockCM sendEvent:@"system_app_review_requested"];
     });
 
-    // TODO: what is the bool return here?
     return YES;
 }
 
-- (BOOL)showModal:(DatamodelModalAction *_Nullable)modal error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showModal:(DatamodelModalAction *)modal
+       actionName:(NSString *)actionName
+            error:(NSError *_Nullable __autoreleasing *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
       CMModalViewController *sheetVc = [[CMModalViewController alloc] initWithDatamodel:modal];
+      if (actionName.length > 0) {
+          sheetVc.modalName = actionName;
+      }
+      sheetVc.completionEventSender = self.cm;
       [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 
-    return NO;
+    return YES;
 }
 
 - (BOOL)canOpenURL:(NSString *_Nullable)urlString {
@@ -141,6 +170,15 @@
         return [UIApplication.sharedApplication canOpenURL:url];
     }
     return NO;
+}
+
+- (NSString *_Nonnull)appVersion {
+    NSString *appVersion = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    return appVersion;
+}
+
+- (NSString *_Nonnull)cmVersion {
+    return CM_LIB_VERSION_NUMBER_STRING;
 }
 
 - (void)openLinkInEmbeddedBrowser:(NSURL *)url {
@@ -152,6 +190,17 @@
       }
       [topController presentViewController:safariVc animated:YES completion:nil];
     });
+}
+
+// Only used in testing, so while this could break over time, CI will catch it and it
+// won't impact production apps.
+- (BOOL)isTestBuild {
+    bool testEnv = [[[NSProcessInfo processInfo] environment] objectForKey:@"XCTestConfigurationFilePath"] != nil;
+    if (testEnv) {
+        return true;
+    }
+
+    return false;
 }
 
 @end

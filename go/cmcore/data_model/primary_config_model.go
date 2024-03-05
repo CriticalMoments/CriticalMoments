@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
+	"golang.org/x/exp/slices"
 )
 
 // Enables "Strict mode" validation for datamodel parsing
@@ -22,9 +24,14 @@ type PrimaryConfig struct {
 	ConfigVersion    string
 	AppId            string
 
+	MinCMVersion         string // for SDK users
+	MinCMVersionInternal string // for internal use
+	MinAppVersion        string
+
 	// Themes
-	defaultTheme *Theme
-	namedThemes  map[string]*Theme
+	defaultTheme     *Theme
+	LibraryThemeName string
+	namedThemes      map[string]*Theme
 
 	// Actions
 	namedActions map[string]*ActionContainer
@@ -41,7 +48,21 @@ func (pc *PrimaryConfig) DefaultTheme() *Theme {
 }
 
 func (pc *PrimaryConfig) ThemeWithName(name string) *Theme {
-	return pc.themeIteratingFallbacks(pc.namedThemes[name])
+	theme, ok := pc.namedThemes[name]
+	if ok {
+		return pc.themeIteratingFallbacks(theme)
+	}
+
+	theme, err := builtInThemeByName(name)
+	if theme != nil && err == nil {
+		return pc.themeIteratingFallbacks(theme)
+	}
+
+	return nil
+}
+
+func (pc *PrimaryConfig) IncludesCustomThemes() bool {
+	return len(pc.namedThemes) > 0
 }
 
 func (pc *PrimaryConfig) ActionWithName(name string) *ActionContainer {
@@ -60,18 +81,14 @@ func (pc *PrimaryConfig) ConditionWithName(name string) *Condition {
 	return nil
 }
 
-func (pc *PrimaryConfig) ActionsForEvent(eventName string) []*ActionContainer {
-	// TODO P2: don't iterate, use a map
-	actions := make([]*ActionContainer, 0)
+func (pc *PrimaryConfig) TriggersForEvent(eventName string) []*Trigger {
+	triggers := make([]*Trigger, 0)
 	for _, trigger := range pc.namedTriggers {
 		if trigger.EventName == eventName {
-			action, ok := pc.namedActions[trigger.ActionName]
-			if ok {
-				actions = append(actions, action)
-			}
+			triggers = append(triggers, trigger)
 		}
 	}
-	return actions
+	return triggers
 }
 
 // Container Decoding
@@ -210,8 +227,11 @@ func EncodeConfig(configBytes []byte, su *signing.SignUtil) ([]byte, error) {
 // JSON
 
 type jsonPrimaryConfig struct {
-	ConfigVersion string `json:"configVersion"`
-	AppId         string `json:"appId"`
+	ConfigVersion        string `json:"configVersion"`
+	AppId                string `json:"appId"`
+	MinAppVersion        string `json:"minAppVersion"`
+	MinCMVersion         string `json:"minCMVersion"`
+	MinCMVersionInternal string `json:"minCMVersionInternal"`
 
 	// Themes
 	ThemesConfig *jsonThemesSection `json:"themes"`
@@ -227,8 +247,8 @@ type jsonPrimaryConfig struct {
 }
 
 type jsonThemesSection struct {
-	DefaultTheme *Theme            `json:"defaultTheme"`
-	NamedThemes  map[string]*Theme `json:"namedThemes"`
+	DefaultThemeName string            `json:"defaultThemeName"`
+	NamedThemes      map[string]*Theme `json:"namedThemes"`
 }
 
 type jsonActionsSection struct {
@@ -252,14 +272,32 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 
 	pc.ConfigVersion = jpc.ConfigVersion
 	pc.AppId = jpc.AppId
+	pc.MinAppVersion = jpc.MinAppVersion
+	pc.MinCMVersion = jpc.MinCMVersion
+	pc.MinCMVersionInternal = jpc.MinCMVersionInternal
 
 	// Themes
 	if jpc.ThemesConfig != nil {
-		if jpc.ThemesConfig.DefaultTheme != nil {
-			pc.defaultTheme = jpc.ThemesConfig.DefaultTheme
-		}
 		if jpc.ThemesConfig.NamedThemes != nil {
 			pc.namedThemes = jpc.ThemesConfig.NamedThemes
+		}
+		if jpc.ThemesConfig.DefaultThemeName != "" {
+			isLibaryTheme := libraryThemeNames[jpc.ThemesConfig.DefaultThemeName]
+			appcoreBuiltInTheme, _ := builtInThemeByName(jpc.ThemesConfig.DefaultThemeName)
+			namedDefaultTheme := pc.namedThemes[jpc.ThemesConfig.DefaultThemeName]
+
+			// Priority order: named, libary, cmcore built-in
+			if namedDefaultTheme != nil {
+				pc.defaultTheme = namedDefaultTheme
+			} else if isLibaryTheme {
+				pc.LibraryThemeName = jpc.ThemesConfig.DefaultThemeName
+			} else if appcoreBuiltInTheme != nil {
+				pc.defaultTheme = appcoreBuiltInTheme
+			} else if StrictDatamodelParsing {
+				return NewUserPresentableError("Default theme specified in config doesn't exist")
+			} else {
+				fmt.Println("CriticalMoments: WARNING - Default theme specified in config doesn't exist. Will fallback to system default theme.")
+			}
 		}
 	}
 	if pc.namedThemes == nil {
@@ -292,6 +330,24 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (pc *PrimaryConfig) NameForActionContainer(c *ActionContainer) string {
+	for name, action := range pc.namedActions {
+		if action == c {
+			return name
+		}
+	}
+	return ""
+}
+
+func (pc *PrimaryConfig) NameForCondition(c *Condition) string {
+	for name, condition := range pc.namedConditions {
+		if condition == c {
+			return name
+		}
+	}
+	return ""
 }
 
 func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
@@ -329,6 +385,22 @@ func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
 
 	if pc.AppId == "" {
 		return "Config must have an appId"
+	}
+
+	if pc.MinAppVersion != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinAppVersion); err != nil {
+			return fmt.Sprintf("Config had invalid minAppVersion: %v", pc.MinAppVersion)
+		}
+	}
+	if pc.MinCMVersion != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinCMVersion); err != nil {
+			return fmt.Sprintf("Config had invalid minCMVersion: %v", pc.MinCMVersion)
+		}
+	}
+	if pc.MinCMVersionInternal != "" {
+		if _, err := conditions.VersionFromVersionString(pc.MinCMVersionInternal); err != nil {
+			return fmt.Sprintf("Config had invalid minCMVersionInternal: %v", pc.MinCMVersionInternal)
+		}
 	}
 
 	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
@@ -388,6 +460,7 @@ func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable
 }
 
 func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
+	allBuiltInThemeNames := AllBuiltInThemeNames()
 	for sourceActionName, action := range pc.namedActions {
 		if action.ActionType == "" || action.actionData == nil {
 			return "Internal issue. Code 15234328"
@@ -397,9 +470,15 @@ func (pc *PrimaryConfig) validateThemeNamesExistReturningUserReadable() string {
 			return fmt.Sprintf("Internal issue for action \"%v\". Code: 88456198", sourceActionName)
 		}
 		for _, themeName := range themeList {
-			_, ok := pc.namedThemes[themeName]
-			if !ok {
-				return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, themeName)
+			isBuiltIn := slices.Contains(allBuiltInThemeNames, themeName)
+			_, hasNamedTheme := pc.namedThemes[themeName]
+			if !hasNamedTheme && !isBuiltIn {
+				// New built in names may be added later. Older devices should ignore unknown names.
+				if StrictDatamodelParsing {
+					return fmt.Sprintf("Action \"%v\" specified named theme \"%v\", which doesn't exist", sourceActionName, themeName)
+				} else {
+					fmt.Println("CriticalMoments: WARNING - Action specified named theme that doesn't exist. Will fallback to system default theme.")
+				}
 			}
 		}
 	}
@@ -463,4 +542,43 @@ func (pc *PrimaryConfig) validateFallbackNames() string {
 	}
 
 	return ""
+}
+
+func (pc *PrimaryConfig) NamedConditionCount() int {
+	return len(pc.namedConditions)
+}
+
+func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
+	all := make([]*Condition, 0)
+	for _, c := range pc.namedConditions {
+		all = append(all, c)
+	}
+
+	for _, a := range pc.namedActions {
+		if a.Condition != nil {
+			all = append(all, a.Condition)
+		}
+		actionConditions, err := a.actionData.AllEmbeddedConditions()
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, actionConditions...)
+	}
+
+	for _, t := range pc.namedTriggers {
+		condition := t.Condition
+		if condition != nil {
+			all = append(all, condition)
+		}
+	}
+
+	return all, nil
+}
+
+func (pc *PrimaryConfig) AllActions() []*ActionContainer {
+	all := make([]*ActionContainer, 0)
+	for _, a := range pc.namedActions {
+		all = append(all, a)
+	}
+	return all
 }

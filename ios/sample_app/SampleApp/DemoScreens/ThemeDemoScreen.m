@@ -39,6 +39,10 @@ static CMTheme *staticCustomTheme = nil;
     self = [super init];
     if (self) {
         self.title = @"Theme Config";
+        self.infoText =
+            @"Apply your brand and app's style.\n\nAfter changing the theme, explore other sections of the demo "
+            @"app like modals and banners to see the impact.";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/themes";
         [self buildSections];
     }
     return self;
@@ -49,19 +53,24 @@ static CMTheme *staticCustomTheme = nil;
     // General
 
     CMDemoAction *resetThemeAction = [[CMDemoAction alloc] init];
-    resetThemeAction.title = @"Reset theme to default";
-    resetThemeAction.subtitle = @"Clear all theme changes, restoring default";
-    [resetThemeAction addTarget:self action:@selector(resetTheme)];
+    resetThemeAction.title = @"Reset Theme";
+    resetThemeAction.snapshotTitle = @"Reset theme to default";
+    resetThemeAction.subtitle = @"Clear all theme changes, restoring default 'system' theme.";
+    [resetThemeAction addTarget:self action:@selector(resetThemes)];
     resetThemeAction.skipInUiTesting = true;
 
-    CMDemoAction *cannedTheme = [[CMDemoAction alloc] init];
-    cannedTheme.title = @"Try demo theme";
-    cannedTheme.subtitle = @"Set default theme to a new look. After selecting, try the 'Show UI with default theme' "
-                           @"section below to visualize the impact.";
-    [cannedTheme addTarget:self action:@selector(cannedTheme)];
-    [cannedTheme addResetTestTarget:self action:@selector(resetCannedTheme)];
+    [self addSection:@"Reset" withActions:@[ resetThemeAction ]];
 
-    [self addSection:@"General" withActions:@[ resetThemeAction, cannedTheme ]];
+    // Custom
+
+    CMDemoAction *cannedTheme = [[CMDemoAction alloc] init];
+    cannedTheme.title = @"Custom theme";
+    cannedTheme.snapshotTitle = @"Try demo theme";
+    cannedTheme.subtitle = @"Set default theme to a new custom look. After selecting.";
+    [cannedTheme addTarget:self action:@selector(cannedTheme)];
+    [cannedTheme addResetTestTarget:self action:@selector(resetThemes)];
+
+    [self addSection:@"Custom Theme" withActions:@[ cannedTheme ]];
 
     // Colors
 
@@ -326,13 +335,7 @@ static CMTheme *staticCustomTheme = nil;
     [Utils.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
-- (void)resetTheme {
-    staticCustomTheme = [[CMTheme alloc] init];
-    [CriticalMoments.sharedInstance setTheme:staticCustomTheme];
-    [CriticalMoments.sharedInstance removeAllBanners];
-}
-
-- (void)resetCannedTheme {
+- (void)resetThemes {
     // reset theme
     staticCustomTheme = [[CMTheme alloc] init];
     [CriticalMoments.sharedInstance setTheme:staticCustomTheme];
@@ -342,6 +345,8 @@ static CMTheme *staticCustomTheme = nil;
 
     // dismiss the alert
     [Utils.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
+
+    [CriticalMoments.sharedInstance removeAllBanners];
 }
 
 - (void)cannedTheme {
@@ -360,21 +365,7 @@ static CMTheme *staticCustomTheme = nil;
     [CriticalMoments.sharedInstance removeAllBanners];
 
     // Pop a modal so the user can see the theme
-    [CriticalMoments.sharedInstance performNamedAction:@"headphoneModalExample" handler:nil];
-
-    UIAlertController *alert = [UIAlertController
-        alertControllerWithTitle:@"Theme Set"
-                         message:@"A theme with custom colors and fonts is now set. This theme will be used across the "
-                                 @"sample app until you select 'Reset theme to default'."
-                  preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *action){
-                                                          }];
-    [alert addAction:defaultAction];
-
-    UIViewController *rootVC = Utils.keyWindow.rootViewController;
-    [rootVC presentViewController:alert animated:YES completion:nil];
+    [CriticalMoments.sharedInstance performNamedAction:@"theme_modal" handler:nil];
 }
 
 - (void)dismissSheets {

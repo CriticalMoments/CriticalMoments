@@ -77,6 +77,13 @@
     [self processError:error];
 }
 
+- (void)registerStaticTimeProperty:(NSString *)key value:(NSDate *)value {
+    NSError *error;
+    int64_t goTime = [CMUtils dateToGoTime:value];
+    [_appcore registerStaticTimeProperty:key value:goTime error:&error];
+    [self processError:error];
+}
+
 - (void)registerLibPropertyProvider:(NSString *)key value:(id<CMDynamicPropertyProvider>)value {
     NSError *error;
     // Wrap the CMDynamicPropertyProvider to implement the appcore interface
@@ -261,6 +268,14 @@
     [self registerLibPropertyProvider:@"reminders_permission" value:rempp];
     CMBluetoothPermissionsPropertyProvider *btpp = [[CMBluetoothPermissionsPropertyProvider alloc] init];
     [self registerLibPropertyProvider:@"bluetooth_permission" value:btpp];
+
+    // Weather
+    NSDictionary<NSString *, CMWeatherPropertyProvider *> *weatherProviders =
+        [CMWeatherPropertyProvider allWeatherProviders];
+    for (NSString *conditionName in weatherProviders.keyEnumerator) {
+        CMWeatherPropertyProvider *provider = weatherProviders[conditionName];
+        [self registerLibPropertyProvider:conditionName value:provider];
+    }
 }
 
 - (void)setUserInterfaceIdiom {

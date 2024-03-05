@@ -55,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
-/// :nodoc:
-- (nonnull NSString *)getApiKey;
-
 /**
  Set a local development Config URL for critical moments.
 
@@ -96,40 +93,70 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)sendEvent:(NSString *)eventName;
 
+/**
+ Set to true to log events to console, as they occur. Primarily uses in debugging, and should be disabled in release
+ builds. Disabled by default.
+
+ @param logEvents if true, events will be logged as they occur
+ */
+- (void)setLogEvents:(bool)logEvents;
+
 #pragma mark Feature Flags / Named Conditions
 
 /**
- Checks a condition string, returning the result of evaluating it.
+ Checks a named condition string, returning the result of evaluating it. The provided name is used to lookup a condition
+in the config file's namedConditions section.
 
- A name is provided so that you can remotely override the condition string using a cloud based config file.
+ Configuration documentation: https://docs.criticalmoments.io/conditional-targeting/named-conditions
 
  The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
 can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
 the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
 
- @param name A name for this condition. Must be provided and can not be an empty string.
- The name allows you to override the hardcoded condition string remotely from the cloud-hosted
- CM config file later if needed.
- @param condition The condition string, for example: "interface_orientation == 'landscape'". See documentation on
-options here: https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions
+ @param name The name of this condition. Must be provided and can not be an empty string.
+ The name is used as a lookup the condition-string of a namedCondition in the config file.
  @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occured evaluating the condition. The boolean value is false for any error.
- @warning Be sure to provide a unique name to each condition you use. Reusing names will make it impossible to override
-each usage independently from remote configuration. Reused names will log warnings in the debug console.
+returns any errors occured evaluating the condition. The boolean value is false for any error, including if the
+condition is not found in the config.
+ @warning Be sure to provide a unique name to each use case. Reusing names (even if the current conditional logic is
+currently equivalent) will make it impossible to override each usage independently from remote configuration.
  */
 - (void)checkNamedCondition:(NSString *_Nonnull)name
-                  condition:(NSString *_Nonnull)condition
                     handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
 
-/// :nodoc: This API is private, and should not be used
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
+// Private, only for internal use (demo app/testing).
+// Evaluate a condition from a conditional-string
+// Do not use this in any other apps. It's against the TOS, and will always return an error.
+/// :nodoc:
+- (void)checkInternalTestCondition:(NSString *_Nonnull)conditionString
+                           handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+#endif
+
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
+/// :nodoc: This API is private, and should not be used. Use events + triggers
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
+#endif
 
 #pragma mark Themes
 
-/// Fetch the current theme for this CM instance
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
+// Fetch the current theme for this CM instance
+// Private, only for internal use (demo app).
+/// :nodoc:
 - (CMTheme *)currentTheme;
-/// Set the current theme for this CM instance
+// Set the current theme for this CM instance.
+// Private, only for internal use (demo app).
+/// :nodoc:
 - (void)setTheme:(CMTheme *)theme;
+// Set the current theme for this CM instance to a built in theme
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (void)setBuiltInTheme:(NSString *)themeName;
+// Private, only for internal use (demo app).
+/// :nodoc:
+- (int)builtInBaseThemeCount;
+#endif
 
 #pragma mark Properties
 
@@ -193,6 +220,7 @@ each usage independently from remote configuration. Reused names will log warnin
  */
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
+#ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:
 - (NSString *)objcPing;
@@ -203,6 +231,7 @@ each usage independently from remote configuration. Reused names will log warnin
 
 /// :nodoc: Private api for sample app.
 - (void)removeAllBanners;
+#endif
 
 @end
 

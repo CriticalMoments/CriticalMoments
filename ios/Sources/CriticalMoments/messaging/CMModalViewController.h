@@ -8,6 +8,7 @@
 #import <UIKit/UIKit.h>
 
 #import "../themes/CMTheme.h"
+#import "../utils/CMEventSender.h"
 
 @import Appcore;
 
@@ -15,11 +16,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMModalViewController : UIViewController
 
-/// :nodoc:
 - (instancetype)initWithDatamodel:(DatamodelModalAction *)model;
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
+
+/// For sending events when actions are performed in the modal
+@property(nonatomic, weak, readwrite) id<CMEventSender> completionEventSender;
+@property(nonatomic, strong, readwrite) NSString *modalName;
 
 @end
 

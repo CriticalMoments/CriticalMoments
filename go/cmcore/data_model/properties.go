@@ -120,6 +120,8 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		"has_watch":                 requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
 		"screen_brightness":         requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeAppStart),
 		"screen_captured":           requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),
+		"app_start_time":            requiredPropertyConfig(CMTimeKind, CMPropertySampleTypeDoNotSample),
+		"session_start_time":        requiredPropertyConfig(CMTimeKind, CMPropertySampleTypeDoNotSample),
 
 		// Audio
 		"other_audio_playing": requiredPropertyConfig(reflect.Bool, CMPropertySampleTypeAppStart),
@@ -158,6 +160,18 @@ func BuiltInPropertyTypes() map[string]*CMPropertyConfig {
 		// Optional built in props
 		"device_model_version": optionalPropertyConfig(reflect.String, CMPropertySampleTypeAppStart),
 		"low_data_mode":        optionalPropertyConfig(reflect.Bool, CMPropertySampleTypeOnUse),
+
+		// Weather
+		"weather_temperature":                          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_apparent_temperature":                 requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_condition":                            requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_cloud_cover":                          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"is_daylight":                                  requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_temperature":          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_apparent_temperature": requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"weather_approx_location_condition":            requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
+		"weather_approx_location_cloud_cover":          requiredPropertyConfig(reflect.Float64, CMPropertySampleTypeOnUse),
+		"approx_location_is_daylight":                  requiredPropertyConfig(reflect.String, CMPropertySampleTypeOnUse),
 
 		// Well known properties - client should provide
 		"user_signup_date":      wellKnownPropertyConfig(CMTimeKind, CMPropertySampleTypeOnCustomSet),

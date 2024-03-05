@@ -6,7 +6,9 @@
 //
 
 #import "CMButton.h"
+
 #import "../CriticalMoments_private.h"
+#import "../themes/CMTheme_private.h"
 
 // Align to default and size=small OS buttons
 #define CM_OS_BUTTON_FONT_SIZE 17.0
@@ -55,9 +57,19 @@
 }
 
 - (void)buttonTapped:(UIButton *)target {
-    // two actions fire:
-    // 1) the model's named action, if it exists
-    // 2) the system's default action, unless prevent default (eg: dismiss modal)
+    // Three actions fire.
+    // Important that #1 is before #3, as #3 may need "topViewController".
+    // 1) the system's default action, unless prevent default (eg: dismiss modal)
+    // 2) the button tapped action if provided
+    // 3) the model's named action, if it exists
+
+    if (!self.model.preventDefault && self.defaultAction) {
+        self.defaultAction();
+    }
+
+    if (self.buttonTappedAction) {
+        self.buttonTappedAction();
+    }
 
     if (self.model.actionName.length > 0) {
         [CriticalMoments.sharedInstance performNamedAction:self.model.actionName
@@ -66,10 +78,6 @@
                                                          NSLog(@"CriticalMoments: Button tap unknown issue: %@", error);
                                                      }
                                                    }];
-    }
-
-    if (!self.model.preventDefault && self.defaultAction) {
-        self.defaultAction();
     }
 }
 
@@ -88,10 +96,12 @@
 - (UIButton *)buildNewStyleButtonWithDataModel:(DatamodelButton *)model {
     if (@available(iOS 15.0, *)) {
         UIButtonConfiguration *c;
+        bool primaryColorBackground;
         if ([DatamodelButtonStyleEnumLarge isEqualToString:model.style]) {
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.buttonSize = UIButtonConfigurationSizeLarge;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
+            primaryColorBackground = true;
         } else if ([DatamodelButtonStyleEnumSecondary isEqualToString:model.style]) {
             c = UIButtonConfiguration.tintedButtonConfiguration;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
@@ -109,6 +119,17 @@
             // normal and any other value
             c = UIButtonConfiguration.filledButtonConfiguration;
             c.baseBackgroundColor = [self.theme primaryColorForView:self];
+            primaryColorBackground = true;
+        }
+        if (primaryColorBackground) {
+            // System uses white text by default, but if theme uses a bright primary color, use the background color
+            // instead Background and primary require legibility in docs
+            CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
+            [c.baseBackgroundColor getRed:&red green:&green blue:&blue alpha:&alpha];
+            double luminance = (0.299 * red + 0.587 * green + 0.114 * blue);
+            if (luminance > 0.7294117647) {
+                c.baseForegroundColor = [self.theme backgroundColor];
+            }
         }
 
         // custom font (font, and size for info-small)

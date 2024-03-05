@@ -13,6 +13,7 @@
 #import "CriticalMoments.h"
 #import "CriticalMoments_private.h"
 @import EventKit;
+#import "../../Sources/CriticalMoments/properties/CMLocationPropertyProvider.h"
 
 // This key is only valid for test bundle "com.apple.dt.xctest.tool"
 #define TEST_API_KEY                                                                                                   \
@@ -120,7 +121,6 @@
     XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation1];
     [cm checkNamedCondition:@"trueCondition"
-                  condition:@"true"
                     handler:^(bool result, NSError *error) {
                       if (result && !error) {
                           [expectation1 fulfill];
@@ -130,7 +130,6 @@
     XCTestExpectation *expectation2 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation2];
     [cm checkNamedCondition:@"falseCondition"
-                  condition:@"false"
                     handler:^(bool result, NSError *_Nullable error) {
                       if (!result && !error) {
                           [expectation2 fulfill];
@@ -141,33 +140,9 @@
     XCTestExpectation *expectation3 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation3];
     [cm checkNamedCondition:@"invalidCondition"
-                  condition:@"fake_var > 6"
                     handler:^(bool result, NSError *_Nullable error) {
                       if (!result && error) {
                           [expectation3 fulfill];
-                      }
-                    }];
-
-    // Override this by name the test json config file, should return true.
-    XCTestExpectation *expectation4 = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectation4];
-    [cm checkNamedCondition:@"overrideToTrue"
-                  condition:@"false"
-                    handler:^(bool result, NSError *_Nullable error) {
-                      if (result && !error) {
-                          [expectation4 fulfill];
-                      }
-                    }];
-
-    // This should show a warning in debug mode, but should pass
-    // "falseCondition" name conflict with early use and different condition
-    XCTestExpectation *expectation5 = [[XCTestExpectation alloc] init];
-    [expectations addObject:expectation5];
-    [cm checkNamedCondition:@"falseCondition"
-                  condition:@"true"
-                    handler:^(bool result, NSError *_Nullable error) {
-                      if (result && !error) {
-                          [expectation5 fulfill];
                       }
                     }];
 
@@ -209,6 +184,7 @@
 
     // should run async after start, and not crash
     [cm sendEvent:@"custom_event"
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@1];
@@ -228,6 +204,7 @@
     XCTestExpectation *expectation2 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation2];
     [cm sendEvent:randEventName
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@2];
@@ -241,6 +218,7 @@
     XCTestExpectation *expectation3 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation3];
     [cm sendEvent:DatamodelAppStartBuiltInEvent
+          builtIn:false
           handler:^(NSError *_Nullable error) {
             [lock lock];
             [orderRan addObject:@3];
@@ -260,13 +238,12 @@
     XCTestExpectation *expectCount = [[XCTestExpectation alloc] init];
     // Test a condition counting events
     NSString *testCondition = [NSString stringWithFormat:@"eventCount('%@') == 1", randEventName];
-    [cm checkNamedCondition:@"testCondition"
-                  condition:testCondition
-                    handler:^(bool result, NSError *_Nullable error) {
-                      if (result && !error) {
-                          [expectCount fulfill];
-                      }
-                    }];
+    [cm checkInternalTestCondition:testCondition
+                           handler:^(bool result, NSError *_Nullable error) {
+                             if (result && !error) {
+                                 [expectCount fulfill];
+                             }
+                           }];
     [self waitForExpectations:@[ expectCount ] timeout:5.0];
 }
 
@@ -332,14 +309,13 @@
     [expectations addObject:expectationSuccess1];
 
     // should run async after start, and not crash
-    [cm checkNamedCondition:@"nonName"
-                  condition:@"true"
-                    handler:^(bool result, NSError *_Nullable error) {
-                      [expectationNotRun fulfill];
-                      if (result && !error) {
-                          [expectationSuccess1 fulfill];
-                      }
-                    }];
+    [cm checkInternalTestCondition:@"true"
+                           handler:^(bool result, NSError *_Nullable error) {
+                             [expectationNotRun fulfill];
+                             if (result && !error) {
+                                 [expectationSuccess1 fulfill];
+                             }
+                           }];
 
     // Shouldn't run yet, even if we wait 1s
     [self waitForExpectations:@[ expectationNotRun ] timeout:1.0];
@@ -350,13 +326,12 @@
     [expectations addObject:expectationSuccess2];
 
     // should run async and not crash
-    [cm checkNamedCondition:@"nonName2"
-                  condition:@"false"
-                    handler:^(bool result, NSError *_Nullable error) {
-                      if (!error && !result) {
-                          [expectationSuccess2 fulfill];
-                      }
-                    }];
+    [cm checkInternalTestCondition:@"false"
+                           handler:^(bool result, NSError *_Nullable error) {
+                             if (!error && !result) {
+                                 [expectationSuccess2 fulfill];
+                             }
+                           }];
 
     // Both should have run, and returned correct results
     [self waitForExpectations:expectations timeout:5.0];
@@ -424,17 +399,16 @@
     // Fetching set properties should work (both short and long form accessors)
     XCTestExpectation *wait = [[XCTestExpectation alloc] init];
     [expectations addObject:wait];
-    [cm checkNamedCondition:@"nonName3"
-                  condition:
-                      @"user_signup_date == unixTimeSeconds(1698093984) && stringy =='hello' && custom_stringy "
-                      @"== 'hello' && "
-                      @"stringy2 == nil && js == 'a' && jb == true && jn == 3.3 && referral_source == 'test_source' && "
-                      @"user_signed_in && user_referral_count == 42 && total_purchase_value == 3.14"
-                    handler:^(bool result, NSError *_Nullable er2) {
-                      XCTAssert(!er2, @"test condition errored");
-                      XCTAssert(result, @"test condition false");
-                      [wait fulfill];
-                    }];
+    [cm checkInternalTestCondition:
+            @"user_signup_date == unixTimeSeconds(1698093984) && stringy =='hello' && custom_stringy "
+            @"== 'hello' && "
+            @"stringy2 == nil && js == 'a' && jb == true && jn == 3.3 && referral_source == 'test_source' && "
+            @"user_signed_in && user_referral_count == 42 && total_purchase_value == 3.14"
+                           handler:^(bool result, NSError *_Nullable er2) {
+                             XCTAssert(!er2, @"test condition errored");
+                             XCTAssert(result, @"test condition false");
+                             [wait fulfill];
+                           }];
 
     // Both should have run, and returned correct results
     [self waitForExpectations:expectations timeout:5.0];
@@ -451,16 +425,70 @@
 
     NSTimeZone *tz = NSTimeZone.localTimeZone;
     NSString *condition = [NSString stringWithFormat:@"timezone_gmt_offset == %ld", tz.secondsFromGMT];
-    [cm checkNamedCondition:@"nonName4"
-                  condition:condition
-                    handler:^(bool result, NSError *_Nullable er2) {
-                      if (er2 || !result) {
-                          XCTAssert(false, @"timezone property failed");
-                      }
-                      [expectation fulfill];
-                    }];
+    [cm checkInternalTestCondition:condition
+                           handler:^(bool result, NSError *_Nullable er2) {
+                             if (er2 || !result) {
+                                 XCTAssert(false, @"timezone property failed");
+                             }
+                             [expectation fulfill];
+                           }];
 
     [self waitForExpectations:expectations timeout:5.0];
+}
+
+- (void)testWeatherProviderCases:(NSArray<NSString *> *)weatherTests {
+    CriticalMoments *cm = [self buildAndStartCMForTest];
+    // TODO P2: global in test not ideal
+    [CriticalMoments.sharedInstance setApiKey:TEST_API_KEY error:nil];
+    XCTAssert(cm, @"Startup issue");
+    @try {
+        // Toronto
+        [CMWeatherPropertyProvider setTestLocationOverride:[[CLLocation alloc] initWithLatitude:43.651070
+                                                                                      longitude:-79.347015]];
+
+        NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+        for (NSString *condition in weatherTests) {
+
+            XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
+            [expectations addObject:expectation];
+            [cm checkInternalTestCondition:condition
+                                   handler:^(bool result, NSError *error) {
+                                     if (!result || error) {
+                                         XCTAssert(false, @"Weather test failed: %@", condition);
+                                     }
+                                     [expectation fulfill];
+                                   }];
+        }
+
+        [self waitForExpectations:expectations timeout:15.0];
+    } @finally {
+        [CMWeatherPropertyProvider setTestLocationOverride:nil];
+    }
+}
+
+- (void)testWeatherProviderAccurate {
+    NSArray<NSString *> *weatherTests = @[
+        @"weather_temperature >= -40.0 && weather_temperature <= 50.0",
+        @"weather_apparent_temperature >= -40.0 && weather_apparent_temperature <= 50.0", // add_test_count
+        @"weather_condition != nil && len(weather_condition) > 0",                        // add_test_count
+        @"weather_cloud_cover >= 0.0 && weather_cloud_cover <= 1.0",                      // add_test_count
+        @"is_daylight in ['unknown', 'daylight', 'not_daylight']",                        // add_test_count
+    ];
+
+    [self testWeatherProviderCases:weatherTests];
+}
+
+- (void)testWeatherProviderApproximate {
+    NSArray<NSString *> *weatherTests = @[
+        @"weather_approx_location_temperature >= -40.0 && weather_approx_location_temperature <= 50.0",
+        @"weather_approx_location_apparent_temperature >= -40.0 && weather_approx_location_apparent_temperature <= 50.0", // add_test_count
+        @"weather_approx_location_condition != nil && len(weather_approx_location_condition) > 0",   // add_test_count
+        @"weather_approx_location_cloud_cover >= 0.0 && weather_approx_location_cloud_cover <= 1.0", // add_test_count
+        @"approx_location_is_daylight in ['unknown', 'daylight', 'not_daylight']",                   // add_test_count
+    ];
+
+    [self testWeatherProviderCases:weatherTests];
 }
 
 @end

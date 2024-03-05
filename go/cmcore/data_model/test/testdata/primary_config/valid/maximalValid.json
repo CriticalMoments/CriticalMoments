@@ -1,15 +1,11 @@
 {
     "configVersion": "v1",
     "appId": "io.criticalmoments.demo",
+    "minAppVersion": "1.0.0",
+    "minCMVersion": "0.8.0",
+    "minCMVersionInternal": "0.7.0",
     "themes": {
-        "defaultTheme": {
-            "bannerBackgroundColor": "#ffffff",
-            "bannerForegroundColor": "#000000",
-            "fontScale": 1.1,
-            "fontName": "AvenirNext-Regular",
-            "boldFontName": "AvenirNext-Bold",
-            "scaleFontForUserPreference": false
-        },
+        "defaultThemeName": "baseTheme",
         "namedThemes": {
             "blueTheme": {
                 "bannerBackgroundColor": "#00ff00",
@@ -30,6 +26,14 @@
             "futureThemeWithFallback": {
                 "bannerBackgroundColor": "invalidNewColorFormat",
                 "fallback": "blueTheme"
+            },
+            "baseTheme": {
+              "bannerBackgroundColor": "#ffffff",
+              "bannerForegroundColor": "#000000",
+              "fontScale": 1.1,
+              "fontName": "AvenirNext-Regular",
+              "boldFontName": "AvenirNext-Bold",
+              "scaleFontForUserPreference": false
             }
         }
     },
@@ -50,7 +54,8 @@
                 "actionData": {
                     "body": "Hello world 2, but on a banner!",
                     "maxLineCount": 1,
-                    "showDismissButton": false
+                    "showDismissButton": false,
+                    "themeName": "elegant"
                 }
             },
             "alertAction": {
@@ -152,6 +157,16 @@
             "trigger_alert": {
                 "eventName": "custom_event_alert",
                 "actionName": "alertAction"
+            },
+            "conditional_trigger_true": {
+                "eventName": "custom_event_conditional_true",
+                "actionName": "alertAction",
+                "condition": "2 > 1"
+            },
+            "conditional_trigger_false": {
+                "eventName": "custom_event_conditional_false",
+                "actionName": "alertAction",
+                "condition": "2 > 3"
             }
         }
     },

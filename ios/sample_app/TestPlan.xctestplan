@@ -21,6 +21,7 @@
     },
     {
       "skippedTests" : [
+        "PropertiesTests\/testGeoIpLocationToronto",
         "SnapshotTests"
       ],
       "target" : {

@@ -43,20 +43,35 @@ func TestUrlValidation(t *testing.T) {
 	}
 }
 
+func buildTestBuiltInProps(propTypes map[string]*datamodel.CMPropertyConfig) map[string]*datamodel.CMPropertyConfig {
+	// These are populated by Appcore, so should be included even if not used in test
+	props := map[string]*datamodel.CMPropertyConfig{
+		"app_start_time":     {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+	}
+
+	for k, v := range propTypes {
+		props[k] = v
+	}
+
+	return props
+}
+
 type testLibBindings struct {
 	lastBannerAction *datamodel.BannerAction
 	lastAlertAction  *datamodel.AlertAction
 	lastLinkAction   *datamodel.LinkAction
 	reviewCount      int
 	defaultTheme     *datamodel.Theme
+	libThemeName     string
 	lastModal        *datamodel.ModalAction
 }
 
-func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction) error {
+func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction, actionName string) error {
 	lb.lastBannerAction = b
 	return nil
 }
-func (lb *testLibBindings) ShowAlert(a *datamodel.AlertAction) error {
+func (lb *testLibBindings) ShowAlert(a *datamodel.AlertAction, actionName string) error {
 	lb.lastAlertAction = a
 	return nil
 }
@@ -68,16 +83,29 @@ func (lb *testLibBindings) SetDefaultTheme(theme *datamodel.Theme) error {
 	lb.defaultTheme = theme
 	return nil
 }
+func (lb *testLibBindings) SetDefaultThemeByLibaryThemeName(name string) error {
+	lb.libThemeName = name
+	return nil
+}
 func (lb *testLibBindings) ShowReviewPrompt() error {
 	lb.reviewCount += 1
 	return nil
 }
-func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
+func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction, actionName string) error {
 	lb.lastModal = modal
 	return nil
 }
 func (lb *testLibBindings) CanOpenURL(url string) bool {
 	return false
+}
+func (lb *testLibBindings) AppVersion() string {
+	return "1.2.3"
+}
+func (lb *testLibBindings) CMVersion() string {
+	return "2.3.4"
+}
+func (lb *testLibBindings) IsTestBuild() bool {
+	return true
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
@@ -101,7 +129,7 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ac.db == nil || ac.db.EventManager() == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
+	if ac.db == nil || ac.eventManager == nil || ac.db.PropertyHistoryManager() == nil || ac.cache == nil {
 		t.Fatal("db, event manager, prop history manager, or cache not setup")
 	}
 	if ac.propertyRegistry.phm != ac.db.PropertyHistoryManager() {
@@ -113,7 +141,7 @@ func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
 	ac.SetApiKey("CM1-aGVsbG86d29ybGQ=-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtbw==-MEUCIQCUfx6xlmQ0kdYkuw3SMFFI6WXrCWKWwetXBrXXG2hjAwIgWBPIMrdM1ET0HbpnXlnpj/f+VXtjRTqNNz9L/AOt4GY=", "io.criticalmoments.demo")
 
 	// Clear required properties, for easier setup
-	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{}
+	ac.propertyRegistry.builtInPropertyTypes = buildTestBuiltInProps(map[string]*datamodel.CMPropertyConfig{})
 	return ac, nil
 }
 
@@ -239,6 +267,13 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal("last banner action should be nil on new appcore test binding")
 	}
 
+	latestAlertTime, err := ac.db.LatestEventTimeByName("action:alertAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestAlertTime != nil {
+		t.Fatal("Alert action should not have fired yet")
+	}
 	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
 		t.Fatal("last alert action should be nil on new appcore test binding")
 	}
@@ -256,7 +291,14 @@ func TestPerformingAction(t *testing.T) {
 		t.Fatal(err)
 	}
 	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
-		t.Fatal("alert event didn't fire")
+		t.Fatal("alert didn't fire")
+	}
+	latestAlertTime, err = ac.db.LatestEventTimeByName("action:alertAction")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestAlertTime == nil {
+		t.Fatal("Alert action should have fired now")
 	}
 
 	err = ac.PerformNamedAction("reviewAction")
@@ -305,7 +347,7 @@ func TestPerformingAction(t *testing.T) {
 	}
 }
 
-func TestConditionalActionDispatching(t *testing.T) {
+func TestConditionalActionAndTriggerDispatching(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
 		t.Fatal(err)
@@ -362,6 +404,36 @@ func TestConditionalActionDispatching(t *testing.T) {
 	if ac.libBindings.(*testLibBindings).lastLinkAction == nil {
 		t.Fatal("last action should not be nil after condition run 3")
 	}
+
+	ac.libBindings.(*testLibBindings).lastAlertAction = nil
+	ac.libBindings.(*testLibBindings).lastLinkAction = nil
+	err = ac.SendClientEvent("custom_event_conditional_false")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil when condition false")
+	}
+
+	err = ac.SendClientEvent("custom_event_conditional_true")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).lastBannerAction != nil {
+		t.Fatal("last action should be nil after trigger")
+	}
+	if ac.libBindings.(*testLibBindings).lastAlertAction == nil {
+		t.Fatal("last alert action should be fired when condition true")
+	}
+	if ac.libBindings.(*testLibBindings).lastLinkAction != nil {
+		t.Fatal("last action should be nil after trigger")
+	}
 }
 
 func TestSetDefaultTheme(t *testing.T) {
@@ -377,8 +449,33 @@ func TestSetDefaultTheme(t *testing.T) {
 		t.Fatal(err)
 	}
 	defaultTheme := ac.libBindings.(*testLibBindings).defaultTheme
-	if defaultTheme == nil && defaultTheme.BannerBackgroundColor != "#ffffff" {
+	if defaultTheme == nil || defaultTheme.BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not set after start")
+	}
+	if ac.libBindings.(*testLibBindings).libThemeName != "" {
+		t.Fatal("Default theme set after start")
+	}
+}
+
+func TestSetDefaultLibraryTheme(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/builtInLibraryTheme.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ac.libBindings.(*testLibBindings).defaultTheme != nil {
+		t.Fatal("Theme should be nil until started")
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defaultThemeName := ac.libBindings.(*testLibBindings).libThemeName
+	if defaultThemeName != "system_dark" {
+		t.Fatal("Default theme not set after start")
+	}
+	defaultTheme := ac.libBindings.(*testLibBindings).defaultTheme
+	if defaultTheme != nil {
+		t.Fatal("Default theme set after start")
 	}
 }
 
@@ -392,49 +489,78 @@ func TestNamedConditions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// conditions without overrides should use provided condition
-	r, err := ac.CheckNamedCondition("newCondition1", "false")
+	// conditions without config file entry should return false
+	r, err := ac.CheckNamedCondition("conditionNotInConfig")
+	if err == nil || r {
+		t.Fatal("missing named condition should error and return false")
+	}
+
+	falseConditionEvent := "ff_false:falseCondition"
+	latestFalseTime, err := ac.db.LatestEventTimeByName(falseConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestFalseTime != nil {
+		t.Fatal("false condition should not have fired yet")
+	}
+	// falseCondition should return false
+	r, err = ac.CheckNamedCondition("falseCondition")
 	if err != nil || r {
 		t.Fatal("false conditions failed")
 	}
-	r, err = ac.CheckNamedCondition("newCondition2", "true")
+	latestFalseTime, err = ac.db.LatestEventTimeByName(falseConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestFalseTime == nil {
+		t.Fatal("false condition should have fired")
+	}
+
+	trueConditionEvent := "ff_true:trueCondition"
+	latestTrueTime, err := ac.db.LatestEventTimeByName(trueConditionEvent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if latestTrueTime != nil {
+		t.Fatal("true condition should not have fired yet")
+	}
+	// trueCondition should return true
+	r, err = ac.CheckNamedCondition("trueCondition")
 	if err != nil || !r {
 		t.Fatal("false conditions failed")
 	}
-
-	// falseCondition should override provided string
-	r, err = ac.CheckNamedCondition("falseCondition", "true")
-	if err != nil || r {
-		t.Fatal("false conditions failed")
+	latestTrueTime, err = ac.db.LatestEventTimeByName(trueConditionEvent)
+	if err != nil {
+		t.Fatal(err)
 	}
-
-	// trueCondition should override provided string
-	r, err = ac.CheckNamedCondition("trueCondition", "false")
-	if err != nil || !r {
-		t.Fatal("false conditions failed")
+	if latestTrueTime == nil {
+		t.Fatal("true condition should have fired")
 	}
 
 	// Check name check
-	_, err = ac.CheckNamedCondition("", "false")
+	_, err = ac.CheckNamedCondition("")
 	if err == nil {
 		t.Fatal("CheckNamedCondition requires name and didn't validate empty string")
 	}
-
-	// Check debug mode checker
-	dmerr := ac.CheckNamedConditionCollision("uniqueName", "false")
-	if dmerr != nil {
-		t.Fatal("dev mode condition failed")
-	}
-	dmerr = ac.CheckNamedConditionCollision("uniqueName", "false")
-	if dmerr != nil {
-		t.Fatal("dev mode condition second time errored, but should pass with same condition")
-	}
-	dmerr = ac.CheckNamedConditionCollision("uniqueName", "true")
-	if dmerr == nil {
-		t.Fatal("unque condition with new value should return a dev warning")
-	}
-
 }
+
+func TestInternalTestConditions(t *testing.T) {
+	// ensure CheckTestCondition is false+error for incorrect bundle ID.
+	// Other tests done in objc layer
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := ac.CheckTestCondition("true")
+	if err == nil || r {
+		t.Fatal("Test condition failed to block invalid test bundle")
+	}
+}
+
 func TestEndToEndEvents(t *testing.T) {
 	ac, err := testBuildValidTestAppCore(t)
 	if err != nil {
@@ -594,10 +720,10 @@ func TestStartupAndCustomPropsRecordPropHistory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ac.propertyRegistry.builtInPropertyTypes = map[string]*datamodel.CMPropertyConfig{
+	ac.propertyRegistry.builtInPropertyTypes = buildTestBuiltInProps(map[string]*datamodel.CMPropertyConfig{
 		"builtInString": {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeAppStart},
 		"builtInNever":  {Type: reflect.String, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
-	}
+	})
 
 	ac.RegisterClientIntProperty("testInt", 42)
 	ac.RegisterStaticStringProperty("builtInString", "hello world")
@@ -667,5 +793,43 @@ func TestStableRandomOperator(t *testing.T) {
 	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("stableRand() != 0 && stableRand() != nil && stableRand() == stableRand()", t))
 	if err != nil || !result {
 		t.Fatal("failed to generate consistent stableRand()")
+	}
+}
+
+func TestMinConfigVersionChecks(t *testing.T) {
+	tests := map[string]bool{
+		"../cmcore/data_model/test/testdata/primary_config/invalid/appVersionTooLow.json":     false,
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLow.json":      false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalid.json":     false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnough.json":    true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/appVersionHighEnough.json":   true,  // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionTooLowInt.json":   false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/invalid/cmVersionInvalidInt.json":  false, // add_test_count
+		"../cmcore/data_model/test/testdata/primary_config/valid/cmVersionHighEnoughInt.json": true,  // add_test_count
+	}
+	for path, shouldPass := range tests {
+		ac, err := buildTestAppCoreWithPath(path, t)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ac.Start(true)
+		if (err == nil) != shouldPass {
+			t.Fatalf("Config version check failed for %v", path)
+		}
+	}
+}
+
+func TestSetLogEvents(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ac.eventManager.logEvents {
+		t.Fatal("logEvents should be false by default")
+	}
+	ac.SetLogEvents(true)
+	if !ac.eventManager.logEvents {
+		t.Fatal("logEvents should be true after setting")
 	}
 }

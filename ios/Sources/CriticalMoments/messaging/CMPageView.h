@@ -15,15 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CMPageView : UIView
 
-/// :nodoc:
 - (instancetype)initWithDatamodel:(DatamodelPage *)model andTheme:(CMTheme *)theme;
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
-/// :nodoc:
-// the "default" action, which will be called after any button tap
+/// the "default" action, which will be called after any button tap
 @property(nonatomic, copy, nullable) void (^anyButtonDefaultAction)();
+/// Called after any button tap, for events
+@property(nonatomic, copy, nullable) void (^buttonCallback)(NSString *_Nullable buttonName, int buttonIndex);
 
 @end
 

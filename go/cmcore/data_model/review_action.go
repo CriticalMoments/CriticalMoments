@@ -23,6 +23,10 @@ func (r *ReviewAction) AllEmbeddedActionNames() ([]string, error) {
 	return []string{}, nil
 }
 
-func (r *ReviewAction) PerformAction(ab ActionBindings) error {
+func (r *ReviewAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{}, nil
+}
+
+func (r *ReviewAction) PerformAction(ab ActionBindings, actionName string) error {
 	return ab.ShowReviewPrompt()
 }

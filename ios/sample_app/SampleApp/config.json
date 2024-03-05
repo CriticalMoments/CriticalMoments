@@ -1,6 +1,6 @@
 {
     "configVersion": "v1",
-    "appId": "io.criticalmoments.sample-app",
+    "appId": "io.criticalmoments.demo-app",
     "themes": {
         "not_defaultTheme": {
             "bannerBackgroundColor": "#000000",
@@ -8,6 +8,7 @@
             "fontName": "AvenirNext-Regular",
             "boldFontName": "AvenirNext-Bold"
         },
+        "defaultThemeName": "system",
         "namedThemes": {
             "blackAndWhiteTheme": {
                 "bannerBackgroundColor": "#000000",
@@ -37,6 +38,364 @@
     },
     "actions": {
         "namedActions": {
+            "journey_goal_1": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') == 0",
+                    "passedActionName": "journey_goal_1_nudge",
+                    "failedActionName": "journey_goal_1_complete"
+                }
+            },
+            "journey_goal_1_nudge": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "Learn how to create your first list →",
+                    "tapActionName": "journey_goal_1_tap"
+                }
+            },
+            "journey_goal_1_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real Todo list app, you could connect the banner tap to your 'Create New List' experience with a deeplink."
+                }
+            },
+            "journey_goal_1_complete": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Goal Already Completed",
+                    "message": "The user has already created a list, and moved onto a later step of the user journey."
+                }
+            },
+            "journey_goal_2": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') < 2",
+                    "passedActionName": "journey_goal_2_nudge",
+                    "failedActionName": "journey_goal_2_fail"
+                }
+            },
+            "journey_goal_2_fail": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0",
+                    "passedActionName": "journey_goal_2_complete",
+                    "failedActionName": "journey_goal_prior_step"
+                }
+            },
+            "journey_goal_2_complete": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Goal Already Completed",
+                    "message": "The user has already added 2 tasks to lists, and moved onto a later step of the user journey."
+                }
+            },
+            "journey_goal_prior_step": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User is on earlier goal",
+                    "message": "The user has not reached this goal. Try earlier goals."
+                }
+            },
+            "journey_goal_3_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real app, you could connect the 'Try Free Trial' button to your purchase experience."
+                }
+            },
+            "journey_goal_2_nudge": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "list.bullet.rectangle.portrait.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Create tasks to start organizing your life!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "This copy could explain to users how to add tasks, and the buttons below could deeplink into that UI in your app.\n\nThis modal UI is fully native, remotely updatable, and themeable.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Take me there",
+                                    "style": "large",
+                                    "actionName": "journey_goal_2_tap"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "journey_goal_2_tap": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Demo Action",
+                    "message": "If this was a real Todo list app, you could connect the button tap to your 'Add Task to List' experience with a deeplink."
+                }
+            },
+            "journey_goal_3": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "eventCount('created_list') > 0 &&  eventCount('created_list_item') >= 2 && eventCount('completed_task') > 0",
+                    "passedActionName": "journey_goal_3_nudge",
+                    "failedActionName": "journey_goal_prior_step"
+                }
+            },
+            "journey_goal_3_nudge": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": false,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "note.text.badge.plus",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Try Pro to get even more!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "This UI should explain the benefits of the Pro plan, and allow the user to purchase a subscription. You can write your own, or use our modal UI system.\n\nThis modal UI is fully native, remotely updatable, and themeable.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Try Free Trial",
+                                    "style": "large",
+                                    "actionName": "journey_goal_3_tap"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "journey_goal_failed": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User not currently at this goal",
+                    "message": "The user has either already completed this goal, or not yet reached this stage of the user journey.\n\nTry earlier or later demos steps."
+                }
+            },
+            "journey_goal_simulated": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "User Action Simulated",
+                    "message": "We've simulated the user completeing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
+                }
+            },
+            "app_out_of_date": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "arrow.down.circle.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "App Update Recommended"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best expereince",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Update Now",
+                                    "style": "large",
+                                    "actionName": "update_app_action"
+                                },
+                                {
+                                    "title": "Not Now",
+                                    "style": "info"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "outage_modal": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "exclamationmark.icloud.fill",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Temporary Interruption"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "We're currently expereincing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "OK",
+                                    "style": "large"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "update_app_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://testflight.apple.com/join/uSwscwu0"
+                }
+            },
+            "product_announcement": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "New Feature: Explore Collaboration Tools →",
+                    "tapActionName": "nested_alert"
+                }
+            },
+            "legal_update": {
+                "actionType": "banner",
+                "actionData": {
+                    "body": "New EU data regulations. Learn how we protect your data →",
+                    "tapActionName": "tos"
+                }
+            },
+            "tos": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io/legal",
+                    "useEmbeddedBrowser": true
+                }
+            },
+            "app_review_simple": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Enjoying Critical Moments?",
+                    "message": "If you’re enjoying Critical Moments, we would greatly appreciate an app review!\n\nIf you are having an issue, our Help Docs and support team are here to help!",
+                    "showOkButton": false,
+                    "showCancelButton": false,
+                    "customButtons": [
+                        {
+                            "label": "Rate Us",
+                            "actionName": "app_review_faux",
+                            "style": "primary"
+                        },
+                        {
+                            "label": "Help, Feedback & Contact Us",
+                            "actionName": "docs_page"
+                        },
+                        {
+                            "label": "Not Now"
+                        }
+                    ]
+                }
+            },
+            "docs_page": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://docs.criticalmoments.io/support",
+                    "useEmbeddedBrowser": true
+                }
+            },
+            "app_review_faux": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Review Critical Moments",
+                    "message": "\n★★★★★\n\nThis isn't a real review prompt as this demo app is distributed via TestFlight, but it would work in a real app."
+                }
+            },
             "short_banner": {
                 "actionType": "banner",
                 "actionData": {
@@ -96,6 +455,52 @@
                     "body": "This message will truncate after the first line, unlike the default of 4 lines. This message is also very very very long so the truncation is visible on iPads, which can be wide, and require run-on sentences.",
                     "maxLineCount": 1,
                     "tapActionName": "nested_alert"
+                }
+            },
+            "theme_modal": {
+                "actionType": "modal",
+                "actionData": {
+                    "showCloseButton": true,
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 80.0,
+                                        "imageData": {
+                                            "symbolName": "circle.hexagongrid.circle",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 2,
+                                    "pageSectionData": {
+                                        "title": "Theme changed!"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 3,
+                                    "pageSectionData": {
+                                        "bodyText": "You've updated the default theme for the demo app.\n\nExplore other demos like modals and banners to see how the theme impacts Critical Moments UI.\n\nYou can reset to the system theme using the option at the top of the Themes demo screens.",
+                                        "scaleFactor": 1.3
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "OK",
+                                    "style": "large"
+                                }
+                            ]
+                        }
+                    }
                 }
             },
             "show_notice_alert": {
@@ -197,6 +602,12 @@
                     "url": "critical-moments-sampleapp:main"
                 }
             },
+            "deeplink_music_action": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "music://music.apple.com/library"
+                }
+            },
             "nested_alert": {
                 "actionType": "alert",
                 "actionData": {
@@ -208,20 +619,52 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition True",
-                    "message": "The condition was evaluated, and was true.\n\nTry changing your device's state to make it true, then tap again."
+                    "message": "The condition was evaluated, and was true.\n\nTry changing your device's state to make it false, then tap again."
                 }
             },
             "conditional_false_alert": {
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition False",
-                    "message": "The condition was evaluated, and was false.\n\nTry changing your device's state to make it false, then tap again."
+                    "message": "The condition was evaluated, and was false.\n\nTry changing your device's state to make it true, then tap again."
                 }
             },
             "conditional_landscape": {
                 "actionType": "conditional_action",
                 "actionData": {
                     "condition": "(interface_orientation == 'landscape')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_dark_mode": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "dark_mode",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_ipad": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(device_model_class == 'iPad')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_warm": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(weather_approx_location_temperature > 20)",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_cloudy": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(weather_approx_location_cloud_cover > 0.5)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -238,6 +681,14 @@
                 "actionType": "conditional_action",
                 "actionData": {
                     "condition": "(device_orientation == 'face_up' || device_orientation == 'face_down')",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
+            "conditional_canada": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "(location_approx_country == 'CA')",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -422,10 +873,11 @@
                             "buttons": [
                                 {
                                     "title": "Take me there",
-                                    "style": "large"
+                                    "style": "large",
+                                    "actionName": "nested_alert"
                                 },
                                 {
-                                    "title": "Now Now",
+                                    "title": "Not Now",
                                     "style": "info"
                                 }
                             ]
@@ -655,7 +1107,28 @@
             "bannerTestTrigger": {
                 "eventName": "show_banner",
                 "actionName": "custom_theme_banner"
+            },
+            "created_list_simulated": {
+                "eventName": "created_list",
+                "actionName": "journey_goal_simulated"
+            },
+            "created_list_item_simulated": {
+                "eventName": "created_list_item",
+                "actionName": "journey_goal_simulated"
+            },
+            "subscribe_trigger": {
+                "eventName": "completed_task",
+                "actionName": "journey_goal_3"
             }
+        }
+    },
+    "conditions": {
+        "namedConditions": {
+            "custom_feature_1": "false",
+            "app_not_recently_installed": "app_install_date < now() - duration('10m')",
+            "weather_warm": "(weather_approx_location_temperature > 20)",
+            "ab_test_group_for_experiment_five": "(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)",
+            "is_iphone_with_recent_os": "device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
         }
     }
 }

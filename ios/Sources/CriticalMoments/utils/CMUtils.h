@@ -7,9 +7,10 @@
 
 #import <Foundation/Foundation.h>
 
-#define CM_LIB_VERSION_NUMBER_STRING @"0.8.1-beta"
+#define CM_LIB_VERSION_NUMBER_STRING @"0.9.0"
 
 @import UIKit;
+@import CoreLocation;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,6 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)uiKitLocalizedStringForKey:(NSString *)key;
 + (long long)cmTimestampFromDate:(NSDate *)date;
 + (bool)isiPad;
++ (int64_t)dateToGoTime:(NSDate *)value;
++ (NSDictionary *)fetchCmApiSyncronous:(NSString *)urlString error:(NSError **)error;
++ (CLLocation *)noiseLocation:(CLLocation *)loc maxNoise:(int)distanceInMeters;
 
 @end
 

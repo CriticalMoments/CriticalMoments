@@ -10,6 +10,7 @@
 @import UIKit;
 
 #import "../themes/CMTheme.h"
+#import "../utils/CMEventSender.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +50,6 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 
 #pragma mark Initializers
 
-/// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -114,6 +114,10 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
  set, tapping will not perform any action.
  */
 @property(nonatomic, readwrite) id<CMBannerActionDelegate> actionDelegate;
+
+/// For sending events when the banner is tapped or closed
+@property(nonatomic, weak, readwrite) id<CMEventSender> completionEventSender;
+@property(nonatomic, strong, readwrite) NSString *bannerName;
 
 @end
 

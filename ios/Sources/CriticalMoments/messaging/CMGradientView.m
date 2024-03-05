@@ -7,6 +7,8 @@
 
 #import "CMGradientView.h"
 
+#import "../themes/CMTheme_private.h"
+
 @interface CMGradientView ()
 
 @property(nonatomic, readwrite) CAGradientLayer *gradient;

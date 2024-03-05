@@ -46,7 +46,6 @@ func TestContainer(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version from JSON")
 	}
-
 }
 
 func TestContainerVersionCheck(t *testing.T) {
@@ -134,6 +133,21 @@ func testHelperBuilPrimaryConfigFromFile(t *testing.T, filePath string) *Primary
 	return &pc
 }
 
+func testAllConditionsContainsCondition(t *testing.T, pc *PrimaryConfig, c *Condition) {
+	all, err := pc.AllConditions()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, cond := range all {
+		// Pointer check, check actual instance returned in case string matches
+		if cond == c {
+			return
+		}
+	}
+	t.Fatalf("Failed to find condition in all conditions: %v", c.String())
+}
+
 func TestPrimaryConfigJson(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
@@ -148,12 +162,21 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("invalid config version parse")
 	}
+	if pc.MinAppVersion != "1.0.0" {
+		t.Fatal("invalid min app version parse")
+	}
+	if pc.MinCMVersion != "0.8.0" {
+		t.Fatal("invalid min cm version parse")
+	}
+	if pc.MinCMVersionInternal != "0.7.0" {
+		t.Fatal("invalid min cm version parse")
+	}
 
 	// Themes
 	if pc.DefaultTheme() == nil || pc.DefaultTheme().BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not parsed")
 	}
-	if len(pc.namedThemes) != 3 {
+	if len(pc.namedThemes) != 4 {
 		t.Fatal("Wrong number of named themes")
 	}
 	blueTheme := pc.ThemeWithName("blueTheme")
@@ -177,9 +200,15 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if bannerAction1 == nil || bannerAction1.BannerAction.Body != "Hello world, but on a banner!" {
 		t.Fatal("Didn't parse banner action 1")
 	}
+	if bannerAction1.BannerAction.CustomThemeName != "blueTheme" {
+		t.Fatal("Didn't parse banner action 1 theme")
+	}
 	bannerAction2 := pc.ActionWithName("bannerAction2")
 	if bannerAction2 == nil || bannerAction2.BannerAction.Body != "Hello world 2, but on a banner!" {
 		t.Fatal("Didn't parse banner action 2")
+	}
+	if bannerAction2.BannerAction.CustomThemeName != "elegant" {
+		t.Fatal("Didn't parse banner action 2 theme")
 	}
 	alertAction := pc.ActionWithName("alertAction")
 	if alertAction == nil || alertAction.AlertAction.Title != "Alert title" {
@@ -193,18 +222,22 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if failConditionAction == nil || failConditionAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse alert action with failing condition")
 	}
+	testAllConditionsContainsCondition(t, pc, failConditionAction.Condition)
 	ca1 := pc.ActionWithName("conditionalWithTrueCondition")
 	if ca1.ConditionalAction == nil || ca1.ConditionalAction.Condition.String() != "2 > 1" {
 		t.Fatal("Didn't parse conditional action 1")
 	}
+	testAllConditionsContainsCondition(t, pc, ca1.ConditionalAction.Condition)
 	ca2 := pc.ActionWithName("conditionalWithFalseCondition")
 	if ca2.ConditionalAction == nil || ca2.ConditionalAction.Condition.String() != "1 > 2" {
 		t.Fatal("Didn't parse conditional action 2")
 	}
+	testAllConditionsContainsCondition(t, pc, ca2.ConditionalAction.Condition)
 	ca3 := pc.ActionWithName("conditionalWithoutFalseAction")
 	if ca3.ConditionalAction == nil || ca3.ConditionalAction.FailedActionName != "" {
 		t.Fatal("Didn't parse conditional action 3")
 	}
+	testAllConditionsContainsCondition(t, pc, ca3.ConditionalAction.Condition)
 	ua := pc.ActionWithName("unknownActionTypeFutureProof")
 	_, ok := ua.actionData.(*UnknownAction)
 	if ua.ActionType != "unknown_future_type" || !ok {
@@ -234,9 +267,12 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if nfas.ActionType != "future_action_type" || !ok || nfas.FallbackActionName != "futureAction" {
 		t.Fatal("unknown action failed to parse with fallback. Old client will break for future config files.")
 	}
+	if len(pc.AllActions()) != len(pc.namedActions) {
+		t.Fatal("all actions count mismatch")
+	}
 
 	// Triggers
-	if len(pc.namedTriggers) != 2 {
+	if len(pc.namedTriggers) != 4 {
 		t.Fatal("Wrong trigger count")
 	}
 	trigger1 := pc.namedTriggers["trigger1"]
@@ -247,23 +283,39 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if trigger2.ActionName != "alertAction" || trigger2.EventName != "custom_event_alert" {
 		t.Fatal("Trigger 2 parsing failed")
 	}
+	trigger3 := pc.namedTriggers["conditional_trigger_true"]
+	if trigger3.ActionName != "alertAction" || trigger3.EventName != "custom_event_conditional_true" || trigger3.Condition.String() != "2 > 1" {
+		t.Fatal("Trigger 3 parsing failed")
+	}
+	testAllConditionsContainsCondition(t, pc, trigger3.Condition)
+	trigger4 := pc.namedTriggers["conditional_trigger_false"]
+	if trigger4.ActionName != "alertAction" || trigger4.EventName != "custom_event_conditional_false" || trigger4.Condition.String() != "2 > 3" {
+		t.Fatal("Trigger 4 parsing failed")
+	}
+	testAllConditionsContainsCondition(t, pc, trigger4.Condition)
 
 	// Conditions
 	if len(pc.namedConditions) != 3 {
 		t.Fatal("Wrong condition count")
 	}
+	if pc.NamedConditionCount() != 3 {
+		t.Fatal("Named condition count mismatch")
+	}
 	c1 := pc.ConditionWithName("trueCondition")
 	if c1 == nil || c1.String() != "true" {
 		t.Fatal("Issue with true condition")
 	}
+	testAllConditionsContainsCondition(t, pc, c1)
 	c2 := pc.ConditionWithName("falseCondition")
 	if c2 == nil || c2.String() != "false" {
 		t.Fatal("Issue with true condition")
 	}
+	testAllConditionsContainsCondition(t, pc, c2)
 	c3 := pc.ConditionWithName("complexCondition")
 	if c3 == nil || c3.String() != "4 > 3 && os_version =='123'" {
 		t.Fatal("complex condition failed")
 	}
+	testAllConditionsContainsCondition(t, pc, c3)
 	c3Var, err := c3.ExtractIdentifiers()
 	if err != nil || len(c3Var.Variables) != 1 || c3Var.Variables[0] != "os_version" {
 		t.Fatal("complex condition failed to parse")
@@ -349,6 +401,10 @@ func TestNoDefaultTheme(t *testing.T) {
 
 func TestNoNamedThemes(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
 
 	pc.namedThemes = nil
 	if pc.Validate() {
@@ -393,10 +449,9 @@ func TestNoNamedActions(t *testing.T) {
 		t.Fatal("empty map should fail since still triggers referencing them")
 	}
 
-	delete(pc.namedTriggers, "trigger1")
-	delete(pc.namedTriggers, "trigger_alert")
+	pc.namedTriggers = make(map[string]*Trigger)
 	if !pc.Validate() {
-		t.Fatal("empty actions should be allowed")
+		t.Fatal("empty actions should be allowed when no triggers reference them")
 	}
 }
 
@@ -496,13 +551,13 @@ func TestPcAccessors(t *testing.T) {
 		t.Fatal("Couldn't find action by name")
 	}
 
-	actions := pc.ActionsForEvent("nada")
-	if len(actions) > 0 {
+	triggers := pc.TriggersForEvent("nada")
+	if len(triggers) > 0 {
 		t.Fatal("Found a action that doesn't exist")
 	}
 
-	actions = pc.ActionsForEvent("custom_event")
-	if len(actions) != 1 || actions[0].ActionType != ActionTypeEnumBanner {
+	triggers = pc.TriggersForEvent("custom_event")
+	if len(triggers) != 1 || pc.ActionWithName(triggers[0].ActionName).ActionType != ActionTypeEnumBanner {
 		t.Fatal("Didn't find action from event")
 	}
 }
@@ -601,5 +656,124 @@ func TestFallbackDefaultTheme(t *testing.T) {
 	}
 	if pc.ThemeWithName("missingName") != nil {
 		t.Fatal("missing name not nil")
+	}
+}
+
+func TestDefaultThemeSelection(t *testing.T) {
+	// Strict mode
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
+	testFileData, err := os.ReadFile("./test/testdata/primary_config/valid/builtInLibraryTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc := PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pc.DefaultTheme() != nil {
+		t.Fatal("Libary theme should not set default")
+	}
+	if pc.LibraryThemeName != "system_dark" {
+		t.Fatal("Failed to parse library theme name")
+	}
+
+	testFileData, err = os.ReadFile("./test/testdata/primary_config/valid/builtInDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc = PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Also checks ThemeWithName works on built in themes
+	if pc.DefaultTheme() != pc.ThemeWithName("elegant_light") {
+		t.Fatal("Libary theme should not set default")
+	}
+	if pc.LibraryThemeName != "" {
+		t.Fatal("Set Library theme name when not needed")
+	}
+
+	// named config based default tested in maximal valid test case
+
+	testFileData, err = os.ReadFile("./test/testdata/primary_config/invalid/invalidDefaultTheme.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc = PrimaryConfig{}
+	err = json.Unmarshal(testFileData, &pc)
+	if err == nil {
+		t.Fatal("Failed to error on invalid default theme")
+	}
+}
+
+func TestFutureBuiltInTheme(t *testing.T) {
+	testFiles := []string{
+		"./test/testdata/primary_config/valid/futureBuiltInActionTheme.json",
+		"./test/testdata/primary_config/valid/futureBuiltInTheme.json", // add_test_count
+	}
+	for _, file := range testFiles {
+		StrictDatamodelParsing = false
+		testFileData, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Non strict should allow unknown theme names, could be future built in
+		pc := PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Strict mode
+		StrictDatamodelParsing = true
+		defer func() {
+			StrictDatamodelParsing = false
+		}()
+
+		// strict mode should not allow unknown theme names
+		pc = PrimaryConfig{}
+		err = json.Unmarshal(testFileData, &pc)
+		if err == nil {
+			t.Fatal("allowed unknown theme name in strict mode")
+		}
+	}
+}
+
+func TestMinAppAndClientVersionNumberValidation(t *testing.T) {
+	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	}
+	if pc.ConfigVersion != "v1" {
+		t.Fatal("Failed to parse config version")
+	}
+
+	pc.MinAppVersion = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinAppVersion")
+	}
+	pc.MinAppVersion = ""
+	pc.MinCMVersion = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinCMVersion")
+	}
+
+	pc.MinCMVersion = ""
+	pc.MinCMVersionInternal = "invalid"
+	if pc.Validate() {
+		t.Fatal("failed to validate MinCMVersionInternal")
+	}
+
+	pc.MinAppVersion = "1.2.3.4.5"
+	pc.MinCMVersion = "v34.234234.234.1123.32"
+	pc.MinCMVersionInternal = "v34.234234.234.1123.32"
+	if !pc.Validate() {
+		t.Fatal(pc.ValidateReturningUserReadableIssue())
 	}
 }

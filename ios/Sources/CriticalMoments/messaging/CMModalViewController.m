@@ -52,6 +52,9 @@
     pv.anyButtonDefaultAction = ^{
       [weakSelf dismissSheet];
     };
+    pv.buttonCallback = ^(NSString *_Nullable buttonName, int buttonIndex) {
+      [weakSelf sendEventsForButtonName:buttonName buttonIndex:buttonIndex];
+    };
     pv.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:pv];
 
@@ -100,15 +103,44 @@
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    // Send event for modal closed, only if we're being dismissed (not just for a view unload for backgrounding)
+    if (self.beingDismissed || self.isMovingFromParentViewController) {
+        if (self.completionEventSender && self.modalName) {
+            NSString *closeEventName = [NSString stringWithFormat:@"sub-action:%@:closed", self.modalName];
+            [self.completionEventSender sendEvent:closeEventName];
+        }
+    }
+}
+
+- (void)sendEventsForButtonName:(NSString *)buttonName buttonIndex:(int)buttonIndex {
+    if (self.completionEventSender && self.modalName) {
+        if (buttonName.length > 0) {
+            NSString *tapEventName = [NSString stringWithFormat:@"sub-action:%@:button:%@", self.modalName, buttonName];
+            [self.completionEventSender sendEvent:tapEventName];
+        }
+        NSString *tapEventIndexName =
+            [NSString stringWithFormat:@"sub-action:%@:button_index:%d", self.modalName, buttonIndex];
+        [self.completionEventSender sendEvent:tapEventIndexName];
+    }
+}
+
 - (void)closeButtonTapped:(UIButton *)sender {
     [self dismissSheet];
 }
 
 - (void)dismissSheet {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      UIViewController *pvc = self.presentingViewController;
-      [pvc dismissViewControllerAnimated:YES completion:nil];
-    });
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self dismissSheet];
+        });
+        return;
+    }
+
+    UIViewController *pvc = self.presentingViewController;
+    [pvc dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

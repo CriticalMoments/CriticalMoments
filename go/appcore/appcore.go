@@ -11,6 +11,7 @@ import (
 	"github.com/CriticalMoments/CriticalMoments/go/appcore/db"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore"
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
+	"github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model/conditions"
 	"github.com/CriticalMoments/CriticalMoments/go/cmcore/signing"
 )
 
@@ -34,21 +35,19 @@ type Appcore struct {
 	// Cache
 	cache *cache
 
-	// database
-	db *db.DB
+	// database and events
+	db           *db.DB
+	eventManager *EventManager
 
 	// Properties
 	propertyRegistry *propertyRegistry
-
-	// Dev Mode namedCondition conflict check
-	seenNamedConditions map[string]string
 }
 
 func NewAppcore() *Appcore {
 	ac := &Appcore{
-		propertyRegistry:    newPropertyRegistry(),
-		seenNamedConditions: map[string]string{},
-		db:                  db.NewDB(),
+		propertyRegistry: newPropertyRegistry(),
+		db:               db.NewDB(),
+		eventManager:     &EventManager{},
 	}
 	// Connect the property registry to the db/proptery history manager
 	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
@@ -148,29 +147,39 @@ func (ac *Appcore) SetTimezoneGMTOffset(gmtOffset int) {
 	ac.propertyRegistry.registerStaticProperty("timezone_gmt_offset", gmtOffset)
 }
 
-func (ac *Appcore) CheckNamedConditionCollision(name string, conditionString string) (returnErr error) {
+// Internal use only
+func (ac *Appcore) CheckTestCondition(conditionString string) (returnResult bool, returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
-			returnErr = fmt.Errorf("panic in CheckNamedConditionsCollision: %v", r)
+			returnResult = false
+			returnErr = fmt.Errorf("panic in CheckTestCondition: %v", r)
 		}
 	}()
 
-	if name == "" {
-		return nil
+	appId, err := ac.propertyRegistry.propertyValue("app_id")
+	if err != nil || appId == nil {
+		return false, errors.New("CheckTestCondition only available in the test app. No app ID")
 	}
-	// in debug mode, track each built-in condition we see, and make sure the developer isn't reusing names
-	// If they use the same name twice for different things, they won't be able to override in the future
-	priorSeen := ac.seenNamedConditions[name]
-	if priorSeen == "" {
-		ac.seenNamedConditions[name] = conditionString
-	} else if priorSeen != conditionString {
-		return fmt.Errorf("the named condition \"%v\" is being used in multiple places in this codebase, with different fallback conditions (\"%v\" and \"%v\"). This will make it impossible to override each usage independently from remote configuration. Please use unique names for each named condition", name, priorSeen, conditionString)
+	appIdString, ok := appId.(string)
+	if !ok || (appIdString != "io.criticalmoments.demo-app" &&
+		appIdString != "com.apple.dt.xctest.tool") {
+		return false, errors.New("CheckTestCondition only available in the test app")
 	}
-	return nil
+
+	if ac.libBindings == nil || !ac.libBindings.IsTestBuild() {
+		return false, errors.New("CheckTestCondition only available on a test build")
+	}
+
+	cond, err := datamodel.NewCondition(conditionString)
+	if err != nil {
+		return false, err
+	}
+
+	return ac.propertyRegistry.evaluateCondition(cond)
 }
 
-func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (returnResult bool, returnErr error) {
+func (ac *Appcore) CheckNamedCondition(name string) (returnResult bool, returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do
 		if r := recover(); r != nil {
@@ -190,15 +199,27 @@ func (ac *Appcore) CheckNamedCondition(name string, conditionString string) (ret
 	condition := ac.config.ConditionWithName(name)
 
 	if condition == nil {
-		// Use provided condition, since config doesn't have an override
-		pCond, err := datamodel.NewCondition(conditionString)
-		if err != nil {
-			return false, err
-		}
-		condition = pCond
+		return false, fmt.Errorf("CheckNamedCondition: no condition found named '%v'", name)
 	}
 
-	return ac.propertyRegistry.evaluateCondition(condition)
+	condResult, condErr := ac.propertyRegistry.evaluateCondition(condition)
+	ac.logEventForNamedCondition(condition, condResult, condErr)
+	return condResult, condErr
+}
+
+func (ac *Appcore) logEventForNamedCondition(condition *datamodel.Condition, result bool, err error) {
+	name := ac.config.NameForCondition(condition)
+	if name == "" {
+		return
+	}
+
+	if err != nil {
+		ac.SendClientEvent(fmt.Sprintf("ff_error:%v", name))
+	} else if result {
+		ac.SendClientEvent(fmt.Sprintf("ff_true:%v", name))
+	} else {
+		ac.SendClientEvent(fmt.Sprintf("ff_false:%v", name))
+	}
 }
 
 func (ac *Appcore) RegisterLibraryBindings(lb LibBindings) {
@@ -247,11 +268,21 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	if ac.cache == nil {
 		return errors.New("the SDK must register a cache directory before calling start")
 	}
+
+	err := ac.RegisterStaticTimeProperty("app_start_time", time.Now().UnixMilli())
+	if err != nil {
+		return err
+	}
+	err = ac.propertyRegistry.addProviderForKey("session_start_time", SessionStartTimePropertyProvider{eventManager: ac.eventManager})
+	if err != nil {
+		return err
+	}
+
 	if err := ac.propertyRegistry.validateProperties(); err != nil {
 		return err
 	}
 
-	err := ac.loadConfig(allowDebugLoad)
+	err = ac.loadConfig(allowDebugLoad)
 	if err != nil {
 		return err
 	}
@@ -317,10 +348,33 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 	if pc.AppId != ac.apiKey.BundleId() {
 		return fmt.Errorf("this config file isn't valid for this app. Config file is key is for app id '%s', but this app has bundle ID is '%s'", pc.AppId, ac.apiKey.BundleId())
 	}
+	if err = ac.isClientTooOldForConfig(pc); err != nil {
+		return err
+	}
 	ac.config = pc
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (ac *Appcore) isClientTooOldForConfig(pc *datamodel.PrimaryConfig) error {
+	if pc.MinAppVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.AppVersion(), pc.MinAppVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the App (%v) is too old for this config file. The minimum version is %v", ac.libBindings.AppVersion(), pc.MinAppVersion)
+		}
+	}
+	if pc.MinCMVersion != "" {
+		if conditions.VersionLessThan(ac.libBindings.CMVersion(), pc.MinCMVersion) {
+			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersion)
+		}
+	}
+	if pc.MinCMVersionInternal != "" {
+		if conditions.VersionLessThan(ac.libBindings.CMVersion(), pc.MinCMVersionInternal) {
+			return fmt.Errorf("CriticalMoments: this version of the CM SDK (%v) is too old for this config file. The minimum version is %v", ac.libBindings.CMVersion(), pc.MinCMVersionInternal)
+		}
 	}
 
 	return nil
@@ -333,6 +387,12 @@ func (ac *Appcore) postConfigSetup() error {
 		if err != nil {
 			fmt.Println("CriticalMoments: there was an issue setting up the default theme from config")
 			return err
+		}
+	} else if ac.config.LibraryThemeName != "" {
+		err := ac.libBindings.SetDefaultThemeByLibaryThemeName(ac.config.LibraryThemeName)
+		if err != nil {
+			// Non critical error. We can continue with default theme
+			fmt.Println("CriticalMoments: there was an issue setting up the default library theme from config")
 		}
 	}
 
@@ -366,20 +426,37 @@ func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 	if !ac.started {
 		return errors.New("Appcore not started")
 	}
+	if ac.eventManager == nil {
+		return errors.New("Appcore EM not started")
+	}
 
-	err := ac.db.EventManager().SendEvent(event)
+	err := ac.eventManager.SendEvent(event, ac)
 	if err != nil {
 		return err
 	}
 
-	// Perform any actions for this event
-	actions := ac.config.ActionsForEvent(event.Name)
+	return ac.performActionsForEvent(event.Name)
+}
+
+func (ac *Appcore) performActionsForEvent(eventName string) error {
+	triggers := ac.config.TriggersForEvent(eventName)
 	var lastErr error
-	for _, action := range actions {
-		err := ac.PerformAction(action)
+	for _, trigger := range triggers {
+		if trigger.Condition != nil {
+			conditionResult, err := ac.propertyRegistry.evaluateCondition(trigger.Condition)
+			if err != nil {
+				// return an error, but don't stop processing
+				lastErr = err
+				continue
+			}
+			if !conditionResult {
+				continue
+			}
+		}
+		err := ac.PerformNamedAction(trigger.ActionName)
 		if err != nil {
 			// return an error, but don't stop processing
-			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", event.Name, err)
+			lastErr = fmt.Errorf("CriticalMoments: there was an issue performing action for event \"%v\". Error: %v", eventName, err)
 		}
 	}
 	return lastErr
@@ -427,7 +504,22 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr e
 	ad := actionDispatcher{
 		appcore: ac,
 	}
-	return action.PerformAction(&ad)
+	actionName := ac.config.NameForActionContainer(action)
+	actionErr := action.PerformAction(&ad, actionName)
+	ac.sendEventForPerformedAction(actionName, actionErr)
+	return actionErr
+}
+
+func (ac *Appcore) sendEventForPerformedAction(actionName string, err error) {
+	if actionName == "" {
+		return
+	}
+
+	if err == nil {
+		ac.SendClientEvent(fmt.Sprintf("action:%v", actionName))
+	} else {
+		ac.SendClientEvent(fmt.Sprintf("action_error:%v", actionName))
+	}
 }
 
 func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme) {
@@ -443,6 +535,10 @@ func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme)
 		return nil
 	}
 	return ac.config.ThemeWithName(themeName)
+}
+
+func (ac *Appcore) SetLogEvents(logEvents bool) {
+	ac.eventManager.logEvents = logEvents
 }
 
 var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
@@ -531,6 +627,7 @@ func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvid
 	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }
+
 func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr error) {
 	defer func() {
 		// We never intentionally panic in CM, but we want to recover if we do

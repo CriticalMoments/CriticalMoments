@@ -1,4 +1,5 @@
 {
     "actionName": "my_action",
-    "eventName": "my_event"
+    "eventName": "my_event",
+    "condition": "3 > 2"
 }

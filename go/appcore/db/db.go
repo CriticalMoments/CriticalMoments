@@ -20,7 +20,6 @@ type DB struct {
 	sqldb        *sql.DB
 	started      bool
 
-	eventManager           *EventManager
 	propertyHistoryManager *PropertyHistoryManager
 }
 
@@ -29,9 +28,6 @@ func NewDB() *DB {
 		started: false,
 	}
 
-	db.eventManager = &EventManager{
-		db: &db,
-	}
 	db.propertyHistoryManager = newPropertyHistoryManager(&db)
 
 	return &db
@@ -66,10 +62,6 @@ func (db *DB) StartWithPath(dataDir string) error {
 func (db *DB) Close() error {
 	db.started = false
 	return db.sqldb.Close()
-}
-
-func (db *DB) EventManager() *EventManager {
-	return db.eventManager
 }
 
 func (db *DB) PropertyHistoryManager() *PropertyHistoryManager {
@@ -198,7 +190,9 @@ func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 
 	var epochTime float64
 	err := db.sqldb.QueryRow(latestEventTimeByNameQuery, name).Scan(&epochTime)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -391,6 +385,21 @@ func (db *DB) DbConditionFunctions() map[string]*datamodel.ConditionDynamicFunct
 				return count, nil
 			},
 			Types: []any{new(func(string, int) int)},
+		},
+		"latestEventTime": {
+			Function: func(params ...any) (any, error) {
+				// Parameter type+count checking is done the Types signature
+				time, err := db.LatestEventTimeByName(params[0].(string))
+				if err != nil {
+					return nil, err
+				}
+				if time == nil {
+					return nil, nil
+				}
+				// Time values not passed by reference
+				return *time, nil
+			},
+			Types: []any{new(func(string) interface{})},
 		},
 		"propertyHistoryLatestValue": {
 			Function: func(params ...any) (any, error) {

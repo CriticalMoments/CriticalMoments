@@ -5,13 +5,15 @@
 //  Created by Steve Cosman on 2023-09-29.
 //
 
+#import "../CriticalMoments_private.h"
+#import "../utils/CMEventSender.h"
 #import "include/CriticalMoments.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @import Appcore;
 
-@interface CriticalMoments ()
+@interface CriticalMoments () <CMEventSender>
 
 // _private header prevents exposing these to public SDK.
 
@@ -21,11 +23,27 @@ NS_ASSUME_NONNULL_BEGIN
 // Internal only -- use start in product
 - (NSError *)startReturningError;
 
-// Internal only -- for testing
-- (void)sendEvent:(NSString *)eventName handler:(void (^)(NSError *_Nullable error))handler;
+// Internal only -- for testing and built in event
+- (void)sendEvent:(NSString *)eventName
+          builtIn:(bool)builtIn
+          handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
-/// :nodoc: access named themes
+/// Access named themes
 - (DatamodelTheme *)themeFromConfigByName:(NSString *)name;
+
+/// Set the current theme for this CM instance.
+/// Private, only for internal use (demo app).
+- (void)setTheme:(CMTheme *)theme;
+
+/// Fetch the current theme for this CM instance
+/// Private, only for internal use (demo app).
+- (CMTheme *)currentTheme;
+
+/// Get API Key
+- (nonnull NSString *)getApiKey;
+
+/// This API is private, and should not be used externally. Use events + triggers to fire named events.
+- (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
 @end
 

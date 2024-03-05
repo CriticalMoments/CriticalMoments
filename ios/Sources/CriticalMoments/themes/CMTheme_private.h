@@ -6,17 +6,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 // _private header prevents exposing these to public SDK.
 
-/// :nodoc: Test Theme for e2e testing
++ (CMTheme *)current;
+
+/// Test Theme for e2e testing
 + (CMTheme *)testTheme;
 
++ (CMTheme *)libaryThemeByName:(NSString *)name;
+
 /**
- :nodoc:
+ Get Theme from Appcore theme
  @param acTheme The appcore theme to convert to CMTheme
  */
 + (CMTheme *)themeFromAppcoreTheme:(DatamodelTheme *)acTheme;
 
-// Theme from config, based on name
-/// :nodoc:
+/// Theme from config, based on name
 + (CMTheme *)namedThemeFromAppcore:(NSString *)themeName;
 
 @end

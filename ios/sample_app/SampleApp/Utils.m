@@ -61,4 +61,48 @@ static NSURL *bundleUrl = nil;
     return true;
 }
 
+/// Parse hex codes in format #ffffff to UIColor
++ (UIColor *)colorFromHexString:(NSString *)hexString {
+    if (hexString.length != 7) {
+        return nil;
+    }
+
+    unsigned int parsed = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+
+    if ([hexString hasPrefix:@"#"]) {
+        [scanner setScanLocation:1];
+    } else {
+        return nil;
+    }
+    bool scannedHex = [scanner scanHexInt:&parsed];
+    if (!scannedHex || ![scanner isAtEnd]) {
+        return nil;
+    }
+
+    CGFloat red = ((parsed & 0xff0000) >> 16) / 255.0;
+    CGFloat green = ((parsed & 0x00ff00) >> 8) / 255.0;
+    CGFloat blue = (parsed & 0x0000ff) / 255.0;
+
+    return [[UIColor alloc] initWithRed:red green:green blue:blue alpha:1.0];
+}
+
++ (NSError *)deleteDatabase {
+    // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
+    // guarunteed to work over time, not is deleting the database file a good idea.
+    NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
+                                                                 inDomains:NSUserDomainMask] lastObject];
+
+    // Set the data directory to applicationSupport/critical_moments_data
+    NSError *error;
+    NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
+
+    BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
+    if (!success || error) {
+        // Errors okay. Fresh start won't have a cache yet.
+        return error;
+    }
+    return nil;
+}
+
 @end

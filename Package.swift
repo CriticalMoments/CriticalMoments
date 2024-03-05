@@ -9,8 +9,8 @@ import Foundation
 // on our GH actions https://github.com/CriticalMoments/CriticalMoments/actions
 var appcoreTarget = Target.binaryTarget(
     name: "Appcore",
-    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.8.0-beta/Appcore.xcframework.zip",
-    checksum: "45ee96b2143ef9fe38d1bc47f5b8464f7fed5a9371b5a5b59b51dec39a059b4f")
+    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.9.0/Appcore.xcframework.zip",
+    checksum: "95cd59ef50467573885865c3244dd3672deb815c8c095637ea3b2b4be16f0eb4")
 
 // If this device has built the appcore framework locally, use that. This is primarily for development.
 // We highly recommend end users use the production binary.
@@ -64,6 +64,7 @@ let package = Package(
             ],
             cSettings: [
                 .headerSearchPath("../../Sources/CriticalMoments"),
+                .define("IS_CRITICAL_MOMENTS_INTERNAL", to:"1")
             ]
         ),
     ],

@@ -81,6 +81,10 @@ func (l *LinkAction) AllEmbeddedActionNames() ([]string, error) {
 	return []string{}, nil
 }
 
-func (l *LinkAction) PerformAction(ab ActionBindings) error {
+func (l *LinkAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{}, nil
+}
+
+func (l *LinkAction) PerformAction(ab ActionBindings, actionName string) error {
 	return ab.ShowLink(l)
 }

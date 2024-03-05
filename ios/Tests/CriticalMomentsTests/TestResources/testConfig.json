@@ -2,18 +2,23 @@
     "configVersion": "v1",
     "appId": "com.apple.dt.xctest.tool",
     "themes": {
-        "defaultTheme": {
-            "bannerBackgroundColor": "#ff0000",
-            "bannerForegroundColor": "#00ff00",
-            "fontScale": 1.1,
-            "fontName": "AvenirNext-Regular",
-            "boldFontName": "AvenirNext-Bold",
-            "scaleFontForUserPreference": false
+        "defaultThemeName": "namedDefault",
+        "namedThemes": {
+            "namedDefault": {
+                "bannerBackgroundColor": "#ff0000",
+                "bannerForegroundColor": "#00ff00",
+                "fontScale": 1.1,
+                "fontName": "AvenirNext-Regular",
+                "boldFontName": "AvenirNext-Bold",
+                "scaleFontForUserPreference": false
+            }
         }
     },
     "conditions": {
         "namedConditions": {
-            "overrideToTrue": "true"
+            "invalidCondition": "fake_var > 6",
+            "trueCondition": "true",
+            "falseCondition": "false"
         }
     },
     "actions": {

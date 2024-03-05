@@ -11,6 +11,9 @@
 
 #import "../appcore_integration/CMLibBindings.h"
 #import "../properties/CMPropertyRegisterer.h"
+#import "../themes/CMTheme_private.h"
+#import "../utils/CMNotificationObserver.h"
+#import "../utils/CMUtils.h"
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted;
@@ -18,6 +21,7 @@
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
 @property(nonatomic, strong) CMTheme *currentTheme;
+@property(nonatomic, strong) CMNotificationObserver *notificationObserver;
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @end
@@ -28,6 +32,7 @@
     self = [super init];
     if (self) {
         _appcore = AppcoreNewAppcore();
+        _notificationObserver = [[CMNotificationObserver alloc] initWithCm:self];
 
         // Event queue is serial to preserve event order
         dispatch_queue_attr_t eventQueueAttr =
@@ -82,6 +87,9 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
+    // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
+    [self.notificationObserver start];
+
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -146,12 +154,6 @@ static CriticalMoments *sharedInstance = nil;
     // Set the data directory to applicationSupport/critical_moments_data
     NSError *error;
     NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_data"];
-
-    /*BOOL success = [NSFileManager.defaultManager removeItemAtURL:criticalMomentsDataDir error:&error];
-    if (!success || error) {
-        NSLog(@"error removing existing cache: %@", error);
-        return error;
-    }*/
 
     [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
                            withIntermediateDirectories:YES
@@ -263,16 +265,27 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
-- (void)sendEvent:(NSString *)eventName {
-    [self sendEvent:eventName handler:nil];
+- (void)setLogEvents:(bool)logEvents {
+    [self.appcore setLogEvents:logEvents];
 }
 
-- (void)sendEvent:(NSString *)eventName handler:(void (^)(NSError *_Nullable error))handler {
+- (void)sendEvent:(NSString *)eventName {
+    [self sendEvent:eventName builtIn:false handler:nil];
+}
+
+- (void)sendEvent:(NSString *)eventName builtIn:(bool)builtIn handler:(void (^)(NSError *_Nullable error))handler {
     __block void (^blockHandler)(NSError *_Nullable error) = handler;
     __block NSString *blockEventName = eventName;
     dispatch_async(_eventQueue, ^{
       NSError *error;
-      [_appcore sendClientEvent:blockEventName error:&error];
+      if (builtIn) {
+          [_appcore sendBuiltInEvent:blockEventName error:&error];
+      } else {
+          [_appcore sendClientEvent:blockEventName error:&error];
+      }
+      if (error) {
+          NSLog(@"CriticalMoments: Error sending event. %@", error.localizedDescription);
+      }
 
       if (blockHandler) {
           blockHandler(error);
@@ -280,26 +293,33 @@ static CriticalMoments *sharedInstance = nil;
     });
 }
 
-- (void)checkNamedCondition:(NSString *)name
-                  condition:(NSString *)condition
-                    handler:(void (^)(bool, NSError *_Nullable))handler {
-#if DEBUG
-    NSError *collisionError;
-    [_appcore checkNamedConditionCollision:name conditionString:condition error:&collisionError];
-    if (collisionError != nil) {
-        NSLog(@"\nWARNING: CriticalMoments\nWARNING: CriticalMoments\nIssue with checkNamedCondition usage. Note: this "
-              @"error log is only shown when debugger attached.\n%@\n\n",
-              collisionError.localizedDescription);
-    }
-#endif
-
+- (void)checkNamedCondition:(NSString *)name handler:(void (^)(bool, NSError *_Nullable))handler {
     __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
     __block NSString *blockName = name;
-    __block NSString *blockCondition = condition;
     dispatch_async(_actionQueue, ^{
       NSError *error;
       BOOL result;
-      [_appcore checkNamedCondition:blockName conditionString:blockCondition returnResult:&result error:&error];
+      [_appcore checkNamedCondition:blockName returnResult:&result error:&error];
+
+      if (blockHandler) {
+          blockHandler(result, error);
+      }
+    });
+}
+
+// Private, only for internal use (demo app).
+// Do not use this in any other apps. Will always return error.
+- (void)checkInternalTestCondition:(NSString *_Nonnull)conditionString
+                           handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler {
+    __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
+    __block NSString *blockCondition = conditionString;
+    dispatch_async(_actionQueue, ^{
+      NSError *error;
+      BOOL result;
+      [_appcore checkTestCondition:blockCondition returnResult:&result error:&error];
+      if (error) {
+          NSLog(@"CriticalMoments: error in test func %@", error);
+      }
 
       if (blockHandler) {
           blockHandler(result, error);
@@ -344,12 +364,8 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
-    if (!value) {
-        [_appcore registerClientTimeProperty:name value:AppcoreLibPropertyProviderNilIntValue error:error];
-    } else {
-        int64_t epochMilliseconds = [@(floor([value timeIntervalSince1970] * 1000)) longLongValue];
-        [_appcore registerClientTimeProperty:name value:epochMilliseconds error:error];
-    }
+    int64_t goTime = [CMUtils dateToGoTime:value];
+    [_appcore registerClientTimeProperty:name value:goTime error:error];
 }
 
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
@@ -370,10 +386,31 @@ static CriticalMoments *sharedInstance = nil;
     return _currentTheme;
 }
 
+// Private/Internal: Only for demo app usage
 - (void)setTheme:(CMTheme *)theme {
     @synchronized(self) {
         _currentTheme = theme;
     }
+}
+
+// Private/Internal: Only for demo app usage
+- (void)setBuiltInTheme:(NSString *)themeName {
+    CMTheme *libTheme = [CMTheme libaryThemeByName:themeName];
+    if (libTheme) {
+        [self setTheme:libTheme];
+        return;
+    }
+
+    DatamodelTheme *dmTheme = [self themeFromConfigByName:themeName];
+    if (dmTheme) {
+        CMTheme *theme = [CMTheme themeFromAppcoreTheme:dmTheme];
+        [self setTheme:theme];
+    }
+}
+
+// Private/Internal: Only for demo app usage
+- (int)builtInBaseThemeCount {
+    return (int)DatamodelBaseThemeCount();
 }
 
 - (bool)isDebug {

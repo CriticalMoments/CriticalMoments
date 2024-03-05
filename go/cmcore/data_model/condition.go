@@ -78,6 +78,7 @@ func StaticConditionConstantProperties() map[string]interface{} {
 var AllBuiltInDynamicFunctions = map[string]bool{
 	"eventCount":                 true,
 	"eventCountWithLimit":        true,
+	"latestEventTime":            true,
 	"canOpenUrl":                 true,
 	"propertyHistoryLatestValue": true,
 	"propertyEver":               true,

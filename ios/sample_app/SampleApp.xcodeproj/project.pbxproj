@@ -9,20 +9,24 @@
 /* Begin PBXBuildFile section */
 		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E0368DB22AF7FE4600A513B7 /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0368DB12AF7FE4600A513B7 /* testConfig.json */; };
-		E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */; };
-		E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E03977E62ACBAD4100A879AD /* SnapshotTesting */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
+		E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */; };
+		E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BA82B6D8267006EA449 /* InfoHeader.m */; };
+		E03F9BAC2B6F30D1006EA449 /* MessagingDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */; };
+		E03F9BAF2B7017F8006EA449 /* FeatureFlagsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BAE2B7017F8006EA449 /* FeatureFlagsDemoScreen.m */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
 		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
 		E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */; };
 		E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E692A0D73F10069E5BD /* LinkDemoScreen.m */; };
 		E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E742A0DC0170069E5BD /* SnapshotTests.m */; };
 		E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */; };
+		E06691422B50C4F700FCFBAF /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E06691412B50C4F700FCFBAF /* SnapshotTesting */; };
 		E069BFB12A217A9E00A4B65E /* ConditionsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */; };
 		E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774A29F9B202001521F4 /* CMDemoScreen.m */; };
 		E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B774D29F9B69D001521F4 /* BannerDemoScreen.m */; };
 		E07B775129FA0144001521F4 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775029FA0144001521F4 /* Utils.m */; };
 		E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E07B775329FA04FF001521F4 /* MainDemoScreen.m */; };
+		E0AB830A2B7A79700003EDE2 /* BuiltInThemesDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */; };
 		E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545ED29F407C2002A25A8 /* AppDelegate.m */; };
 		E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E0B545F029F407C2002A25A8 /* SceneDelegate.m */; };
 		E0B545F729F407C2002A25A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0B545F529F407C2002A25A8 /* Main.storyboard */; };
@@ -50,6 +54,14 @@
 		E0368DB12AF7FE4600A513B7 /* testConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = testConfig.json; path = ../../Tests/CriticalMomentsTests/TestResources/testConfig.json; sourceTree = "<group>"; };
 		E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSnapshotTests.swift; sourceTree = "<group>"; };
 		E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SampleAppTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConversionDemoScreen.h; sourceTree = "<group>"; };
+		E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConversionDemoScreen.m; sourceTree = "<group>"; };
+		E03F9BA72B6D8267006EA449 /* InfoHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoHeader.h; sourceTree = "<group>"; };
+		E03F9BA82B6D8267006EA449 /* InfoHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfoHeader.m; sourceTree = "<group>"; };
+		E03F9BAA2B6F30D1006EA449 /* MessagingDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessagingDemoScreen.h; sourceTree = "<group>"; };
+		E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessagingDemoScreen.m; sourceTree = "<group>"; };
+		E03F9BAD2B7017F8006EA449 /* FeatureFlagsDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeatureFlagsDemoScreen.h; sourceTree = "<group>"; };
+		E03F9BAE2B7017F8006EA449 /* FeatureFlagsDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeatureFlagsDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
@@ -72,6 +84,8 @@
 		E07B775229FA04FF001521F4 /* MainDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainDemoScreen.h; sourceTree = "<group>"; };
 		E07B775329FA04FF001521F4 /* MainDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainDemoScreen.m; sourceTree = "<group>"; };
 		E089CE482A361F0D00BD2BB9 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+		E0AB83082B7A79700003EDE2 /* BuiltInThemesDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BuiltInThemesDemoScreen.h; sourceTree = "<group>"; };
+		E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BuiltInThemesDemoScreen.m; sourceTree = "<group>"; };
 		E0B545E929F407C2002A25A8 /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0B545EC29F407C2002A25A8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E0B545ED29F407C2002A25A8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -104,9 +118,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E03977E72ACBAD4100A879AD /* SnapshotTesting in Frameworks */,
 				E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */,
-				E03977E52ACBAD4100A879AD /* InlineSnapshotTesting in Frameworks */,
+				E06691422B50C4F700FCFBAF /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,8 +141,16 @@
 				E07B775329FA04FF001521F4 /* MainDemoScreen.m */,
 				E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */,
 				E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */,
+				E0AB83082B7A79700003EDE2 /* BuiltInThemesDemoScreen.h */,
+				E0AB83092B7A79700003EDE2 /* BuiltInThemesDemoScreen.m */,
 				E0DD1D182A3A1B4B0059CC38 /* SheetDemoScreen.h */,
 				E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */,
+				E03F9BA42B6D79D6006EA449 /* ConversionDemoScreen.h */,
+				E03F9BA52B6D79D6006EA449 /* ConversionDemoScreen.m */,
+				E03F9BAA2B6F30D1006EA449 /* MessagingDemoScreen.h */,
+				E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */,
+				E03F9BAD2B7017F8006EA449 /* FeatureFlagsDemoScreen.h */,
+				E03F9BAE2B7017F8006EA449 /* FeatureFlagsDemoScreen.m */,
 			);
 			path = DemoScreens;
 			sourceTree = "<group>";
@@ -177,6 +198,8 @@
 				E07B774F29FA0144001521F4 /* Utils.h */,
 				E07B775029FA0144001521F4 /* Utils.m */,
 				E0446E632A0970A10069E5BD /* config.json */,
+				E03F9BA72B6D8267006EA449 /* InfoHeader.h */,
+				E03F9BA82B6D8267006EA449 /* InfoHeader.m */,
 			);
 			path = SampleApp;
 			sourceTree = "<group>";
@@ -247,9 +270,8 @@
 			);
 			name = SampleAppTests;
 			packageProductDependencies = (
-				E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */,
-				E03977E62ACBAD4100A879AD /* SnapshotTesting */,
 				E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */,
+				E06691412B50C4F700FCFBAF /* SnapshotTesting */,
 			);
 			productName = SampleAppTests;
 			productReference = E0B5460429F407C3002A25A8 /* SampleAppTests.xctest */;
@@ -323,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E03F9BAC2B6F30D1006EA449 /* MessagingDemoScreen.m in Sources */,
 				E0B545EE29F407C2002A25A8 /* AppDelegate.m in Sources */,
 				E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */,
 				E0DD1D1A2A3A1B4B0059CC38 /* SheetDemoScreen.m in Sources */,
@@ -331,9 +354,13 @@
 				E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */,
 				E07B775129FA0144001521F4 /* Utils.m in Sources */,
 				E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */,
+				E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */,
 				E0B545FF29F407C3002A25A8 /* main.m in Sources */,
 				E0446E782A0DC2430069E5BD /* SampleAppCoreViewController.m in Sources */,
+				E0AB830A2B7A79700003EDE2 /* BuiltInThemesDemoScreen.m in Sources */,
 				E07B775429FA04FF001521F4 /* MainDemoScreen.m in Sources */,
+				E03F9BAF2B7017F8006EA449 /* FeatureFlagsDemoScreen.m in Sources */,
+				E03F9BA92B6D8267006EA449 /* InfoHeader.m in Sources */,
 				E0B545F129F407C2002A25A8 /* SceneDelegate.m in Sources */,
 				E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */,
 				E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */,
@@ -524,9 +551,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = D5VFD22Y98;
+				DEVELOPMENT_TEAM = 3555VWY9R9;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"IS_CRITICAL_MOMENTS_INTERNAL=1",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Critical Moments";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow testing CriticalMoments in SampleApp";
@@ -538,14 +572,14 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.sample-app";
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.demo-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -560,9 +594,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = D5VFD22Y98;
+				DEVELOPMENT_TEAM = 3555VWY9R9;
+				GCC_PREPROCESSOR_DEFINITIONS = "IS_CRITICAL_MOMENTS_INTERNAL=1";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Critical Moments";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Allow testing CriticalMoments in SampleApp";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Allow location to demo checking location in the SampleApp";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow testing CriticalMoments in SampleApp";
@@ -574,14 +611,14 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.sample-app";
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.demo-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -595,7 +632,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D5VFD22Y98;
+				DEVELOPMENT_TEAM = 3555VWY9R9;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"IS_CRITICAL_MOMENTS_INTERNAL=1",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
@@ -617,7 +659,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = D5VFD22Y98;
+				DEVELOPMENT_TEAM = 3555VWY9R9;
+				GCC_PREPROCESSOR_DEFINITIONS = "IS_CRITICAL_MOMENTS_INTERNAL=1";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
@@ -679,12 +722,7 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = CriticalMoments;
 		};
-		E03977E42ACBAD4100A879AD /* InlineSnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = InlineSnapshotTesting;
-		};
-		E03977E62ACBAD4100A879AD /* SnapshotTesting */ = {
+		E06691412B50C4F700FCFBAF /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E03977E32ACBAD4100A879AD /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;

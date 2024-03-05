@@ -218,6 +218,15 @@ func TestInsertAndRetrieve(t *testing.T) {
 	db := testBuildTestDb(t)
 	defer db.Close()
 
+	// request before rows exist
+	ct, err := db.LatestEventTimeByName("event_not_in_db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ct != nil {
+		t.Fatal("LatestEventTimeByName didn't return nil")
+	}
+
 	// insert a row into events
 	e, err := datamodel.NewCustomEventWithName("test")
 	if err != nil {
@@ -228,11 +237,11 @@ func TestInsertAndRetrieve(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ct, err := db.LatestEventTimeByName(e.Name)
+	ct, err = db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if t == nil {
+	if ct == nil {
 		t.Fatal("LatestEventTimeByName returned nil")
 	}
 	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {
@@ -542,5 +551,47 @@ func TestStableRandom(t *testing.T) {
 	}
 	if initialRand != nextRand {
 		t.Fatal("StableRandom returned different values")
+	}
+}
+
+func createTestDb(path string) (*DB, error) {
+	db := NewDB()
+	err := db.StartWithPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func TestPathChecks(t *testing.T) {
+	dataPath := fmt.Sprintf("/tmp/criticalmoments/test-temp-%v", rand.Int())
+	db, err := createTestDb(dataPath)
+	if err == nil {
+		t.Fatal("Failed to check path exists")
+	}
+	if db != nil {
+		t.Fatal("set invalid path")
+	}
+
+	filePath := fmt.Sprintf("/tmp/cm-test-temp-%v.txt", rand.Int())
+	file, err := os.OpenFile(filePath, os.O_RDONLY|os.O_CREATE, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	file.Close()
+	db, err = createTestDb(dataPath)
+	if err == nil {
+		t.Fatal("Failed to check path exists and is dir")
+	}
+	if db != nil {
+		t.Fatal("set invalid path")
+	}
+
+	os.MkdirAll(dataPath, os.ModePerm)
+	db, err = createTestDb(dataPath)
+	expectedPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataPath)
+	if err != nil || db.databasePath != expectedPath {
+		t.Fatal("Failed to set data path")
 	}
 }

@@ -3,6 +3,8 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+
+	"golang.org/x/exp/slices"
 )
 
 type Theme struct {
@@ -54,6 +56,187 @@ type jsonTheme struct {
 
 	// Fallback Theme Name
 	FallbackThemeName string `json:"fallback,omitempty"`
+}
+
+// These themes provided by libary level, depend on the system
+var libraryThemeNames map[string]bool = map[string]bool{
+	"system":       true,
+	"system_light": true,
+	"system_dark":  true,
+}
+
+var builtInThemes map[string]*Theme = map[string]*Theme{
+	"elegant_light": {
+		BannerBackgroundColor:      "#000000",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#000000",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontName:                   "AvenirNext-Regular",
+		BoldFontName:               "AvenirNext-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: true,
+	},
+	"elegant_dark": {
+		BannerBackgroundColor:      "#ffffff",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#ffffff",
+		BackgroundColor:            "#000000",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#dddddd",
+		FontName:                   "AvenirNext-Regular",
+		BoldFontName:               "AvenirNext-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: true,
+	},
+	// terminal MIT source: https://github.com/altercation/solarized
+	"terminal_light": {
+		BannerBackgroundColor:      "#fdf6e3",
+		BannerForegroundColor:      "#859900",
+		PrimaryColor:               "#859900",
+		BackgroundColor:            "#fdf6e3",
+		PrimaryTextColor:           "#859900",
+		SecondaryTextColor:         "#b58900",
+		FontName:                   "Courier",
+		BoldFontName:               "Courier-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"terminal_dark": {
+		BannerBackgroundColor:      "#001e27",
+		BannerForegroundColor:      "#6cbe6c",
+		PrimaryColor:               "#6cbe6c",
+		BackgroundColor:            "#001e27",
+		PrimaryTextColor:           "#6cbe6c",
+		SecondaryTextColor:         "#51ef84",
+		FontName:                   "Courier",
+		BoldFontName:               "Courier-Bold",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"jazzy_dark": {
+		BannerBackgroundColor:      "#3d088c",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#c1316d",
+		BackgroundColor:            "#3d088c",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#e2deed",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"jazzy_light": {
+		BannerBackgroundColor:      "#3d088c",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#c1316d",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#3d088c",
+		SecondaryTextColor:         "#64478d",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"honey_dark": {
+		BannerBackgroundColor:      "#f4d42b",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#000000",
+		BackgroundColor:            "#f4d42b",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"honey_light": {
+		BannerBackgroundColor:      "#f4d42b",
+		BannerForegroundColor:      "#000000",
+		PrimaryColor:               "#ebc603",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#000000",
+		SecondaryTextColor:         "#222222",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"sea_dark": {
+		BannerBackgroundColor:      "#ffffff",
+		BannerForegroundColor:      "#112c5d",
+		PrimaryColor:               "#ffffff",
+		BackgroundColor:            "#112c5d",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#8eabdc",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"sea_light": {
+		BannerBackgroundColor:      "#112c5d",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#112c5d",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#112c5d",
+		SecondaryTextColor:         "#244278",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"aqua_dark": {
+		BannerBackgroundColor:      "#65c0a6",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#65c0a6",
+		BackgroundColor:            "#5063ec",
+		PrimaryTextColor:           "#ffffff",
+		SecondaryTextColor:         "#d9e3f2",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+	"aqua_light": {
+		BannerBackgroundColor:      "#5063ec",
+		BannerForegroundColor:      "#ffffff",
+		PrimaryColor:               "#65c0a6",
+		BackgroundColor:            "#ffffff",
+		PrimaryTextColor:           "#4253ce",
+		SecondaryTextColor:         "#5063ec",
+		FontScale:                  1.0,
+		ScaleFontForUserPreference: false,
+	},
+}
+
+var combinedThemeNames []string = []string{
+	"terminal",
+	"elegant",
+	"jazzy",
+	"honey",
+	"sea",
+	"aqua",
+}
+
+func AllBuiltInThemeNames() []string {
+	themeNames := combinedThemeNames
+	for themeName := range builtInThemes {
+		themeNames = append(themeNames, themeName)
+	}
+	return themeNames
+}
+
+func BaseThemeCount() int {
+	return len(combinedThemeNames) + (len(libraryThemeNames) / 3)
+}
+
+func builtInThemeByName(name string) (*Theme, error) {
+	builtIn, ok := builtInThemes[name]
+	if ok {
+		return builtIn, nil
+	}
+
+	if slices.Contains(combinedThemeNames, name) {
+		darkTheme, darkOk := builtInThemes[name+"_dark"]
+		lightTheme, lightOk := builtInThemes[name+"_light"]
+		if darkOk && lightOk {
+			// copy and return combined
+			d := *darkTheme
+			l := *lightTheme
+			l.DarkModeTheme = &d
+			return &l, nil
+		}
+	}
+
+	return nil, NewUserPresentableError(fmt.Sprintf("Theme name '%v' is not valid. Check the spelling and try again.", name))
 }
 
 var (

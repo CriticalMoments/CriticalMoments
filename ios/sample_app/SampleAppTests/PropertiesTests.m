@@ -56,8 +56,8 @@
         @"locale_country_code": @"locale_country_code != nil && len(locale_country_code) == 2", // add_test_count
         @"locale_currency_code": @"locale_currency_code != nil && len(locale_currency_code) == 3", // add_test_count
         @"locale_language_direction": @"locale_language_direction in ['RTL', 'LTR']", // add_test_count
-        @"app_id": @"app_id == 'io.criticalmoments.sample-app'", // add_test_count
-        @"app_version": @"app_version == '1.0'", // add_test_count
+        @"app_id": @"app_id == 'io.criticalmoments.demo-app'", // add_test_count
+        @"app_version": @"versionGreaterThan(app_version, '0.9.9') && versionLessThan(app_version, '9.9.9')", // add_test_count
         @"app_install_date": @"app_install_date != nil && app_install_date > unixTimeMilliseconds(1688744356123) && app_install_date < unixTimeMilliseconds(1988744356123)", // add_test_count
         @"app_install_date_now": @"app_install_date <= now()", // add_test_count
         @"device_battery_level": @"device_battery_level == -1 || (device_battery_level >= 0.0 && device_battery_level <= 1.0)", // add_test_count
@@ -74,6 +74,8 @@
         @"has_watch": @"has_watch in [true, false]", // add_test_count
         @"foreground": @"foreground in [true, false]", // add_test_count
         @"app_state": @"app_state in ['active', 'inactive', 'background', 'unknown']", // add_test_count
+        @"app_start_time": @"now() >= app_start_time && now() - duration('5m') < app_start_time", // add_test_count
+        @"session_start_time": @"now() >= session_start_time && now() - duration('5m') < session_start_time", // add_test_count
         
         // Audio
         @"has_headphones": @"has_headphones in [true,false]", // add_test_count
@@ -81,10 +83,6 @@
         @"has_bt_headset": @"has_bt_headset in [true,false]", // add_test_count
         @"has_wired_headset": @"has_wired_headset in [true,false]", // add_test_count
         @"has_car_audio": @"has_car_audio in [true,false]", // add_test_count
-
-        @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
-        @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
-        @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count
         
         @"timezone_gmt_offset": @"timezone_gmt_offset != nil && timezone_gmt_offset <= 24*60*60 && timezone_gmt_offset >= -24*60*60", // add_test_count
         @"location_permission": @"location_permission in [true,false]", // add_test_count
@@ -103,6 +101,9 @@
         @"location_approx_region": @"location_approx_region == nil || len (location_approx_region ?? '') > 0", // add_test_count
         @"location_approx_country": @"location_approx_country == nil || len (location_approx_country ?? '') > 0", // add_test_count
         
+        // Weather -- tested in library
+        
+        // Permissions
         @"contacts_permission": @"contacts_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"camera_permission": @"camera_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         @"microphone_permission": @"microphone_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
@@ -114,10 +115,34 @@
         @"bluetooth_permission": @"bluetooth_permission in ['not_determined', 'restricted', 'denied', 'authorized', 'unknown']", // add_test_count
         
         // Functions
+        // These are tested in more depth in appcore, but e2e tests here
         @"propertyHistoryLatestValue": @"propertyHistoryLatestValue('platform') == 'iOS' || propertyHistoryLatestValue('platform') == 'iPadOS'", // add_test_count
+        @"propertyHistoryLatestValueCurrent": @"propertyHistoryLatestValue('platform') == platform", // add_test_count
         @"propertyHistoryLatestValueNil": @"propertyHistoryLatestValue('never_set_prop') == nil", // add_test_count
-        @"propertyEver": @"propertyEver('app_id', 'io.criticalmoments.sample-app') && !propertyEver('app_id', 'wrongval') && !propertyEver('wrongproperty', 'a')", // add_test_count
+        @"propertyEver": @"propertyEver('app_id', 'io.criticalmoments.demo-app') && !propertyEver('app_id', 'wrongval') && !propertyEver('wrongproperty', 'a')", // add_test_count
         @"stableRand": @"stableRand() == stableRand()", // add_test_count
+        @"last_event_time": @"latestEventTime('app_start') < now() && latestEventTime('fake_event') == nil", // add_test_count
+        @"canOpenUrl": @"!canOpenUrl('not_a_real_app://') && canOpenUrl('https://criticalmoments.io') && canOpenUrl('app-settings:')", // add_test_count
+        @"eventCount": @"eventCount('app_start') >= 1 && eventCount('never') == 0", // add_test_count
+        @"eventCountWithLimit": @"eventCountWithLimit('app_start',1) == 1 && eventCount('never') == 0", // add_test_count
+        @"versionNumberComponent": @"versionNumberComponent('16.3.1.2', 1) == 3", // add_test_count
+        @"versionGreaterThan": @"versionGreaterThan('10.2', '9.9.9')", // add_test_count
+        @"versionLessThan": @"versionLessThan('9.9.9', '10.2')", // add_test_count
+        @"versionEqual": @"versionEqual('9.9.9', 'v9.9.9')", // add_test_count
+        @"unixTimeNanoseconds": @"unixTimeSeconds(1708550686000000000) < now() && unixTimeNanoseconds(1708550686000000000) > now() - duration('175000h')", // add_test_count
+        @"unixTimeMilliseconds": @"unixTimeMilliseconds(1708550686000) < now() && unixTimeMilliseconds(1708550686000) > now() - duration('175000h')", // add_test_count
+        @"unixTimeSeconds": @"unixTimeSeconds(1708550686) < now() && unixTimeSeconds(1708550686) > now() - duration('175000h')", // add_test_count
+        @"formatTime": @"formatTime(unixTimeSeconds(1708550686), 'year') == 2024", // add_test_count
+        @"rand": @"(rand() % 100) >= 0 && (rand() % 100) < 100", // add_test_count
+        @"sessionRand": @"(sessionRand() % 100) >= 0 && (sessionRand() % 100) < 100 && sessionRand() == sessionRand()", // add_test_count
+        @"randForKey": @"randForKey('key1', 1) == 292785326893130985", // add_test_count
+        @"constantProps": @"RFC3339 == '2006-01-02T15:04:05.999999999Z07:00' && date_format == '2006-01-02'", // add_test_count
+        
+        // Events
+        @"app_start": @"now() > latestEventTime('app_start') && now() - duration('5m') < latestEventTime('app_start')", // add_test_count
+        @"app_entered_foreground": @"now() > latestEventTime('app_entered_foreground') && now() - duration('5m') < latestEventTime('app_entered_foreground')", // add_test_count
+        @"app_entered_background": @"latestEventTime('app_entered_background') == nil || (now() > latestEventTime('app_entered_background') && now() - duration('5m') < latestEventTime('app_entered_background'))", // add_test_count
+        @"session_start": @"(now() > latestEventTime('session_start') && now() - duration('5m') < latestEventTime('session_start'))", // add_test_count
     };
     // clang-format on
 
@@ -134,15 +159,15 @@
         // Expectations are only used to wait -- actual assets in the callback
         XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:name];
         [expectations addObject:expectation];
-        [cm checkNamedCondition:name
-                      condition:condition
-                        handler:^(bool result, NSError *_Nullable error) {
-                          if (error != nil) {
-                              XCTAssert(false, @"Property test failed with error: %@", error);
-                          }
-                          XCTAssertTrue(result, @"Property test did not return true for condition check: %@", name);
-                          [expectation fulfill];
-                        }];
+        [cm checkInternalTestCondition:condition
+                               handler:^(bool result, NSError *_Nullable error) {
+                                 if (error != nil) {
+                                     XCTAssert(false, @"Property test failed with error: %@", error);
+                                 }
+                                 XCTAssertTrue(result, @"Property test did not return true for condition check: %@",
+                                               name);
+                                 [expectation fulfill];
+                               }];
     }
 
     [self waitForExpectations:expectations timeout:20];
@@ -153,25 +178,48 @@
     AppDelegate *aad = (AppDelegate *)ad;
     CriticalMoments *cm = [aad cmInstance];
 
-    // Response varries on... location, so manual testing required.
-    XCTSkipIf(true, @"skipping location test as it expected results vary by location.");
+    NSString *condition = @"len(location_approx_city ?? 'unknown') > 0 && "
+                          @"len(location_approx_country ?? 'unknown') > 0 && "
+                          @"len(location_approx_region ?? 'unknown') > 0 && abs(location_approx_latitude ?? 0.0) <= 90 "
+                          @"&& abs(location_approx_longitude ?? 0.0) <= 180";
+
+    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
+
+    XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
+    [expectations addObject:expectation1];
+    [cm checkInternalTestCondition:condition
+                           handler:^(bool result, NSError *error) {
+                             if (!result || error) {
+                                 XCTAssert(false, "approx location condition failed to return");
+                             }
+                             [expectation1 fulfill];
+                           }];
+
+    [self waitForExpectations:expectations timeout:5.0];
+}
+
+// Not included in test plan, so not run by default. But helpful for development.
+- (void)testGeoIpLocationToronto {
+    id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
+    AppDelegate *aad = (AppDelegate *)ad;
+    CriticalMoments *cm = [aad cmInstance];
 
     NSString *condition =
-        @"location_approx_city == 'Toronto' && location_approx_country == 'CA' && location_approx_region == 'ON' "
+        @"(location_approx_city == 'Toronto' || location_approx_city == 'North York') && location_approx_country == "
+        @"'CA' && location_approx_region == 'ON' "
         @"&& abs(location_approx_latitude - 43.651070) < 0.5 && abs(location_approx_longitude - -79.347015) < 0.5";
 
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     XCTestExpectation *expectation1 = [[XCTestExpectation alloc] init];
     [expectations addObject:expectation1];
-    [cm checkNamedCondition:@"locCondition"
-                  condition:condition
-                    handler:^(bool result, NSError *error) {
-                      if (!result || error) {
-                          XCTAssert(false, "approx location condition failed to return");
-                      }
-                      [expectation1 fulfill];
-                    }];
+    [cm checkInternalTestCondition:condition
+                           handler:^(bool result, NSError *error) {
+                             if (!result || error) {
+                                 XCTAssert(false, "approx location condition failed to return");
+                             }
+                             [expectation1 fulfill];
+                           }];
 
     [self waitForExpectations:expectations timeout:5.0];
 }

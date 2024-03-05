@@ -20,6 +20,8 @@
     self = [super init];
     if (self) {
         self.title = @"Banner Demos";
+        self.buttonLink = @"https://docs.criticalmoments.io/actions/banners";
+        self.infoText = @"Announcements that appear across every screen in your app";
         [self buildSections];
     }
     return self;

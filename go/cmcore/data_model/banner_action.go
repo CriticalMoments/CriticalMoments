@@ -106,9 +106,12 @@ func (b *BannerAction) AllEmbeddedActionNames() ([]string, error) {
 		return []string{}, nil
 	}
 	return []string{b.TapActionName}, nil
-
 }
 
-func (b *BannerAction) PerformAction(ab ActionBindings) error {
-	return ab.ShowBanner(b)
+func (l *BannerAction) AllEmbeddedConditions() ([]*Condition, error) {
+	return []*Condition{}, nil
+}
+
+func (b *BannerAction) PerformAction(ab ActionBindings, actionName string) error {
+	return ab.ShowBanner(b, actionName)
 }

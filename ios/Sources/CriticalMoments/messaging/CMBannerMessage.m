@@ -6,6 +6,7 @@
 //
 
 #import "CMBannerMessage.h"
+#import "../CriticalMoments_private.h"
 #import "../include/CriticalMoments.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
@@ -197,6 +198,12 @@
 }
 
 - (void)dismissTapped:(UIButton *)sender {
+    // event for close
+    if (self.completionEventSender && self.bannerName.length > 0) {
+        NSString *closeEvent = [NSString stringWithFormat:@"sub-action:%@:closed", self.bannerName];
+        [self.completionEventSender sendEvent:closeEvent];
+    }
+
     [self.messageManagerDelegate dismissedMessage:self];
 }
 
@@ -205,6 +212,12 @@
 }
 
 - (void)bannerTapped {
+    // event for action
+    if (self.completionEventSender && self.bannerName.length > 0) {
+        NSString *closeEvent = [NSString stringWithFormat:@"sub-action:%@:tapped", self.bannerName];
+        [self.completionEventSender sendEvent:closeEvent];
+    }
+
     [self.actionDelegate messageAction:self];
 }
 
