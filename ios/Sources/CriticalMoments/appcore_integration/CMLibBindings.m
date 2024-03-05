@@ -121,6 +121,7 @@
 }
 
 - (BOOL)showReviewPrompt:(NSError *_Nullable __autoreleasing *)error {
+    __block CriticalMoments *blockCM = self.cm;
     dispatch_async(dispatch_get_main_queue(), ^{
       if (@available(iOS 14.0, *)) {
           UIWindowScene *scene = [CMUtils keyWindow].windowScene;
@@ -130,6 +131,8 @@
       } else {
           [SKStoreReviewController requestReview];
       }
+
+      [blockCM sendEvent:@"system_app_review_requested"];
     });
 
     return YES;
