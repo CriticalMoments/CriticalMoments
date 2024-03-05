@@ -449,7 +449,7 @@ func TestSetDefaultTheme(t *testing.T) {
 		t.Fatal(err)
 	}
 	defaultTheme := ac.libBindings.(*testLibBindings).defaultTheme
-	if defaultTheme == nil && defaultTheme.BannerBackgroundColor != "#ffffff" {
+	if defaultTheme == nil || defaultTheme.BannerBackgroundColor != "#ffffff" {
 		t.Fatal("Default theme not set after start")
 	}
 	if ac.libBindings.(*testLibBindings).libThemeName != "" {
