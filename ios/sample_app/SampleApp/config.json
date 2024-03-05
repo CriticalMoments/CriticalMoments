@@ -87,7 +87,7 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Goal Already Completed",
-                    "message": "The user has already added 2 taks to lists, and moved onto a later step of the user journey."
+                    "message": "The user has already added 2 tasks to lists, and moved onto a later step of the user journey."
                 }
             },
             "journey_goal_prior_step": {
@@ -619,14 +619,14 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition True",
-                    "message": "The condition was evaluated, and was true.\n\nTry changing your device's state to make it true, then tap again."
+                    "message": "The condition was evaluated, and was true.\n\nTry changing your device's state to make it false, then tap again."
                 }
             },
             "conditional_false_alert": {
                 "actionType": "alert",
                 "actionData": {
                     "title": "Condition False",
-                    "message": "The condition was evaluated, and was false.\n\nTry changing your device's state to make it false, then tap again."
+                    "message": "The condition was evaluated, and was false.\n\nTry changing your device's state to make it true, then tap again."
                 }
             },
             "conditional_landscape": {
