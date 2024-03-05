@@ -79,7 +79,9 @@
         dispatch_async(dispatch_get_main_queue(), ^{
           CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
           bannerMessage.completionEventSender = self.cm;
-          bannerMessage.bannerName = actionName;
+          if (actionName.length > 0) {
+              bannerMessage.bannerName = actionName;
+          }
           [[CMBannerManager shared] showAppWideMessage:bannerMessage];
         });
     } else {
@@ -101,7 +103,9 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
       CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
-      alert.alertName = actionName;
+      if (actionName.length > 0) {
+          alert.alertName = actionName;
+      }
       alert.completionEventSender = self.cm;
       [alert showAlert];
     });
@@ -150,6 +154,10 @@
             error:(NSError *_Nullable __autoreleasing *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
       CMModalViewController *sheetVc = [[CMModalViewController alloc] initWithDatamodel:modal];
+      if (actionName.length > 0) {
+          sheetVc.modalName = actionName;
+      }
+      sheetVc.completionEventSender = self.cm;
       [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 

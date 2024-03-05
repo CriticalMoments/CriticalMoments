@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// the "default" action, which won't be called if the model has preventDefault=true
 @property(nonatomic, copy, nullable) void (^defaultAction)();
+/// button tapped action, always called
+@property(nonatomic, copy, nullable) void (^buttonTappedAction)();
 
 @end
 

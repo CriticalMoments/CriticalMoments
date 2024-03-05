@@ -275,6 +275,11 @@
                   weakSelf.anyButtonDefaultAction();
               }
             };
+            button.buttonTappedAction = ^{
+              if (weakSelf.buttonCallback) {
+                  weakSelf.buttonCallback(buttonModel.title, i);
+              }
+            };
         }
     }
 

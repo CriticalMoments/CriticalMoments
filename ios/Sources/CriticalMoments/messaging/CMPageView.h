@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// the "default" action, which will be called after any button tap
 @property(nonatomic, copy, nullable) void (^anyButtonDefaultAction)();
+/// Called after any button tap, for events
+@property(nonatomic, copy, nullable) void (^buttonCallback)(NSString *_Nullable buttonName, int buttonIndex);
 
 @end
 

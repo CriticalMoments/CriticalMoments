@@ -57,12 +57,18 @@
 }
 
 - (void)buttonTapped:(UIButton *)target {
-    // two actions fire. Important that #1 is first, as the second may need "topViewController".
+    // Three actions fire.
+    // Important that #1 is before #3, as #3 may need "topViewController".
     // 1) the system's default action, unless prevent default (eg: dismiss modal)
-    // 2) the model's named action, if it exists
+    // 2) the button tapped action if provided
+    // 3) the model's named action, if it exists
 
     if (!self.model.preventDefault && self.defaultAction) {
         self.defaultAction();
+    }
+
+    if (self.buttonTappedAction) {
+        self.buttonTappedAction();
     }
 
     if (self.model.actionName.length > 0) {
