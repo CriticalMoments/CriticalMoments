@@ -7,12 +7,12 @@ type actionDispatcher struct {
 	appcore *Appcore
 }
 
-func (ap *actionDispatcher) ShowBanner(banner *datamodel.BannerAction) error {
-	return ap.appcore.libBindings.ShowBanner(banner)
+func (ap *actionDispatcher) ShowBanner(banner *datamodel.BannerAction, actionName string) error {
+	return ap.appcore.libBindings.ShowBanner(banner, actionName)
 }
 
-func (ap *actionDispatcher) ShowAlert(alert *datamodel.AlertAction) error {
-	return ap.appcore.libBindings.ShowAlert(alert)
+func (ap *actionDispatcher) ShowAlert(alert *datamodel.AlertAction, actionName string) error {
+	return ap.appcore.libBindings.ShowAlert(alert, actionName)
 }
 
 func (ap *actionDispatcher) ShowLink(link *datamodel.LinkAction) error {
@@ -23,8 +23,8 @@ func (ap *actionDispatcher) ShowReviewPrompt() error {
 	return ap.appcore.libBindings.ShowReviewPrompt()
 }
 
-func (ap *actionDispatcher) ShowModal(modal *datamodel.ModalAction) error {
-	return ap.appcore.libBindings.ShowModal(modal)
+func (ap *actionDispatcher) ShowModal(modal *datamodel.ModalAction, actionName string) error {
+	return ap.appcore.libBindings.ShowModal(modal, actionName)
 }
 
 func (ap *actionDispatcher) PerformConditionalAction(ca *datamodel.ConditionalAction) error {

@@ -67,7 +67,9 @@
     return YES;
 }
 
-- (BOOL)showBanner:(DatamodelBannerAction *_Nullable)banner error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showBanner:(DatamodelBannerAction *)banner
+        actionName:(NSString *)actionName
+             error:(NSError *_Nullable __autoreleasing *)error {
     if (!banner) {
         *error = [NSError errorWithDomain:@"CMIOS" code:92739238 userInfo:nil];
         return NO;
@@ -76,6 +78,8 @@
     if (@available(iOS 13, *)) {
         dispatch_async(dispatch_get_main_queue(), ^{
           CMBannerMessage *bannerMessage = [[CMBannerMessage alloc] initWithAppcoreDataModel:banner];
+          bannerMessage.completionEventSender = self.cm;
+          bannerMessage.bannerName = actionName;
           [[CMBannerManager shared] showAppWideMessage:bannerMessage];
         });
     } else {
@@ -87,8 +91,9 @@
     return YES;
 }
 
-- (BOOL)showAlert:(DatamodelAlertAction *_Nullable)alertDataModel
-            error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showAlert:(DatamodelAlertAction *)alertDataModel
+       actionName:(NSString *)actionName
+            error:(NSError *_Nullable __autoreleasing *)error {
     if (!alertDataModel) {
         *error = [NSError errorWithDomain:@"CMIOS" code:4565684 userInfo:nil];
         return NO;
@@ -96,6 +101,8 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
       CMAlert *alert = [[CMAlert alloc] initWithAppcoreDataModel:alertDataModel];
+      alert.alertName = actionName;
+      alert.completionEventSender = self.cm;
       [alert showAlert];
     });
 
@@ -138,7 +145,9 @@
     return YES;
 }
 
-- (BOOL)showModal:(DatamodelModalAction *_Nullable)modal error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+- (BOOL)showModal:(DatamodelModalAction *)modal
+       actionName:(NSString *)actionName
+            error:(NSError *_Nullable __autoreleasing *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
       CMModalViewController *sheetVc = [[CMModalViewController alloc] initWithDatamodel:modal];
       [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];

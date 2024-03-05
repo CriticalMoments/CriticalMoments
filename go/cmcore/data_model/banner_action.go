@@ -112,6 +112,6 @@ func (l *BannerAction) AllEmbeddedConditions() ([]*Condition, error) {
 	return []*Condition{}, nil
 }
 
-func (b *BannerAction) PerformAction(ab ActionBindings) error {
-	return ab.ShowBanner(b)
+func (b *BannerAction) PerformAction(ab ActionBindings, actionName string) error {
+	return ab.ShowBanner(b, actionName)
 }

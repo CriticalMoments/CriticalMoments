@@ -67,11 +67,11 @@ type testLibBindings struct {
 	lastModal        *datamodel.ModalAction
 }
 
-func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction) error {
+func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction, actionName string) error {
 	lb.lastBannerAction = b
 	return nil
 }
-func (lb *testLibBindings) ShowAlert(a *datamodel.AlertAction) error {
+func (lb *testLibBindings) ShowAlert(a *datamodel.AlertAction, actionName string) error {
 	lb.lastAlertAction = a
 	return nil
 }
@@ -91,7 +91,7 @@ func (lb *testLibBindings) ShowReviewPrompt() error {
 	lb.reviewCount += 1
 	return nil
 }
-func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction) error {
+func (lb *testLibBindings) ShowModal(modal *datamodel.ModalAction, actionName string) error {
 	lb.lastModal = modal
 	return nil
 }

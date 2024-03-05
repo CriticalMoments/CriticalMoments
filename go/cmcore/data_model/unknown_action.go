@@ -22,6 +22,6 @@ func (u *UnknownAction) AllEmbeddedConditions() ([]*Condition, error) {
 	return []*Condition{}, nil
 }
 
-func (u *UnknownAction) PerformAction(ab ActionBindings) error {
-	return fmt.Errorf("this version of critical moments does not support this action type (\"%v\"). action not performed", u.ActionType)
+func (u *UnknownAction) PerformAction(ab ActionBindings, actionName string) error {
+	return fmt.Errorf("this version of critical moments does not support this action type (\"%v\"). \"%v\" action not performed", u.ActionType, actionName)
 }

@@ -504,13 +504,13 @@ func (ac *Appcore) PerformAction(action *datamodel.ActionContainer) (returnErr e
 	ad := actionDispatcher{
 		appcore: ac,
 	}
-	actionErr := action.PerformAction(&ad)
-	ac.sendEventForPerformedAction(action, actionErr)
+	actionName := ac.config.NameForActionContainer(action)
+	actionErr := action.PerformAction(&ad, actionName)
+	ac.sendEventForPerformedAction(actionName, actionErr)
 	return actionErr
 }
 
-func (ac *Appcore) sendEventForPerformedAction(action *datamodel.ActionContainer, err error) {
-	actionName := ac.config.NameForActionContainer(action)
+func (ac *Appcore) sendEventForPerformedAction(actionName string, err error) {
 	if actionName == "" {
 		return
 	}

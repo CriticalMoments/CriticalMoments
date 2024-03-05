@@ -6,13 +6,14 @@
 //
 
 #import "../CriticalMoments_private.h"
+#import "../utils/CMEventSender.h"
 #import "include/CriticalMoments.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @import Appcore;
 
-@interface CriticalMoments ()
+@interface CriticalMoments () <CMEventSender>
 
 // _private header prevents exposing these to public SDK.
 

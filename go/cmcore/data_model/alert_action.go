@@ -227,8 +227,8 @@ func (l *AlertAction) AllEmbeddedConditions() ([]*Condition, error) {
 	return []*Condition{}, nil
 }
 
-func (a *AlertAction) PerformAction(ab ActionBindings) error {
-	return ab.ShowAlert(a)
+func (a *AlertAction) PerformAction(ab ActionBindings, actionName string) error {
+	return ab.ShowAlert(a, actionName)
 }
 
 func (a *AlertAction) CustomButtonsCount() int {

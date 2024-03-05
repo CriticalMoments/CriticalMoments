@@ -86,6 +86,6 @@ func (m *ModalAction) AllEmbeddedConditions() ([]*Condition, error) {
 	return []*Condition{}, nil
 }
 
-func (m *ModalAction) PerformAction(ab ActionBindings) error {
-	return ab.ShowModal(m)
+func (m *ModalAction) PerformAction(ab ActionBindings, actionName string) error {
+	return ab.ShowModal(m, actionName)
 }

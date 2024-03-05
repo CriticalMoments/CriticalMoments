@@ -62,7 +62,14 @@
         NSString *cancelString = [CMUtils uiKitLocalizedStringForKey:@"Cancel"];
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelString
                                                                style:UIAlertActionStyleCancel
-                                                             handler:nil];
+                                                             handler:^(UIAlertAction *_Nonnull action) {
+                                                               // Action just for events here.
+                                                               // "Cancel" not localized because event names should not
+                                                               // be localized -2 constant for Cancel (documented)
+                                                               [self buttonTappedWithAction:nil
+                                                                                 buttonName:@"Cancel"
+                                                                                buttonIndex:-2];
+                                                             }];
         [alert addAction:cancelAction];
     }
 
@@ -76,13 +83,14 @@
 
     if (dataModel.showOkButton) {
         NSString *okString = [CMUtils uiKitLocalizedStringForKey:@"OK"];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:okString
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *_Nonnull action) {
-                                                           if (self.dataModel.okButtonActionName.length > 0) {
-                                                               [self performAction:self.dataModel.okButtonActionName];
-                                                           }
-                                                         }];
+        UIAlertAction *okAction = [UIAlertAction
+            actionWithTitle:okString
+                      style:UIAlertActionStyleDefault
+                    handler:^(UIAlertAction *_Nonnull action) {
+                      // Use "OK" since we don't want events localized
+                      // use -1 a constant for OK (documented)
+                      [self buttonTappedWithAction:self.dataModel.okButtonActionName buttonName:@"OK" buttonIndex:-1];
+                    }];
         [alert addAction:okAction];
 
         // Only highlight ok as primary if there's other buttons.
@@ -131,9 +139,9 @@
         CMCustomAlertButton *action = [CMCustomAlertButton actionWithTitle:buttonModel.label
                                                                      style:style
                                                                    handler:^(UIAlertAction *action) {
-                                                                     if (buttonModel.actionName.length > 0) {
-                                                                         [self performAction:buttonModel.actionName];
-                                                                     }
+                                                                     [self buttonTappedWithAction:buttonModel.actionName
+                                                                                       buttonName:buttonModel.label
+                                                                                      buttonIndex:i];
                                                                    }];
         action.isPrimaryAction = [DatamodelAlertActionButtonStyleEnumPrimary isEqualToString:buttonModel.style];
 
@@ -143,13 +151,25 @@
     return customActions;
 }
 
-- (void)performAction:(NSString *)actionName {
-    [CriticalMoments.sharedInstance performNamedAction:actionName
-                                               handler:^(NSError *_Nullable error) {
-                                                 if (error) {
-                                                     NSLog(@"CriticalMoments: Alert tap unknown issue: %@", error);
-                                                 }
-                                               }];
+- (void)buttonTappedWithAction:(NSString *)actionName buttonName:(NSString *)btnName buttonIndex:(int)btnIdx {
+    if (self.completionEventSender && self.alertName.length > 0) {
+        if (btnName) {
+            NSString *tapEventName = [NSString stringWithFormat:@"sub-action:%@:button:%@", self.alertName, btnName];
+            [self.completionEventSender sendEvent:tapEventName];
+        }
+        NSString *tapEventIndexName =
+            [NSString stringWithFormat:@"sub-action:%@:button_index:%d", self.alertName, btnIdx];
+        [self.completionEventSender sendEvent:tapEventIndexName];
+    }
+
+    if (actionName.length > 0) {
+        [CriticalMoments.sharedInstance performNamedAction:actionName
+                                                   handler:^(NSError *_Nullable error) {
+                                                     if (error) {
+                                                         NSLog(@"CriticalMoments: Alert tap unknown issue: %@", error);
+                                                     }
+                                                   }];
+    }
 }
 
 @end
