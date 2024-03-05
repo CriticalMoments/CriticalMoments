@@ -221,13 +221,6 @@
                     }
                 }
             },
-            "journey_goal_2_tap": {
-                "actionType": "alert",
-                "actionData": {
-                    "title": "Demo Action",
-                    "message": "If this was a real Todo list app, you could connect the button tap to your 'Add Task to List' experience with an app deeplink."
-                }
-            },
             "journey_goal_failed": {
                 "actionType": "alert",
                 "actionData": {
