@@ -9,8 +9,8 @@ import Foundation
 // on our GH actions https://github.com/CriticalMoments/CriticalMoments/actions
 var appcoreTarget = Target.binaryTarget(
     name: "Appcore",
-    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.9.0/Appcore.xcframework.zip",
-    checksum: "95cd59ef50467573885865c3244dd3672deb815c8c095637ea3b2b4be16f0eb4")
+    url: "https://github.com/CriticalMoments/CriticalMoments/releases/download/appcore-v0.9.1/Appcore.xcframework.zip",
+    checksum: "676252f7cb288caa2cb99df03e413f02a7e42ec221e3f621fbea18e069f29808")
 
 // If this device has built the appcore framework locally, use that. This is primarily for development.
 // We highly recommend end users use the production binary.
