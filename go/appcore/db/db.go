@@ -48,13 +48,13 @@ func (db *DB) StartWithPath(dataDir string) error {
 	sqldb.SetMaxOpenConns(1)
 
 	db.databasePath = dbPath
-	db.sqldb = sqldb
 
-	err = db.migrate()
+	err = migrate(sqldb)
 	if err != nil {
 		return err
 	}
 
+	db.sqldb = sqldb
 	db.started = true
 	return nil
 }
@@ -71,12 +71,12 @@ func (db *DB) PropertyHistoryManager() *PropertyHistoryManager {
 // migrations can be run on each start because they are incremental and non-destructive
 // Future migrations must also be incremental (only append to this, check if not exists),
 // or we must implement a versioning system
-func (db *DB) migrate() error {
-	if db.sqldb == nil {
+func migrate(sqldb *sql.DB) error {
+	if sqldb == nil {
 		return errors.New("CriticalMoments: DB not started")
 	}
 
-	_, err := db.sqldb.Exec(`
+	_, err := sqldb.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 			id INTEGER PRIMARY KEY,
 			name TEXT NOT NULL,
@@ -181,7 +181,9 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 	return count, nil
 }
 
-const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+// the "*1.0" is needed to convert the integer to a real number. If a time happens round to an integer, the golang
+// sqlite library will parse it as a time.Time instead of float64, causing an error
+const latestEventTimeByNameQuery = `SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	if !db.started {
@@ -229,9 +231,15 @@ func DBPropertyTypeIntFromKind(k reflect.Kind) (DBPropertyType, error) {
 	}
 }
 
-const latestPropHistoryTimeByNameQuery = `SELECT created_at FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+// the "*1.0" is needed to convert the integer to a real number. If a time happens round to an integer, the golang
+// sqlite library will parse it as a time.Time instead of float64, causing an error
+const latestPropHistoryTimeByNameQuery = `SELECT created_at*1.0 FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) latestPropertyHistoryTime(name string) (*time.Time, error) {
+	if !db.started {
+		return nil, errors.New("CriticalMoments: DB not started")
+	}
+
 	var epochTime float64
 	err := db.sqldb.
 		QueryRow(latestPropHistoryTimeByNameQuery, name).
