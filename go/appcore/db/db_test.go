@@ -55,7 +55,7 @@ func TestDBMigrate(t *testing.T) {
 	testSchema(db, t)
 
 	// run again to make sure it doesn't fail
-	err := db.migrate()
+	err := migrate(db.sqldb)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func BenchmarkWarmMigrate(b *testing.B) {
 	defer db.Close()
 
 	for i := 0; i < b.N; i++ {
-		err := db.migrate()
+		err := migrate(db.sqldb)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -593,5 +593,53 @@ func TestPathChecks(t *testing.T) {
 	expectedPath := fmt.Sprintf("file:%s/critical_moments_db.db?_journal_mode=WAL&mode=rwc", dataPath)
 	if err != nil || db.databasePath != expectedPath {
 		t.Fatal("Failed to set data path")
+	}
+}
+
+// Wild issue: if timestamps rounded to .0 seconds, they are returned as time.Time, and if not they are returned as float64
+func TestTimestampRoundingAndLatestPropHistory(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	// insert a row into table
+	_, err := db.sqldb.Exec(`
+		INSERT INTO property_history (name, type, text_value, sample_type)
+		VALUES ('test', ?, 'val', 1)
+	`, DBPropertyTypeString)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ct, err := db.latestPropertyHistoryTime("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ct == nil {
+		t.Fatal("LatestPropHistoryTime returned nil")
+	}
+	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {
+		t.Fatal("LatestPropHistoryTime returned wrong time")
+	}
+
+	// update the row to exact time, no milliseconds
+	// This previously caused the return type to change to time.Time, and errored
+	time.Sleep(time.Millisecond * 2)
+	_, err = db.sqldb.Exec(`
+		UPDATE property_history SET created_at = 1710791550
+		WHERE name = 'test'
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ct, err = db.latestPropertyHistoryTime("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ct == nil {
+		t.Fatal("LatestPropHistoryTime returned nil")
+	}
+	if math.Abs(float64(ct.Unix())-1710791550.0) > 0.1 {
+		t.Fatal("LatestPropHistoryTime returned wrong time")
 	}
 }
