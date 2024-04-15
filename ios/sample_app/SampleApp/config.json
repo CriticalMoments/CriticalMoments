@@ -615,6 +615,14 @@
                     "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
                 }
             },
+            "app_review_template": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "/* Device condition checks we suggest for almost all apps */ device_battery_level > 0.2 &&  !device_low_power_mode &&  has_active_network &&  !low_data_mode && device_orientation != 'face_up' &&  device_orientation != 'face_down' &&  foreground &&   /* Optional device checks. You decide if these make sense for your app */ !other_audio_playing &&  !on_call &&  !has_car_audio &&  /* Check last prompt time was not in last 21 days. Note: this uses the 'ask_for_review' action we fire below.  */ (   eventCount('ask_for_review') == 0 ||    lastEventTime('ask_for_review') < now() - duration('504h') ) &&  /* Check the app wasn't installed in last week */ app_install_date < now() - duration('168h') &&  /* Check their app version isn't too old. Comment out until you have old clients you no longer want to request reviews on */ /* versionGreaterThan(app_version, '2.4.0') && */  /* Check the app version isn't in the 'known buggy versions' list. Commented out until you have versions you wish to add. */ /* app_version not in ['buggy_version_1', 'buggy_version_2'] && */  /* Out of date OS check */ !versionLessThan(os_version, '16.0') &&  /* only prompt users who's native language is supported in your UI. Uncomment once you set the correct values in the list. */ /* locale_language_code IN ['en', 'es', 'de'] && */  /* Trailing true to make editing this template easier, as lines above end in '&&' */ true",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
+                }
+            },
             "conditional_true_alert": {
                 "actionType": "alert",
                 "actionData": {
