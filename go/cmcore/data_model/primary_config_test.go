@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
@@ -299,6 +300,12 @@ func TestPrimaryConfigJson(t *testing.T) {
 		t.Fatal("Wrong condition count")
 	}
 	if pc.NamedConditionCount() != 3 {
+		t.Fatal("Named condition count mismatch")
+	}
+	if !slices.Contains(pc.NamedConditionsConditionals(), "4 > 3 && os_version =='123'") {
+		t.Fatal("Named condition incorrect")
+	}
+	if len(pc.NamedConditionsConditionals()) != 3 {
 		t.Fatal("Named condition count mismatch")
 	}
 	c1 := pc.ConditionWithName("trueCondition")

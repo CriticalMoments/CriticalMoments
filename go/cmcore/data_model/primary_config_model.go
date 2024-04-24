@@ -548,6 +548,14 @@ func (pc *PrimaryConfig) NamedConditionCount() int {
 	return len(pc.namedConditions)
 }
 
+func (pc *PrimaryConfig) NamedConditionsConditionals() []string {
+	conditionals := make([]string, 0, len(pc.namedConditions))
+	for _, c := range pc.namedConditions {
+		conditionals = append(conditionals, c.conditionString)
+	}
+	return conditionals
+}
+
 func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
 	all := make([]*Condition, 0)
 	for _, c := range pc.namedConditions {
