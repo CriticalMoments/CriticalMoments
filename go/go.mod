@@ -1,6 +1,6 @@
 module github.com/CriticalMoments/CriticalMoments/go
 
-go 1.20
+go 1.22
 
 require (
 	github.com/antonmedv/expr v1.15.3
