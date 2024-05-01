@@ -20,10 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// init is not available. Use sharedInstance for all use cases.
 - (instancetype)init NS_UNAVAILABLE;
 
-/**
- The default instance of critical moments. You should always use this instance
- */
+/// :nodoc:
 + (CriticalMoments *)sharedInstance;
+
+/**
+ The default instance of Critical Moments. You should always use this instance.
+ */
++ (CriticalMoments *)shared;
 
 #pragma mark Setup
 

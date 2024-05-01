@@ -59,7 +59,7 @@
 
 static CriticalMoments *sharedInstance = nil;
 
-+ (CriticalMoments *)sharedInstance {
++ (CriticalMoments *)shared {
     // avoid lock if we can
     if (sharedInstance) {
         return sharedInstance;
@@ -72,6 +72,10 @@ static CriticalMoments *sharedInstance = nil;
 
         return sharedInstance;
     }
+}
+
++ (CriticalMoments *)sharedInstance {
+    return [CriticalMoments shared];
 }
 
 - (NSString *)objcPing {

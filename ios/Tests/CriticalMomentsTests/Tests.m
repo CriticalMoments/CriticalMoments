@@ -491,4 +491,12 @@
     [self testWeatherProviderCases:weatherTests];
 }
 
+- (void)testSharedInstance {
+    CriticalMoments *cm = [CriticalMoments sharedInstance];
+    XCTAssertNotNil(cm, @"shared instance not created");
+    CriticalMoments *cmShared = [CriticalMoments shared];
+    XCTAssertEqual(cm, cmShared, @"shared instance mismatch");
+    return cm;
+}
+
 @end
