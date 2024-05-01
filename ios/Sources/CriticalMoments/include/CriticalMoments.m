@@ -233,6 +233,13 @@ static CriticalMoments *sharedInstance = nil;
     return apiKey;
 }
 
+- (void)setDevelopmentConfigName:(NSString *)configFileName {
+    NSString *extension = [configFileName pathExtension];
+    NSString *resourceName = [configFileName stringByDeletingPathExtension];
+    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:resourceName withExtension:extension];
+    [self setDevelopmentConfigUrl:localConfigUrl.absoluteString];
+}
+
 - (void)setDevelopmentConfigUrl:(NSString *)urlString {
     if (![urlString hasPrefix:@"file://"]) {
         NSLog(@"CriticalMoments: invalid file URL sent to setDevelopmentConfigUrl. The URL must begin with `file://`");

@@ -32,8 +32,7 @@
     [CriticalMoments.sharedInstance setLogEvents:true];
 #endif
 
-    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:@"config" withExtension:@"json"];
-    [CriticalMoments.sharedInstance setDevelopmentConfigUrl:localConfigUrl.absoluteString];
+    [CriticalMoments.sharedInstance setDevelopmentConfigName:@"config.json"];
     NSString *webBasedConfigUrl =
         @"https://storage.googleapis.com/critical-moments-test-cases/sampleAppTestConfig.cmconfig";
     [CriticalMoments.sharedInstance setReleaseConfigUrl:webBasedConfigUrl];

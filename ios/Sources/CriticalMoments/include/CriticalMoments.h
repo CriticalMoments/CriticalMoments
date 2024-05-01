@@ -56,7 +56,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
 /**
- Set a local development Config URL for critical moments.
+ Set a local development config file for Critical Moments by name. Path will be looked up in your main bundle.
+
+ For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
+ guide for how to create this file: https://docs.criticalmoments.io/quick-start
+
+ This local config file will not be used on release builds / app store builds. You must also set a production config URL
+ with setProductionConfigUrl for those builds.
+
+ @param configFileName the name of the config file (e.g. `cmConfig.json`). The full path will be looked up in your main
+ bundle.
+ */
+- (void)setDevelopmentConfigName:(NSString *)configFileName;
+
+/**
+ Set a local development config URL for Critical Moments.
 
  For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
  guide for how to create this file: https://docs.criticalmoments.io/quick-start
