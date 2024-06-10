@@ -17,12 +17,13 @@ System here for each new type
 */
 
 const (
-	ActionTypeEnumBanner      string = "banner"
-	ActionTypeEnumAlert       string = "alert"
-	ActionTypeEnumLink        string = "link"
-	ActionTypeEnumConditional string = "conditional_action"
-	ActionTypeEnumModal       string = "modal"
-	ActionTypeEnumReview      string = "review_prompt"
+	ActionTypeEnumBanner       string = "banner"
+	ActionTypeEnumAlert        string = "alert"
+	ActionTypeEnumLink         string = "link"
+	ActionTypeEnumConditional  string = "conditional_action"
+	ActionTypeEnumModal        string = "modal"
+	ActionTypeEnumReview       string = "review_prompt"
+	ActionTypeEnumNotification string = "notification"
 )
 
 // This section is the json data model we use for parsing/masrshaling
@@ -34,11 +35,12 @@ type ActionContainer struct {
 
 	// Strongly typed action data
 	// All nil except the one aligning to actionType
-	BannerAction      *BannerAction
-	AlertAction       *AlertAction
-	LinkAction        *LinkAction
-	ConditionalAction *ConditionalAction
-	ModalAction       *ModalAction
+	BannerAction       *BannerAction
+	AlertAction        *AlertAction
+	LinkAction         *LinkAction
+	ConditionalAction  *ConditionalAction
+	ModalAction        *ModalAction
+	NotificationAction *NotificationAction
 
 	// generalized interface for functions we need for any actions type.
 	// Typically a pointer to the one value above that is populated.
@@ -77,12 +79,13 @@ type ActionTypeInterface interface {
 
 var (
 	actionTypeRegistry = map[string]func(json.RawMessage, *ActionContainer) (ActionTypeInterface, error){
-		ActionTypeEnumBanner:      unpackBannerFromJson,
-		ActionTypeEnumAlert:       unpackAlertFromJson,
-		ActionTypeEnumLink:        unpackLinkFromJson,
-		ActionTypeEnumConditional: unpackConditionalActionFromJson,
-		ActionTypeEnumReview:      unpackReviewFromJson,
-		ActionTypeEnumModal:       unpackModalFromJson,
+		ActionTypeEnumBanner:       unpackBannerFromJson,
+		ActionTypeEnumAlert:        unpackAlertFromJson,
+		ActionTypeEnumLink:         unpackLinkFromJson,
+		ActionTypeEnumConditional:  unpackConditionalActionFromJson,
+		ActionTypeEnumReview:       unpackReviewFromJson,
+		ActionTypeEnumModal:        unpackModalFromJson,
+		ActionTypeEnumNotification: unpackNotificationFromJson,
 	}
 )
 

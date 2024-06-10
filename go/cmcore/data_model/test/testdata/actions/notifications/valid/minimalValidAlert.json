@@ -1,0 +1,6 @@
+{
+    "actionType": "notification",
+    "actionData": {
+        "title": "title"
+    }
+}

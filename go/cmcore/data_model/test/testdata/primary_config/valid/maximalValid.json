@@ -145,6 +145,14 @@
                         }
                     }
                 }
+            },
+            "notificationAction": {
+                "actionType": "notification",
+                "actionData": {
+                    "title": "Notification title",
+                    "body": "Notification body",
+                    "actionName": "bannerAction1"
+                }
             }
         }
     },

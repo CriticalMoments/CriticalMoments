@@ -194,7 +194,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 14 {
+	if len(pc.namedActions) != 15 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -270,6 +270,11 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 	if len(pc.AllActions()) != len(pc.namedActions) {
 		t.Fatal("all actions count mismatch")
+	}
+	notif := pc.ActionWithName("notificationAction")
+	if notif == nil || notif.NotificationAction == nil || notif.NotificationAction.Title != "Notification title" || notif.NotificationAction.Body != "Notification body" || notif.NotificationAction.ActionName != "bannerAction1" {
+
+		t.Fatal("Notification action failed to parse")
 	}
 
 	// Triggers
