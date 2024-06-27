@@ -194,7 +194,7 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 
 	// Actions
-	if len(pc.namedActions) != 15 {
+	if len(pc.namedActions) != 14 {
 		t.Fatal("Wrong number of named actions")
 	}
 	bannerAction1 := pc.ActionWithName("bannerAction1")
@@ -270,11 +270,6 @@ func TestPrimaryConfigJson(t *testing.T) {
 	}
 	if len(pc.AllActions()) != len(pc.namedActions) {
 		t.Fatal("all actions count mismatch")
-	}
-	notif := pc.ActionWithName("notificationAction")
-	if notif == nil || notif.NotificationAction == nil || notif.NotificationAction.Title != "Notification title" || notif.NotificationAction.Body != "Notification body" || notif.NotificationAction.ActionName != "bannerAction1" {
-
-		t.Fatal("Notification action failed to parse")
 	}
 
 	// Triggers
@@ -462,8 +457,9 @@ func TestNoNamedActions(t *testing.T) {
 	}
 
 	pc.namedTriggers = make(map[string]*Trigger)
+	pc.notifications = make(map[string]*Notification)
 	if !pc.Validate() {
-		t.Fatal("empty actions should be allowed when no triggers reference them")
+		t.Fatal("empty actions should be allowed when no triggers or notifications reference them")
 	}
 }
 
@@ -630,11 +626,14 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 		t.Fatal("Strict parsing ignored extra field")
 	}
 }
-func TestFallbackNameChecks(t *testing.T) {
+func TestInvalidsError(t *testing.T) {
 	invalidJson := []string{
+		// Fallback name checks
 		"invalidFallbackAction1.json",
 		"invalidFallbackTheme2.json", // add_test_count
 		"invalidFallbackTheme1.json", // add_test_count
+		// Invalid notification action name
+		"invalidNotificationAction.json", // add_test_count
 	}
 
 	for _, invalidFile := range invalidJson {
@@ -645,7 +644,7 @@ func TestFallbackNameChecks(t *testing.T) {
 		pc := PrimaryConfig{}
 		err = json.Unmarshal(testFileData, &pc)
 		if err == nil {
-			t.Fatal("Failed to disallow invalid fallback")
+			t.Fatalf("Failed to disallow invalid primary config: %v\n\n%v", invalidFile, err)
 		}
 	}
 }

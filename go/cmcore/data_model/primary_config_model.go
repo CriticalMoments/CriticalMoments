@@ -41,6 +41,9 @@ type PrimaryConfig struct {
 
 	// Conditions
 	namedConditions map[string]*Condition
+
+	// Notifications
+	notifications map[string]*Notification
 }
 
 func (pc *PrimaryConfig) DefaultTheme() *Theme {
@@ -244,6 +247,9 @@ type jsonPrimaryConfig struct {
 
 	// Conditions
 	ConditionsConfig *jsonConditionsSection `json:"conditions"`
+
+	// Notifications
+	Notifications map[string]*Notification `json:"notifications"`
 }
 
 type jsonThemesSection struct {
@@ -323,6 +329,16 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.namedConditions = jpc.ConditionsConfig.NamedConditions
 	} else {
 		pc.namedConditions = make(map[string]*Condition)
+	}
+
+	// Notifications
+	if jpc.Notifications != nil {
+		for notificationID, notificaiton := range jpc.Notifications {
+			notificaiton.ID = notificationID
+		}
+		pc.notifications = jpc.Notifications
+	} else {
+		pc.notifications = make(map[string]*Notification)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
@@ -445,6 +461,11 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 			return fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue)
 		}
 	}
+	for notificationID, notification := range pc.notifications {
+		if notIssue := notification.ValidateReturningUserReadableIssue(); notIssue != "" {
+			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notIssue)
+		}
+	}
 
 	return ""
 }
@@ -508,6 +529,16 @@ func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() str
 			_, ok := pc.namedActions[actionName]
 			if !ok {
 				return fmt.Sprintf("Action \"%v\" specified named action \"%v\", which doesn't exist", sourceActionName, actionName)
+			}
+		}
+	}
+
+	// Validate actions in notifications exist
+	for id, notif := range pc.notifications {
+		if notif.ActionName != "" {
+			_, ok := pc.namedActions[notif.ActionName]
+			if !ok {
+				return fmt.Sprintf("Notificaiton '%v' has action name '%v', which does not exist", id, notif.ActionName)
 			}
 		}
 	}

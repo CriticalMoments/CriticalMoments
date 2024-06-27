@@ -8,10 +8,11 @@ import (
 
 func TestNotificationActionValidators(t *testing.T) {
 	// valid
-	a := NotificationAction{
+	a := Notification{
 		Title:      "Title",
 		Body:       "Body",
 		ActionName: "ActionName",
+		ID:         "io.criticalmoments.test",
 	}
 	if !a.Validate() {
 		t.Fatal(a.ValidateReturningUserReadableIssue())
@@ -28,6 +29,14 @@ func TestNotificationActionValidators(t *testing.T) {
 	if a.Validate() {
 		t.Fatal("Allowed empty title")
 	}
+	a.Title = "title"
+	if !a.Validate() {
+		t.Fatal("should be valid")
+	}
+	a.ID = ""
+	if a.Validate() {
+		t.Fatal("Allowed empty ID")
+	}
 }
 
 func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
@@ -35,25 +44,23 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
-	var ac ActionContainer
-	err = json.Unmarshal(testFileData, &ac)
+	var n Notification
+	err = json.Unmarshal(testFileData, &n)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if ac.ActionType != ActionTypeEnumNotification {
-		t.Fatal("wrong action type")
-	}
-	na := ac.NotificationAction
-
-	if na.Title != "title" {
+	if n.Title != "title" {
 		t.Fatal("failed to parse title")
 	}
-	if na.Body != "" {
+	if n.Body != "" {
 		t.Fatal("failed to parse body as nil")
 	}
-	if na.ActionName != "" {
+	if n.ActionName != "" {
 		t.Fatal("failed to parse actionName as nil")
+	}
+	if n.ID != "" {
+		t.Fatal("ID should be nil")
 	}
 }
 
@@ -62,24 +69,19 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
-	var ac ActionContainer
-	err = json.Unmarshal(testFileData, &ac)
+	var n Notification
+	err = json.Unmarshal(testFileData, &n)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if ac.ActionType != ActionTypeEnumNotification {
-		t.Fatal("wrong action type")
-	}
-	na := ac.NotificationAction
-
-	if na.Title != "title" {
+	if n.Title != "title" {
 		t.Fatal("failed to parse title")
 	}
-	if na.Body != "body" {
+	if n.Body != "body" {
 		t.Fatal("failed to parse body")
 	}
-	if na.ActionName != "actionName" {
+	if n.ActionName != "actionName" {
 		t.Fatal("failed to parse actionName")
 	}
 }
@@ -89,8 +91,8 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
-	var ac ActionContainer
-	err = json.Unmarshal(testFileData, &ac)
+	var n Notification
+	err = json.Unmarshal(testFileData, &n)
 	if err == nil {
 		t.Fatal("Allowed invalid json")
 	}

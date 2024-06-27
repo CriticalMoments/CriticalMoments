@@ -1,8 +1,5 @@
 {
-    "actionType": "notification",
-    "actionData": {
-        "title": "title",
-        "body": "body",
-        "actionName": "actionName"
-    }
+  "title": "title",
+  "body": "body",
+  "actionName": "actionName"
 }

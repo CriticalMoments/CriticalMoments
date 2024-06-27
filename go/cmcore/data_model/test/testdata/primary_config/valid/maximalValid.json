@@ -145,15 +145,14 @@
                         }
                     }
                 }
-            },
-            "notificationAction": {
-                "actionType": "notification",
-                "actionData": {
-                    "title": "Notification title",
-                    "body": "Notification body",
-                    "actionName": "bannerAction1"
-                }
             }
+        }
+    },
+    "notifications": {
+        "testNotification": {
+            "title": "Notification title",
+            "body": "Notification body",
+            "actionName": "bannerAction1"
         }
     },
     "triggers": {
