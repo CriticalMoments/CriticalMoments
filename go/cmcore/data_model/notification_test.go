@@ -9,13 +9,16 @@ import (
 )
 
 func TestNotificationActionValidators(t *testing.T) {
-	// valid
+	var timestamp int64 = 1000
 	a := Notification{
 		Title:              "Title",
 		Body:               "Body",
 		ActionName:         "ActionName",
 		ID:                 "io.criticalmoments.test",
 		DeliveryDaysOfWeek: []time.Weekday{time.Monday, time.Tuesday},
+		DeliveryTime: DeliveryTime{
+			TimestampEpoch: &timestamp,
+		},
 	}
 	if !a.Validate() {
 		t.Fatal(a.ValidateReturningUserReadableIssue())
@@ -80,6 +83,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.CancelationEvents != nil {
 		t.Fatal("failed to parse cancelation condition")
 	}
+	if n.DeliveryTime.TimestampEpoch == nil || *n.DeliveryTime.TimestampEpoch != 1000 {
+		t.Fatal("failed to parse delivery time")
+	}
 }
 
 func TestJsonParsingMaxFieldsNotif(t *testing.T) {
@@ -126,6 +132,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if !slices.Equal(*n.CancelationEvents, []string{"event1", "event2"}) {
 		t.Fatal("failed to parse cancelation events")
 	}
+	if n.DeliveryTime.EventName == nil || *n.DeliveryTime.EventName != "some_event" || n.DeliveryTime.EventOffset == nil || *n.DeliveryTime.EventOffset != 300 {
+		t.Fatal("failed to parse delivery time")
+	}
 }
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
@@ -170,5 +179,52 @@ func TestParseDowString(t *testing.T) {
 		if !slices.Equal(dowResult, target) {
 			t.Fatalf("Day of week string failed parsing for: %v", dowResult)
 		}
+	}
+}
+
+func TestDeliveryTimeValidation(t *testing.T) {
+	// Case: Both TimestampEpoch and EventName are nil
+	dt := DeliveryTime{}
+	issue := dt.ValidateReturningUserReadableIssue()
+	if issue != "DeliveryTime must have either a Timestamp or an EventName defined." {
+		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Case: Both TimestampEpoch and EventName are defined
+	timestamp := int64(1000)
+	eventName := "event"
+	dt = DeliveryTime{TimestampEpoch: &timestamp, EventName: &eventName}
+	issue = dt.ValidateReturningUserReadableIssue()
+	if issue != "DeliveryTime cannot have both a Timestamp and an EventName defined." {
+		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Case: Both TimestampEpoch and EventOffset are defined
+	eventOffset := 30
+	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffset: &eventOffset}
+	issue = dt.ValidateReturningUserReadableIssue()
+	if issue != "DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
+		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Case: Valid TimestampEpoch
+	dt = DeliveryTime{TimestampEpoch: &timestamp}
+	issue = dt.ValidateReturningUserReadableIssue()
+	if issue != "" {
+		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Case: Valid EventName
+	dt = DeliveryTime{EventName: &eventName}
+	issue = dt.ValidateReturningUserReadableIssue()
+	if issue != "" {
+		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Case: Valid EventOffset with EventName
+	dt = DeliveryTime{EventName: &eventName, EventOffset: &eventOffset}
+	issue = dt.ValidateReturningUserReadableIssue()
+	if issue != "" {
+		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 }

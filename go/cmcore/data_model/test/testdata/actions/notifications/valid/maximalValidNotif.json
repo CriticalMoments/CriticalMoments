@@ -9,5 +9,9 @@
     "condition": "true",
     "maxWaitTime": 10
   },
-  "cancelationEvents": ["event1", "event2"]
+  "cancelationEvents": ["event1", "event2"],
+  "deliveryTime": {
+    "eventName": "some_event",
+    "eventOffset": 300
+  }
 } 

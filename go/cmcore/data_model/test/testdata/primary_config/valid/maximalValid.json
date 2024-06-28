@@ -152,7 +152,10 @@
         "testNotification": {
             "title": "Notification title",
             "body": "Notification body",
-            "actionName": "bannerAction1"
+            "actionName": "bannerAction1",
+            "deliveryTime": {
+              "timestamp": 1000
+            }
         }
     },
     "triggers": {

@@ -27,6 +27,7 @@ type Notification struct {
 	Body       string
 	ActionName string
 
+	DeliveryTime                      DeliveryTime
 	DeliveryDaysOfWeek                []time.Weekday
 	DeliveryWindowLocalTimeOfDayStart int
 	DeliveryWindowLocalTimeOfDayEnd   int
@@ -40,14 +41,21 @@ type IdealDevlieryConditions struct {
 	MaxWaitTime int       `json:"maxWaitTime"`
 }
 
+type DeliveryTime struct {
+	TimestampEpoch *int64  `json:"timestamp,omitempty"`
+	EventName      *string `json:"eventName,omitempty"`
+	EventOffset    *int    `json:"eventOffset,omitempty"`
+}
+
 type jsonNotification struct {
 	Title      string `json:"title,omitempty"`
 	Body       string `json:"body,omitempty"`
 	ActionName string `json:"actionName,omitempty"`
 
-	DeliveryDaysOfWeekString          string `json:"deliveryDaysOfWeek,omitempty"`
-	DeliveryWindowLocalTimeOfDayStart *int   `json:"deliveryLocalTimeOfDayStart,omitempty"`
-	DeliveryWindowLocalTimeOfDayEnd   *int   `json:"deliveryLocalTimeOfDayEnd,omitempty"`
+	DeliveryTime                      DeliveryTime `json:"deliveryTime,omitempty"`
+	DeliveryDaysOfWeekString          string       `json:"deliveryDaysOfWeek,omitempty"`
+	DeliveryWindowLocalTimeOfDayStart *int         `json:"deliveryLocalTimeOfDayStart,omitempty"`
+	DeliveryWindowLocalTimeOfDayEnd   *int         `json:"deliveryLocalTimeOfDayEnd,omitempty"`
 
 	IdealDeliveryConditions *IdealDevlieryConditions `json:"idealDeliveryConditions,omitempty"`
 	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
@@ -90,6 +98,22 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
 		}
 	}
+	if dtErr := n.DeliveryTime.ValidateReturningUserReadableIssue(); dtErr != "" {
+		return "Notification has invalid delivery time: " + dtErr
+	}
+	return ""
+}
+
+func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
+	if d.TimestampEpoch == nil && d.EventName == nil {
+		return "DeliveryTime must have either a Timestamp or an EventName defined."
+	}
+	if d.TimestampEpoch != nil && d.EventName != nil {
+		return "DeliveryTime cannot have both a Timestamp and an EventName defined."
+	}
+	if d.TimestampEpoch != nil && d.EventOffset != nil {
+		return "DeliveryTime cannot have both a Timestamp and an EventOffset defined."
+	}
 	return ""
 }
 
@@ -105,6 +129,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.ActionName = jn.ActionName
 	n.IdealDevlieryConditions = jn.IdealDeliveryConditions
 	n.CancelationEvents = jn.CancelationEvents
+	n.DeliveryTime = jn.DeliveryTime
 
 	if jn.DeliveryDaysOfWeekString != "" {
 		n.DeliveryDaysOfWeek = parseDaysOfWeekString(jn.DeliveryDaysOfWeekString)

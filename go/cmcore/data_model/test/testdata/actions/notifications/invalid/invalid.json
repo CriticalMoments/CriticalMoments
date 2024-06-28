@@ -1,3 +1,6 @@
 {
-  "body": "no title"
+  "body": "no title",
+  "deliveryTime": {
+    "timestamp": 1000
+  }
 }
