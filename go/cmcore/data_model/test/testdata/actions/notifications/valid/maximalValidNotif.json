@@ -1,0 +1,8 @@
+{
+  "title": "title",
+  "body": "body",
+  "actionName": "actionName",
+  "deliveryDaysOfWeek": "Monday,Tuesday",
+  "deliveryLocalTimeOfDayStart": 60,
+  "deliveryLocalTimeOfDayEnd": 120
+} 
