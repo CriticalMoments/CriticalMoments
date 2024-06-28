@@ -2,6 +2,7 @@ package datamodel
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -29,6 +30,14 @@ type Notification struct {
 	DeliveryDaysOfWeek                []time.Weekday
 	DeliveryWindowLocalTimeOfDayStart int
 	DeliveryWindowLocalTimeOfDayEnd   int
+
+	IdealDevlieryConditions *IdealDevlieryConditions
+	CancelationEvents       *[]string
+}
+
+type IdealDevlieryConditions struct {
+	Condition   Condition `json:"condition"`
+	MaxWaitTime int       `json:"maxWaitTime"`
 }
 
 type jsonNotification struct {
@@ -39,6 +48,9 @@ type jsonNotification struct {
 	DeliveryDaysOfWeekString          string `json:"deliveryDaysOfWeek,omitempty"`
 	DeliveryWindowLocalTimeOfDayStart *int   `json:"deliveryLocalTimeOfDayStart,omitempty"`
 	DeliveryWindowLocalTimeOfDayEnd   *int   `json:"deliveryLocalTimeOfDayEnd,omitempty"`
+
+	IdealDeliveryConditions *IdealDevlieryConditions `json:"idealDeliveryConditions,omitempty"`
+	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
 }
 
 func (a *Notification) Validate() bool {
@@ -59,6 +71,25 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	if len(n.DeliveryDaysOfWeek) == 0 {
 		return "Notifications must have at least one day of week valid for delivery."
 	}
+	if n.CancelationEvents != nil {
+		for _, event := range *n.CancelationEvents {
+			if event == "" {
+				return fmt.Sprintf("Notification '%v' has an blank cancelation event", n.ID)
+			}
+		}
+	}
+	if n.IdealDevlieryConditions != nil {
+		if conErr := n.IdealDevlieryConditions.Condition.Validate(); conErr != nil {
+			conErrUserReadable := "Unknown error"
+			if uperr, ok := conErr.(*UserPresentableError); ok {
+				conErrUserReadable = uperr.UserErrorString()
+			}
+			return "Notification has invalid ideal delivery condition: " + conErrUserReadable
+		}
+		if n.IdealDevlieryConditions.MaxWaitTime < -1 || n.IdealDevlieryConditions.MaxWaitTime == 0 {
+			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
+		}
+	}
 	return ""
 }
 
@@ -72,6 +103,8 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.Title = jn.Title
 	n.Body = jn.Body
 	n.ActionName = jn.ActionName
+	n.IdealDevlieryConditions = jn.IdealDeliveryConditions
+	n.CancelationEvents = jn.CancelationEvents
 
 	if jn.DeliveryDaysOfWeekString != "" {
 		n.DeliveryDaysOfWeek = parseDaysOfWeekString(jn.DeliveryDaysOfWeekString)

@@ -74,6 +74,12 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.DeliveryWindowLocalTimeOfDayEnd != defaultDeliveryWindowLocalTimeEnd {
 		t.Fatal("failed to parse default delivery end time")
 	}
+	if n.IdealDevlieryConditions != nil {
+		t.Fatal("failed to parse ideal delivery conditions")
+	}
+	if n.CancelationEvents != nil {
+		t.Fatal("failed to parse cancelation condition")
+	}
 }
 
 func TestJsonParsingMaxFieldsNotif(t *testing.T) {
@@ -105,17 +111,40 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if n.DeliveryWindowLocalTimeOfDayEnd != 120 {
 		t.Fatal("failed to parse delivery end time")
 	}
+	if n.IdealDevlieryConditions == nil {
+		t.Fatal("failed to parse ideal delivery conditions")
+	}
+	if n.IdealDevlieryConditions.Condition.conditionString != "true" {
+		t.Fatal("failed to parse ideal delivery condition")
+	}
+	if n.IdealDevlieryConditions.MaxWaitTime != 10 {
+		t.Fatal("failed to parse ideal delivery max wait time")
+	}
+	if n.CancelationEvents == nil {
+		t.Fatal("failed to parse cancelation condition")
+	}
+	if !slices.Equal(*n.CancelationEvents, []string{"event1", "event2"}) {
+		t.Fatal("failed to parse cancelation events")
+	}
 }
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
-	testFileData, err := os.ReadFile("./test/testdata/actions/notifications/invalid/invalid.json")
-	if err != nil {
-		t.Fatal()
+	cases := []string{
+		"./test/testdata/actions/notifications/invalid/invalid.json",
+		"./test/testdata/actions/notifications/invalid/invalidCondition.json",        // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json", // add_test_case
 	}
-	var n Notification
-	err = json.Unmarshal(testFileData, &n)
-	if err == nil {
-		t.Fatal("Allowed invalid json")
+
+	for _, testFile := range cases {
+		testFileData, err := os.ReadFile(testFile)
+		if err != nil {
+			t.Fatal()
+		}
+		var n Notification
+		err = json.Unmarshal(testFileData, &n)
+		if err == nil {
+			t.Fatalf("Allowed invalid json: %v", testFile)
+		}
 	}
 }
 

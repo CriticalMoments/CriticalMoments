@@ -6,8 +6,7 @@
   "deliveryLocalTimeOfDayStart": 60,
   "deliveryLocalTimeOfDayEnd": 120,
   "idealDeliveryConditions": {
-    "condition": "true",
+    "condition": "true > 1",
     "maxWaitTime": 10
-  },
-  "cancelationEvents": ["event1", "event2"]
+  }
 } 
