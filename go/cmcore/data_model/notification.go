@@ -156,7 +156,6 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// TODO_P0: test P0
 // Parsed comman separated day of week strings, removing dupes and standardizing order
 func parseDaysOfWeekString(i string) []time.Weekday {
 	days := []time.Weekday{}
