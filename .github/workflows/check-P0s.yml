@@ -12,6 +12,7 @@ jobs:
     name: Check for P0 issues
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
 
     - name: Check for P0 issue comments
       run: |
