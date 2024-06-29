@@ -14,7 +14,7 @@ jobs:
     steps:
 
     - name: Check for P0 issue comments
-      run: > 
+      run: |
         todos=true
         grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github . || todos=false
         if [ "$todos" == true ]
