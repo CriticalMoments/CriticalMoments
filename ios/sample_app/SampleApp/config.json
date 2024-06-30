@@ -1138,5 +1138,21 @@
             "ab_test_group_for_experiment_five": "(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)",
             "is_iphone_with_recent_os": "device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
         }
+    },
+    "notifications": {
+        "pastDueNotification": {
+          "title": "Too old, should not show",
+          "body": "Too old, should not show",
+          "deliveryTime": {
+            "timestamp": 1000
+          }
+        },
+        "futureNotification": {
+          "title": "Future",
+          "body": "For test cases, in 2040",
+          "deliveryTime": {
+            "timestamp": 2224580934
+          }
+        }
     }
 }

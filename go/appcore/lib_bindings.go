@@ -17,6 +17,9 @@ type LibBindings interface {
 	ShowReviewPrompt() error
 	ShowModal(modal *datamodel.ModalAction, actionName string) error
 
+	// Notifications
+	UpdateNotificationPlan(notifPlan *NotificationPlan) error
+
 	// Condition functions
 	CanOpenURL(url string) bool
 

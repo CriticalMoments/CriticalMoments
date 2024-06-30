@@ -10,6 +10,8 @@
 #import "../SampleApp/AppDelegate.h"
 #import "../SampleApp/DemoScreens/BuiltInThemesDemoScreen.h"
 #import "../SampleApp/Utils.h"
+#import "UserNotifications/UserNotifications.h"
+
 @import CriticalMoments;
 
 @interface SampleAppTests : XCTestCase
@@ -79,4 +81,19 @@
     XCTAssert(success, @"A app-writeable directory passes urlAllowedForDebugLoad check");
 }
 
+- (void)testNotifcations {
+    XCTestExpectation *waitExpectation = [[XCTestExpectation alloc] init];
+
+    // Check we schedule the future one, but not the past one.
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nonnull requests) {
+      XCTAssert(requests.count == 1, @"only one test notification should get scheduled");
+      UNNotificationRequest *n = requests.firstObject;
+      XCTAssert([@"io.criticalmoments.notifications.futureNotification" isEqualToString:n.identifier],
+                @"wrong notification scheduled");
+      XCTAssert([@"Future" isEqualToString:n.content.title], @"notification title mismatch");
+      [waitExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ waitExpectation ] timeout:5.0];
+}
 @end

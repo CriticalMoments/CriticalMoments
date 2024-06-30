@@ -43,6 +43,19 @@ func (sn *ScheduledNotification) ScheduledAtEpochMilliseconds() int64 {
 	return sn.scheduledAt.UnixMilli()
 }
 
+func (ac *Appcore) SendNotficationPlanToLib() error {
+	plan, err := ac.NotificationPlan()
+	if err != nil {
+		return err
+	}
+	err = ac.libBindings.UpdateNotificationPlan(&plan)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ac *Appcore) NotificationPlan() (NotificationPlan, error) {
 	plan := NotificationPlan{
 		unscheduledNotifications: make([]*datamodel.Notification, 0),

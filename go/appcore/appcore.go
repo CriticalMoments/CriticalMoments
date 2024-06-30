@@ -299,6 +299,11 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 		fmt.Printf("CriticalMoments: there was an issue sending the built in event \"%v\". Continuing as this error is non-fatal: %v\n", datamodel.AppStartBuiltInEvent, err)
 	}
 
+	err = ac.SendNotficationPlanToLib()
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue setting up notifications. Continuing as this error is non-fatal: %v\n", err)
+	}
+
 	return nil
 }
 
