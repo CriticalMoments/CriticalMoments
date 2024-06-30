@@ -6,7 +6,8 @@
       "title": "title",
       "body": "body",
       "deliveryTime": {
-        "eventName": "event1"
+        "eventName": "event1",
+        "eventInstance": "latest"
       }
     },
     "event2Notification": {
@@ -14,7 +15,8 @@
       "body": "body",
       "deliveryTime": {
         "eventName": "event2",
-        "eventOffset": 60
+        "eventOffset": 60,
+        "eventInstance": "first"
       }
     }
   }

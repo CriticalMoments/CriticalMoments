@@ -1,6 +1,7 @@
 package appcore
 
 import (
+	"errors"
 	"time"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -65,32 +66,37 @@ func (ac *Appcore) NotificationPlan() (NotificationPlan, error) {
 }
 
 func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notification) *time.Time {
-	// TODO_P0: if ideal, move to end of delviery window
-
-	// Statically scheduled
 	if staticTimestamp := notification.DeliveryTime.Timestamp(); staticTimestamp != nil {
+		// Statically scheduled
+		// If time has passed, we should not deliver static time notification
 		if time.Now().After(*staticTimestamp) {
-			// Time has passed, we should not deliver this notification
 			return nil
 		}
 		return staticTimestamp
-	}
-
-	// Event based scheduling
-	if eventName := notification.DeliveryTime.EventName; eventName != nil {
-		// TODO_P0: this is always the latest. Need modes here I think.
-		lastEventTime, err := ac.db.LatestEventTimeByName(*eventName)
-		if lastEventTime == nil || err != nil {
-			// Contunue with the next notification
+	} else if eventName := notification.DeliveryTime.EventName; eventName != nil {
+		// Event based scheduling
+		eventTime, err := eventTimeForDeliveryTime(ac, &notification.DeliveryTime)
+		if eventTime == nil || err != nil {
 			return nil
 		}
-		targetTime := lastEventTime
+		deliveryTime := eventTime
 		if notification.DeliveryTime.EventOffset != nil {
-			offsetTime := lastEventTime.Add(time.Duration(*notification.DeliveryTime.EventOffset) * time.Second)
-			targetTime = &offsetTime
+			offsetTime := eventTime.Add(time.Duration(*notification.DeliveryTime.EventOffset) * time.Second)
+			deliveryTime = &offsetTime
 		}
-		return targetTime
+
+		// TODO_P0: in past do we still schedule? I think so but confirm
+		return deliveryTime
 	}
 
 	return nil
+}
+
+func eventTimeForDeliveryTime(ac *Appcore, dt *datamodel.DeliveryTime) (*time.Time, error) {
+	if dt.EventInstance() == datamodel.EventInstanceTypeLatest {
+		return ac.db.LatestEventTimeByName(*dt.EventName)
+	} else if dt.EventInstance() == datamodel.EventInstanceTypeFirst {
+		return ac.db.FirstEventTimeByName(*dt.EventName)
+	}
+	return nil, errors.New("invalid event instance type")
 }

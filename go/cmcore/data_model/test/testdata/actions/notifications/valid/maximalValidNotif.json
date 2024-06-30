@@ -12,6 +12,7 @@
   "cancelationEvents": ["event1", "event2"],
   "deliveryTime": {
     "eventName": "some_event",
-    "eventOffset": 300
+    "eventOffset": 300,
+    "eventInstance": "first"
   }
 } 

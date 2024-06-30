@@ -86,6 +86,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.DeliveryTime.TimestampEpoch == nil || *n.DeliveryTime.TimestampEpoch != 1000 {
 		t.Fatal("failed to parse delivery time")
 	}
+	if n.DeliveryTime.EventInstanceString != nil || n.DeliveryTime.EventInstance() != EventInstanceTypeLatest {
+		t.Fatal("event instance should default to latest when not set")
+	}
 }
 
 func TestJsonParsingMaxFieldsNotif(t *testing.T) {
@@ -134,6 +137,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	}
 	if n.DeliveryTime.EventName == nil || *n.DeliveryTime.EventName != "some_event" || n.DeliveryTime.EventOffset == nil || *n.DeliveryTime.EventOffset != 300 {
 		t.Fatal("failed to parse delivery time")
+	}
+	if n.DeliveryTime.EventInstanceString == nil || n.DeliveryTime.EventInstance() != EventInstanceTypeFirst {
+		t.Fatal("event instance should set to first")
 	}
 }
 
@@ -226,5 +232,47 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	issue = dt.ValidateReturningUserReadableIssue()
 	if issue != "" {
 		t.Fatalf("Unexpected validation issue: %v", issue)
+	}
+
+	// Empty/missing should detfault to latest
+	if dt.EventInstance() != EventInstanceTypeLatest {
+		t.Fatal("failed to return latest")
+	}
+	s := ""
+	dt.EventInstanceString = &s
+	if dt.EventInstance() != EventInstanceTypeLatest {
+		t.Fatal("failed to return latest")
+	}
+	s = "latest"
+	dt.EventInstanceString = &s
+	if dt.EventInstance() != EventInstanceTypeLatest {
+		t.Fatal("failed to return latest")
+	}
+	s = "first"
+	dt.EventInstanceString = &s
+	if dt.EventInstance() != EventInstanceTypeFirst {
+		t.Fatal("failed to return First")
+	}
+	if dt.ValidateReturningUserReadableIssue() != "" {
+		t.Fatal("Errored on valid event instance string")
+	}
+	s = "invalid"
+	dt.EventInstanceString = &s
+	if dt.EventInstance() != EventInstanceTypeUnknown {
+		t.Fatal("failed to return latest for unrecognized")
+	}
+	if dt.ValidateReturningUserReadableIssue() != "" {
+		t.Fatal("Errored on invalid event instance string in not strict mode")
+	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	if dt.ValidateReturningUserReadableIssue() == "" {
+		t.Fatal("Did not error on invalid event instance string in not strict mode")
+	}
+	s = "latest"
+	if dt.ValidateReturningUserReadableIssue() != "" {
+		t.Fatal("Errored on valid event instance string in strict mode")
 	}
 }

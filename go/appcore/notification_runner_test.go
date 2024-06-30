@@ -89,8 +89,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if sn.Notification.ID != "event1Notification" {
 		t.Fatalf("Expected ScheduledNotificationAtIndex to return event notification, got %s", sn.Notification.ID)
 	}
-	// Expect it scheduled within 1s of now
-	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli())) > 1000 {
+	// Expect it scheduled within 100ms of now
+	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli())) > 100 {
 		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn.ScheduledAtEpochMilliseconds())
 	}
 	if plan.UnscheduledNotificationCount() != 1 {
@@ -109,17 +109,46 @@ func TestEventNotificationPlan(t *testing.T) {
 	if plan.ScheduledNotificationCount() != 2 {
 		t.Fatalf("Expected 2 scheduled notifications, got %d", plan.ScheduledNotificationCount())
 	}
-	sn = plan.ScheduledNotificationAtIndex(0)
-	if sn.Notification.ID != "event2Notification" {
+	sn2 := plan.ScheduledNotificationAtIndex(0)
+	if sn2.Notification.ID != "event2Notification" {
 		// Index is interterminate
-		sn = plan.ScheduledNotificationAtIndex(1)
+		sn2 = plan.ScheduledNotificationAtIndex(1)
 	}
-	if sn.Notification.ID != "event2Notification" {
+	if sn2.Notification.ID != "event2Notification" {
 		t.Fatalf("Expected ScheduledNotificationAtIndex to return event notification, got %s", sn.Notification.ID)
 	}
-	// Expect it scheduled within 1s of 60s from now
-	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli()-60000)) > 1000 {
-		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn.ScheduledAtEpochMilliseconds())
+	// Expect it scheduled within 100ms of 60s from now
+	if math.Abs(float64(sn2.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli()-60000)) > 100 {
+		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn2.ScheduledAtEpochMilliseconds())
+	}
+
+	// Fire again after delay. Testing lastest vs first eventInstance targeting
+	time.Sleep(110 * time.Millisecond)
+	ac.SendClientEvent("event1")
+	ac.SendClientEvent("event2")
+
+	plan, err = ac.NotificationPlan()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plan.ScheduledNotificationCount() != 2 {
+		t.Fatalf("Expected 2 scheduled notifications, got %d", plan.ScheduledNotificationCount())
+	}
+	first := plan.ScheduledNotificationAtIndex(0)
+	latest := plan.ScheduledNotificationAtIndex(1)
+	if first.Notification.ID != "event2Notification" {
+		// Index is interterminate
+		first = plan.ScheduledNotificationAtIndex(1)
+		latest = plan.ScheduledNotificationAtIndex(0)
+	}
+	// Check first has same time
+	if first.ScheduledAtEpochMilliseconds()-sn2.ScheduledAtEpochMilliseconds() != 0 {
+		t.Fatal("Event notifications scheduled around first event should not move in time")
+	}
+	// Check lastest has moved
+	latestMove := latest.ScheduledAtEpochMilliseconds() - sn.ScheduledAtEpochMilliseconds()
+	if latestMove < 100 || latestMove > 200 {
+		t.Fatal("latest should move if the event fired again")
 	}
 }
 

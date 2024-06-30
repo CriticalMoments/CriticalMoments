@@ -41,10 +41,33 @@ type IdealDevlieryConditions struct {
 	MaxWaitTime int       `json:"maxWaitTime"`
 }
 
+type EventInstanceTypeEnum int
+
+const (
+	// unknown, should not process. Could be type from future SDK
+	EventInstanceTypeUnknown EventInstanceTypeEnum = iota
+	// The notification's time is relative to the latest time the event occured
+	EventInstanceTypeLatest
+	// The notification's time is relative to the first time the event occured
+	EventInstanceTypeFirst
+)
+
 type DeliveryTime struct {
-	TimestampEpoch *int64  `json:"timestamp,omitempty"`
-	EventName      *string `json:"eventName,omitempty"`
-	EventOffset    *int    `json:"eventOffset,omitempty"`
+	TimestampEpoch      *int64  `json:"timestamp,omitempty"`
+	EventName           *string `json:"eventName,omitempty"`
+	EventOffset         *int    `json:"eventOffset,omitempty"`
+	EventInstanceString *string `json:"eventInstance,omitempty"`
+}
+
+func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
+	// Default to latest for nil/empty, but not unrecognized
+	if dt.EventInstanceString == nil || *dt.EventInstanceString == "" || *dt.EventInstanceString == "latest" {
+		return EventInstanceTypeLatest
+	}
+	if dt.EventInstanceString != nil && *dt.EventInstanceString == "first" {
+		return EventInstanceTypeFirst
+	}
+	return EventInstanceTypeUnknown
 }
 
 type jsonNotification struct {
@@ -113,6 +136,11 @@ func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
 	}
 	if d.TimestampEpoch != nil && d.EventOffset != nil {
 		return "DeliveryTime cannot have both a Timestamp and an EventOffset defined."
+	}
+	if StrictDatamodelParsing {
+		if d.EventInstance() == EventInstanceTypeUnknown {
+			return fmt.Sprintf("Notification event instance must be 'first' or 'latest', got '%v'", d.EventInstanceString)
+		}
 	}
 	return ""
 }
