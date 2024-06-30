@@ -457,7 +457,7 @@ func TestNoNamedActions(t *testing.T) {
 	}
 
 	pc.namedTriggers = make(map[string]*Trigger)
-	pc.notifications = make(map[string]*Notification)
+	pc.Notifications = make(map[string]*Notification)
 	if !pc.Validate() {
 		t.Fatal("empty actions should be allowed when no triggers or notifications reference them")
 	}

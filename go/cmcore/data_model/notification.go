@@ -117,6 +117,14 @@ func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
 	return ""
 }
 
+func (d *DeliveryTime) Timestamp() *time.Time {
+	if d.TimestampEpoch == nil {
+		return nil
+	}
+	time := time.Unix(*d.TimestampEpoch, 0)
+	return &time
+}
+
 func (n *Notification) UnmarshalJSON(data []byte) error {
 	var jn jsonNotification
 	err := json.Unmarshal(data, &jn)

@@ -1,0 +1,21 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "notifications": {
+    "event1Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event1"
+      }
+    },
+    "event2Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event2",
+        "eventOffset": 60
+      }
+    }
+  }
+}

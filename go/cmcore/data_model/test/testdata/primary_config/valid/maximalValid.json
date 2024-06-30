@@ -156,7 +156,14 @@
             "deliveryTime": {
               "timestamp": 1000
             }
-        }
+        },
+        "futureStaticNotification": {
+          "title": "title",
+          "body": "body",
+          "deliveryTime": {
+            "timestamp": 2224580934
+          }
+      }
     },
     "triggers": {
         "namedTriggers": {

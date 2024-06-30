@@ -43,7 +43,7 @@ type PrimaryConfig struct {
 	namedConditions map[string]*Condition
 
 	// Notifications
-	notifications map[string]*Notification
+	Notifications map[string]*Notification
 }
 
 func (pc *PrimaryConfig) DefaultTheme() *Theme {
@@ -336,9 +336,9 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		for notificationID, notificaiton := range jpc.Notifications {
 			notificaiton.ID = notificationID
 		}
-		pc.notifications = jpc.Notifications
+		pc.Notifications = jpc.Notifications
 	} else {
-		pc.notifications = make(map[string]*Notification)
+		pc.Notifications = make(map[string]*Notification)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
@@ -461,7 +461,7 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 			return fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue)
 		}
 	}
-	for notificationID, notification := range pc.notifications {
+	for notificationID, notification := range pc.Notifications {
 		if notIssue := notification.ValidateReturningUserReadableIssue(); notIssue != "" {
 			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notIssue)
 		}
@@ -534,7 +534,7 @@ func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() str
 	}
 
 	// Validate actions in notifications exist
-	for id, notif := range pc.notifications {
+	for id, notif := range pc.Notifications {
 		if notif.ActionName != "" {
 			_, ok := pc.namedActions[notif.ActionName]
 			if !ok {
