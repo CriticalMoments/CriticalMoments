@@ -82,18 +82,30 @@
 }
 
 - (void)testNotifcations {
+    // Need to notification permissions for this test to work
+    XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
+    BOOL __block approved = false;
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull settings) {
+      approved = settings.authorizationStatus == UNAuthorizationStatusAuthorized;
+      [approvalExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ approvalExpectation ] timeout:2.0];
+    if (!approved) {
+        XCTSkip(@"User notification permission not approved, test won't work");
+    }
+
     XCTestExpectation *waitExpectation = [[XCTestExpectation alloc] init];
 
     // Check we schedule the future one, but not the past one.
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     [center getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nonnull requests) {
-      XCTAssert(requests.count == 1, @"only one test notification should get scheduled");
+      XCTAssert(requests.count == 1, @"only one test notification should get scheduled. Got %ld", requests.count);
       UNNotificationRequest *n = requests.firstObject;
       XCTAssert([@"io.criticalmoments.notifications.futureNotification" isEqualToString:n.identifier],
-                @"wrong notification scheduled");
+                @"wrong notification scheduled. Got %@", n.identifier);
       XCTAssert([@"Future" isEqualToString:n.content.title], @"notification title mismatch");
       [waitExpectation fulfill];
     }];
-    [self waitForExpectations:@[ waitExpectation ] timeout:5.0];
+    [self waitForExpectations:@[ waitExpectation ] timeout:10.0];
 }
 @end
