@@ -62,6 +62,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.Body != "" {
 		t.Fatal("failed to parse body as nil")
 	}
+	if n.Sound != "" {
+		t.Fatal("failed to parse sound as nil")
+	}
 	if n.ActionName != "" {
 		t.Fatal("failed to parse actionName as nil")
 	}
@@ -107,6 +110,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	}
 	if n.Body != "body" {
 		t.Fatal("failed to parse body")
+	}
+	if n.Sound != "default" {
+		t.Fatal("failed to parse sound")
 	}
 	if n.ActionName != "actionName" {
 		t.Fatal("failed to parse actionName")

@@ -1,6 +1,7 @@
 {
   "title": "title",
   "body": "body",
+  "sound": "default",
   "actionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryLocalTimeOfDayStart": 60,

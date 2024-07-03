@@ -26,6 +26,7 @@ type Notification struct {
 	Title      string
 	Body       string
 	ActionName string
+	Sound      string
 
 	DeliveryTime                      DeliveryTime
 	DeliveryDaysOfWeek                []time.Weekday
@@ -74,6 +75,7 @@ type jsonNotification struct {
 	Title      string `json:"title,omitempty"`
 	Body       string `json:"body,omitempty"`
 	ActionName string `json:"actionName,omitempty"`
+	Sound      string `json:"sound,omitempty"`
 
 	DeliveryTime                      DeliveryTime `json:"deliveryTime,omitempty"`
 	DeliveryDaysOfWeekString          string       `json:"deliveryDaysOfWeek,omitempty"`
@@ -162,6 +164,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 
 	n.Title = jn.Title
 	n.Body = jn.Body
+	n.Sound = jn.Sound
 	n.ActionName = jn.ActionName
 	n.IdealDevlieryConditions = jn.IdealDeliveryConditions
 	n.CancelationEvents = jn.CancelationEvents

@@ -1140,6 +1140,25 @@
         }
     },
     "notifications": {
+        "appStartNotification": {
+          "title": "App Started",
+          "body": "The app was last started 5 seconds ago",
+          "deliveryTime": {
+            "eventName": "app_start",
+            "eventOffset": 5,
+            "eventInstance": "latest"
+          }
+        },
+        "appBackground": {
+          "title": "App Backgrounded",
+          "sound": "default",
+          "body": "The app was last moved to background 2 seconds ago",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventOffset": 2,
+            "eventInstance": "latest"
+          }
+        },
         "pastDueNotification": {
           "title": "Too old, should not show",
           "body": "Too old, should not show",

@@ -39,12 +39,7 @@
         return;
     }
 
-    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-    content.title = notifSchedule.notification.title;
-    // TODO_P0 check this can be empty, we allow empty in config
-    content.body = notifSchedule.notification.body;
-    // TODO_P0 -- more options, at least silent/default.
-    // content.sound = [UNNotificationSound defaultSound];
+    UNNotificationContent *content = [CMNotificationHandler buildNotificationContent:notifSchedule.notification];
 
     // TODO: would really rather use exact time. This could be messed up by timezones? And too complicated. Look at
     // android API for how I want to implement dow and tod filters (go or here). Here might respect timezone!
@@ -69,6 +64,22 @@
                    NSLog(@"CriticalMoments: Error scheduling notification: %@", error);
                }
              }];
+}
+
++ (UNNotificationContent *)buildNotificationContent:(DatamodelNotification *)notification {
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    // TODO_P0: check this is required, we require in config
+    content.title = notification.title;
+    // TODO_P0 check this can be empty, we allow empty in config
+    content.body = notification.body;
+
+    if ([@"default" isEqualToString:notification.sound]) {
+        content.sound = [UNNotificationSound defaultSound];
+    } else if (notification.sound.length > 0) {
+        // Note: invalid names fallback to default. Keep system behaviour.
+        content.sound = [UNNotificationSound soundNamed:notification.sound];
+    }
+    return content;
 }
 
 + (NSString *)notificationId:(DatamodelNotification *)notif {
