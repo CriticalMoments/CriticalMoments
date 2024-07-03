@@ -11,15 +11,14 @@ func TestNotificationList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
 	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	plan, err := ac.NotificationPlan()
-	if err != nil {
-		t.Fatal(err)
-	}
+	plan := lb.lastNotificationPlan
 	if plan.UnscheduledNotificationCount() != 1 {
 		t.Fatalf("Expected 1 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
 	}
@@ -53,15 +52,22 @@ func TestEventNotificationPlan(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
+	if lb.lastNotificationPlan != nil {
+		t.Fatal("NP binding set too soon")
+	}
+
 	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// No events, should be nothing scheduled
-	plan, err := ac.NotificationPlan()
-	if err != nil {
-		t.Fatal(err)
+	plan := lb.lastNotificationPlan
+	if plan == nil {
+		t.Fatal("NP binding not set after startup")
 	}
 	if plan.ScheduledNotificationCount() != 0 {
 		t.Fatalf("Expected 0 scheduled notifications, got %d", plan.ScheduledNotificationCount())
@@ -75,10 +81,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	plan, err = ac.NotificationPlan()
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	plan = lb.lastNotificationPlan
 	if plan.ScheduledNotificationCount() != 1 {
 		t.Fatalf("Expected 1 scheduled notification, got %d", plan.ScheduledNotificationCount())
 	}
@@ -102,7 +106,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	plan, err = ac.NotificationPlan()
+
+	plan = lb.lastNotificationPlan
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +132,7 @@ func TestEventNotificationPlan(t *testing.T) {
 	ac.SendClientEvent("event1")
 	ac.SendClientEvent("event2")
 
-	plan, err = ac.NotificationPlan()
+	plan = lb.lastNotificationPlan
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,6 +155,23 @@ func TestEventNotificationPlan(t *testing.T) {
 	if latestMove < 100 || latestMove > 200 {
 		t.Fatal("latest should move if the event fired again")
 	}
-}
 
-// TODO_P0: test event processor: firing event should dispatch "schedule notification"
+	// Sent an event which should cancel the "2" notification
+	ac.SendClientEvent("cancel2event")
+
+	plan = lb.lastNotificationPlan
+	if plan.ScheduledNotificationCount() != 1 {
+		t.Fatalf("Expected 1 scheduled notification, got %d", plan.ScheduledNotificationCount())
+	}
+	sn = plan.ScheduledNotificationAtIndex(0)
+	if sn == nil {
+		t.Fatal("Expected ScheduledNotificationAtIndex to return a value")
+	}
+	if sn.Notification.ID != "event1Notification" {
+		t.Fatalf("Expected ScheduledNotificationAtIndex to return event notification, got %s", sn.Notification.ID)
+	}
+	// Check cache is working
+	if *ac.seenCancelationEvents["cancel2event"] != true {
+		t.Fatal("Expected cancel2event to be in seenCancelationEvents")
+	}
+}

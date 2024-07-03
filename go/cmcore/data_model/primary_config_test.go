@@ -327,6 +327,20 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if err != nil || len(c3Var.Variables) != 1 || c3Var.Variables[0] != "os_version" {
 		t.Fatal("complex condition failed to parse")
 	}
+
+	// Notifications - tested in more depth in notification_test.go
+	if len(pc.Notifications) != 2 {
+		t.Fatal("Failed to parse notifications")
+	}
+	if pc.Notifications["testNotification"] == nil {
+		t.Fatal("Failed to parse notification id")
+	}
+	if pc.Notifications["testNotification"].ID != "testNotification" {
+		t.Fatal("Failed to parse notification id")
+	}
+	if pc.Notifications["testNotification"].Title != "Notification title" {
+		t.Fatal("Failed to parse notification title")
+	}
 }
 
 func TestFutureConditionStrictValidation(t *testing.T) {

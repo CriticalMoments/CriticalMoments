@@ -13,6 +13,7 @@
     "event2Notification": {
       "title": "title",
       "body": "body",
+      "cancelationEvents": ["cancel2event"],
       "deliveryTime": {
         "eventName": "event2",
         "eventOffset": 60,

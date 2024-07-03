@@ -216,7 +216,8 @@
     [cm checkInternalTestCondition:condition
                            handler:^(bool result, NSError *error) {
                              if (!result || error) {
-                                 XCTAssert(false, "approx location condition failed to return");
+                                 XCTAssert(false, "approx location condition failed - note, this test requires you to "
+                                                  "be in Toronto to pass! Manual runs only");
                              }
                              [expectation1 fulfill];
                            }];
