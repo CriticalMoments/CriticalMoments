@@ -13,6 +13,7 @@ func TestNotificationActionValidators(t *testing.T) {
 	a := Notification{
 		Title:              "Title",
 		Body:               "Body",
+		BadgeCount:         -1,
 		ActionName:         "ActionName",
 		ID:                 "io.criticalmoments.test",
 		DeliveryDaysOfWeek: []time.Weekday{time.Monday, time.Tuesday},
@@ -34,6 +35,14 @@ func TestNotificationActionValidators(t *testing.T) {
 	a.Title = ""
 	if a.Validate() {
 		t.Fatal("Allowed empty title and body")
+	}
+	a.BadgeCount = 1
+	if !a.Validate() {
+		t.Fatal("Should be valid with badge count")
+	}
+	a.BadgeCount = -1
+	if a.Validate() {
+		t.Fatal("Needs a title, body, or badge count")
 	}
 	a.Title = "title"
 	if !a.Validate() {
@@ -105,11 +114,17 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.Body != "" {
 		t.Fatal("failed to parse body as nil")
 	}
+	if n.BadgeCount != -1 {
+		t.Fatal("failed to parse badge count as unset")
+	}
 	if n.Sound != "" {
 		t.Fatal("failed to parse sound as nil")
 	}
 	if n.RelevanceScore != nil {
 		t.Fatal("failed to parse relevance score as nil")
+	}
+	if n.InterruptionLevel != "" {
+		t.Fatal("failed to parse interruption level as nil")
 	}
 	if n.ActionName != "" {
 		t.Fatal("failed to parse actionName as nil")
@@ -157,11 +172,17 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if n.Body != "body" {
 		t.Fatal("failed to parse body")
 	}
+	if n.BadgeCount != 10 {
+		t.Fatal("failed to parse badge count")
+	}
 	if n.Sound != "default" {
 		t.Fatal("failed to parse sound")
 	}
 	if *n.RelevanceScore != 0.5 {
 		t.Fatal("failed to parse relevance score")
+	}
+	if n.InterruptionLevel != "passive" {
+		t.Fatal("failed to parse interruption level")
 	}
 	if n.ActionName != "actionName" {
 		t.Fatal("failed to parse actionName")
@@ -202,7 +223,13 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 	cases := []string{
 		"./test/testdata/actions/notifications/invalid/invalidCondition.json",
 		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json", // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json",       // add_test_case
 	}
+
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
 
 	for _, testFile := range cases {
 		testFileData, err := os.ReadFile(testFile)

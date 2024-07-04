@@ -28,6 +28,7 @@ type Notification struct {
 	ID         string
 	Title      string
 	Body       string
+	BadgeCount int
 	ActionName string
 	Sound      string
 
@@ -80,6 +81,7 @@ func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
 type jsonNotification struct {
 	Title      string `json:"title,omitempty"`
 	Body       string `json:"body,omitempty"`
+	BadgeCount *int   `json:"badgeCount,omitempty"`
 	ActionName string `json:"actionName,omitempty"`
 	Sound      string `json:"sound,omitempty"`
 
@@ -107,8 +109,10 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	if !ignoreID && n.ID == "" {
 		return "Notification must have ID"
 	}
-	if n.Title == "" && n.Body == "" {
-		return "Notifications must have a title and/or a body."
+	if n.Title == "" &&
+		n.Body == "" &&
+		n.BadgeCount < 0 {
+		return "Notifications must have one or more of: title, body, and badgeCount."
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
 		return "Notifications must have at least one day of week valid for delivery."
@@ -189,6 +193,14 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.RelevanceScore = jn.RelevanceScore
 	n.InterruptionLevel = jn.InterruptionLevel
 
+	if jn.BadgeCount != nil {
+		n.BadgeCount = *jn.BadgeCount
+		if StrictDatamodelParsing && n.BadgeCount < 0 {
+			return NewUserPresentableError("Notification badgeCount must be greater than or equal to 0")
+		}
+	} else {
+		n.BadgeCount = -1 // default to -1 for unset
+	}
 	if jn.DeliveryDaysOfWeekString != "" {
 		n.DeliveryDaysOfWeek = parseDaysOfWeekString(jn.DeliveryDaysOfWeekString)
 	} else {

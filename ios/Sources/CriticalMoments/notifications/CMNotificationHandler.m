@@ -68,8 +68,14 @@
 
 + (UNNotificationContent *)buildNotificationContent:(DatamodelNotification *)notification {
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+
     content.title = notification.title;
     content.body = notification.body;
+
+    // Zero is valid to remove badge. Any negative value should be nil.
+    if (notification.badgeCount >= 0) {
+        content.badge = [NSNumber numberWithLong:notification.badgeCount];
+    }
 
     if ([@"default" isEqualToString:notification.sound]) {
         content.sound = [UNNotificationSound defaultSound];

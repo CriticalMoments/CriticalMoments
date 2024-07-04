@@ -3,6 +3,8 @@
   "body": "body",
   "sound": "default",
   "relevanceScore": 0.5,
+  "interruptionLevel": "passive",
+  "badgeCount": 10,
   "actionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryLocalTimeOfDayStart": 60,
