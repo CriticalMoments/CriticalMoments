@@ -33,7 +33,10 @@ jobs:
               body = payload.pull_request.body;
             }
 
-            return body.includes(directive);
+            console.log("Checking for ML CR directive in PR body (request_ml_cr)");
+            let result = body.includes(directive);
+            console.log("Is requesting ML CR: " + result);
+            return result;
       
       - uses: actions/checkout@v3
         if: steps.directive-validation.outputs.result == 'true'
