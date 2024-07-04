@@ -22,11 +22,12 @@ const defaultDeliveryWindowLocalTimeStart = 9 * 60 * 60
 const defaultDeliveryWindowLocalTimeEnd = 21 * 60 * 60
 
 type Notification struct {
-	ID         string
-	Title      string
-	Body       string
-	ActionName string
-	Sound      string
+	ID             string
+	Title          string
+	Body           string
+	ActionName     string
+	Sound          string
+	RelevanceScore *float64
 
 	DeliveryTime                      DeliveryTime
 	DeliveryDaysOfWeek                []time.Weekday
@@ -72,10 +73,11 @@ func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
 }
 
 type jsonNotification struct {
-	Title      string `json:"title,omitempty"`
-	Body       string `json:"body,omitempty"`
-	ActionName string `json:"actionName,omitempty"`
-	Sound      string `json:"sound,omitempty"`
+	Title          string   `json:"title,omitempty"`
+	Body           string   `json:"body,omitempty"`
+	ActionName     string   `json:"actionName,omitempty"`
+	Sound          string   `json:"sound,omitempty"`
+	RelevanceScore *float64 `json:"relevanceScore,omitempty"`
 
 	DeliveryTime                      DeliveryTime `json:"deliveryTime,omitempty"`
 	DeliveryDaysOfWeekString          string       `json:"deliveryDaysOfWeek,omitempty"`
@@ -103,6 +105,9 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
 		return "Notifications must have at least one day of week valid for delivery."
+	}
+	if n.RelevanceScore != nil && (*n.RelevanceScore < 0 || *n.RelevanceScore > 1) {
+		return "Relevance score must be between 0 and 1 if provided."
 	}
 	if n.CancelationEvents != nil {
 		for _, event := range *n.CancelationEvents {
@@ -169,6 +174,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.IdealDevlieryConditions = jn.IdealDeliveryConditions
 	n.CancelationEvents = jn.CancelationEvents
 	n.DeliveryTime = jn.DeliveryTime
+	n.RelevanceScore = jn.RelevanceScore
 
 	if jn.DeliveryDaysOfWeekString != "" {
 		n.DeliveryDaysOfWeek = parseDaysOfWeekString(jn.DeliveryDaysOfWeekString)
@@ -215,4 +221,13 @@ func parseDaysOfWeekString(i string) []time.Weekday {
 	}
 
 	return days
+}
+
+// Gomobile accessor (doesn't support pointers)
+func (n *Notification) GetRelevanceScore() float64 {
+	return *n.RelevanceScore
+}
+
+func (n *Notification) HasRelevanceScore() bool {
+	return n.RelevanceScore != nil
 }

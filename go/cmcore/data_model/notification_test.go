@@ -48,6 +48,26 @@ func TestNotificationActionValidators(t *testing.T) {
 	if a.Validate() {
 		t.Fatal("Allowed empty ID")
 	}
+	a.ID = "io.criticalmoments.test"
+	if !a.Validate() {
+		t.Fatal("should be valid")
+	}
+	rc := 0.5
+	a.RelevanceScore = &rc
+	if !a.Validate() {
+		t.Fatal("should be valid")
+	}
+	rc = 1.1
+	a.RelevanceScore = &rc
+	if a.Validate() {
+		t.Fatal("Allowed invalid relevance score")
+	}
+	rc = -0.0001
+	a.RelevanceScore = &rc
+	if a.Validate() {
+		t.Fatal("Allowed invalid relevance score")
+	}
+	a.RelevanceScore = nil
 }
 
 func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
@@ -69,6 +89,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	}
 	if n.Sound != "" {
 		t.Fatal("failed to parse sound as nil")
+	}
+	if n.RelevanceScore != nil {
+		t.Fatal("failed to parse relevance score as nil")
 	}
 	if n.ActionName != "" {
 		t.Fatal("failed to parse actionName as nil")
@@ -118,6 +141,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	}
 	if n.Sound != "default" {
 		t.Fatal("failed to parse sound")
+	}
+	if *n.RelevanceScore != 0.5 {
+		t.Fatal("failed to parse relevance score")
 	}
 	if n.ActionName != "actionName" {
 		t.Fatal("failed to parse actionName")

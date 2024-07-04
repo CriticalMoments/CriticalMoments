@@ -77,6 +77,13 @@
         // Note: invalid names fallback to default. Keep system behaviour.
         content.sound = [UNNotificationSound soundNamed:notification.sound];
     }
+
+    if (@available(iOS 15.0, *)) {
+        if ([notification hasRelevanceScore]) {
+            content.relevanceScore = [notification getRelevanceScore];
+        }
+    }
+
     return content;
 }
 

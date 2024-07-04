@@ -2,6 +2,7 @@
   "title": "title",
   "body": "body",
   "sound": "default",
+  "relevanceScore": 0.5,
   "actionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryLocalTimeOfDayStart": 60,
