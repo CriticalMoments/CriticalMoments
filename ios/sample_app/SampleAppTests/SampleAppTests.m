@@ -95,17 +95,102 @@
         XCTSkip(@"User notification permission not approved, test won't work");
     }
 
-    XCTestExpectation *waitExpectation = [[XCTestExpectation alloc] init];
-
-    // Check we schedule the future one, but not the past one.
-    [center getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nonnull requests) {
-      XCTAssert(requests.count == 1, @"only one test notification should get scheduled. Got %ld", requests.count);
-      UNNotificationRequest *n = requests.firstObject;
-      XCTAssert([@"io.criticalmoments.notifications.futureNotification" isEqualToString:n.identifier],
-                @"wrong notification scheduled. Got %@", n.identifier);
-      XCTAssert([@"Future" isEqualToString:n.content.title], @"notification title mismatch");
-      [waitExpectation fulfill];
-    }];
-    [self waitForExpectations:@[ waitExpectation ] timeout:10.0];
+    // Check the furute notification is scheduled
+    XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.futureNotification"],
+              @"future notification not scheduled");
+    // Check the past notification is not
+    XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.pastDueNotification"],
+              @"past notification scheduled");
 }
+
+- (void)testNotifcationEventsAndCleanup {
+    // Need to notification permissions for this test to work
+    XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
+    BOOL __block approved = false;
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull settings) {
+      approved = settings.authorizationStatus == UNAuthorizationStatusAuthorized;
+      [approvalExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ approvalExpectation ] timeout:2.0];
+    if (!approved) {
+        XCTSkip(@"User notification permission not approved, test won't work");
+    }
+
+    // Manually add a notification, as if it had been leftover from a prior config
+    [self scheduleNotificationWithId:@"io.criticalmoments.notifications.priorNotification"];
+    // Add a notification as if the app added it, we shouldn't mess with this
+    [self scheduleNotificationWithId:@"app_notification"];
+
+    // Check the manual notification is scheduled
+    XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.priorNotification"],
+              @"prior notification not scheduled");
+    // Check the app notification is scheduled
+    XCTAssert([self notificationScheduled:@"app_notification"], @"app notification not scheduled");
+    // Check the event triggered is not scheduled as the event hasn't fired yet
+    XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
+              @"event notification scheduled too soon");
+
+    // Send an event that triggers a notificaiton refresh
+    [CriticalMoments.sharedInstance sendEvent:@"trigger_notificaiton_event"];
+
+    // Wait for propigation
+    sleep(2.0);
+
+    // Check we unscheduled the prior notification in our cleanup
+    XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.priorNotification"],
+              @"prior notification should be unscheduled");
+    // Check the app notification is still scheduled
+    XCTAssert([self notificationScheduled:@"app_notification"], @"app notification not scheduled");
+    // Check the event trigger worked
+    XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
+              @"event notif not scheduled");
+
+    // Send an event that triggers cancelation of notification
+    [CriticalMoments.sharedInstance sendEvent:@"cancel_notification"];
+
+    // Wait for propigation
+    sleep(2.0);
+
+    // Check we unscheduled the prior notification in our cleanup
+    XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.priorNotification"],
+              @"prior notification should be unscheduled");
+    // Check the app notification is still scheduled
+    XCTAssert([self notificationScheduled:@"app_notification"], @"app notification not scheduled");
+    // Check the event trigger worked
+    XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
+              @"event notif is scheduled after cancelation");
+}
+
+- (void)scheduleNotificationWithId:(NSString *)notifId {
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = @"Test Notification";
+    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:10
+                                                                                                    repeats:NO];
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notifId
+                                                                          content:content
+                                                                          trigger:trigger];
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center addNotificationRequest:request withCompletionHandler:nil];
+}
+
+- (bool)notificationScheduled:(NSString *)notifId {
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
+    bool __block found = false;
+
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center
+        getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nullable requests) {
+          for (UNNotificationRequest *request in requests) {
+              if ([request.identifier isEqualToString:notifId]) {
+                  found = true;
+              }
+          }
+          [expectation fulfill];
+        }];
+
+    [self waitForExpectations:@[ expectation ] timeout:2.0];
+    return found;
+}
+
 @end

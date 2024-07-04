@@ -248,6 +248,12 @@ func parseDaysOfWeekString(i string) []time.Weekday {
 	return days
 }
 
+const NotificationUniqueIDPrefix = "io.criticalmoments.notifications."
+
+func (n *Notification) UniqueID() string {
+	return fmt.Sprintf("%v%v", NotificationUniqueIDPrefix, n.ID)
+}
+
 // Gomobile accessor (doesn't support pointers)
 func (n *Notification) GetRelevanceScore() float64 {
 	return *n.RelevanceScore

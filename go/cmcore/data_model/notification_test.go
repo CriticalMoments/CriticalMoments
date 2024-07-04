@@ -357,3 +357,12 @@ func TestDeliveryTimeValidation(t *testing.T) {
 		t.Fatal("Errored on valid event instance string in strict mode")
 	}
 }
+
+func TestNotificationUniqueID(t *testing.T) {
+	n := Notification{
+		ID: "test",
+	}
+	if n.UniqueID() != "io.criticalmoments.notifications.test" {
+		t.Fatal("failed to generate unique ID")
+	}
+}

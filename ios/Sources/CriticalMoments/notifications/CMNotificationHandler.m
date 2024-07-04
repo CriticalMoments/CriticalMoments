@@ -13,25 +13,29 @@
 
 + (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)plan {
     // Schedule needed notifications
+    NSMutableSet<NSString *> *scheduleNotifIds = [[NSMutableSet alloc] init];
     for (int i = 0; i < plan.scheduledNotificationCount; i++) {
-        AppcoreScheduledNotification *notif = [plan scheduledNotificationAtIndex:i];
-        [CMNotificationHandler scheduleNotification:notif];
+        AppcoreScheduledNotification *sn = [plan scheduledNotificationAtIndex:i];
+        [CMNotificationHandler scheduleNotification:sn];
+        [scheduleNotifIds addObject:[sn.notification uniqueID]];
     }
 
-    // Unschedule all notifications that no longer apply
-    if (plan.unscheduledNotificationCount > 0) {
-        NSMutableArray<NSString *> *unscheduleNotifIds = [[NSMutableArray alloc] init];
-        for (int i = 0; i < plan.unscheduledNotificationCount; i++) {
-            DatamodelNotification *notif = [plan unscheduledNotificationAtIndex:i];
-            if (!notif) {
-                continue;
-            }
-            NSString *notifId = [CMNotificationHandler notificationId:notif];
-            [unscheduleNotifIds addObject:notifId];
-        }
-        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-        [center removePendingNotificationRequestsWithIdentifiers:unscheduleNotifIds];
-    }
+    // Unschedule all notifications that are not in scheduled list
+    // Note: can't simply use plan.unscheduledNotification, as we also want to delete any from prior configs. Use our
+    // namespace instead.
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center
+        getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nullable requests) {
+          NSMutableArray<NSString *> *notifIdsToUnschedule = [[NSMutableArray alloc] init];
+          for (UNNotificationRequest *request in requests) {
+              // Notificaitons in our namespace, which aren't scheduled
+              if (![scheduleNotifIds containsObject:request.identifier] &&
+                  [request.identifier hasPrefix:DatamodelNotificationUniqueIDPrefix]) {
+                  [notifIdsToUnschedule addObject:request.identifier];
+              }
+          }
+          [center removePendingNotificationRequestsWithIdentifiers:notifIdsToUnschedule];
+        }];
 }
 
 + (void)scheduleNotification:(AppcoreScheduledNotification *)notifSchedule {
@@ -51,7 +55,7 @@
     UNCalendarNotificationTrigger *trigger =
         [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:dateComponents repeats:NO];
 
-    NSString *notifId = [CMNotificationHandler notificationId:notifSchedule.notification];
+    NSString *notifId = [notifSchedule.notification uniqueID];
 
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notifId
                                                                           content:content
@@ -103,10 +107,6 @@
     }
 
     return content;
-}
-
-+ (NSString *)notificationId:(DatamodelNotification *)notif {
-    return [NSString stringWithFormat:@"io.criticalmoments.notifications.%@", notif.id_];
 }
 
 @end

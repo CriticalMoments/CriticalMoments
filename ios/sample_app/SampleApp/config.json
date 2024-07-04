@@ -1172,6 +1172,14 @@
           "deliveryTime": {
             "timestamp": 2224580934
           }
+        },
+        "eventTriggeredNotification": {
+          "title": "event triggered",
+          "cancelationEvents": ["cancel_notification"],
+          "deliveryTime": {
+            "eventName": "trigger_notificaiton_event",
+            "eventOffset": 600
+          }
         }
     }
 }
