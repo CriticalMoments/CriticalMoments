@@ -6,18 +6,40 @@ permissions:
   contents: read
   actions: read
 
-on: pull_request
+on:
+  issue_comment:
+    types: [created]
 
 jobs:
   run_code_review:
+    # Only run if this is a PR
+    if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
+      - name: Check if PR comment instructs us to start ML CR
+        id: directive-validation
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const directive = 'request_ml_cr';
+            const payload = context.payload;
+
+            let body = '';
+
+            if (payload.pull_request) {
+              body = payload.pull_request.body;
+            }
+
+            return body.includes(directive);
+      
       - uses: actions/checkout@v3
+        if: steps.directive-validation.outputs.result == 'true'
         with:
           fetch-depth: 0
 
       - name: Code Review GPT
         uses: mattzcarey/code-review-gpt@v0.1.8
+        if: steps.directive-validation.outputs.result == 'true'
         with:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MODEL: 'gpt-4o'
