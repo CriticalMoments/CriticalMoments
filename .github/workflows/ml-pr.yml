@@ -33,7 +33,8 @@ jobs:
               body = payload.pull_request.body;
             }
 
-            console.log("Checking for ML CR directive in PR body (request_ml_cr)");
+            console.log("Checking for ML CR directive in PR body (request_ml_cr) in comment: " + body);
+            console.log("context.payload: " + JSON.stringify(context.payload));
             let result = body.includes(directive);
             console.log("Is requesting ML CR: " + result);
             return result;
