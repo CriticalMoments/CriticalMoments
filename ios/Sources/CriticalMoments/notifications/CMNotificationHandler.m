@@ -68,9 +68,7 @@
 
 + (UNNotificationContent *)buildNotificationContent:(DatamodelNotification *)notification {
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-    // TODO_P0: check this is required, we require in config
     content.title = notification.title;
-    // TODO_P0 check this can be empty, we allow empty in config
     content.body = notification.body;
 
     if ([@"default" isEqualToString:notification.sound]) {

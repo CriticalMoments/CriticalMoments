@@ -33,9 +33,14 @@ func TestNotificationActionValidators(t *testing.T) {
 	}
 	a.Title = ""
 	if a.Validate() {
-		t.Fatal("Allowed empty title")
+		t.Fatal("Allowed empty title and body")
 	}
 	a.Title = "title"
+	if !a.Validate() {
+		t.Fatal("should be valid")
+	}
+	a.Title = ""
+	a.Body = "body"
 	if !a.Validate() {
 		t.Fatal("should be valid")
 	}
@@ -151,8 +156,7 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
 	cases := []string{
-		"./test/testdata/actions/notifications/invalid/invalid.json",
-		"./test/testdata/actions/notifications/invalid/invalidCondition.json",        // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidCondition.json",
 		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json", // add_test_case
 	}
 

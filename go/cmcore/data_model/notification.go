@@ -98,8 +98,8 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	if !ignoreID && n.ID == "" {
 		return "Notification must have ID"
 	}
-	if n.Title == "" {
-		return "Notifications must have a title."
+	if n.Title == "" && n.Body == "" {
+		return "Notifications must have a title and/or a body."
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
 		return "Notifications must have at least one day of week valid for delivery."
