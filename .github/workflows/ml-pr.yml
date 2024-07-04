@@ -34,7 +34,9 @@ jobs:
             }
 
             console.log("Checking for ML CR directive in PR body (request_ml_cr) in comment: " + body);
-            console.log("context.payload: " + JSON.stringify(context.payload));
+            console.log("comment: " + JSON.stringify(palyload.comment));
+            console.log("comment: " + JSON.stringify(palyload.comment.body));
+            console.log("context.payload: " + JSON.stringify(payload));
             let result = body.includes(directive);
             console.log("Is requesting ML CR: " + result);
             return result;
