@@ -68,6 +68,24 @@ func TestNotificationActionValidators(t *testing.T) {
 		t.Fatal("Allowed invalid relevance score")
 	}
 	a.RelevanceScore = nil
+	a.InterruptionLevel = "passive"
+	if !a.Validate() {
+		t.Fatal("should be valid")
+	}
+	a.InterruptionLevel = "futureUnknown"
+	if !a.Validate() {
+		t.Fatal("should not error since not strict")
+	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+	a.InterruptionLevel = "futureUnknown"
+	if a.Validate() {
+		t.Fatal("should not be valid if strict")
+	}
+	StrictDatamodelParsing = false
+	a.InterruptionLevel = ""
 }
 
 func TestJsonParsingMinimalFieldsNotif(t *testing.T) {

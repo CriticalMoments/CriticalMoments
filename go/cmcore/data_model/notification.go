@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 )
@@ -21,13 +22,17 @@ var allDaysOfWeek = []time.Weekday{
 const defaultDeliveryWindowLocalTimeStart = 9 * 60 * 60
 const defaultDeliveryWindowLocalTimeEnd = 21 * 60 * 60
 
+var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
+
 type Notification struct {
-	ID             string
-	Title          string
-	Body           string
-	ActionName     string
-	Sound          string
-	RelevanceScore *float64
+	ID         string
+	Title      string
+	Body       string
+	ActionName string
+	Sound      string
+
+	RelevanceScore    *float64
+	InterruptionLevel string
 
 	DeliveryTime                      DeliveryTime
 	DeliveryDaysOfWeek                []time.Weekday
@@ -73,11 +78,13 @@ func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
 }
 
 type jsonNotification struct {
-	Title          string   `json:"title,omitempty"`
-	Body           string   `json:"body,omitempty"`
-	ActionName     string   `json:"actionName,omitempty"`
-	Sound          string   `json:"sound,omitempty"`
-	RelevanceScore *float64 `json:"relevanceScore,omitempty"`
+	Title      string `json:"title,omitempty"`
+	Body       string `json:"body,omitempty"`
+	ActionName string `json:"actionName,omitempty"`
+	Sound      string `json:"sound,omitempty"`
+
+	RelevanceScore    *float64 `json:"relevanceScore,omitempty"`
+	InterruptionLevel string   `json:"interruptionLevel,omitempty"`
 
 	DeliveryTime                      DeliveryTime `json:"deliveryTime,omitempty"`
 	DeliveryDaysOfWeekString          string       `json:"deliveryDaysOfWeek,omitempty"`
@@ -108,6 +115,11 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	}
 	if n.RelevanceScore != nil && (*n.RelevanceScore < 0 || *n.RelevanceScore > 1) {
 		return "Relevance score must be between 0 and 1 if provided."
+	}
+	if StrictDatamodelParsing && n.InterruptionLevel != "" {
+		if !slices.Contains(validInterruptionLevels, n.InterruptionLevel) {
+			return fmt.Sprintf("Interruption level must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel)
+		}
 	}
 	if n.CancelationEvents != nil {
 		for _, event := range *n.CancelationEvents {
@@ -175,6 +187,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.CancelationEvents = jn.CancelationEvents
 	n.DeliveryTime = jn.DeliveryTime
 	n.RelevanceScore = jn.RelevanceScore
+	n.InterruptionLevel = jn.InterruptionLevel
 
 	if jn.DeliveryDaysOfWeekString != "" {
 		n.DeliveryDaysOfWeek = parseDaysOfWeekString(jn.DeliveryDaysOfWeekString)

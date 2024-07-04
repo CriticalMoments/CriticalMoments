@@ -84,6 +84,18 @@
         }
     }
 
+    if (@available(iOS 15.0, *)) {
+        if ([@"passive" isEqualToString:notification.interruptionLevel]) {
+            content.interruptionLevel = UNNotificationInterruptionLevelPassive;
+        } else if ([@"active" isEqualToString:notification.interruptionLevel]) {
+            content.interruptionLevel = UNNotificationInterruptionLevelActive;
+        } else if ([@"critical" isEqualToString:notification.interruptionLevel]) {
+            content.interruptionLevel = UNNotificationInterruptionLevelCritical;
+        } else if ([@"timeSensitive" isEqualToString:notification.interruptionLevel]) {
+            content.interruptionLevel = UNNotificationInterruptionLevelTimeSensitive;
+        }
+    }
+
     return content;
 }
 
