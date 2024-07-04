@@ -1,14 +1,5 @@
 name: Code Review GPT
 
-# Our ML code review tool should remine me to remove this coment and typos
-# TODO: Add a comment to remine me to remove this coment and typos
-
-permissions:
-  id-token: write
-  pull-requests: write
-  contents: read
-  actions: read
-
 on: pull_request
 
 jobs:
