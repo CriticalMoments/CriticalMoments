@@ -8,11 +8,12 @@ permissions:
 
 on:
   pull_request:
-    types: [ ready_for_review ]
+    types: [ review_requested ]
 
 jobs:
   run_code_review:
     runs-on: ubuntu-latest
+    if: ${{ github.event.requested_team.name == 'scosman-bot'}}
     steps:
       - uses: actions/checkout@v3
         with:
