@@ -3,9 +3,11 @@ on:
   pull_request:
     branches:
       - main
+      - vnext
   push:
     branches:
       - main
+      - vnext
 
 jobs:
   p0-check:
