@@ -21,22 +21,16 @@ jobs:
     steps:
       - name: Check if PR comment instructs us to start ML CR
         id: directive-validation
+        if: ${{ github.event.issue.pull_request }}
         uses: actions/github-script@v3
         with:
           script: |
             const directive = 'request_ml_cr';
             const payload = context.payload;
 
-            let body = '';
-
-            if (payload.pull_request) {
-              body = payload.comment.body;
-            }
+            let body = payload.comment.body;
 
             console.log("Checking for ML CR directive in PR body (request_ml_cr) in comment: " + body);
-            console.log("comment: " + JSON.stringify(payload.comment));
-            console.log("body: " + JSON.stringify(payload.comment.body));
-            console.log("payload: " + JSON.stringify(payload));
             let result = body.includes(directive);
             console.log("Is requesting ML CR: " + result);
             return result;
