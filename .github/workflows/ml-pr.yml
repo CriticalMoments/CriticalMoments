@@ -30,7 +30,7 @@ jobs:
             let body = '';
 
             if (payload.pull_request) {
-              body = payload.pull_request.body;
+              body = payload.comment.body;
             }
 
             console.log("Checking for ML CR directive in PR body (request_ml_cr) in comment: " + body);
