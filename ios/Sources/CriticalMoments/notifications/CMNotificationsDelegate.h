@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMNotificationsDelegate : NSObject <UNUserNotificationCenterDelegate>
 
 - (instancetype)init NS_UNAVAILABLE;
-- (id)initWithOriginalDelegate:(id<UNUserNotificationCenterDelegate>)originalDelegate;
+- (instancetype)initWithOriginalDelegate:(id<UNUserNotificationCenterDelegate>)originalDelegate;
 
 @end
 

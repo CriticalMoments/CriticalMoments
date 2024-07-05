@@ -44,12 +44,12 @@ func (sn *ScheduledNotification) ScheduledAtEpochMilliseconds() int64 {
 
 func (ac *Appcore) initializeNotificaitonPlan() error {
 	if ac.notificationPlan == nil {
-		return ac.forceUpdateNotificaitonPlan()
+		return ac.forceUpdateNotificationPlan()
 	}
 	return nil
 }
 
-func (ac *Appcore) forceUpdateNotificaitonPlan() error {
+func (ac *Appcore) forceUpdateNotificationPlan() error {
 	plan, err := ac.generateNotificationPlan()
 	if err != nil {
 		return err
@@ -162,7 +162,7 @@ func (ac *Appcore) notificationRunnerProcessEvent(event *datamodel.Event) error 
 		return err
 	}
 	if needsUpdate {
-		err = ac.forceUpdateNotificaitonPlan()
+		err = ac.forceUpdateNotificationPlan()
 		if err != nil {
 			return err
 		}

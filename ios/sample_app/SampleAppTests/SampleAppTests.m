@@ -81,7 +81,7 @@
     XCTAssert(success, @"A app-writeable directory passes urlAllowedForDebugLoad check");
 }
 
-- (void)testNotifcations {
+- (void)testNotifications {
     // Need to notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
     BOOL __block approved = false;
@@ -103,7 +103,7 @@
               @"past notification scheduled");
 }
 
-- (void)testNotifcationEventsAndCleanup {
+- (void)testNotificationEventsAndCleanup {
     // Need to notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
     BOOL __block approved = false;
