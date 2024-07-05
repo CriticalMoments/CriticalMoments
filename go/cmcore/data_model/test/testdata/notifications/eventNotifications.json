@@ -14,10 +14,21 @@
       "title": "title",
       "body": "body",
       "cancelationEvents": ["cancel2event"],
+      "actionName": "bannerAction",
       "deliveryTime": {
         "eventName": "event2",
         "eventOffset": 60,
         "eventInstance": "first"
+      }
+    }
+  },
+  "actions": {
+    "namedActions": {
+      "bannerAction": {
+          "actionType": "banner",
+          "actionData": {
+              "body": "Hello world, but on a banner!"
+          }
       }
     }
   }

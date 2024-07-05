@@ -4,6 +4,8 @@ import (
 	"math"
 	"testing"
 	"time"
+
+	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
 )
 
 func TestNotificationList(t *testing.T) {
@@ -173,5 +175,34 @@ func TestEventNotificationPlan(t *testing.T) {
 	// Check cache is working
 	if *ac.seenCancelationEvents["cancel2event"] != true {
 		t.Fatal("Expected cancel2event to be in seenCancelationEvents")
+	}
+}
+
+func TestNotificationEventAction(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/eventNotifications.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if lb.lastBannerAction != nil {
+		t.Fatal("Expected no banner action")
+	}
+
+	n := datamodel.Notification{
+		ID: "event2Notification",
+	}
+	// Calling simulates tapping the notification, which should trigger the action
+	ac.ActionForNotification(n.UniqueID())
+
+	if lb.lastBannerAction == nil {
+		t.Fatal("Expected banner action")
 	}
 }

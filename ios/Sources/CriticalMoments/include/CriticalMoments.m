@@ -7,13 +7,15 @@
 
 #import "CriticalMoments.h"
 
-#import "../messaging/CMBannerManager.h"
-
 #import "../appcore_integration/CMLibBindings.h"
+#import "../messaging/CMBannerManager.h"
+#import "../notifications/CMNotificationsDelegate.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
+
+#import <UserNotifications/UserNotifications.h>
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted;
@@ -24,6 +26,7 @@
 @property(nonatomic, strong) CMNotificationObserver *notificationObserver;
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
+@property(nonatomic, strong) CMNotificationsDelegate *notificationDelegate;
 @end
 
 @implementation CriticalMoments
@@ -93,6 +96,10 @@ static CriticalMoments *sharedInstance = nil;
 - (void)start {
     // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
     [self.notificationObserver start];
+
+    // Register notification delegate on main thread. This must be done before app finishes launching, so can't be
+    // deferred.
+    [self registerNotificationDelegate];
 
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
@@ -396,6 +403,27 @@ static CriticalMoments *sharedInstance = nil;
     }
     return _currentTheme;
 }
+
+#pragma mark Notifications
+
+- (void)registerNotificationDelegate {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    id<UNUserNotificationCenterDelegate> existingDelegate = center.delegate;
+    _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate];
+    center.delegate = _notificationDelegate;
+}
+
+- (void)actionForNotification:(NSString *)identifier {
+    dispatch_async(_actionQueue, ^{
+      NSError *error;
+      [_appcore actionForNotification:identifier error:&error];
+      if (error) {
+          NSLog(@"CriticalMoments: error in notification: %@", error.localizedDescription);
+      }
+    });
+}
+
+#pragma mark Demo App and Internal APIs
 
 // Private/Internal: Only for demo app usage
 - (void)setTheme:(CMTheme *)theme {

@@ -659,3 +659,12 @@ func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr 
 	}
 	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
 }
+
+func (ac *Appcore) ActionForNotification(notificationId string) error {
+	for _, notification := range ac.config.Notifications {
+		if notification.UniqueID() == notificationId && notification.ActionName != "" {
+			return ac.PerformNamedAction(notification.ActionName)
+		}
+	}
+	return nil
+}

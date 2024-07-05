@@ -24,6 +24,9 @@
     // guarunteed to work over time, nor is deleting the database file a good idea.
     [Utils deleteDatabase];
 
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+
     // This key is only valid for this sample app. Do not try to use it for other apps.
     NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtby1hcHA=-MEQCIFSYDKeKMwiLOJ9bsoNACtSxRbJEWh91kpE47biWR/"
                        @"9BAiB9xT4UUj88Jw0fMjCGMA89NM/j0sHGzuhOST4VIIyS6A==";
@@ -40,9 +43,6 @@
 
     // Create files for test. Need these to be in app bundle, not test bundle, so creating here.
     [Utils createTestFileUrls];
-
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    center.delegate = self;
 
     return YES;
 }
