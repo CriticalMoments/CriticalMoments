@@ -145,6 +145,27 @@
     // Check the event trigger worked
     XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
               @"event notif not scheduled");
+    UNCalendarNotificationTrigger *initialEventRequest =
+        (UNCalendarNotificationTrigger *)[self
+            notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"]
+            .trigger;
+    NSDate *initialTime = [initialEventRequest nextTriggerDate];
+
+    // Send notification that pushes back time of the notification
+    [CriticalMoments.sharedInstance sendEvent:@"trigger_notificaiton_event"];
+    // Wait for propigation
+    sleep(2.0);
+
+    UNCalendarNotificationTrigger *laterEventRequest =
+        (UNCalendarNotificationTrigger *)[self
+            notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"]
+            .trigger;
+    NSDate *latestTime = [laterEventRequest nextTriggerDate];
+    XCTAssert(initialEventRequest != laterEventRequest, @"event notification not updated");
+    XCTAssert(initialTime != nil && latestTime != nil, @"date issue");
+    XCTAssert([initialTime compare:latestTime] == NSOrderedAscending, @"event did not push back delviery time");
+    NSTimeInterval timediff = [latestTime timeIntervalSinceDate:initialTime];
+    XCTAssert(timediff > 1.8 && timediff < 2.2, @"event did not push back delivery time by correct amount (2s)");
 
     // Send an event that triggers cancelation of notification
     [CriticalMoments.sharedInstance sendEvent:@"cancel_notification"];
@@ -165,7 +186,7 @@
 - (void)scheduleNotificationWithId:(NSString *)notifId {
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.title = @"Test Notification";
-    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:10
+    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:600
                                                                                                     repeats:NO];
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notifId
                                                                           content:content
@@ -174,23 +195,27 @@
     [center addNotificationRequest:request withCompletionHandler:nil];
 }
 
-- (bool)notificationScheduled:(NSString *)notifId {
+- (UNNotificationRequest *)notificationScheduled:(NSString *)notifId {
+    UNNotificationRequest *__block notifRequest;
     XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
-    bool __block found = false;
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     [center
         getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nullable requests) {
           for (UNNotificationRequest *request in requests) {
+
               if ([request.identifier isEqualToString:notifId]) {
-                  found = true;
+                  if (notifRequest != nil) {
+                      XCTAssert(false, @"Two notifications with same id");
+                  }
+                  notifRequest = request;
               }
           }
           [expectation fulfill];
         }];
 
     [self waitForExpectations:@[ expectation ] timeout:2.0];
-    return found;
+    return notifRequest;
 }
 
 @end
