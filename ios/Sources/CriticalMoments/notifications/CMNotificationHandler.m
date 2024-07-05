@@ -47,6 +47,7 @@
 
     // TODO: would really rather use exact time. This could be messed up by timezones? And too complicated. Look at
     // android API for how I want to implement dow and tod filters (go or here). Here might respect timezone!
+    // Can just do UNTimeIntervalNotificationTrigger, subracting date?
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:notifSchedule.scheduledAtEpochMilliseconds / 1000.0];
     NSCalendarUnit allUnits = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour |
                               NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitTimeZone;
@@ -79,6 +80,10 @@
     // Zero is valid to remove badge. Any negative value should be nil.
     if (notification.badgeCount >= 0) {
         content.badge = [NSNumber numberWithLong:notification.badgeCount];
+    }
+
+    if (notification.launchImageName.length > 0) {
+        content.launchImageName = notification.launchImageName;
     }
 
     if ([@"default" isEqualToString:notification.sound]) {

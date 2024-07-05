@@ -120,6 +120,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.Sound != "" {
 		t.Fatal("failed to parse sound as nil")
 	}
+	if n.LaunchImageName != "" {
+		t.Fatal("failed to parse launch image name as nil")
+	}
 	if n.RelevanceScore != nil {
 		t.Fatal("failed to parse relevance score as nil")
 	}
@@ -177,6 +180,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	}
 	if n.Sound != "default" {
 		t.Fatal("failed to parse sound")
+	}
+	if n.LaunchImageName != "storyboard1" {
+		t.Fatal("failed to parse launch image name")
 	}
 	if *n.RelevanceScore != 0.5 {
 		t.Fatal("failed to parse relevance score")

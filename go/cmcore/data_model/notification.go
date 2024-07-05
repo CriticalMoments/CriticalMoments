@@ -32,6 +32,8 @@ type Notification struct {
 	ActionName string
 	Sound      string
 
+	LaunchImageName string
+
 	RelevanceScore    *float64
 	InterruptionLevel string
 
@@ -84,6 +86,8 @@ type jsonNotification struct {
 	BadgeCount *int   `json:"badgeCount,omitempty"`
 	ActionName string `json:"actionName,omitempty"`
 	Sound      string `json:"sound,omitempty"`
+
+	LaunchImageName string `json:"launchImageName,omitempty"`
 
 	RelevanceScore    *float64 `json:"relevanceScore,omitempty"`
 	InterruptionLevel string   `json:"interruptionLevel,omitempty"`
@@ -192,6 +196,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.DeliveryTime = jn.DeliveryTime
 	n.RelevanceScore = jn.RelevanceScore
 	n.InterruptionLevel = jn.InterruptionLevel
+	n.LaunchImageName = jn.LaunchImageName
 
 	if jn.BadgeCount != nil {
 		n.BadgeCount = *jn.BadgeCount

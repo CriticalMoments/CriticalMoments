@@ -5,6 +5,7 @@
   "relevanceScore": 0.5,
   "interruptionLevel": "passive",
   "badgeCount": 10,
+  "launchImageName": "storyboard1",
   "actionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryLocalTimeOfDayStart": 60,
