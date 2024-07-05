@@ -9,9 +9,10 @@
 
 @import CriticalMoments;
 
+#import "UserNotifications/UserNotifications.h"
 #import "Utils.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <UNUserNotificationCenterDelegate>
 
 @end
 
@@ -39,6 +40,9 @@
 
     // Create files for test. Need these to be in app bundle, not test bundle, so creating here.
     [Utils createTestFileUrls];
+
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
 
     return YES;
 }
@@ -89,4 +93,13 @@
     return NO;
 }
 
+#pragma mark - UNUserNotificationCenterDelegate
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+    // For demo app, we want to show notifications over app UI. Client apps don't need to do this.
+    completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert |
+                      UNNotificationPresentationOptionBadge);
+}
 @end
