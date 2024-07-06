@@ -11,9 +11,6 @@
 #import "MainDemoScreen.h"
 #import "Utils.h"
 
-// TODO_P0
-#import "UserNotifications/UserNotifications.h"
-
 #define BANNER_HEIGHT 60.0
 
 @import CriticalMoments;
@@ -58,17 +55,6 @@
         [tabAppearance configureWithOpaqueBackground];
         self.tabBar.scrollEdgeAppearance = tabAppearance;
     }
-
-    // TODO_P0: not here!
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    UNAuthorizationOptions opt = UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound;
-    [center requestAuthorizationWithOptions:opt
-                          completionHandler:^(BOOL granted, NSError *_Nullable error) {
-                            NSLog(@"");
-                            // TODO_P0: do we need to trigger scheduling once granted? I think we do!
-                            // Maybe
-                            // https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/getnotificationsettings(completionhandler:)?language=objc
-                          }];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {

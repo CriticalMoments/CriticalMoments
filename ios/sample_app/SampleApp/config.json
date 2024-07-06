@@ -1140,15 +1140,6 @@
         }
     },
     "notifications": {
-        "appStartNotification": {
-          "title": "App Started",
-          "body": "The app was last started 5 seconds ago",
-          "deliveryTime": {
-            "eventName": "app_start",
-            "eventOffset": 5,
-            "eventInstance": "latest"
-          }
-        },
         "appBackground": {
           "title": "App Backgrounded",
           "sound": "default",
@@ -1179,6 +1170,42 @@
           "deliveryTime": {
             "eventName": "trigger_notificaiton_event",
             "eventOffset": 600
+          }
+        },
+        "demoEventNotificationTap": {
+          "title": "Demo Notification",
+          "body": "Notification triggered by an in app event. Tap to launch in-app action.",
+          "actionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_1",
+            "eventOffset": 2
+          }
+        },
+        "demoEventNotification2": {
+          "title": "Delayed Demo Notification",
+          "body": "Notification triggered after 5s delay. Tap to launch in-app action.",
+          "actionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_2",
+            "eventOffset": 5
+          }
+        },
+        "demoEventNotification3": {
+          "title": "Badge Set on Homescreen",
+          "body": "Open your iOS homescreen to see the badge on the CM icon.",
+          "badgeCount": 42,
+          "deliveryTime": {
+            "eventName": "demo_notification_3",
+            "eventOffset": 2
+          }
+        },
+        "demoEventNotification4": {
+          "title": "Badge Removed on Homescreen",
+          "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
+          "badgeCount": 0,
+          "deliveryTime": {
+            "eventName": "demo_notification_4",
+            "eventOffset": 2
           }
         }
     }

@@ -15,6 +15,7 @@
 #import "FeatureFlagsDemoScreen.h"
 #import "LinkDemoScreen.h"
 #import "MessagingDemoScreen.h"
+#import "NotificationsDemoScreen.h"
 #import "SheetDemoScreen.h"
 #import "ThemeDemoScreen.h"
 
@@ -42,13 +43,20 @@
     conversionDemo.subtitle = @"Help your users get the most from your app, and convert to paid.";
     conversionDemo.actionNextScreen = [[ConversionDemoScreen alloc] init];
 
+    CMDemoAction *notificationDemo = [[CMDemoAction alloc] init];
+    notificationDemo.title = @"Notifications & Badges";
+    notificationDemo.subtitle = @"Notifications delivered to your users, targting the ideal time for re-engagement.";
+    // TODO_P0
+    notificationDemo.skipInUiTesting = YES;
+    notificationDemo.actionNextScreen = [[NotificationsDemoScreen alloc] init];
+
     CMDemoAction *flagsDemo = [[CMDemoAction alloc] init];
     flagsDemo.title = @"Smart Feature Flags";
     flagsDemo.subtitle = @"Conditional feature flags which update state based on client conditions.";
     flagsDemo.skipInUiTesting = YES;
     flagsDemo.actionNextScreen = [[FeatureFlagsDemoScreen alloc] init];
 
-    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, flagsDemo, conversionDemo ]];
+    [self addSection:@"Use Case Examples" withActions:@[ messagingDemo, notificationDemo, flagsDemo, conversionDemo ]];
 
     CMDemoAction *conditionDemos = [[CMDemoAction alloc] init];
     conditionDemos.title = @"Conditions";
