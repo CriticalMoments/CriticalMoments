@@ -81,6 +81,7 @@
     XCTAssert(success, @"A app-writeable directory passes urlAllowedForDebugLoad check");
 }
 
+// MANUAL_TEST_CASE: Need to manually allow notifications permissions before this test works.
 - (void)testNotifications {
     // Need to notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
@@ -103,6 +104,7 @@
               @"past notification scheduled");
 }
 
+// MANUAL_TEST_CASE: Need to manually allow notifications permissions before this test works.
 - (void)testNotificationEventsAndCleanup {
     // Need to notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
