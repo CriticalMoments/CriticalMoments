@@ -14,7 +14,7 @@
       "title": "title",
       "body": "body",
       "cancelationEvents": ["cancel2event"],
-      "actionName": "bannerAction",
+      "tapActionName": "bannerAction",
       "deliveryTime": {
         "eventName": "event2",
         "eventOffset": 60,

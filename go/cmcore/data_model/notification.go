@@ -84,7 +84,7 @@ type jsonNotification struct {
 	Title      string `json:"title,omitempty"`
 	Body       string `json:"body,omitempty"`
 	BadgeCount *int   `json:"badgeCount,omitempty"`
-	ActionName string `json:"actionName,omitempty"`
+	ActionName string `json:"tapActionName,omitempty"`
 	Sound      string `json:"sound,omitempty"`
 
 	LaunchImageName string `json:"launchImageName,omitempty"`

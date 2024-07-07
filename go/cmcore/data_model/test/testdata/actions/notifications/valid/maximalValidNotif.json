@@ -6,7 +6,7 @@
   "interruptionLevel": "passive",
   "badgeCount": 10,
   "launchImageName": "storyboard1",
-  "actionName": "actionName",
+  "tapActionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryLocalTimeOfDayStart": 60,
   "deliveryLocalTimeOfDayEnd": 120,
