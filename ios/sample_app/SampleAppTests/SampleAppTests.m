@@ -147,8 +147,8 @@
     // Check the event trigger worked
     XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
               @"event notif not scheduled");
-    UNCalendarNotificationTrigger *initialEventRequest =
-        (UNCalendarNotificationTrigger *)[self
+    UNTimeIntervalNotificationTrigger *initialEventRequest =
+        (UNTimeIntervalNotificationTrigger *)[self
             notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"]
             .trigger;
     NSDate *initialTime = [initialEventRequest nextTriggerDate];
@@ -158,8 +158,8 @@
     // Wait for propigation
     sleep(2.0);
 
-    UNCalendarNotificationTrigger *laterEventRequest =
-        (UNCalendarNotificationTrigger *)[self
+    UNTimeIntervalNotificationTrigger *laterEventRequest =
+        (UNTimeIntervalNotificationTrigger *)[self
             notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"]
             .trigger;
     NSDate *latestTime = [laterEventRequest nextTriggerDate];

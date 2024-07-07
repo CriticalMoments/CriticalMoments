@@ -45,16 +45,11 @@
 
     UNNotificationContent *content = [CMNotificationHandler buildNotificationContent:notifSchedule.notification];
 
-    // TODO: would really rather use exact time. This could be messed up by timezones? And too complicated. Look at
-    // android API for how I want to implement dow and tod filters (go or here). Here might respect timezone!
-    // Can just do UNTimeIntervalNotificationTrigger, subracting date?
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:notifSchedule.scheduledAtEpochMilliseconds / 1000.0];
-    NSCalendarUnit allUnits = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour |
-                              NSCalendarUnitMinute | NSCalendarUnitSecond | NSCalendarUnitTimeZone;
-    NSDateComponents *dateComponents = [NSCalendar.currentCalendar components:allUnits fromDate:date];
-
-    UNCalendarNotificationTrigger *trigger =
-        [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:dateComponents repeats:NO];
+    UNNotificationTrigger *trigger = [CMNotificationHandler triggerForDate:date];
+    if (!trigger) {
+        return;
+    }
 
     NSString *notifId = [notifSchedule.notification uniqueID];
 
@@ -69,6 +64,21 @@
                    NSLog(@"CriticalMoments: Error scheduling notification: %@", error);
                }
              }];
+}
+
++ (UNNotificationTrigger *)triggerForDate:(NSDate *)date {
+    NSTimeInterval timeUntilDate = [date timeIntervalSinceNow];
+    // TODO_P0: the -0.5 check is checking that this was just scheduled (not old and likely already delivered one). Temp
+    // workaround. We should cache delivered time (or scheduled time) by ID, and not re-schedule if we already
+    // delivered/scheduled it.
+    if (timeUntilDate < -0.5) {
+        return nil;
+    }
+    if (timeUntilDate <= 0.5) {
+        // <= 0s delay not allowed, so use small value.
+        timeUntilDate = 0.001;
+    }
+    return [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeUntilDate repeats:NO];
 }
 
 + (UNNotificationContent *)buildNotificationContent:(DatamodelNotification *)notification {

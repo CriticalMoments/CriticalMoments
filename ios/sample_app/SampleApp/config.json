@@ -1146,7 +1146,6 @@
           "body": "The app was last moved to background 2 seconds ago",
           "deliveryTime": {
             "eventName": "app_entered_background",
-            "eventOffset": 2,
             "eventInstance": "latest"
           }
         },
@@ -1177,8 +1176,7 @@
           "body": "Notification triggered by an in app event. Tap to launch in-app action.",
           "tapActionName": "nested_alert",
           "deliveryTime": {
-            "eventName": "demo_notification_1",
-            "eventOffset": 2
+            "eventName": "demo_notification_1"
           }
         },
         "demoEventNotification2": {
@@ -1195,8 +1193,7 @@
           "body": "Open your iOS homescreen to see the badge on the CM icon.",
           "badgeCount": 42,
           "deliveryTime": {
-            "eventName": "demo_notification_3",
-            "eventOffset": 2
+            "eventName": "demo_notification_3"
           }
         },
         "demoEventNotification4": {
@@ -1204,8 +1201,7 @@
           "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
           "badgeCount": 0,
           "deliveryTime": {
-            "eventName": "demo_notification_4",
-            "eventOffset": 2
+            "eventName": "demo_notification_4"
           }
         }
     }
