@@ -59,9 +59,31 @@ func TestEventNotificationPlan(t *testing.T) {
 		t.Fatal("NP binding set too soon")
 	}
 
+	// Check seenCancelationEvents is empty
+	if len(ac.seenCancelationEvents) != 0 {
+		t.Fatal("Expected seenCancelationEvents to be empty")
+	}
+
+	// manually insert a cancelation event before starting to check we load it from DB correctly
+	cancel3Event := datamodel.Event{
+		Name:      "cancel3event",
+		EventType: datamodel.EventTypeCustom,
+	}
+	err = ac.db.InsertEvent(&cancel3Event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	err = ac.Start(true)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Check seenCancelationEvents work: all should load from DB, 3 should be true
+	if len(ac.seenCancelationEvents) != 2 ||
+		*ac.seenCancelationEvents["cancel2event"] != false ||
+		*ac.seenCancelationEvents["cancel3event"] != true {
+		t.Fatal("Expected seenCancelationEvents to be populated for all cancelation events")
 	}
 
 	// No events, should be nothing scheduled
@@ -72,7 +94,7 @@ func TestEventNotificationPlan(t *testing.T) {
 	if plan.ScheduledNotificationCount() != 0 {
 		t.Fatalf("Expected 0 scheduled notifications, got %d", plan.ScheduledNotificationCount())
 	}
-	if plan.UnscheduledNotificationCount() != 2 {
+	if plan.UnscheduledNotificationCount() != 3 {
 		t.Fatalf("Expected 2 unscheduled notifications, got %d", plan.UnscheduledNotificationCount())
 	}
 
@@ -97,7 +119,7 @@ func TestEventNotificationPlan(t *testing.T) {
 	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli())) > 100 {
 		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn.ScheduledAtEpochMilliseconds())
 	}
-	if plan.UnscheduledNotificationCount() != 1 {
+	if plan.UnscheduledNotificationCount() != 2 {
 		t.Fatalf("Expected 1 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
 	}
 
@@ -159,6 +181,14 @@ func TestEventNotificationPlan(t *testing.T) {
 	// Sent an event which should cancel the "2" notification
 	ac.SendClientEvent("cancel2event")
 
+	// Check we persisted as seenCancelationEvent
+	if len(ac.seenCancelationEvents) != 2 ||
+		*ac.seenCancelationEvents["cancel2event"] != true ||
+		*ac.seenCancelationEvents["cancel3event"] != true {
+		t.Fatal("Expected seenCancelationEvents to be populated for all cancelation events")
+	}
+
+	// Check it's cancelled
 	plan = lb.lastNotificationPlan
 	if plan.ScheduledNotificationCount() != 1 {
 		t.Fatalf("Expected 1 scheduled notification, got %d", plan.ScheduledNotificationCount())
@@ -169,10 +199,6 @@ func TestEventNotificationPlan(t *testing.T) {
 	}
 	if sn.Notification.ID != "event1Notification" {
 		t.Fatalf("Expected ScheduledNotificationAtIndex to return event notification, got %s", sn.Notification.ID)
-	}
-	// Check cache is working
-	if *ac.seenCancelationEvents["cancel2event"] != true {
-		t.Fatal("Expected cancel2event to be in seenCancelationEvents")
 	}
 }
 

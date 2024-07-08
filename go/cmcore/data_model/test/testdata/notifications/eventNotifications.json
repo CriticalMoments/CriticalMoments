@@ -20,6 +20,17 @@
         "eventOffset": 60,
         "eventInstance": "first"
       }
+    },
+    "event3Notification": {
+      "title": "title",
+      "body": "body",
+      "cancelationEvents": ["cancel3event"],
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event3",
+        "eventOffset": 60,
+        "eventInstance": "first"
+      }
     }
   },
   "actions": {

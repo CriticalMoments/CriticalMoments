@@ -152,21 +152,24 @@ func (ac *Appcore) isNotificationCanceled(notification *datamodel.Notification) 
 	if notification.CancelationEvents == nil {
 		return false
 	}
-	// Check cache first
+	uncachedCancelationEvents := make([]string, 0)
+	// Check cache first.
+	// If any canceled=true are found, we can return true without checking DB
 	for _, cancelEventName := range *notification.CancelationEvents {
 		canceled := ac.seenCancelationEvents[cancelEventName]
 		if canceled != nil && *canceled {
 			return true
+		} else if canceled == nil {
+			uncachedCancelationEvents = append(uncachedCancelationEvents, cancelEventName)
 		}
 	}
-	// Check DB, cache results
-	for _, cancelEventName := range *notification.CancelationEvents {
+	// Check DB for uncached cancelation events
+	for _, cancelEventName := range uncachedCancelationEvents {
 		cancelEventCount, err := ac.db.EventCountByNameWithLimit(cancelEventName, 1)
 		if err != nil {
 			// shouldn't fail, but better to be safe
 			return true
 		}
-		// TODO_P0: add test cases for cache. False first then true, true first then false, in DB, only in app.
 		canceled := cancelEventCount > 0
 		ac.seenCancelationEvents[cancelEventName] = &canceled
 		if canceled {
