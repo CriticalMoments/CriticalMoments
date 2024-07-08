@@ -69,14 +69,18 @@
 
 + (UNNotificationTrigger *)triggerForDate:(NSDate *)date {
     NSTimeInterval timeUntilDate = [date timeIntervalSinceNow];
-    // Appcore sends all notifications. Including old ones which may be delivered (could be 6 months old). Don't schedule a notification if it's in the past (by more than 0.8s). Those are likely already delivered/scheduled, if not stale.
+    // Appcore sends all notifications. Including old ones which may be delivered (could be 6 months old). Don't
+    // schedule a notification if it's in the past (by more than 0.8s). Those are likely already delivered/scheduled, if
+    // not stale.
     if (timeUntilDate < -0.8) {
         return nil;
     }
     if (timeUntilDate <= 1) {
         // Part 1) <= 0s delay not allowed, so use check and set to positive value
-        // Part 2) Why 1s in the future? In case AppCore sends several updates for same notificaiton rapidly. By scheduling 1s out (from delivery time), and not scheduling if 0.9s in past we avoid duplicate notifications for same timestamp. Could add a cache, but async APIs make that risky. Keep it simple.
-        // Part 3) A bit of debounce if app sends multiple events
+        // Part 2) Why 1s in the future? In case AppCore sends several updates for same notificaiton rapidly. By
+        // scheduling 1s out (from delivery time), and not scheduling if 0.9s in past we avoid duplicate notifications
+        // for same timestamp. Could add a cache, but async APIs make that risky. Keep it simple. Part 3) A bit of
+        // debounce if app sends multiple events
         timeUntilDate = 1;
     }
     return [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeUntilDate repeats:NO];
