@@ -5,7 +5,10 @@
         "testNotification": {
             "title": "Notification title",
             "body": "Notification body",
-            "actionName": "action_does_not_exist"
+            "tapActionName": "action_does_not_exist",
+            "deliveryTime": {
+              "eventName": "some_event"
+            }
         }
     }
 }

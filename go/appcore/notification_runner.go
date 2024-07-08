@@ -91,6 +91,12 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	if canceled := ac.isNotificationCanceled(notification); canceled {
 		return nil
 	}
+	if notification.ScheduleCondition != nil {
+		condResult, condErr := ac.propertyRegistry.evaluateCondition(notification.ScheduleCondition)
+		if condErr != nil || !condResult {
+			return nil
+		}
+	}
 
 	if staticTimestamp := notification.DeliveryTime.Timestamp(); staticTimestamp != nil {
 		// Statically scheduled

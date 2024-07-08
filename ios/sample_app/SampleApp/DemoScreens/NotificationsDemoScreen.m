@@ -35,12 +35,19 @@
 
 - (void)buildSections {
 
-    // TODO_P0: usage demos (need conditions)
-    // 1) Reminder to finish setup: close the app, and 5s later you'll reviece an alert to remind you to finish signing
-    // up. Normally this would be a few hours later at an ideal time (7pm, connected to wifi), not a few seconds later.
-    // 2) Churn prevention: 5s after closing app make a pitch
-    // 3) Remind later: when on WiFi and using device. Note: you won't recieve this notificaiton right away, it make
+    // TODO_P0: another usage demos (need conditions)
+    // Remind later: when on WiFi and using device. Note: you won't recieve this notificaiton right away, it make
     // take a few hours. But it is likely to find you when you're at home/work, and have a moment to use your phone.
+
+    CMDemoAction *comeBackDemo = [[CMDemoAction alloc] init];
+    comeBackDemo.title = @"Complete Onboarding CTA";
+    comeBackDemo.subtitle =
+        @"Reduce new-user churn by reminding users who abandon setup. Show a notification a few minutes after they "
+        @"leave the app (for this demo we use a 5s delay).\n\nTap this, then dismiss the app to see a CTA notification "
+        @"5 seconds after the app moves to the background.";
+    comeBackDemo.actionCMEventName = @"enableComeBack";
+
+    [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo ]];
 
     CMDemoAction *eventNotification = [[CMDemoAction alloc] init];
     eventNotification.title = @"Basic Notifications";

@@ -1,0 +1,14 @@
+{
+    "configVersion": "v1",
+    "appId": "io.criticalmoments.demo",
+    "notifications": {
+      "testNotification": {
+          "title": "Notification title",
+          "body": "Notification body",
+          "scheduleCondition": "invalid(condition) ???",
+          "deliveryTime": {
+             "eventName": "some_event"
+          }
+      }
+  }
+}

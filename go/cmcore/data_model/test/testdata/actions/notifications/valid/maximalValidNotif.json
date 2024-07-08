@@ -10,6 +10,7 @@
   "deliveryDaysOfWeek": "Monday,Tuesday",
   "deliveryTimeOfDayStart": "01:30",
   "deliveryTimeOfDayEnd": "23:59",
+  "scheduleCondition": "true",
   "idealDeliveryConditions": {
     "condition": "true",
     "maxWaitTime": 10

@@ -644,10 +644,10 @@ func TestInvalidsError(t *testing.T) {
 	invalidJson := []string{
 		// Fallback name checks
 		"invalidFallbackAction1.json",
-		"invalidFallbackTheme2.json", // add_test_count
-		"invalidFallbackTheme1.json", // add_test_count
-		// Invalid notification action name
-		"invalidNotificationAction.json", // add_test_count
+		"invalidFallbackTheme2.json",        // add_test_count
+		"invalidFallbackTheme1.json",        // add_test_count
+		"invalidNotificationAction.json",    // add_test_count
+		"invalidNotificationCondition.json", // add_test_count
 	}
 
 	for _, invalidFile := range invalidJson {

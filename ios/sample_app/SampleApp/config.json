@@ -1140,13 +1140,15 @@
         }
     },
     "notifications": {
-        "appBackground": {
-          "title": "App Backgrounded",
+        "comeBackDemo": {
+          "title": "Complete your setup!",
           "sound": "default",
-          "body": "The app was last moved to background 2 seconds ago",
+          "body": "[Your app's value prop here]. It only takes 2 minutes!",
+          "scheduleCondition": "eventCount('enableComeBack') > 0",
           "deliveryTime": {
             "eventName": "app_entered_background",
-            "eventInstance": "latest"
+            "eventInstance": "latest",
+            "eventOffset": 5
           }
         },
         "pastDueNotification": {

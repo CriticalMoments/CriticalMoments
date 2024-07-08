@@ -597,17 +597,25 @@ func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
 		if a.Condition != nil {
 			all = append(all, a.Condition)
 		}
-		actionConditions, err := a.actionData.AllEmbeddedConditions()
-		if err != nil {
-			return nil, err
+		if a.actionData != nil {
+			actionConditions, err := a.actionData.AllEmbeddedConditions()
+			if err != nil {
+				return nil, err
+			}
+			all = append(all, actionConditions...)
 		}
-		all = append(all, actionConditions...)
 	}
 
 	for _, t := range pc.namedTriggers {
 		condition := t.Condition
 		if condition != nil {
 			all = append(all, condition)
+		}
+	}
+
+	for _, n := range pc.Notifications {
+		if n.ScheduleCondition != nil {
+			all = append(all, n.ScheduleCondition)
 		}
 	}
 

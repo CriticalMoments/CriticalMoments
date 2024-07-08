@@ -146,6 +146,9 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.InterruptionLevel != "" {
 		t.Fatal("failed to parse interruption level as nil")
 	}
+	if n.ScheduleCondition != nil {
+		t.Fatal("faild to parse nil scheduled condition")
+	}
 	if n.ActionName != "" {
 		t.Fatal("failed to parse actionName as nil")
 	}
@@ -206,6 +209,9 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	}
 	if n.InterruptionLevel != "passive" {
 		t.Fatal("failed to parse interruption level")
+	}
+	if n.ScheduleCondition.conditionString != "true" {
+		t.Fatal("failed to parse schedule condition")
 	}
 	if n.ActionName != "actionName" {
 		t.Fatal("failed to parse actionName")

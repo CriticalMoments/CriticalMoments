@@ -38,6 +38,8 @@ type Notification struct {
 	RelevanceScore    *float64
 	InterruptionLevel string
 
+	ScheduleCondition *Condition
+
 	DeliveryTime                  DeliveryTime
 	DeliveryDaysOfWeek            []time.Weekday
 	DeliveryWindowTODStartMinutes int
@@ -93,6 +95,8 @@ type jsonNotification struct {
 	RelevanceScore    *float64 `json:"relevanceScore,omitempty"`
 	InterruptionLevel string   `json:"interruptionLevel,omitempty"`
 
+	ScheduleCondition *Condition `json:"scheduleCondition"`
+
 	DeliveryTime             DeliveryTime `json:"deliveryTime,omitempty"`
 	DeliveryDaysOfWeekString string       `json:"deliveryDaysOfWeek,omitempty"`
 	// HH:MM format
@@ -138,6 +142,11 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	if StrictDatamodelParsing && n.InterruptionLevel != "" {
 		if !slices.Contains(validInterruptionLevels, n.InterruptionLevel) {
 			return fmt.Sprintf("Interruption level must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel)
+		}
+	}
+	if n.ScheduleCondition != nil {
+		if err := n.ScheduleCondition.Validate(); err != nil {
+			return fmt.Sprintf("Invalid condition in notification [%v]", n.ID)
 		}
 	}
 	if n.CancelationEvents != nil {
@@ -208,6 +217,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.RelevanceScore = jn.RelevanceScore
 	n.InterruptionLevel = jn.InterruptionLevel
 	n.LaunchImageName = jn.LaunchImageName
+	n.ScheduleCondition = jn.ScheduleCondition
 
 	if jn.BadgeCount != nil {
 		n.BadgeCount = *jn.BadgeCount
@@ -266,7 +276,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 
 func parseMinutesFromHHMMString(i string) (int, error) {
 	if i == "" {
-		return 0, errors.New("Empty string for HH:MM time of day")
+		return 0, errors.New("empty string for HH:MM time of day")
 	}
 	values := strings.Split(i, ":")
 	if len(values) != 2 {

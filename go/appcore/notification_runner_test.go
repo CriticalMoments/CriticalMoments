@@ -351,3 +351,49 @@ func TestDateWindowShift(t *testing.T) {
 	}
 	time.Local = torontoTime
 }
+
+func TestScheduleCondition(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/conditionalNotifications.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Condition is false, should not be scheduled
+	err = ac.SendClientEvent("event3")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan := lb.lastNotificationPlan
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plan.ScheduledNotificationCount() != 0 {
+		t.Fatal("scheduled a notification when condition wasn't met")
+	}
+
+	// Make condition true, should be scheduled
+	err = ac.SendClientEvent("event3con")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.SendClientEvent("event3")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan = lb.lastNotificationPlan
+	if plan.ScheduledNotificationCount() != 1 {
+		t.Fatalf("Expected notification to be scheduled")
+	}
+	sn := plan.ScheduledNotificationAtIndex(0)
+	if sn.Notification.ID != "event3Notification" {
+		t.Fatal("should schedule notification 3")
+	}
+}
