@@ -1169,7 +1169,7 @@
           "title": "event triggered",
           "cancelationEvents": ["cancel_notification"],
           "deliveryTime": {
-            "eventName": "trigger_notificaiton_event",
+            "eventName": "trigger_notification_event",
             "eventOffset": 600
           }
         },

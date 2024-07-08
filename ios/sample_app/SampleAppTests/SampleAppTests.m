@@ -83,7 +83,7 @@
 
 // MANUAL_TEST_CASE: Need to manually allow notifications permissions before this test works.
 - (void)testNotifications {
-    // Need to notification permissions for this test to work
+    // Need notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
     BOOL __block approved = false;
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -96,7 +96,7 @@
         XCTSkip(@"User notification permission not approved, test won't work");
     }
 
-    // Check the furute notification is scheduled
+    // Check the future notification is scheduled
     XCTAssert([self notificationScheduled:@"io.criticalmoments.notifications.futureNotification"],
               @"future notification not scheduled");
     // Check the past notification is not
@@ -106,7 +106,7 @@
 
 // MANUAL_TEST_CASE: Need to manually allow notifications permissions before this test works.
 - (void)testNotificationEventsAndCleanup {
-    // Need to notification permissions for this test to work
+    // Need notification permissions for this test to work
     XCTestExpectation *approvalExpectation = [[XCTestExpectation alloc] init];
     BOOL __block approved = false;
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -133,10 +133,10 @@
     XCTAssert(![self notificationScheduled:@"io.criticalmoments.notifications.eventTriggeredNotification"],
               @"event notification scheduled too soon");
 
-    // Send an event that triggers a notificaiton refresh
-    [CriticalMoments.sharedInstance sendEvent:@"trigger_notificaiton_event"];
+    // Send an event that triggers a notification refresh
+    [CriticalMoments.sharedInstance sendEvent:@"trigger_notification_event"];
 
-    // Wait for propigation
+    // Wait for propagation
     sleep(2.0);
 
     // Check we unscheduled the prior notification in our cleanup
@@ -154,8 +154,8 @@
     NSDate *initialTime = [initialEventRequest nextTriggerDate];
 
     // Send notification that pushes back time of the notification
-    [CriticalMoments.sharedInstance sendEvent:@"trigger_notificaiton_event"];
-    // Wait for propigation
+    [CriticalMoments.sharedInstance sendEvent:@"trigger_notification_event"];
+    // Wait for propagation
     sleep(2.0);
 
     UNTimeIntervalNotificationTrigger *laterEventRequest =
@@ -165,14 +165,14 @@
     NSDate *latestTime = [laterEventRequest nextTriggerDate];
     XCTAssert(initialEventRequest != laterEventRequest, @"event notification not updated");
     XCTAssert(initialTime != nil && latestTime != nil, @"date issue");
-    XCTAssert([initialTime compare:latestTime] == NSOrderedAscending, @"event did not push back delviery time");
+    XCTAssert([initialTime compare:latestTime] == NSOrderedAscending, @"event did not push back delivery time");
     NSTimeInterval timediff = [latestTime timeIntervalSinceDate:initialTime];
     XCTAssert(timediff > 1.8 && timediff < 2.2, @"event did not push back delivery time by correct amount (2s)");
 
     // Send an event that triggers cancelation of notification
     [CriticalMoments.sharedInstance sendEvent:@"cancel_notification"];
 
-    // Wait for propigation
+    // Wait for propagation
     sleep(2.0);
 
     // Check we unscheduled the prior notification in our cleanup
