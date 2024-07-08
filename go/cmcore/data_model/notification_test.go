@@ -95,6 +95,23 @@ func TestNotificationActionValidators(t *testing.T) {
 	}
 	StrictDatamodelParsing = false
 	a.InterruptionLevel = ""
+	a.DeliveryWindowTODEndMinutes = 24 * 60
+	if a.Validate() {
+		t.Fatal("delivery window out of bounds")
+	}
+	a.DeliveryWindowTODEndMinutes = 23*60 + 59
+	if !a.Validate() {
+		t.Fatal("delivery window failed in bounds")
+	}
+	a.DeliveryWindowTODEndMinutes = 2
+	a.DeliveryWindowTODStartMinutes = 3
+	if a.Validate() {
+		t.Fatal("Allowed start after end")
+	}
+	a.DeliveryWindowTODEndMinutes = 60
+	if !a.Validate() {
+		t.Fatal("delivery window failed in bounds")
+	}
 }
 
 func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
@@ -138,10 +155,10 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if !slices.Equal(n.DeliveryDaysOfWeek, allDaysOfWeek) {
 		t.Fatal("failed to parse default delivery days of week")
 	}
-	if n.DeliveryWindowLocalTimeOfDayStart != defaultDeliveryWindowLocalTimeStart {
+	if n.DeliveryWindowTODStartMinutes != defaultDeliveryWindowLocalTimeStart {
 		t.Fatal("failed to parse default delivery start time")
 	}
-	if n.DeliveryWindowLocalTimeOfDayEnd != defaultDeliveryWindowLocalTimeEnd {
+	if n.DeliveryWindowTODEndMinutes != defaultDeliveryWindowLocalTimeEnd {
 		t.Fatal("failed to parse default delivery end time")
 	}
 	if n.IdealDevlieryConditions != nil {
@@ -196,10 +213,10 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if !slices.Equal(n.DeliveryDaysOfWeek, []time.Weekday{time.Monday, time.Tuesday}) {
 		t.Fatal("failed to parse delivery days of week")
 	}
-	if n.DeliveryWindowLocalTimeOfDayStart != 60 {
+	if n.DeliveryWindowTODStartMinutes != 90 {
 		t.Fatal("failed to parse delivery start time")
 	}
-	if n.DeliveryWindowLocalTimeOfDayEnd != 120 {
+	if n.DeliveryWindowTODEndMinutes != 23*60+59 {
 		t.Fatal("failed to parse delivery end time")
 	}
 	if n.IdealDevlieryConditions == nil {
@@ -370,5 +387,43 @@ func TestNotificationUniqueID(t *testing.T) {
 	}
 	if n.UniqueID() != "io.criticalmoments.notifications.test" {
 		t.Fatal("failed to generate unique ID")
+	}
+}
+
+func TestHHMMStringParsing(t *testing.T) {
+	cases := map[string]int{
+		"00:00": 0,
+		"01:00": 60,         // add_test_case
+		"13:13": 13*60 + 13, // add_test_case
+		"23:59": 23*60 + 59, // add_test_case
+	}
+
+	for hhmmString, seconds := range cases {
+		secondsResult, err := parseMinutesFromHHMMString(hhmmString)
+		if err != nil {
+			t.Fatalf("Failed to parse %v", hhmmString)
+		}
+		if secondsResult != seconds {
+			t.Fatalf("Failed to parse %v, got %v", hhmmString, secondsResult)
+		}
+	}
+
+	errorCases := []string{
+		"00:60",
+		"24:00",    // add_test_case
+		"24:01",    // add_test_case
+		"25:00",    // add_test_case
+		"00:00:00", // add_test_case
+		"00:00:60", // add_test_case
+		"",         // add_test_case
+		"asd:sdf",  // add_test_case
+		"asdf",     // add_test_case
+	}
+
+	for _, hhmmString := range errorCases {
+		_, err := parseMinutesFromHHMMString(hhmmString)
+		if err == nil {
+			t.Fatalf("Failed to error on %v", hhmmString)
+		}
 	}
 }

@@ -2,8 +2,10 @@ package datamodel
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -19,8 +21,8 @@ var allDaysOfWeek = []time.Weekday{
 }
 
 // 9am to 9pm
-const defaultDeliveryWindowLocalTimeStart = 9 * 60 * 60
-const defaultDeliveryWindowLocalTimeEnd = 21 * 60 * 60
+const defaultDeliveryWindowLocalTimeStart = 9 * 60
+const defaultDeliveryWindowLocalTimeEnd = 21 * 60
 
 var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
 
@@ -37,10 +39,10 @@ type Notification struct {
 	RelevanceScore    *float64
 	InterruptionLevel string
 
-	DeliveryTime                      DeliveryTime
-	DeliveryDaysOfWeek                []time.Weekday
-	DeliveryWindowLocalTimeOfDayStart int
-	DeliveryWindowLocalTimeOfDayEnd   int
+	DeliveryTime                  DeliveryTime
+	DeliveryDaysOfWeek            []time.Weekday
+	DeliveryWindowTODStartMinutes int
+	DeliveryWindowTODEndMinutes   int
 
 	IdealDevlieryConditions *IdealDevlieryConditions
 	CancelationEvents       *[]string
@@ -92,10 +94,11 @@ type jsonNotification struct {
 	RelevanceScore    *float64 `json:"relevanceScore,omitempty"`
 	InterruptionLevel string   `json:"interruptionLevel,omitempty"`
 
-	DeliveryTime                      DeliveryTime `json:"deliveryTime,omitempty"`
-	DeliveryDaysOfWeekString          string       `json:"deliveryDaysOfWeek,omitempty"`
-	DeliveryWindowLocalTimeOfDayStart *int         `json:"deliveryLocalTimeOfDayStart,omitempty"`
-	DeliveryWindowLocalTimeOfDayEnd   *int         `json:"deliveryLocalTimeOfDayEnd,omitempty"`
+	DeliveryTime             DeliveryTime `json:"deliveryTime,omitempty"`
+	DeliveryDaysOfWeekString string       `json:"deliveryDaysOfWeek,omitempty"`
+	// HH:MM format
+	DeliveryWindowTODStart string `json:"deliveryTimeOfDayStart,omitempty"`
+	DeliveryWindowTODEnd   string `json:"deliveryTimeOfDayEnd,omitempty"`
 
 	IdealDeliveryConditions *IdealDevlieryConditions `json:"idealDeliveryConditions,omitempty"`
 	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
@@ -117,6 +120,15 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 		n.Body == "" &&
 		n.BadgeCount < 0 {
 		return "Notifications must have one or more of: title, body, and badgeCount."
+	}
+	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > 24*60-1 {
+		return "Notifications must have a deliveryTimeOfDayStart between 0 and 24*60 mins."
+	}
+	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > 24*60-1 {
+		return "Notifications must have a deliveryTimeOfDayEnd between 0 and 24*60 mins."
+	}
+	if n.DeliveryWindowTODStartMinutes > n.DeliveryWindowTODEndMinutes {
+		return "Notifications must have a deliveryTimeOfDayStart before deliveryTimeOfDayEnd."
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
 		return "Notifications must have at least one day of week valid for delivery."
@@ -212,15 +224,37 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 		// Default to all days of week
 		n.DeliveryDaysOfWeek = allDaysOfWeek
 	}
-	if jn.DeliveryWindowLocalTimeOfDayStart != nil {
-		n.DeliveryWindowLocalTimeOfDayStart = *jn.DeliveryWindowLocalTimeOfDayStart
-	} else {
-		n.DeliveryWindowLocalTimeOfDayStart = defaultDeliveryWindowLocalTimeStart
+
+	// Defaults could change over time, so either all custom, or all default or config could be invalid
+	if (jn.DeliveryWindowTODStart == "" && jn.DeliveryWindowTODEnd != "") ||
+		(jn.DeliveryWindowTODStart != "" && jn.DeliveryWindowTODEnd == "") {
+		return NewUserPresentableError("DeliveryTime must have both deliveryTimeOfDayStart and deliveryTimeOfDayEnd defined if either is defined.")
 	}
-	if jn.DeliveryWindowLocalTimeOfDayEnd != nil {
-		n.DeliveryWindowLocalTimeOfDayEnd = *jn.DeliveryWindowLocalTimeOfDayEnd
+	if jn.DeliveryWindowTODStart != "" {
+		deliveryStart, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODStart)
+		if err != nil && StrictDatamodelParsing {
+			return NewUserPresentableError("Invalid deliveryTimeOfDayStart. Expect HH:MM format. Was: " + jn.DeliveryWindowTODStart)
+		} else if err != nil {
+			fmt.Printf("CriticalMoments: invalid deliveryTimeOfDayStart [%v]. Using default: %v\n", jn.DeliveryWindowTODStart, defaultDeliveryWindowLocalTimeStart)
+			n.DeliveryWindowTODStartMinutes = defaultDeliveryWindowLocalTimeStart
+		} else {
+			n.DeliveryWindowTODStartMinutes = deliveryStart
+		}
 	} else {
-		n.DeliveryWindowLocalTimeOfDayEnd = defaultDeliveryWindowLocalTimeEnd
+		n.DeliveryWindowTODStartMinutes = defaultDeliveryWindowLocalTimeStart
+	}
+	if jn.DeliveryWindowTODEnd != "" {
+		deliveryEnd, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODEnd)
+		if err != nil && StrictDatamodelParsing {
+			return NewUserPresentableError("Invalid deliveryTimeOfDayEnd. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
+		} else if err != nil {
+			fmt.Printf("CriticalMoments: invalid deliveryTimeOfDayEnd [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
+			n.DeliveryWindowTODEndMinutes = defaultDeliveryWindowLocalTimeEnd
+		} else {
+			n.DeliveryWindowTODEndMinutes = deliveryEnd
+		}
+	} else {
+		n.DeliveryWindowTODEndMinutes = defaultDeliveryWindowLocalTimeEnd
 	}
 
 	// ignore ID which is set later from primary config
@@ -229,6 +263,28 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func parseMinutesFromHHMMString(i string) (int, error) {
+	if i == "" {
+		return 0, errors.New("Empty string for HH:MM time of day")
+	}
+	values := strings.Split(i, ":")
+	if len(values) != 2 {
+		return 0, errors.New("invalid HH:MM time of day")
+	}
+	hours, err := strconv.Atoi(values[0])
+	if err != nil {
+		return 0, err
+	}
+	minutes, err := strconv.Atoi(values[1])
+	if err != nil {
+		return 0, err
+	}
+	if hours < 0 || hours > 23 || minutes < 0 || minutes > 59 {
+		return 0, errors.New("invalid HH:MM time of day")
+	}
+	return hours*60 + minutes, nil
 }
 
 // Parsed comman separated day of week strings, removing dupes and standardizing order

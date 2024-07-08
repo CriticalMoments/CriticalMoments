@@ -8,8 +8,8 @@
   "launchImageName": "storyboard1",
   "tapActionName": "actionName",
   "deliveryDaysOfWeek": "Monday,Tuesday",
-  "deliveryLocalTimeOfDayStart": 60,
-  "deliveryLocalTimeOfDayEnd": 120,
+  "deliveryTimeOfDayStart": "01:30",
+  "deliveryTimeOfDayEnd": "23:59",
   "idealDeliveryConditions": {
     "condition": "true",
     "maxWaitTime": 10

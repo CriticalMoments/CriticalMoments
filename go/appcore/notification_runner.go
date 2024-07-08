@@ -2,6 +2,7 @@ package appcore
 
 import (
 	"errors"
+	"slices"
 	"time"
 
 	datamodel "github.com/CriticalMoments/CriticalMoments/go/cmcore/data_model"
@@ -70,9 +71,10 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 	}
 	for _, notification := range ac.config.Notifications {
 		if deliveryTimestamp := ac.deliveryTimeForNotification(notification); deliveryTimestamp != nil {
+			deliveryTimeShiftedToWindow := shiftDeliveryTimeForAllowedWindows(notification, deliveryTimestamp)
 			sn := ScheduledNotification{
 				Notification: notification,
-				scheduledAt:  *deliveryTimestamp,
+				scheduledAt:  *deliveryTimeShiftedToWindow,
 			}
 			plan.scheduledNotifications = append(plan.scheduledNotifications, &sn)
 		} else {
@@ -115,6 +117,33 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	}
 
 	return nil
+}
+
+// Move the time forward until it is in the delivery window
+func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, deliveryTime *time.Time) *time.Time {
+	newTime := *deliveryTime
+
+	// Shift hours first, if needed
+	deliveryMinuteOfDay := newTime.Minute() + newTime.Hour()*60
+	startHour := notification.DeliveryWindowTODStartMinutes / 60
+	startMinute := notification.DeliveryWindowTODStartMinutes % 60
+	if deliveryMinuteOfDay < notification.DeliveryWindowTODStartMinutes {
+		// Shift to start time on same day
+		newTime = time.Date(newTime.Year(), newTime.Month(), newTime.Day(), startHour, startMinute, 0, 0, newTime.Location())
+	} else if deliveryMinuteOfDay > notification.DeliveryWindowTODEndMinutes {
+		// Shift to next day at start time (soonest time after that fits window)
+		newTime = time.Date(newTime.Year(), newTime.Month(), newTime.Day()+1, startHour, startMinute, 0, 0, newTime.Location())
+	}
+
+	// Shift day of week forward 1d until it's in the window
+	for int := 0; int < 7; int++ {
+		if slices.Contains(notification.DeliveryDaysOfWeek, newTime.Weekday()) {
+			break
+		}
+		newTime = newTime.AddDate(0, 0, 1)
+	}
+
+	return &newTime
 }
 
 func (ac *Appcore) isNotificationCanceled(notification *datamodel.Notification) bool {
