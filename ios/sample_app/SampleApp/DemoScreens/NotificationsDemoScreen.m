@@ -21,7 +21,6 @@
             @"Deliver notifiations to users when your app isn't open.\n\nSet the badge (count) on your app "
             @"icon.\n\nCritical Moments can deliver "
             @"notifications without servers. It can also optimize the ideal delivery time to increase engagement.";
-        // TODO_P0
         // self.buttonLink = @"https://docs.criticalmoments.io/actions/alerts";
 
         [self buildSections];
@@ -34,8 +33,7 @@
 }
 
 - (void)buildSections {
-
-    // TODO_P0: another usage demos (need conditions)
+    // Future usage demos:
     // Remind later: when on WiFi and using device. Note: you won't recieve this notificaiton right away, it make
     // take a few hours. But it is likely to find you when you're at home/work, and have a moment to use your phone.
 

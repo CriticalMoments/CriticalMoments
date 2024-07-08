@@ -45,8 +45,6 @@ func TestNotificationList(t *testing.T) {
 	if sn.ScheduledAtEpochMilliseconds() != 2224580934*1000 {
 		t.Fatalf("Expected ScheduledAtEpoch to return time in 2040, got %d", sn.ScheduledAtEpochMilliseconds())
 	}
-
-	// TODO_P0: test bg execution
 }
 
 func TestEventNotificationPlan(t *testing.T) {

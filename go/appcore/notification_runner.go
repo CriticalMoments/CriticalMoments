@@ -81,8 +81,6 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 			plan.unscheduledNotifications = append(plan.unscheduledNotifications, notification)
 		}
 	}
-	// TODO_P0: filter those already delivered
-	// TODO_P0: set BG time needed somewhere, and range
 
 	return plan, nil
 }
@@ -101,7 +99,6 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	if staticTimestamp := notification.DeliveryTime.Timestamp(); staticTimestamp != nil {
 		// Statically scheduled
 		// If time has passed, we should not deliver static time notification
-		// TODO_P0: test that sceduling for near now (or just past) still devlivers asap in iOS
 		if time.Now().After(*staticTimestamp) {
 			return nil
 		}
@@ -118,7 +115,6 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 			deliveryTime = &offsetTime
 		}
 
-		// TODO_P0: in past do we still schedule? I think so but confirm
 		return deliveryTime
 	}
 
