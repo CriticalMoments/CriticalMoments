@@ -8,6 +8,7 @@
 #import "NotificationsDemoScreen.h"
 
 #import "UserNotifications/UserNotifications.h"
+#import <CriticalMoments.h>
 #import <UIKit/UIKit.h>
 
 @implementation NotificationsDemoScreen
@@ -64,19 +65,24 @@
         @"after tapping to see the effect.";
     clearBadgeNotif.actionCMEventName = @"demo_notification_4";
 
-    [self addSection:@"Basic Examples"
-         withActions:@[ eventNotification, delayNotification, badgeNotif, clearBadgeNotif ]];
+    CMDemoAction *criticalNotif = [[CMDemoAction alloc] init];
+    criticalNotif.title = @"Critical Notification";
+    criticalNotif.subtitle =
+        @"Show a notification with a 'critical' interruption level, which will receive priority on the lock screen.";
+    criticalNotif.actionCMEventName = @"demo_notification_5";
+
+    [self addSection:@"Notification Examples" withActions:@[ eventNotification, delayNotification, criticalNotif ]];
+
+    [self addSection:@"Badge Examples" withActions:@[ badgeNotif, clearBadgeNotif ]];
 }
 
 - (void)requestPermission:(UIViewController *)vc {
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    UNAuthorizationOptions opt = UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound;
-    [center requestAuthorizationWithOptions:opt
-                          completionHandler:^(BOOL granted, NSError *_Nullable error) {
-                            if (!granted || error) {
-                                [self showPermissionsIssue:vc];
-                            }
-                          }];
+    [CriticalMoments.shared
+        requestNotificationPermissionWithCompletionHandler:^(BOOL granted, NSError *_Nullable error) {
+          if (!granted || error) {
+              [self showPermissionsIssue:vc];
+          }
+        }];
 }
 
 - (void)showPermissionsIssue:(UIViewController *)vc {

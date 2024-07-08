@@ -1203,6 +1203,15 @@
           "deliveryTime": {
             "eventName": "demo_notification_4"
           }
+        },
+        "demoEventNotification5": {
+          "title": "Critical Notification",
+          "body": "Display a 'critical' level notification, which will get priority on lockscreen.",
+          "interruptionLevel": "critical",
+          "relevanceScore": 1.0,
+          "deliveryTime": {
+            "eventName": "demo_notification_5"
+          }
         }
     }
 }

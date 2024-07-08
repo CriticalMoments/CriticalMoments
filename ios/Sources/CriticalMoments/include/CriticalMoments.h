@@ -237,6 +237,22 @@ currently equivalent) will make it impossible to override each usage independent
  */
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
+#pragma mark Notifications
+
+/**
+ Request permission to show notifications to the user, using the system prompt.
+
+ Safe to call this even if the user has already granted permission. A duplicate prompt won't be shown.
+
+ Using this instead of the system requestAuthorizationWithOptions will trigger Critical Moments to schedule any needed
+ permissions once the user grants permission.
+
+ @param completionHandler Optional. A handler to be called back immediatly after permissions are granted or denied. Not
+ called if this user had already granted/denied notification permissions and no prompt was displayed.
+ */
+- (void)requestNotificationPermissionWithCompletionHandler:
+    (void (^_Nullable)(BOOL granted, NSError *__nullable error))completionHandler;
+
 #ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Simple "ping" method for testing end to end integrations
 /// :nodoc:

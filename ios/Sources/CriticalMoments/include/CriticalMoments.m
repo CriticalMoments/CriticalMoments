@@ -423,6 +423,32 @@ static CriticalMoments *sharedInstance = nil;
     });
 }
 
+- (void)requestNotificationPermissionWithCompletionHandler:
+    (void (^_Nullable)(BOOL granted, NSError *__nullable error))completionHandler {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+
+    // Check if already authorized/denied.
+    // We don't want to force update the plan unless permissions are actually changing.
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull settings) {
+      BOOL authorized = settings.authorizationStatus == UNAuthorizationStatusAuthorized;
+      BOOL denied = settings.authorizationStatus == UNAuthorizationStatusDenied;
+      if (!authorized && !denied) {
+          UNAuthorizationOptions opt = UNAuthorizationOptionAlert | UNAuthorizationOptionBadge |
+                                       UNAuthorizationOptionSound | UNAuthorizationOptionCriticalAlert;
+          [center requestAuthorizationWithOptions:opt
+                                completionHandler:^(BOOL granted, NSError *_Nullable error) {
+                                  if (completionHandler) {
+                                      completionHandler(granted, error);
+                                  }
+                                  if (granted) {
+                                      // Schedule any CM notifications that need to be scheduled now
+                                      [_appcore forceUpdateNotificationPlan:nil];
+                                  }
+                                }];
+      }
+    }];
+}
+
 #pragma mark Demo App and Internal APIs
 
 // Private/Internal: Only for demo app usage
