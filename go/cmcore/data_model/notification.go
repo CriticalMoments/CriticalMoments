@@ -20,9 +20,8 @@ var allDaysOfWeek = []time.Weekday{
 	time.Saturday,
 }
 
-// 9am to 9pm
-const defaultDeliveryWindowLocalTimeStart = 9 * 60
-const defaultDeliveryWindowLocalTimeEnd = 21 * 60
+const defaultDeliveryWindowLocalTimeStart = 0
+const defaultDeliveryWindowLocalTimeEnd = 23*60 + 59
 
 var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
 
