@@ -48,6 +48,7 @@
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:notifSchedule.scheduledAtEpochMilliseconds / 1000.0];
     UNNotificationTrigger *trigger = [CMNotificationHandler triggerForDate:date];
     if (!trigger) {
+        // No error, nil here means already delivered
         return;
     }
 
@@ -68,15 +69,15 @@
 
 + (UNNotificationTrigger *)triggerForDate:(NSDate *)date {
     NSTimeInterval timeUntilDate = [date timeIntervalSinceNow];
-    // TODO_P0: the -0.5 check is checking that this was just scheduled (not old and likely already delivered one). Temp
-    // workaround. We should cache delivered time (or scheduled time) by ID, and not re-schedule if we already
-    // delivered/scheduled it.
-    if (timeUntilDate < -0.5) {
+    // Appcore sends all notifications. Including old ones which may be delivered (could be 6 months old). Don't schedule a notification if it's in the past (by more than 0.8s). Those are likely already delivered/scheduled, if not stale.
+    if (timeUntilDate < -0.8) {
         return nil;
     }
-    if (timeUntilDate <= 0.5) {
-        // <= 0s delay not allowed, so use small value.
-        timeUntilDate = 0.001;
+    if (timeUntilDate <= 1) {
+        // Part 1) <= 0s delay not allowed, so use check and set to positive value
+        // Part 2) Why 1s in the future? In case AppCore sends several updates for same notificaiton rapidly. By scheduling 1s out (from delivery time), and not scheduling if 0.9s in past we avoid duplicate notifications for same timestamp. Could add a cache, but async APIs make that risky. Keep it simple.
+        // Part 3) A bit of debounce if app sends multiple events
+        timeUntilDate = 1;
     }
     return [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeUntilDate repeats:NO];
 }
