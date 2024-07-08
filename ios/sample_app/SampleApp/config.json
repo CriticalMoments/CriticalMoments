@@ -664,7 +664,7 @@
             "conditional_warm": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_temperature > 20)",
+                    "condition": "((weather_approx_location_temperature ?? 0) > 20)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -672,7 +672,7 @@
             "conditional_cloudy": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_cloud_cover > 0.5)",
+                    "condition": "((weather_approx_location_cloud_cover ?? 0) > 0.5)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -1134,7 +1134,7 @@
         "namedConditions": {
             "custom_feature_1": "false",
             "app_not_recently_installed": "app_install_date < now() - duration('10m')",
-            "weather_warm": "(weather_approx_location_temperature > 20)",
+            "weather_warm": "((weather_approx_location_temperature ?? 0) > 20)",
             "ab_test_group_for_experiment_five": "(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)",
             "is_iphone_with_recent_os": "device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
         }
