@@ -17,10 +17,10 @@
     self = [super init];
     if (self) {
         self.title = @"Notification & Badges";
-        self.infoText =
-            @"Deliver notifiations to users when your app isn't open.\n\nSet the badge (count) on your app "
-            @"icon.\n\nCritical Moments can deliver "
-            @"notifications without servers. It can also optimize the ideal delivery time to increase engagement.";
+        self.infoText = @"Deliver notifiations to users when your app isn't open.\n\nSet the badge (count) on your app "
+                        @"icon.\n\nCritical Moments can deliver "
+                        @"notifications without a push server. It can also optimize the ideal delivery time to "
+                        @"increase engagement.";
         // self.buttonLink = @"https://docs.criticalmoments.io/actions/alerts";
 
         [self buildSections];
@@ -33,16 +33,15 @@
 }
 
 - (void)buildSections {
-    // Future usage demos:
-    // Remind later: when on WiFi and using device. Note: you won't recieve this notificaiton right away, it make
+    // Future usage demos to add:
+    // Remind later, when on WiFi and using device. Note: you won't receive this notification right away. It
     // take a few hours. But it is likely to find you when you're at home/work, and have a moment to use your phone.
+    // Alert explaining delay.
 
     CMDemoAction *comeBackDemo = [[CMDemoAction alloc] init];
     comeBackDemo.title = @"Complete Onboarding CTA";
     comeBackDemo.subtitle =
-        @"Reduce new-user churn by reminding users who abandon setup. Show a notification a few minutes after they "
-        @"leave the app (for this demo we use a 5s delay).\n\nTap this, then dismiss the app to see a CTA notification "
-        @"5 seconds after the app moves to the background.";
+        @"Reduce new-user churn by reminding users who abandon onboarding, reminding them to complete their setup.";
     comeBackDemo.actionCMEventName = @"enableComeBack";
 
     [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo ]];
@@ -57,6 +56,14 @@
     delayNotification.subtitle = @"Display a notification with a 5s delay.";
     delayNotification.actionCMEventName = @"demo_notification_2";
 
+    CMDemoAction *criticalNotif = [[CMDemoAction alloc] init];
+    criticalNotif.title = @"Critical Notification";
+    criticalNotif.subtitle = @"Show a notification set to the 'critical' interruption level. This notification will "
+                             @"receive priority on the lock screen.";
+    criticalNotif.actionCMEventName = @"demo_notification_5";
+
+    [self addSection:@"Notification Examples" withActions:@[ eventNotification, delayNotification, criticalNotif ]];
+
     CMDemoAction *badgeNotif = [[CMDemoAction alloc] init];
     badgeNotif.title = @"Set App Icon Badge";
     badgeNotif.subtitle = @"Display a badge on your app icon. Badges are numbers that indicate content is available in "
@@ -70,20 +77,12 @@
         @"after tapping to see the effect.";
     clearBadgeNotif.actionCMEventName = @"demo_notification_4";
 
-    CMDemoAction *criticalNotif = [[CMDemoAction alloc] init];
-    criticalNotif.title = @"Critical Notification";
-    criticalNotif.subtitle =
-        @"Show a notification with a 'critical' interruption level, which will receive priority on the lock screen.";
-    criticalNotif.actionCMEventName = @"demo_notification_5";
-
-    [self addSection:@"Notification Examples" withActions:@[ eventNotification, delayNotification, criticalNotif ]];
-
     [self addSection:@"Badge Examples" withActions:@[ badgeNotif, clearBadgeNotif ]];
 }
 
 - (void)requestPermission:(UIViewController *)vc {
     [CriticalMoments.shared
-        requestNotificationPermissionWithCompletionHandler:^(BOOL granted, NSError *_Nullable error) {
+        requestNotificationPermissionWithCompletionHandler:^(BOOL prompted, BOOL granted, NSError *_Nullable error) {
           if (!granted || error) {
               [self showPermissionsIssue:vc];
           }

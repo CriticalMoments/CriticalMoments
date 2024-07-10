@@ -246,11 +246,12 @@ currently equivalent) will make it impossible to override each usage independent
  This API calls the system's requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
  schedule any queued notifications.
 
- @param completionHandler Optional. A handler to be called back immediatly after permissions are granted or denied. Not
- called if this user had already granted/denied notification permissions and no prompt was displayed.
+ @param completionHandler Optional. A handler to be called back immediatly after permissions are granted or denied.
+ `prompted` returns true if the user saw a permission prompt for this call, and false if the user had made the
+ authorization decision in the past.
  */
 - (void)requestNotificationPermissionWithCompletionHandler:
-    (void (^_Nullable)(BOOL granted, NSError *__nullable error))completionHandler;
+    (void (^_Nullable)(BOOL prompted, BOOL granted, NSError *__nullable error))completionHandler;
 
 #ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Simple "ping" method for testing end to end integrations
