@@ -1,9 +1,6 @@
 name: Build and Test SDK
 
-on:
-  push:
-    paths:
-      - 'ios/**'
+on: push
 
 jobs:
   build_and_test:
@@ -30,4 +27,4 @@ jobs:
         run: ./go/build_appcore.sh 
 
       - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.5,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && exit ${PIPESTATUS[0]}
+        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && exit ${PIPESTATUS[0]}
