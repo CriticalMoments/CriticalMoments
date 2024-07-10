@@ -462,8 +462,8 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 		}
 	}
 	for notificationID, notification := range pc.Notifications {
-		if notIssue := notification.ValidateReturningUserReadableIssue(); notIssue != "" {
-			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notIssue)
+		if notifIssue := notification.ValidateReturningUserReadableIssue(); notifIssue != "" {
+			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notifIssue)
 		}
 	}
 
