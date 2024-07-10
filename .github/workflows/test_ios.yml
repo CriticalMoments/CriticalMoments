@@ -27,7 +27,7 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_15.4.app && /usr/bin/xcodebuild -version
 
       - name: Build go appcore xcframework
-        run: ./go/build_appcore.sh && ls -la go/appcore/build/Appcore.xcframework/
+        run: ./go/build_appcore.sh
 
       - name: Select xcode 15.2 for iOS
         run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
