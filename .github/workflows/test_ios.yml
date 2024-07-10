@@ -14,6 +14,9 @@ jobs:
           go-version-file: 'go/go.mod'
           cache-dependency-path: go/go.sum
 
+      - name: Which xcpretty
+        run: which xcpretty && xcpretty --version
+
       - name: Setup gomobile
         run: cd go && go install golang.org/x/mobile/cmd/gomobile && gomobile init && cd ..
 
