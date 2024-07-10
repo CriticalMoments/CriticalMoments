@@ -45,7 +45,7 @@
 
     CMDemoAction *notificationDemo = [[CMDemoAction alloc] init];
     notificationDemo.title = @"Notifications & Badges";
-    notificationDemo.subtitle = @"Notifications delivered to your users, targting the ideal time for re-engagement.";
+    notificationDemo.subtitle = @"Notifications delivered to your users, targeting the ideal time for re-engagement.";
     notificationDemo.skipInUiTesting = YES;
     notificationDemo.actionNextScreen = [[NotificationsDemoScreen alloc] init];
 

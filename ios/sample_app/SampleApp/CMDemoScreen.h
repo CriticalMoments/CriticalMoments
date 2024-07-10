@@ -52,8 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readwrite) NSString *title;
 @property(nonatomic, readwrite) NSString *infoText, *buttonLink, *buttonTitle;
 
-//@property (nonatomic, copy, nullable) void (^willAppear)(void);
-
 - (NSArray<CMDemoSection *> *)sections;
 
 - (void)addSection:(NSString *)section withActions:(NSArray<CMDemoAction *> *)actions;

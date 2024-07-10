@@ -240,12 +240,11 @@ currently equivalent) will make it impossible to override each usage independent
 #pragma mark Notifications
 
 /**
- Request permission to show notifications to the user, using the system prompt.
+ Requests a person’s authorization to allow local and remote notifications for your app, using the standard system
+ prompt to the user.
 
- Safe to call this even if the user has already granted permission. A duplicate prompt won't be shown.
-
- Using this instead of the system requestAuthorizationWithOptions will trigger Critical Moments to schedule any needed
- permissions once the user grants permission.
+ This API calls the system's requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
+ schedule any queued notifications.
 
  @param completionHandler Optional. A handler to be called back immediatly after permissions are granted or denied. Not
  called if this user had already granted/denied notification permissions and no prompt was displayed.

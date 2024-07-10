@@ -503,6 +503,13 @@
                     }
                 }
             },
+            "enableComeBackAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Onboarding Alert Scheduled",
+                    "message": "Dismiss this app, and a notification will remind you to complete onboarding 5 seconds later.\n\nIn a real app, you would use a longer delay, such as 15 minutes."
+                }
+            },
             "show_notice_alert": {
                 "actionType": "alert",
                 "actionData": {
@@ -1127,6 +1134,10 @@
             "subscribe_trigger": {
                 "eventName": "completed_task",
                 "actionName": "journey_goal_3"
+            },
+            "enableComeBackInstructions": {
+                "eventName": "enableComeBack",
+                "actionName": "enableComeBackAlert"
             }
         }
     },
