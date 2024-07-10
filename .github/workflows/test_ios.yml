@@ -1,6 +1,9 @@
 name: Build and Test SDK
 
-on: push
+on:
+  push:
+    paths:
+      - 'ios/**'
 
 jobs:
   build_and_test:
