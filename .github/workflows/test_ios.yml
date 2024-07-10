@@ -20,10 +20,15 @@ jobs:
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
 
+        # Can use 15.3 for both once, contains fix:
+        # https://forums.swift.org/t/xcodebuild-create-xcframework-not-working-in-xcode-15-0/67439/4
+      - name: Select xcode 14.2 for Appcore build
+        run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
+
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
 
-      - name: Select xcode
+      - name: Select xcode 15.2 for iOS build
         run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test iOS Package and SampleApp
