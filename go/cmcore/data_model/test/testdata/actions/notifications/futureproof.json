@@ -1,7 +1,0 @@
-{
-    "actionType": "alert",
-    "actionData": {
-        "title": "hello from the future",
-        "style": "future_style"
-    }
-}
