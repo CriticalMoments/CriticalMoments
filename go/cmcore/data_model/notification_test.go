@@ -117,7 +117,7 @@ func TestNotificationActionValidators(t *testing.T) {
 func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	testFileData, err := os.ReadFile("./test/testdata/actions/notifications/valid/minimalValidNotif.json")
 	if err != nil {
-		t.Fatal()
+		t.Fatal(err)
 	}
 	var n Notification
 	err = json.Unmarshal(testFileData, &n)

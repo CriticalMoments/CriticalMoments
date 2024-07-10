@@ -30,15 +30,17 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    // Prefer original delegate behaviour if set
-    if (self.originalDelegate) {
+    // Prefer original delegate's behaviour if available
+    if ([self.originalDelegate respondsToSelector:@selector(userNotificationCenter:
+                                                           willPresentNotification:withCompletionHandler:)]) {
         [self.originalDelegate userNotificationCenter:center
                               willPresentNotification:notification
                                 withCompletionHandler:completionHandler];
         return;
     }
 
-    // Align to the default OS behaviour if the app doesn't set a delegate: don't display any notifications.
+    // Align to the default OS behaviour if the app doesn't set a delegate: don't display any notifications overtop the
+    // active app.
     completionHandler(0);
 }
 
@@ -54,7 +56,8 @@
         return;
     }
 
-    if (self.originalDelegate) {
+    if ([self.originalDelegate respondsToSelector:@selector(userNotificationCenter:
+                                                      didReceiveNotificationResponse:withCompletionHandler:)]) {
         [self.originalDelegate userNotificationCenter:center
                        didReceiveNotificationResponse:response
                                 withCompletionHandler:completionHandler];

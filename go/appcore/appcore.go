@@ -305,7 +305,7 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	}
 
 	// In practice, the event above probably already triggered this, but just in case
-	err = ac.initializeNotificaitonPlan()
+	err = ac.initializeNotificationPlan()
 	if err != nil {
 		fmt.Printf("CriticalMoments: there was an issue setting up notifications. Continuing as this error is non-fatal: %v\n", err)
 	}

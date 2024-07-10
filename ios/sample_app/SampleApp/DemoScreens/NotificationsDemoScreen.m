@@ -114,7 +114,7 @@
                                  }];
       [alert addAction:defaultAction];
       alert.preferredAction = defaultAction;
-      [vc presentViewController:alert animated:YES completion:nil];
+      [vc.navigationController presentViewController:alert animated:YES completion:nil];
     });
 }
 

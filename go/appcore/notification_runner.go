@@ -43,7 +43,7 @@ func (sn *ScheduledNotification) ScheduledAtEpochMilliseconds() int64 {
 	return sn.scheduledAt.UnixMilli()
 }
 
-func (ac *Appcore) initializeNotificaitonPlan() error {
+func (ac *Appcore) initializeNotificationPlan() error {
 	if ac.notificationPlan == nil {
 		return ac.ForceUpdateNotificationPlan()
 	}
