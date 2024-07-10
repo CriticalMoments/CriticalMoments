@@ -28,3 +28,9 @@ jobs:
         check-path: 'ios'
         fallback-style: 'WebKit'
         include-regex: '^.*\.((((c|C)(c|pp|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))|(ino|pde|proto|cu|m))$'
+
+    - name: Download go misspell
+      run: go install github.com/client9/misspell/cmd/misspell@latest
+
+    - name: Run misspell
+      run: misspell -error .
