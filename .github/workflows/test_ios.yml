@@ -14,9 +14,6 @@ jobs:
           go-version-file: 'go/go.mod'
           cache-dependency-path: go/go.sum
 
-      - name: Which xcpretty
-        run: which xcpretty && xcpretty --version
-
       - name: Setup gomobile
         run: cd go && go install golang.org/x/mobile/cmd/gomobile && gomobile init && cd ..
 
@@ -30,4 +27,4 @@ jobs:
         run: ./go/build_appcore.sh 
 
       - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && cd ../..
+        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && cd ../..
