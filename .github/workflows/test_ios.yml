@@ -20,8 +20,8 @@ jobs:
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
 
-      - name: Select xcode 14.2 for Appcore
-        run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
+      - name: Select xcode 14 for Appcore
+        run: sudo xcode-select -switch /Applications/Xcode_14.3.1.app && /usr/bin/xcodebuild -version
 
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
