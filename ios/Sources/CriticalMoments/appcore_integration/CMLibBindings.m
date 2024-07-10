@@ -167,6 +167,10 @@
 
 - (BOOL)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan
                          error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    if ([self.cm userNotificationsDisabled]) {
+        return YES;
+    }
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       [CMNotificationHandler updateNotificationPlan:notifPlan];
     });

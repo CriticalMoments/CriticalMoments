@@ -23,11 +23,14 @@ jobs:
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
 
-      - name: Select xcode
+      - name: Select xcode 15.4 for Appcore
         run: sudo xcode-select -switch /Applications/Xcode_15.4.app && /usr/bin/xcodebuild -version
 
       - name: Build go appcore xcframework
-        run: ./go/build_appcore.sh 
+        run: ./go/build_appcore.sh
+
+      - name: Select xcode 15.2 for iOS
+        run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && cd ../..
+        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && exit ${PIPESTATUS[0]}
