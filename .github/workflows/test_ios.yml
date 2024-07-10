@@ -5,7 +5,7 @@ on: push
 jobs:
   build_and_test:
     name: Build & test SDK
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - uses: actions/checkout@v4
@@ -20,16 +20,11 @@ jobs:
       - name: Golang tests
         run: cd go && go test -v ./... && cd ..
 
-        # Can use 15.3 for both once, contains fix:
-        # https://forums.swift.org/t/xcodebuild-create-xcframework-not-working-in-xcode-15-0/67439/4
-      - name: Select xcode 14.2 for Appcore build
-        run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
+      - name: Select xcode
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app && /usr/bin/xcodebuild -version
 
       - name: Build go appcore xcframework
         run: ./go/build_appcore.sh 
-
-      - name: Select xcode 15.2 for iOS build
-        run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test iOS Package and SampleApp
         run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test | xcpretty && cd ../..
