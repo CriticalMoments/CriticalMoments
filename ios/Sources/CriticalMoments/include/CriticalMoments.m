@@ -18,7 +18,7 @@
 #import <UserNotifications/UserNotifications.h>
 
 @interface CriticalMoments ()
-@property(nonatomic) BOOL queuesStarted;
+@property(nonatomic) BOOL queuesStarted, disableNotifications;
 @property(nonatomic, strong) NSString *releaseConfigUrl, *devConfigUrl;
 @property(nonatomic, strong) AppcoreAppcore *appcore;
 @property(nonatomic, strong) CMLibBindings *bindings;
@@ -406,7 +406,18 @@ static CriticalMoments *sharedInstance = nil;
 
 #pragma mark Notifications
 
+- (void)disableUserNotifications {
+    _disableNotifications = true;
+}
+
+- (BOOL)userNotificationsDisabled {
+    return _disableNotifications;
+}
+
 - (void)registerNotificationDelegate {
+    if (_disableNotifications) {
+        return;
+    }
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     id<UNUserNotificationCenterDelegate> existingDelegate = center.delegate;
     _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate];
