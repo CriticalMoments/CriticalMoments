@@ -36,7 +36,9 @@
     </header>
 
     <p class="breadcrumbs">
-      <a class="breadcrumb" href="../index.html"> Reference</a>
+      <a class="breadcrumb" href="../index.html">Index</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      <a class="breadcrumb" href="../Classes.html">Classes</a>
       <img class="carat" src="../img/carat.png" alt=""/>
       CriticalMoments Class Reference
     </p>
@@ -115,9 +117,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(cm)sharedInstance"></a>
-                    <a name="//apple_ref/objc/Method/+sharedInstance" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)sharedInstance">+sharedInstance</a>
+                    <a name="/c:objc(cs)CriticalMoments(cm)shared"></a>
+                    <a name="//apple_ref/objc/Method/+shared" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(cm)shared">+shared</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -125,19 +127,19 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The default instance of critical moments. You should always use this instance</p>
+                        <p>The default instance of Critical Moments. You should always use this instance.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">CriticalMoments</span> <span class="o">*</span><span class="p">)</span><span class="n">sharedInstance</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">+</span> <span class="p">(</span><span class="n">nonnull</span> <span class="n">CriticalMoments</span> <span class="o">*</span><span class="p">)</span><span class="n">shared</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">sharedInstance</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">CriticalMoments</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">class</span> <span class="kd">func</span> <span class="nf">shared</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">CriticalMoments</span></code></pre>
 
                         </div>
                       </div>
@@ -273,6 +275,64 @@ or not at all.</li>
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/c:objc(cs)CriticalMoments(im)setDevelopmentConfigName:"></a>
+                    <a name="//apple_ref/objc/Method/-setDevelopmentConfigName:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setDevelopmentConfigName:">-setDevelopmentConfigName:<wbr></a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Set a local development config file for Critical Moments by name. Path will be looked up in your main bundle.</p>
+
+<p>For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
+guide for how to create this file: <a href="https://docs.criticalmoments.io/quick-start">https://docs.criticalmoments.io/quick-start</a></p>
+
+<p>This local config file will not be used on release builds / app store builds. You must also set a production config URL
+with setProductionConfigUrl for those builds.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setDevelopmentConfigName</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">configFileName</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setDevelopmentConfigName</span><span class="p">(</span><span class="n">_</span> <span class="nv">configFileName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>configFileName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the name of the config file (e.g. <code>cmConfig.json</code>). The full path will be looked up in your main
+bundle.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/c:objc(cs)CriticalMoments(im)setDevelopmentConfigUrl:"></a>
                     <a name="//apple_ref/objc/Method/-setDevelopmentConfigUrl:" class="dashAnchor"></a>
                     <a class="token" href="#/c:objc(cs)CriticalMoments(im)setDevelopmentConfigUrl:">-setDevelopmentConfigUrl:<wbr></a>
@@ -283,7 +343,7 @@ or not at all.</li>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Set a local development Config URL for critical moments.</p>
+                        <p>Set a local development config URL for Critical Moments.</p>
 
 <p>For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
 guide for how to create this file: <a href="https://docs.criticalmoments.io/quick-start">https://docs.criticalmoments.io/quick-start</a></p>
@@ -348,7 +408,7 @@ for details: <a href="https://docs.criticalmoments.io/config-file">https://docs.
     <p class="aside-title">Warning</p>
     Be sure to secure who can upload files to this URL path. This config
 file can present messages directly to your users, and you should treat security
-seriously, as you would your app update release process or webpage secuirty.
+seriously, as you would your app update release process or webpage security.
 
 </div>
 
@@ -539,7 +599,7 @@ in the config file&rsquo;s namedConditions section.</p>
 <p>Configuration documentation: <a href="https://docs.criticalmoments.io/conditional-targeting/named-conditions">https://docs.criticalmoments.io/conditional-targeting/named-conditions</a></p>
 
 <p>The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
-can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+can use properties which are asynchronous (checking network state, battery state, and many others).  It is not called on
 the main thread, so be sure to dispatch to the main thread if calling into UI libraries.</p>
 <div class="aside aside-warning">
     <p class="aside-title">Warning</p>
@@ -560,7 +620,7 @@ currently equivalent) will make it impossible to override each usage independent
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Bool</span><span class="p">,</span> <span class="p">(</span><span class="n">any</span> <span class="kt">Error</span><span class="p">)?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Bool</span><span class="p">,</span> <span class="p">(</span><span class="kd">any</span> <span class="kt">Error</span><span class="p">)?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -590,7 +650,7 @@ The name is used as a lookup the condition-string of a namedCondition in the con
                               <td>
                                 <div>
                                   <p>A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occured evaluating the condition. The boolean value is false for any error, including if the
+returns any errors occurred evaluating the condition. The boolean value is false for any error, including if the
 condition is not found in the config.</p>
                                 </div>
                               </td>
@@ -1073,14 +1133,85 @@ failed, just that some field(s) failed.</p>
                 </li>
               </ul>
             </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Notifications"></a>
+                <a name="//apple_ref/objc/Section/Notifications" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Notifications"></a>
+                  <h3 class="section-name"><span>Notifications</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:objc(cs)CriticalMoments(im)requestNotificationPermissionWithCompletionHandler:"></a>
+                    <a name="//apple_ref/objc/Method/-requestNotificationPermissionWithCompletionHandler:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)requestNotificationPermissionWithCompletionHandler:">-requestNotificationPermissionWithCompletionHandler:<wbr></a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Requests a person’s authorization to allow local and remote notifications for your app, using the standard system
+prompt to the user.</p>
+
+<p>This API calls the system&rsquo;s requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
+schedule any queued notifications.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Objective-C</p>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">requestNotificationPermissionWithCompletionHandler</span><span class="p">:</span>
+    <span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">_Nullable</span><span class="p">)(</span><span class="n">BOOL</span><span class="p">,</span> <span class="n">BOOL</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">))</span><span class="nv">completionHandler</span><span class="p">;</span></code></pre>
+
+                        </div>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">requestNotificationPermission</span><span class="p">()</span> <span class="k">async</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">Bool</span><span class="p">,</span> <span class="kt">Bool</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>completionHandler</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional. A handler to be called back immediately after permissions are granted or denied.
+<code>prompted</code> returns true if the user saw a permission prompt for this call, and false if the user had made the
+authorization decision in the past.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2024 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2024-03-18)</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+      <p>&copy; 2024 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2024-07-11)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>
 </html>
