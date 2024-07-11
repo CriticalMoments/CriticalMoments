@@ -21,7 +21,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
-    // guarunteed to work over time, nor is deleting the database file a good idea.
+    // guaranteed to work over time, nor is deleting the database file a good idea.
     [Utils deleteDatabase];
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];

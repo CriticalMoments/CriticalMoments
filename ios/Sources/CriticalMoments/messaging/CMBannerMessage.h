@@ -101,7 +101,7 @@ typedef NS_ENUM(NSUInteger, CMBannerPosition) {
 @property(nonatomic, readwrite) bool showDismissButton;
 
 /**
- Controlls the max number of lines allowed in the banner message text. Defaults
+ Controls the max number of lines allowed in the banner message text. Defaults
  to 4. Set to 0 for unlimited, although banners are still capped at 20% of
  screen height and will eventually tuncate.
  */

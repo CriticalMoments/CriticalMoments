@@ -47,7 +47,7 @@
     [updateRecommended addResetTestTarget:self action:@selector(resetAll)];
 
     CMDemoAction *outageModal = [[CMDemoAction alloc] init];
-    outageModal.title = @"Service Outage or Maintanence Warning";
+    outageModal.title = @"Service Outage or Maintenance Warning";
     outageModal.subtitle = @"During an outage, let your user know that you're aware and working on a fix."
                            @" Messaging in these moments can reduce negative reviews, panic about data loss, and "
                            @"support request volume.\n\nThese can be remotely added during outages, and removed after.";

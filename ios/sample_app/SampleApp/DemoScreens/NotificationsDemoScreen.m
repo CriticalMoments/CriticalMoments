@@ -48,7 +48,7 @@
 
     CMDemoAction *eventNotification = [[CMDemoAction alloc] init];
     eventNotification.title = @"Basic Notifications";
-    eventNotification.subtitle = @"Display a notification, triggered immediatly after an in app event.";
+    eventNotification.subtitle = @"Display a notification, triggered immediately after an in app event.";
     eventNotification.actionCMEventName = @"demo_notification_1";
 
     CMDemoAction *delayNotification = [[CMDemoAction alloc] init];

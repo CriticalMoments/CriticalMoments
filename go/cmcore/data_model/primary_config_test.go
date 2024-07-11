@@ -701,7 +701,7 @@ func TestDefaultThemeSelection(t *testing.T) {
 		t.Fatal(err)
 	}
 	if pc.DefaultTheme() != nil {
-		t.Fatal("Libary theme should not set default")
+		t.Fatal("Library theme should not set default")
 	}
 	if pc.LibraryThemeName != "system_dark" {
 		t.Fatal("Failed to parse library theme name")
@@ -718,7 +718,7 @@ func TestDefaultThemeSelection(t *testing.T) {
 	}
 	// Also checks ThemeWithName works on built in themes
 	if pc.DefaultTheme() != pc.ThemeWithName("elegant_light") {
-		t.Fatal("Libary theme should not set default")
+		t.Fatal("Library theme should not set default")
 	}
 	if pc.LibraryThemeName != "" {
 		t.Fatal("Set Library theme name when not needed")

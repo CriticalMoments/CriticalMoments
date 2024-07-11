@@ -292,7 +292,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 			appcoreBuiltInTheme, _ := builtInThemeByName(jpc.ThemesConfig.DefaultThemeName)
 			namedDefaultTheme := pc.namedThemes[jpc.ThemesConfig.DefaultThemeName]
 
-			// Priority order: named, libary, cmcore built-in
+			// Priority order: named, library, cmcore built-in
 			if namedDefaultTheme != nil {
 				pc.defaultTheme = namedDefaultTheme
 			} else if isLibaryTheme {
@@ -333,8 +333,8 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 
 	// Notifications
 	if jpc.Notifications != nil {
-		for notificationID, notificaiton := range jpc.Notifications {
-			notificaiton.ID = notificationID
+		for notificationID, notification := range jpc.Notifications {
+			notification.ID = notificationID
 		}
 		pc.Notifications = jpc.Notifications
 	} else {
@@ -538,7 +538,7 @@ func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() str
 		if notif.ActionName != "" {
 			_, ok := pc.namedActions[notif.ActionName]
 			if !ok {
-				return fmt.Sprintf("Notificaiton '%v' has action name '%v', which does not exist", id, notif.ActionName)
+				return fmt.Sprintf("Notification '%v' has action name '%v', which does not exist", id, notif.ActionName)
 			}
 		}
 	}

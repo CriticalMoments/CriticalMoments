@@ -287,7 +287,7 @@ func TestParseDowString(t *testing.T) {
 		// dupes
 		"Monday,Monday,Tuesday": {time.Monday, time.Tuesday}, // add_test_case
 		// Invalid data
-		"Monday,Febuary,Tuesday": {time.Monday, time.Tuesday}, // add_test_case
+		"Monday,Pineapple,Tuesday": {time.Monday, time.Tuesday}, // add_test_case
 		// robustness
 		"Monday,,Tuesday": {time.Monday, time.Tuesday}, // add_test_case
 		// fix order

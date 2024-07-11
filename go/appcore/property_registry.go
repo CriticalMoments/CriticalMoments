@@ -228,7 +228,7 @@ func (p *propertyRegistry) buildPropertyMapForCondition(fields *datamodel.Condit
 				return nil, err
 			}
 			if err == errPropertyNotFound {
-				// set not-found variables to nil. Likely new var names from future SDK runing on an old SDK.
+				// set not-found variables to nil. Likely new var names from future SDK running on an old SDK.
 				// We want the condition string to be able to check for nil for backwards compatibility (typically "?? true" or "?? false")
 				propsEnv[v] = nil
 			} else {

@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param urlString the URL string of the json config file. Should begin with `https://`
  @warning Be sure to secure who can upload files to this URL path. This config
  file can present messages directly to your users, and you should treat security
- seriously, as you would your app update release process or webpage secuirty.
+ seriously, as you would your app update release process or webpage security.
  */
 - (void)setReleaseConfigUrl:(NSString *)urlString;
 
@@ -127,13 +127,13 @@ in the config file's namedConditions section.
  Configuration documentation: https://docs.criticalmoments.io/conditional-targeting/named-conditions
 
  The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
-can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+can use properties which are asynchronous (checking network state, battery state, and many others).  It is not called on
 the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
 
  @param name The name of this condition. Must be provided and can not be an empty string.
  The name is used as a lookup the condition-string of a namedCondition in the config file.
  @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occured evaluating the condition. The boolean value is false for any error, including if the
+returns any errors occurred evaluating the condition. The boolean value is false for any error, including if the
 condition is not found in the config.
  @warning Be sure to provide a unique name to each use case. Reusing names (even if the current conditional logic is
 currently equivalent) will make it impossible to override each usage independently from remote configuration.
@@ -246,7 +246,7 @@ currently equivalent) will make it impossible to override each usage independent
  This API calls the system's requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
  schedule any queued notifications.
 
- @param completionHandler Optional. A handler to be called back immediatly after permissions are granted or denied.
+ @param completionHandler Optional. A handler to be called back immediately after permissions are granted or denied.
  `prompted` returns true if the user saw a permission prompt for this call, and false if the user had made the
  authorization decision in the past.
  */

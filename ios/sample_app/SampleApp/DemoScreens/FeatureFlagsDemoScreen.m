@@ -86,7 +86,7 @@
                       action.subtitle =
                           @"This flag looks at user engagement history to determine it's value. In this case, how long "
                           @"ago the app was installed.\n\nCondition: app_install_date < now() - duration('10m')";
-                      [self addSection:@"User Engagment History" withActions:@[ action ]];
+                      [self addSection:@"User Engagement History" withActions:@[ action ]];
                     }];
 }
 
