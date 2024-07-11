@@ -37,8 +37,9 @@ if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") |
 echo "running go staticcheck"
 staticcheck ./...
 
-echo "running misspelli. To fix issues run 'misspell -w .'"
-misspell -error .
+# targetted is a misspelling in jazzy framework output, ignore it
+echo "running misspell. To fix issues run 'misspell -w .'"
+misspell -error -i "targetted" .
 
 echo "running go tests"
 go test ./... > /dev/null
