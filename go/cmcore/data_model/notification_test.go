@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 )
@@ -249,10 +250,10 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 }
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
-	cases := []string{
-		"./test/testdata/actions/notifications/invalid/invalidCondition.json",
-		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json", // add_test_case
-		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json",       // add_test_case
+	cases := map[string]string{
+		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Invalid Condition",
+		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "blank cancelation event",                                    // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json":       "Notification badgeCount must be greater than or equal to 0", // add_test_case
 	}
 
 	StrictDatamodelParsing = true
@@ -260,7 +261,7 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 		StrictDatamodelParsing = false
 	}()
 
-	for _, testFile := range cases {
+	for testFile, expectedError := range cases {
 		testFileData, err := os.ReadFile(testFile)
 		if err != nil {
 			t.Fatal()
@@ -269,6 +270,13 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 		err = json.Unmarshal(testFileData, &n)
 		if err == nil {
 			t.Fatalf("Allowed invalid json: %v", testFile)
+		}
+		errorString := err.Error()
+		if upError, ok := err.(*UserPresentableError); ok {
+			errorString = upError.UserErrorString()
+		}
+		if !strings.Contains(errorString, expectedError) {
+			t.Fatalf("Allowed invalid: %v, expected error: %v, got error: %v", testFile, expectedError, errorString)
 		}
 	}
 }
