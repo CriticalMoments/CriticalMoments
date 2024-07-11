@@ -151,7 +151,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		if slices.Contains(alertStyles, *ja.Style) {
 			alertStyle = *ja.Style
 		} else {
-			// Backwards compatibilty -- default to dialog if this client doesn't recognize the style
+			// Backwards compatibility -- default to dialog if this client doesn't recognize the style
 			if StrictDatamodelParsing {
 				styleErr := fmt.Sprintf("invalid alert style found in config file: \"%v\"", *ja.Style)
 				return NewUserPresentableError(styleErr)

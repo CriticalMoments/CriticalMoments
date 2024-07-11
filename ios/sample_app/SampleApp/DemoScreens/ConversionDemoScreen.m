@@ -47,7 +47,7 @@
     aha1complete.actionCMEventName = @"created_list";
     [aha1complete addResetTestTarget:self action:@selector(resetAll)];
 
-    // This action is hidden from UI, but visable in unit tests, creating and e2e test with database state
+    // This action is hidden from UI, but visible in unit tests, creating and e2e test with database state
     CMDemoAction *aha1UiTestAfter = [[CMDemoAction alloc] init];
     aha1UiTestAfter.title = @"Goal 1: Hidden UI Test Goal";
     aha1UiTestAfter.skipInUI = YES;
@@ -69,11 +69,11 @@
     CMDemoAction *aha2complete = [[CMDemoAction alloc] init];
     aha2complete.title = @"Simulate Goal 2: Add task to list";
     aha2complete.subtitle = @"Tap this to simulate the user adding an task to a list. You'll need to tap this twice to "
-                            @"compelte the second goal of the user journey.";
+                            @"complete the second goal of the user journey.";
     aha2complete.actionCMEventName = @"created_list_item";
     [aha2complete addResetTestTarget:self action:@selector(resetAll)];
 
-    // These two actions are hidden from UI, but visable in unit tests, creating and e2e test with database state
+    // These two actions are hidden from UI, but visible in unit tests, creating and e2e test with database state
     CMDemoAction *aha2complete2 = [[CMDemoAction alloc] init];
     aha2complete2.title = @"Goal 2: Simulate User Action Hidden";
     aha2complete2.skipInUI = YES;

@@ -200,7 +200,7 @@ func (ac *Appcore) CheckNamedCondition(name string) (returnResult bool, returnEr
 		return false, errors.New("CheckNamedCondition requires a non-empty name")
 	}
 
-	// lookup name for override, prefering the condition from the config when available
+	// lookup name for override, preferring the condition from the config when available
 	condition := ac.config.ConditionWithName(name)
 
 	if condition == nil {

@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Fetches a tint color to to apply to buttons, icons, links and more.
 /// You must provide the view this will be rendered in, so we can resolve system colors at runtime from view heiarchy if
-/// a color is not set explicity in the theme.
+/// a color is not set explicitly in the theme.
 - (UIColor *)primaryColorForView:(UIView *)view;
 /// Set the primary color for your brand. This is used on buttons, icons, links and more.
 /// Should be legible on backgroundColor.

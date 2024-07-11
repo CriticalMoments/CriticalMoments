@@ -45,7 +45,7 @@
     CMDemoAction *warmCondition = [[CMDemoAction alloc] init];
     warmCondition.title = @"Current Temperature";
     warmCondition.subtitle =
-        @"Condition true if it over 20 degrees celcius outside.\n\n(weather_approx_location_temperature > 20)";
+        @"Condition true if it over 20 degrees celsius outside.\n\n(weather_approx_location_temperature > 20)";
     warmCondition.actionCMActionName = @"conditional_warm";
     warmCondition.skipInUiTesting = true;
     [warmCondition addResetTestTarget:self action:@selector(dismissAlerts)];

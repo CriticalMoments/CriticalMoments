@@ -58,7 +58,7 @@ type jsonTheme struct {
 	FallbackThemeName string `json:"fallback,omitempty"`
 }
 
-// These themes provided by libary level, depend on the system
+// These themes provided by library level, depend on the system
 var libraryThemeNames map[string]bool = map[string]bool{
 	"system":       true,
 	"system_light": true,

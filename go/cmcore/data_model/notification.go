@@ -63,9 +63,9 @@ type EventInstanceTypeEnum int
 const (
 	// unknown, should not process. Could be type from future SDK
 	EventInstanceTypeUnknown EventInstanceTypeEnum = iota
-	// The notification's time is relative to the latest time the event occured
+	// The notification's time is relative to the latest time the event occurred
 	EventInstanceTypeLatest
-	// The notification's time is relative to the first time the event occured
+	// The notification's time is relative to the first time the event occurred
 	EventInstanceTypeFirst
 )
 

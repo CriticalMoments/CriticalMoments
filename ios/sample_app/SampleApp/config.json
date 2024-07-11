@@ -232,7 +232,7 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "User Action Simulated",
-                    "message": "We've simulated the user completeing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
+                    "message": "We've simulated the user completing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
                 }
             },
             "app_out_of_date": {
@@ -266,7 +266,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 3,
                                     "pageSectionData": {
-                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best expereince",
+                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best experience",
                                         "scaleFactor": 1.3
                                     }
                                 }
@@ -317,7 +317,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 3,
                                     "pageSectionData": {
-                                        "bodyText": "We're currently expereincing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
+                                        "bodyText": "We're currently experiencing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resolved soon.",
                                         "scaleFactor": 1.3
                                     }
                                 }
@@ -619,7 +619,7 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Nested Action",
-                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
+                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a information sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
                 }
             },
             "app_review_template": {

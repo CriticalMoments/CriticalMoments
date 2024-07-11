@@ -39,7 +39,7 @@ func (k *ApiKey) ValidWithSigner(u *SignUtil) (bool, error) {
 /*
  API Key Format
   - Top level separator "-"
-	- 3 sections: API Key Version, props, signature (- seperated)
+	- 3 sections: API Key Version, props, signature (- separated)
 	- API version: CM1 for now. Can evolve later, but should be back compatible so V1 can parse any future version.
 	- Props: a list. only "b" (ios bundle ID) is required for now. Ignore others when parsing (but do sign). Divided by dashes again, base64 encoded.
 	- Signature: a signature of the entire key, up until here

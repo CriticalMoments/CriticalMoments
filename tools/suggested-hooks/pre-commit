@@ -1,5 +1,13 @@
 #!/bin/sh
 
+current_branch="$(git branch --show-current)"
+for protected_branch in "main" "other_branch_you_want_protected"; do
+    if [[ "$protected_branch" == "$current_branch" ]]; then
+        echo "ERROR: local branch $current_branch is protected" 
+        exit 1
+    fi
+done
+
 # Check code formatting was run
 HOOK_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 $HOOK_PATH/../../ios/check-code-format.sh
@@ -19,13 +27,33 @@ set -e
 dir="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 cd $dir/../../go
 
+echo $PWD
 echo "Running Go Vet"
 go vet ./...
 
 echo "running go fmt"
 if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") | wc -l)" -gt 0 ]; then exit 1; fi
 
+echo "running go staticcheck"
+staticcheck ./...
+
+# targetted is a misspelling in jazzy framework output, ignore it
+echo "running misspell. To fix issues run 'misspell -w .'"
+misspell -error -i "targetted" .
+
 echo "running go tests"
 go test ./... > /dev/null
+
+
+cd ..
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$BRANCH" == "main" ]]; then
+  echo "On main: checking for TODO_P0s"
+  todos=true && grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github . || todos=false
+  if [[ $todos == true ]]; then
+    echo "Fix TODOs above"
+    exit 1
+  fi
+fi
 
 exit 0

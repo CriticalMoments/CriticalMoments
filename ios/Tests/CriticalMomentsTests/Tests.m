@@ -396,7 +396,7 @@
 
     // registering after start should error
     [cm registerStringProperty:@"hello" forKey:@"stringy2" error:&error];
-    XCTAssertNotNil(error, @"allowed registartion after start");
+    XCTAssertNotNil(error, @"allowed registration after start");
 
     // Fetching set properties should work (both short and long form accessors)
     XCTestExpectation *wait = [[XCTestExpectation alloc] init];
