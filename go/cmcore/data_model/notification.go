@@ -20,8 +20,10 @@ var allDaysOfWeek = []time.Weekday{
 	time.Saturday,
 }
 
+// Allow any time of day by default (0:00 to 23:59)
+const maxWindowLocalTimeEnd = 23*60 + 59
 const defaultDeliveryWindowLocalTimeStart = 0
-const defaultDeliveryWindowLocalTimeEnd = 23*60 + 59
+const defaultDeliveryWindowLocalTimeEnd = maxWindowLocalTimeEnd
 
 var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
 
@@ -40,7 +42,9 @@ type Notification struct {
 
 	ScheduleCondition *Condition
 
-	DeliveryTime                  DeliveryTime
+	DeliveryTime DeliveryTime
+
+	// Delivery Window
 	DeliveryDaysOfWeek            []time.Weekday
 	DeliveryWindowTODStartMinutes int
 	DeliveryWindowTODEndMinutes   int
@@ -66,7 +70,10 @@ const (
 )
 
 type DeliveryTime struct {
-	TimestampEpoch      *int64  `json:"timestamp,omitempty"`
+	// Exact point in time
+	TimestampEpoch *int64 `json:"timestamp,omitempty"`
+
+	// Event based
 	EventName           *string `json:"eventName,omitempty"`
 	EventOffset         *int    `json:"eventOffset,omitempty"`
 	EventInstanceString *string `json:"eventInstance,omitempty"`
@@ -116,19 +123,20 @@ func (n *Notification) ValidateReturningUserReadableIssue() string {
 }
 
 func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool) string {
+	// ID is set later from primary config map ID
 	if !ignoreID && n.ID == "" {
 		return "Notification must have ID"
 	}
 	if n.Title == "" &&
 		n.Body == "" &&
 		n.BadgeCount < 0 {
-		return "Notifications must have one or more of: title, body, and badgeCount."
+		return "Notifications must have one or more of: title, body, or badgeCount."
 	}
-	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > 24*60-1 {
-		return "Notifications must have a deliveryTimeOfDayStart between 0 and 24*60 mins."
+	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {
+		return "Notifications must have a deliveryTimeOfDayStart between 0 and 23:59 mins."
 	}
-	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > 24*60-1 {
-		return "Notifications must have a deliveryTimeOfDayEnd between 0 and 24*60 mins."
+	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {
+		return "Notifications must have a deliveryTimeOfDayEnd between 0 and 23:59 mins."
 	}
 	if n.DeliveryWindowTODStartMinutes > n.DeliveryWindowTODEndMinutes {
 		return "Notifications must have a deliveryTimeOfDayStart before deliveryTimeOfDayEnd."
@@ -158,11 +166,7 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 	}
 	if n.IdealDevlieryConditions != nil {
 		if conErr := n.IdealDevlieryConditions.Condition.Validate(); conErr != nil {
-			conErrUserReadable := "Unknown error"
-			if uperr, ok := conErr.(*UserPresentableError); ok {
-				conErrUserReadable = uperr.UserErrorString()
-			}
-			return "Notification has invalid ideal delivery condition: " + conErrUserReadable
+			return fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID)
 		}
 		if n.IdealDevlieryConditions.MaxWaitTime < -1 || n.IdealDevlieryConditions.MaxWaitTime == 0 {
 			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
@@ -186,7 +190,7 @@ func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
 	}
 	if StrictDatamodelParsing {
 		if d.EventInstance() == EventInstanceTypeUnknown {
-			return fmt.Sprintf("Notification event instance must be 'first' or 'latest', got '%v'", d.EventInstanceString)
+			return fmt.Sprintf("Notification event instance must be 'first' or 'latest' (default), got '%v'", d.EventInstanceString)
 		}
 	}
 	return ""
@@ -301,6 +305,7 @@ func parseDaysOfWeekString(i string) []time.Weekday {
 	days := []time.Weekday{}
 	components := strings.Split(i, ",")
 
+	// This format orders and dedupes them, for consistency
 	for dow := range allDaysOfWeek {
 		dowWD := time.Weekday(dow)
 		dowName := dowWD.String()
@@ -324,11 +329,10 @@ func (n *Notification) UniqueID() string {
 	return fmt.Sprintf("%v%v", NotificationUniqueIDPrefix, n.ID)
 }
 
-// Gomobile accessor (doesn't support pointers)
+// Gomobile accessors. Gomobiledoesn't support pointers
 func (n *Notification) GetRelevanceScore() float64 {
 	return *n.RelevanceScore
 }
-
 func (n *Notification) HasRelevanceScore() bool {
 	return n.RelevanceScore != nil
 }

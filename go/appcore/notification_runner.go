@@ -74,7 +74,7 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 			deliveryTimeShiftedToWindow := shiftDeliveryTimeForAllowedWindows(notification, deliveryTimestamp)
 			sn := ScheduledNotification{
 				Notification: notification,
-				scheduledAt:  *deliveryTimeShiftedToWindow,
+				scheduledAt:  deliveryTimeShiftedToWindow,
 			}
 			plan.scheduledNotifications = append(plan.scheduledNotifications, &sn)
 		} else {
@@ -91,14 +91,14 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	}
 	if notification.ScheduleCondition != nil {
 		condResult, condErr := ac.propertyRegistry.evaluateCondition(notification.ScheduleCondition)
-		if condErr != nil || !condResult {
+		if !condResult || condErr != nil {
 			return nil
 		}
 	}
 
 	if staticTimestamp := notification.DeliveryTime.Timestamp(); staticTimestamp != nil {
 		// Statically scheduled
-		// If time has passed, we should not deliver static time notification
+		// If time has passed, we should not schedule static time notification
 		if time.Now().After(*staticTimestamp) {
 			return nil
 		}
@@ -121,8 +121,8 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	return nil
 }
 
-// Move the time forward until it is in the delivery window
-func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, deliveryTime *time.Time) *time.Time {
+// Move the time forward until it is in the delivery window (time of day, day of week)
+func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, deliveryTime *time.Time) time.Time {
 	newTime := *deliveryTime
 
 	// Shift hours first, if needed
@@ -133,7 +133,7 @@ func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, de
 		// Shift to start time on same day
 		newTime = time.Date(newTime.Year(), newTime.Month(), newTime.Day(), startHour, startMinute, 0, 0, newTime.Location())
 	} else if deliveryMinuteOfDay > notification.DeliveryWindowTODEndMinutes {
-		// Shift to next day at start time (soonest time after that fits window)
+		// Shift to next day at start time (we never shift backwards)
 		newTime = time.Date(newTime.Year(), newTime.Month(), newTime.Day()+1, startHour, startMinute, 0, 0, newTime.Location())
 	}
 
@@ -145,7 +145,7 @@ func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, de
 		newTime = newTime.AddDate(0, 0, 1)
 	}
 
-	return &newTime
+	return newTime
 }
 
 func (ac *Appcore) isNotificationCanceled(notification *datamodel.Notification) bool {
