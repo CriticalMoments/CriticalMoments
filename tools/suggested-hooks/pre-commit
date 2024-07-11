@@ -49,7 +49,7 @@ cd ..
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$BRANCH" == "main" ]]; then
   echo "On main: checking for TODO_P0s"
-  todos=true && grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github . || todos=false
+  todos=true && grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github --exclude-dir=tools . || todos=false
   if [[ $todos == true ]]; then
     echo "Fix TODOs above"
     exit 1
