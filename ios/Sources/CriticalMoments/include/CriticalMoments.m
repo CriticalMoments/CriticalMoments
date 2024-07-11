@@ -8,6 +8,7 @@
 #import "CriticalMoments.h"
 
 #import "../appcore_integration/CMLibBindings.h"
+#import "../background/CMBackgroundHandler.h"
 #import "../messaging/CMBannerManager.h"
 #import "../notifications/CMNotificationsDelegate.h"
 #import "../properties/CMPropertyRegisterer.h"
@@ -101,6 +102,10 @@ static CriticalMoments *sharedInstance = nil;
     // deferred.
     [self registerNotificationDelegate];
 
+    // Registering BG work must be done before the end of app launch, do no defer
+    //  https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)?language=objc
+    [CMBackgroundHandler registerBackgroundTasks];
+
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -187,6 +192,9 @@ static CriticalMoments *sharedInstance = nil;
 
     // We've started now. Can resume the two worker queues.
     [self startQueues];
+
+    // Schedule the background work
+    [CMBackgroundHandler scheduleBackgroundTask];
 
     return nil;
 }
