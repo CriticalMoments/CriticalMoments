@@ -28,11 +28,7 @@
         getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *_Nullable requests) {
           NSMutableArray<NSString *> *notifIdsToUnschedule = [[NSMutableArray alloc] init];
           for (UNNotificationRequest *request in requests) {
-<<<<<<< HEAD
               // Notifications in our namespace, which aren't scheduled
-=======
-              // Notificaitons in our namespace, which aren't scheduled
->>>>>>> vnext
               if (![scheduleNotifIds containsObject:request.identifier] &&
                   [request.identifier hasPrefix:DatamodelNotificationUniqueIDPrefix]) {
                   [notifIdsToUnschedule addObject:request.identifier];
@@ -81,11 +77,7 @@
     }
     if (timeUntilDate <= 1) {
         // Part 1) <= 0s delay not allowed, so use check and set to positive value
-<<<<<<< HEAD
         // Part 2) Why 1s in the future? In case AppCore sends several updates for same notification rapidly. By
-=======
-        // Part 2) Why 1s in the future? In case AppCore sends several updates for same notificaiton rapidly. By
->>>>>>> vnext
         // scheduling 1s out (from delivery time), and not scheduling if 0.9s in past we avoid duplicate notifications
         // for same timestamp. Could add a cache, but async APIs make that risky. Keep it simple. Part 3) A bit of
         // debounce if app sends multiple events
