@@ -41,6 +41,9 @@ type PrimaryConfig struct {
 
 	// Conditions
 	namedConditions map[string]*Condition
+
+	// Notifications
+	Notifications map[string]*Notification
 }
 
 func (pc *PrimaryConfig) DefaultTheme() *Theme {
@@ -244,6 +247,9 @@ type jsonPrimaryConfig struct {
 
 	// Conditions
 	ConditionsConfig *jsonConditionsSection `json:"conditions"`
+
+	// Notifications
+	Notifications map[string]*Notification `json:"notifications"`
 }
 
 type jsonThemesSection struct {
@@ -323,6 +329,16 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.namedConditions = jpc.ConditionsConfig.NamedConditions
 	} else {
 		pc.namedConditions = make(map[string]*Condition)
+	}
+
+	// Notifications
+	if jpc.Notifications != nil {
+		for notificationID, notificaiton := range jpc.Notifications {
+			notificaiton.ID = notificationID
+		}
+		pc.Notifications = jpc.Notifications
+	} else {
+		pc.Notifications = make(map[string]*Notification)
 	}
 
 	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
@@ -445,6 +461,11 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 			return fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue)
 		}
 	}
+	for notificationID, notification := range pc.Notifications {
+		if notifIssue := notification.ValidateReturningUserReadableIssue(); notifIssue != "" {
+			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notifIssue)
+		}
+	}
 
 	return ""
 }
@@ -512,6 +533,16 @@ func (pc *PrimaryConfig) validateEmbeddedActionsExistReturningUserReadable() str
 		}
 	}
 
+	// Validate actions in notifications exist
+	for id, notif := range pc.Notifications {
+		if notif.ActionName != "" {
+			_, ok := pc.namedActions[notif.ActionName]
+			if !ok {
+				return fmt.Sprintf("Notificaiton '%v' has action name '%v', which does not exist", id, notif.ActionName)
+			}
+		}
+	}
+
 	return ""
 }
 
@@ -566,17 +597,25 @@ func (pc *PrimaryConfig) AllConditions() ([]*Condition, error) {
 		if a.Condition != nil {
 			all = append(all, a.Condition)
 		}
-		actionConditions, err := a.actionData.AllEmbeddedConditions()
-		if err != nil {
-			return nil, err
+		if a.actionData != nil {
+			actionConditions, err := a.actionData.AllEmbeddedConditions()
+			if err != nil {
+				return nil, err
+			}
+			all = append(all, actionConditions...)
 		}
-		all = append(all, actionConditions...)
 	}
 
 	for _, t := range pc.namedTriggers {
 		condition := t.Condition
 		if condition != nil {
 			all = append(all, condition)
+		}
+	}
+
+	for _, n := range pc.Notifications {
+		if n.ScheduleCondition != nil {
+			all = append(all, n.ScheduleCondition)
 		}
 	}
 

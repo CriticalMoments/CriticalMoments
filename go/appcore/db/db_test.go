@@ -247,6 +247,13 @@ func TestInsertAndRetrieve(t *testing.T) {
 	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {
 		t.Fatal("LatestEventTimeByName returned wrong time")
 	}
+	ft, err := db.FirstEventTimeByName(e.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ft.Compare(*ct) != 0 {
+		t.Fatal("First and latest event time should return same result when there's only one event")
+	}
 
 	// insert another event
 	time.Sleep(time.Millisecond * 2)
@@ -257,6 +264,10 @@ func TestInsertAndRetrieve(t *testing.T) {
 	ct2, err := db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
+	}
+	ft2, _ := db.FirstEventTimeByName(e.Name)
+	if ft2.Compare(*ct) != 0 {
+		t.Fatal("FirstEventTimeByName should return same result as the first latest")
 	}
 	// Confirm latest is sorting correctly
 	if ct2.Compare(*ct) != 1 {

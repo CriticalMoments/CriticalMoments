@@ -1,0 +1,14 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "notifications": {
+    "event3Notification": {
+      "title": "title",
+      "body": "body",
+      "scheduleCondition": "eventCount('event3con') > 0",
+      "deliveryTime": {
+        "eventName": "event3"
+      }
+    }
+  }
+}

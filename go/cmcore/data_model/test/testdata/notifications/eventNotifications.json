@@ -1,0 +1,46 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "notifications": {
+    "event1Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event1",
+        "eventInstance": "latest"
+      }
+    },
+    "event2Notification": {
+      "title": "title",
+      "body": "body",
+      "cancelationEvents": ["cancel2event"],
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event2",
+        "eventOffset": 60,
+        "eventInstance": "first"
+      }
+    },
+    "event3Notification": {
+      "title": "title",
+      "body": "body",
+      "cancelationEvents": ["cancel3event"],
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event3",
+        "eventOffset": 60,
+        "eventInstance": "first"
+      }
+    }
+  },
+  "actions": {
+    "namedActions": {
+      "bannerAction": {
+          "actionType": "banner",
+          "actionData": {
+              "body": "Hello world, but on a banner!"
+          }
+      }
+    }
+  }
+}

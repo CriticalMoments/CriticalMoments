@@ -503,6 +503,13 @@
                     }
                 }
             },
+            "enableComeBackAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Onboarding Alert Scheduled",
+                    "message": "Dismiss this app, and a notification will remind you to complete onboarding 5 seconds later.\n\nIn a real app, you would use a longer delay, such as 15 minutes."
+                }
+            },
             "show_notice_alert": {
                 "actionType": "alert",
                 "actionData": {
@@ -664,7 +671,7 @@
             "conditional_warm": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_temperature > 20)",
+                    "condition": "((weather_approx_location_temperature ?? 0) > 20)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -672,7 +679,7 @@
             "conditional_cloudy": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_cloud_cover > 0.5)",
+                    "condition": "((weather_approx_location_cloud_cover ?? 0) > 0.5)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -1127,6 +1134,10 @@
             "subscribe_trigger": {
                 "eventName": "completed_task",
                 "actionName": "journey_goal_3"
+            },
+            "enableComeBackInstructions": {
+                "eventName": "enableComeBack",
+                "actionName": "enableComeBackAlert"
             }
         }
     },
@@ -1134,9 +1145,86 @@
         "namedConditions": {
             "custom_feature_1": "false",
             "app_not_recently_installed": "app_install_date < now() - duration('10m')",
-            "weather_warm": "(weather_approx_location_temperature > 20)",
+            "weather_warm": "((weather_approx_location_temperature ?? 0) > 20)",
             "ab_test_group_for_experiment_five": "(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)",
             "is_iphone_with_recent_os": "device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
+        }
+    },
+    "notifications": {
+        "comeBackDemo": {
+          "title": "Complete your setup!",
+          "sound": "default",
+          "body": "[Your app's value prop here]. It only takes 2 minutes!",
+          "scheduleCondition": "eventCount('enableComeBack') > 0",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventInstance": "latest",
+            "eventOffset": 5
+          }
+        },
+        "pastDueNotification": {
+          "title": "Too old, should not show",
+          "body": "Too old, should not show",
+          "deliveryTime": {
+            "timestamp": 1000
+          }
+        },
+        "futureNotification": {
+          "title": "Future",
+          "body": "For test cases, in 2040",
+          "deliveryTime": {
+            "timestamp": 2224580934
+          }
+        },
+        "eventTriggeredNotification": {
+          "title": "event triggered",
+          "cancelationEvents": ["cancel_notification"],
+          "deliveryTime": {
+            "eventName": "trigger_notification_event",
+            "eventOffset": 600
+          }
+        },
+        "demoEventNotificationTap": {
+          "title": "Demo Notification",
+          "body": "Notification triggered by an in app event. Tap to launch in-app action.",
+          "tapActionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_1"
+          }
+        },
+        "demoEventNotification2": {
+          "title": "Delayed Demo Notification",
+          "body": "Notification triggered after 5s delay. Tap to launch in-app action.",
+          "tapActionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_2",
+            "eventOffset": 5
+          }
+        },
+        "demoEventNotification3": {
+          "title": "Badge Set on Homescreen",
+          "body": "Open your iOS homescreen to see the badge on the CM icon.",
+          "badgeCount": 42,
+          "deliveryTime": {
+            "eventName": "demo_notification_3"
+          }
+        },
+        "demoEventNotification4": {
+          "title": "Badge Removed on Homescreen",
+          "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
+          "badgeCount": 0,
+          "deliveryTime": {
+            "eventName": "demo_notification_4"
+          }
+        },
+        "demoEventNotification5": {
+          "title": "Critical Notification",
+          "body": "Display a 'critical' level notification, which will get priority on lockscreen.",
+          "interruptionLevel": "critical",
+          "relevanceScore": 1.0,
+          "deliveryTime": {
+            "eventName": "demo_notification_5"
+          }
         }
     }
 }

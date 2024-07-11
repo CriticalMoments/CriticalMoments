@@ -1,0 +1,11 @@
+{
+  "title": "title",
+  "body": "body",
+  "idealDeliveryConditions": {
+    "condition": "true > 1",
+    "maxWaitTime": 10
+  },
+  "deliveryTime": {
+    "timestamp": 1000
+  }
+} 
