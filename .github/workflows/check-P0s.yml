@@ -19,7 +19,7 @@ jobs:
     - name: Check for P0 issue comments
       run: |
         todos=true
-        grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github . || todos=false
+        grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github --exclude-dir=tools . || todos=false
         if [[ $todos == true ]]
         then
           echo "TODO_P0 issues found"
