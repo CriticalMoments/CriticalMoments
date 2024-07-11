@@ -14,6 +14,7 @@
 #import "../messaging/CMBannerMessage.h"
 #import "../messaging/CMBannerMessage_private.h"
 #import "../messaging/CMModalViewController.h"
+#import "../notifications/CMNotificationHandler.h"
 #import "../themes/CMTheme.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMUtils.h"
@@ -161,6 +162,18 @@
       [CMUtils.topViewController presentViewController:sheetVc animated:YES completion:nil];
     });
 
+    return YES;
+}
+
+- (BOOL)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan
+                         error:(NSError *_Nullable __autoreleasing *_Nullable)error {
+    if ([self.cm userNotificationsDisabled]) {
+        return YES;
+    }
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      [CMNotificationHandler updateNotificationPlan:notifPlan];
+    });
     return YES;
 }
 

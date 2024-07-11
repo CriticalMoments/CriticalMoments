@@ -41,13 +41,18 @@ type Appcore struct {
 
 	// Properties
 	propertyRegistry *propertyRegistry
+
+	// Notifications
+	notificationPlan      *NotificationPlan
+	seenCancelationEvents map[string]*bool
 }
 
 func NewAppcore() *Appcore {
 	ac := &Appcore{
-		propertyRegistry: newPropertyRegistry(),
-		db:               db.NewDB(),
-		eventManager:     &EventManager{},
+		propertyRegistry:      newPropertyRegistry(),
+		db:                    db.NewDB(),
+		eventManager:          &EventManager{},
+		seenCancelationEvents: make(map[string]*bool),
 	}
 	// Connect the property registry to the db/proptery history manager
 	ac.propertyRegistry.phm = ac.db.PropertyHistoryManager()
@@ -299,6 +304,12 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 		fmt.Printf("CriticalMoments: there was an issue sending the built in event \"%v\". Continuing as this error is non-fatal: %v\n", datamodel.AppStartBuiltInEvent, err)
 	}
 
+	// In practice, the event above probably already triggered this, but just in case
+	err = ac.initializeNotificationPlan()
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue setting up notifications. Continuing as this error is non-fatal: %v\n", err)
+	}
+
 	return nil
 }
 
@@ -435,7 +446,14 @@ func (ac *Appcore) processEvent(event *datamodel.Event) (returnErr error) {
 		return err
 	}
 
-	return ac.performActionsForEvent(event.Name)
+	performErr := ac.performActionsForEvent(event.Name)
+
+	err = ac.notificationRunnerProcessEvent(event)
+	if err != nil {
+		fmt.Printf("CriticalMoments: there was an issue processing notifications for event '%v'. Error: %v\n", event.Name, err)
+	}
+
+	return performErr
 }
 
 func (ac *Appcore) performActionsForEvent(eventName string) error {
@@ -640,4 +658,13 @@ func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr 
 		return errRegisterAfterStart
 	}
 	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
+}
+
+func (ac *Appcore) ActionForNotification(notificationId string) error {
+	for _, notification := range ac.config.Notifications {
+		if notification.UniqueID() == notificationId && notification.ActionName != "" {
+			return ac.PerformNamedAction(notification.ActionName)
+		}
+	}
+	return nil
 }

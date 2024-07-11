@@ -184,14 +184,28 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 // the "*1.0" is needed to convert the integer to a real number. If a time happens round to an integer, the golang
 // sqlite library will parse it as a time.Time instead of float64, causing an error
 const latestEventTimeByNameQuery = `SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+const firstEventTimeByNameQuery = `SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at LIMIT 1`
 
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
+	return db.eventTimeByName(name, false)
+}
+
+func (db *DB) FirstEventTimeByName(name string) (*time.Time, error) {
+	return db.eventTimeByName(name, true)
+}
+
+func (db *DB) eventTimeByName(name string, first bool) (*time.Time, error) {
 	if !db.started {
 		return nil, errors.New("CriticalMoments: DB not started")
 	}
 
+	query := latestEventTimeByNameQuery
+	if first {
+		query = firstEventTimeByNameQuery
+	}
+
 	var epochTime float64
-	err := db.sqldb.QueryRow(latestEventTimeByNameQuery, name).Scan(&epochTime)
+	err := db.sqldb.QueryRow(query, name).Scan(&epochTime)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	} else if err != nil {

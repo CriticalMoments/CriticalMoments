@@ -90,6 +90,7 @@
 }
 
 - (void)startCMForTest:(CriticalMoments *)cm {
+    [cm disableUserNotifications];
     NSBundle *testBundle = [NSBundle bundleForClass:self.class];
     NSURL *resourceBundleId =
         [testBundle.bundleURL URLByAppendingPathComponent:@"CriticalMoments_CriticalMomentsTests.bundle"];
@@ -249,6 +250,7 @@
 
 - (void)testPerformActionBeforeStart {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    [cm disableUserNotifications];
 
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 

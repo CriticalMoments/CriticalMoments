@@ -135,4 +135,7 @@
     [_sections addObject:section];
 }
 
+- (void)didAppear:(UIViewController *)vc {
+}
+
 @end

@@ -327,6 +327,20 @@ func TestPrimaryConfigJson(t *testing.T) {
 	if err != nil || len(c3Var.Variables) != 1 || c3Var.Variables[0] != "os_version" {
 		t.Fatal("complex condition failed to parse")
 	}
+
+	// Notifications - tested in more depth in notification_test.go
+	if len(pc.Notifications) != 2 {
+		t.Fatal("Failed to parse notifications")
+	}
+	if pc.Notifications["testNotification"] == nil {
+		t.Fatal("Failed to parse notification id")
+	}
+	if pc.Notifications["testNotification"].ID != "testNotification" {
+		t.Fatal("Failed to parse notification id")
+	}
+	if pc.Notifications["testNotification"].Title != "Notification title" {
+		t.Fatal("Failed to parse notification title")
+	}
 }
 
 func TestFutureConditionStrictValidation(t *testing.T) {
@@ -457,8 +471,9 @@ func TestNoNamedActions(t *testing.T) {
 	}
 
 	pc.namedTriggers = make(map[string]*Trigger)
+	pc.Notifications = make(map[string]*Notification)
 	if !pc.Validate() {
-		t.Fatal("empty actions should be allowed when no triggers reference them")
+		t.Fatal("empty actions should be allowed when no triggers or notifications reference them")
 	}
 }
 
@@ -625,11 +640,14 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 		t.Fatal("Strict parsing ignored extra field")
 	}
 }
-func TestFallbackNameChecks(t *testing.T) {
+func TestInvalidsError(t *testing.T) {
 	invalidJson := []string{
+		// Fallback name checks
 		"invalidFallbackAction1.json",
-		"invalidFallbackTheme2.json", // add_test_count
-		"invalidFallbackTheme1.json", // add_test_count
+		"invalidFallbackTheme2.json",        // add_test_count
+		"invalidFallbackTheme1.json",        // add_test_count
+		"invalidNotificationAction.json",    // add_test_count
+		"invalidNotificationCondition.json", // add_test_count
 	}
 
 	for _, invalidFile := range invalidJson {
@@ -640,7 +658,7 @@ func TestFallbackNameChecks(t *testing.T) {
 		pc := PrimaryConfig{}
 		err = json.Unmarshal(testFileData, &pc)
 		if err == nil {
-			t.Fatal("Failed to disallow invalid fallback")
+			t.Fatalf("Failed to disallow invalid primary config: %v\n\n%v", invalidFile, err)
 		}
 	}
 }

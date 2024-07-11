@@ -45,6 +45,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// This API is private, and should not be used externally. Use events + triggers to fire named events.
 - (void)performNamedAction:(NSString *)name handler:(void (^_Nullable)(NSError *_Nullable error))handler;
 
+/// Private API to process a CM notification when it's tapped
+- (void)actionForNotification:(NSString *)identifier;
+
+/// Private API to disable notification, as NSUserNotificationCenter isn't available in SPM tests
+- (void)disableUserNotifications;
+- (BOOL)userNotificationsDisabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

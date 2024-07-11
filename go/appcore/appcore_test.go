@@ -58,13 +58,14 @@ func buildTestBuiltInProps(propTypes map[string]*datamodel.CMPropertyConfig) map
 }
 
 type testLibBindings struct {
-	lastBannerAction *datamodel.BannerAction
-	lastAlertAction  *datamodel.AlertAction
-	lastLinkAction   *datamodel.LinkAction
-	reviewCount      int
-	defaultTheme     *datamodel.Theme
-	libThemeName     string
-	lastModal        *datamodel.ModalAction
+	lastBannerAction     *datamodel.BannerAction
+	lastAlertAction      *datamodel.AlertAction
+	lastLinkAction       *datamodel.LinkAction
+	reviewCount          int
+	defaultTheme         *datamodel.Theme
+	libThemeName         string
+	lastModal            *datamodel.ModalAction
+	lastNotificationPlan *NotificationPlan
 }
 
 func (lb *testLibBindings) ShowBanner(b *datamodel.BannerAction, actionName string) error {
@@ -106,6 +107,10 @@ func (lb *testLibBindings) CMVersion() string {
 }
 func (lb *testLibBindings) IsTestBuild() bool {
 	return true
+}
+func (lb *testLibBindings) UpdateNotificationPlan(notifPlan *NotificationPlan) error {
+	lb.lastNotificationPlan = notifPlan
+	return nil
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
@@ -243,6 +248,28 @@ func TestSendEvent(t *testing.T) {
 	err = ac.SendClientEvent("net.scosman.asdf")
 	if err != nil {
 		t.Fatal("valid custom event errored", err)
+	}
+}
+
+func TestNotificationPlanCallback(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
+	if lb.lastNotificationPlan != nil {
+		t.Fatal("NP binding set too soon")
+	}
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if lb.lastNotificationPlan == nil {
+		t.Fatal("didn't call notification plan callback")
 	}
 }
 

@@ -9,9 +9,10 @@
 
 @import CriticalMoments;
 
+#import "UserNotifications/UserNotifications.h"
 #import "Utils.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <UNUserNotificationCenterDelegate>
 
 @end
 
@@ -22,6 +23,9 @@
     // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
     // guarunteed to work over time, nor is deleting the database file a good idea.
     [Utils deleteDatabase];
+
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
 
     // This key is only valid for this sample app. Do not try to use it for other apps.
     NSString *apiKey = @"CM1-Yjppby5jcml0aWNhbG1vbWVudHMuZGVtby1hcHA=-MEQCIFSYDKeKMwiLOJ9bsoNACtSxRbJEWh91kpE47biWR/"
@@ -89,4 +93,13 @@
     return NO;
 }
 
+#pragma mark - UNUserNotificationCenterDelegate
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+    // For demo app, we want to show notifications over app UI. Client apps don't need to do this.
+    completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert |
+                      UNNotificationPresentationOptionBadge);
+}
 @end

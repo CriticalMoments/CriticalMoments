@@ -198,6 +198,7 @@
     [self waitForExpectations:expectations timeout:5.0];
 }
 
+// MANUAL_TEST_CASE: Need to manually run in Toronto (or with VPN into Toronto)
 // Not included in test plan, so not run by default. But helpful for development.
 - (void)testGeoIpLocationToronto {
     id<UIApplicationDelegate> ad = UIApplication.sharedApplication.delegate;
@@ -216,7 +217,8 @@
     [cm checkInternalTestCondition:condition
                            handler:^(bool result, NSError *error) {
                              if (!result || error) {
-                                 XCTAssert(false, "approx location condition failed to return");
+                                 XCTAssert(false, "approx location condition failed - note, this test requires you to "
+                                                  "be in Toronto to pass! Manual runs only");
                              }
                              [expectation1 fulfill];
                            }];
