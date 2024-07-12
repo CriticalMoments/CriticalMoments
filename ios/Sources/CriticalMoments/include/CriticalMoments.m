@@ -105,6 +105,9 @@ static CriticalMoments *sharedInstance = nil;
     // Registering BG work must be done before the end of app launch, do no defer
     //  https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)?language=objc
     [CMBackgroundHandler registerBackgroundTasks];
+    // TODO_P0: needs to be here? Tried background and never got called. Trying this.
+    // Schedule the background work
+    [CMBackgroundHandler scheduleBackgroundTask];
 
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
@@ -192,9 +195,6 @@ static CriticalMoments *sharedInstance = nil;
 
     // We've started now. Can resume the two worker queues.
     [self startQueues];
-
-    // Schedule the background work
-    [CMBackgroundHandler scheduleBackgroundTask];
 
     return nil;
 }
