@@ -3,11 +3,28 @@ package appcore
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
+
+var connectedCache *bool
+
+func internetConnected() (ok bool) {
+	if connectedCache != nil {
+		return *connectedCache
+	}
+	client := http.Client{
+		Timeout: 2 * time.Second,
+	}
+	_, err := client.Get("http://clients3.google.com/generate_204")
+	connected := err == nil
+	connectedCache = &connected
+	return *connectedCache
+}
 
 func TestCheckInvalidCacheDir(t *testing.T) {
 	cache, err := newCacheWithBaseDir("/not/a/real/path/dude")
@@ -67,6 +84,10 @@ func TestCheckFindInvalidConfigWithEtag(t *testing.T) {
 }
 
 func TestDeletePriorCache(t *testing.T) {
+	if !internetConnected() {
+		t.Skip("No internet connection, skipping cache test")
+	}
+
 	url := "https://storage.googleapis.com/critical-moments-test-cases/hello.config"
 	configName := "primary"
 	expectedEtag := "d73b04b0e696b0945283defa3eee4538"
@@ -144,6 +165,10 @@ func TestCheckCleanEtag(t *testing.T) {
 }
 
 func TestCheckNetworkFetch(t *testing.T) {
+	if !internetConnected() {
+		t.Skip("No internet connection, skipping cache test")
+	}
+
 	base := fmt.Sprintf("/tmp/criticalmoments/testprimarycachenetwork-%v", rand.Int())
 	url := "https://storage.googleapis.com/critical-moments-test-cases/hello.config"
 	configName := "primary"
@@ -206,6 +231,10 @@ func TestCheckNetworkFetch(t *testing.T) {
 }
 
 func TestCheckNetworkFetchMainPath(t *testing.T) {
+	if !internetConnected() {
+		t.Skip("No internet connection, skipping cache test")
+	}
+
 	base := fmt.Sprintf("/tmp/criticalmoments/testprimarycachenetworkmain-%v", rand.Int())
 	url := "https://storage.googleapis.com/critical-moments-test-cases/hello.config"
 	configName := "primary"
