@@ -4,7 +4,8 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>io.criticalmoments</string>
+		<string>io.criticalmoments.bg_fetch</string>
+		<string>io.criticalmoments.bg_process</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -47,6 +48,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
 	</array>
 </dict>
 </plist>

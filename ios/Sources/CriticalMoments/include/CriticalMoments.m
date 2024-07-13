@@ -105,7 +105,7 @@ static CriticalMoments *sharedInstance = nil;
     // Registering BG work must be done before the end of app launch, do no defer
     //  https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)?language=objc
     [CMBackgroundHandler registerBackgroundTasks];
-    // TODO_P0: needs to be here? Tried background and never got called. Trying this.
+    // TODO_P0: needs to be here and not deferred? Tried background thread and never got called. Trying this.
     // Schedule the background work
     [CMBackgroundHandler scheduleBackgroundTask];
 
@@ -195,6 +195,11 @@ static CriticalMoments *sharedInstance = nil;
 
     // We've started now. Can resume the two worker queues.
     [self startQueues];
+
+#ifdef DEBUG
+    // check everything is setup correctly
+    [self devModeCheckSetupCorrectly];
+#endif
 
     return nil;
 }
@@ -511,5 +516,17 @@ static CriticalMoments *sharedInstance = nil;
 - (void)removeAllBanners {
     [CMBannerManager.shared removeAllAppWideMessages];
 }
+
+#ifdef DEBUG
+// Not compiled into release builds, only debug.
+// Checks everything is setup correctly and setup logs issues for devs to see
+- (void)devModeCheckSetupCorrectly {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                     [CMBackgroundHandler devModeCheckBackgroundSetupCorrectly];
+                     [CMNotificationsDelegate devModeCheckNotificationDelegateSetupCorrectly];
+                   });
+}
+#endif
 
 @end

@@ -72,4 +72,20 @@
     [self.originalDelegate userNotificationCenter:center openSettingsForNotification:notification];
 }
 
+#ifdef DEBUG
+// Only compiled in debug mode, not included in release builds.
+// Check everything is setup correctly, and log a warning if not.
++ (void)devModeCheckNotificationDelegateSetupCorrectly {
+    // Check the app's notification delegate is ours (potentually wrapping theirs)
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    id<UNUserNotificationCenterDelegate> currentDelegate = center.delegate;
+    if (!currentDelegate || ![currentDelegate isKindOfClass:[CMNotificationsDelegate class]]) {
+        NSLog(@"CriticalMoments Debug Developer Warning: The CM notification delegate is not registered. Tapping "
+              @"notifications from CM won't trigger the correct actions. If you register a custom "
+              @"UNUserNotificationCenterDelegate, do so before calling the start method of CriticalMoments.\nThis "
+              @"warning is only in debug builds, and is not included in release builds.");
+    }
+}
+#endif
+
 @end

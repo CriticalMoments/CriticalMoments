@@ -16,6 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithOriginalDelegate:(id<UNUserNotificationCenterDelegate>)originalDelegate;
 
+#ifdef DEBUG
++ (void)devModeCheckNotificationDelegateSetupCorrectly;
+#endif
+
 @end
 
 NS_ASSUME_NONNULL_END
