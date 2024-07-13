@@ -183,6 +183,21 @@
             break;
         }
     }
+
+    // Check both background modes are in the Info.plist
+    NSArray *permittedBackgroundModes = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIBackgroundModes"];
+    NSArray<NSString *> *requiredModes = @[ @"fetch", @"processing" ];
+
+    for (NSString *requiredMode in requiredModes) {
+        if (![permittedBackgroundModes containsObject:requiredMode]) {
+            NSLog(@"CriticalMoments Debug Developer Warning: You must enable 'Background processing' and 'Background "
+                  @"fetch' capabilities for this app. Without them, some Critical Moments features will not function, "
+                  @"such as smart notifications. See our quick "
+                  @"start guide for details: https://docs.criticalmoments.io\nThis warning is only on debug builds, "
+                  @"and is not included in release builds.");
+            break;
+        }
+    }
 }
 #endif
 
