@@ -1152,9 +1152,9 @@
     },
     "notifications": {
         "comeBackDemo": {
-          "title": "Complete your setup!",
+          "title": "Complete Setup",
           "sound": "default",
-          "body": "[Your app's value prop here]. It only takes 2 minutes!",
+          "body": "[Sample Content] It only takes 2 minutes to start healthy habbits with LifeTracker.",
           "scheduleCondition": "eventCount('enableComeBack') > 0",
           "deliveryTime": {
             "eventName": "app_entered_background",
