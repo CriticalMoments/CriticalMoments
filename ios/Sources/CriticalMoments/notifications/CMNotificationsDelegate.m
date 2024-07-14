@@ -8,6 +8,7 @@
 #import "CMNotificationsDelegate.h"
 
 #import "../CriticalMoments_private.h"
+#import <os/log.h>
 
 @import Appcore;
 
@@ -80,10 +81,13 @@
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     id<UNUserNotificationCenterDelegate> currentDelegate = center.delegate;
     if (!currentDelegate || ![currentDelegate isKindOfClass:[CMNotificationsDelegate class]]) {
-        NSLog(@"CriticalMoments Debug Developer Warning: The CM notification delegate is not registered. Tapping "
-              @"notifications from CM won't trigger the correct actions. If you register a custom "
-              @"UNUserNotificationCenterDelegate, do so before calling the start method of CriticalMoments.\nThis "
-              @"warning is only in debug builds, and is not included in release builds.");
+        os_log_error(OS_LOG_DEFAULT,
+                     "CriticalMoments: Setup Issue\n\nThe CM notification delegate is not registered. As a result, "
+                     "tapping notifications from CM will not trigger the correct action. This is likely because a "
+                     "custom UNUserNotificationCenterDelegate was registered after starting CriticalMoments.\n\nTo "
+                     "resolve, register your custom UNUserNotificationCenterDelegate before calling "
+                     "`CriticalMoments.shared.start()`. Your delegate will still be called for any notification not "
+                     "triggered by Critical Moments.\n\nThis warning log is only in debug builds.");
     }
 }
 #endif

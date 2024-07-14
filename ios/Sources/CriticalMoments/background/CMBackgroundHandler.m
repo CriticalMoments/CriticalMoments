@@ -8,6 +8,7 @@
 #import "CMBackgroundHandler.h"
 
 #import <BackgroundTasks/BackgroundTasks.h>
+#import <os/log.h>
 
 // TODO_P0 remove import
 #import "UserNotifications/UserNotifications.h"
@@ -176,10 +177,11 @@
         [[NSBundle mainBundle] objectForInfoDictionaryKey:@"BGTaskSchedulerPermittedIdentifiers"];
     for (NSString *requiredTaskId in allBackgroundIds) {
         if (![permittedIdentifiers containsObject:requiredTaskId]) {
-            NSLog(@"CriticalMoments Debug Developer Warning: The CM background task IDs must be registered in your "
-                  @"Info.plist for some Critical Moments features to function, such as notifications. See our quick "
-                  @"start guide for details: https://docs.criticalmoments.io\nThis warning is only on debug builds, "
-                  @"and is not included in release builds.");
+            os_log_error(
+                OS_LOG_DEFAULT,
+                "CriticalMoments: Setup Issue\nYou must add CM background task IDs to your Info.plist. If you don't, "
+                "some CM features will not function.\n\nSee our quick start guide for details on how to resolve this "
+                "issue: https://docs.criticalmoments.io\n\nThis warning log is only in debug builds.");
             break;
         }
     }
@@ -190,11 +192,11 @@
 
     for (NSString *requiredMode in requiredModes) {
         if (![permittedBackgroundModes containsObject:requiredMode]) {
-            NSLog(@"CriticalMoments Debug Developer Warning: You must enable 'Background processing' and 'Background "
-                  @"fetch' capabilities for this app. Without them, some Critical Moments features will not function, "
-                  @"such as smart notifications. See our quick "
-                  @"start guide for details: https://docs.criticalmoments.io\nThis warning is only on debug builds, "
-                  @"and is not included in release builds.");
+            os_log_error(OS_LOG_DEFAULT,
+                         "CriticalMoments: Setup Issue\nYou must enable 'Background processing' and 'Background fetch' "
+                         "capabilities in your app. Without them, some Critical Moments features will not "
+                         "function.\n\nSee our quick start guide for details on how to resolve this issue: "
+                         "https://docs.criticalmoments.io\n\nThis warning log is only in debug builds.");
             break;
         }
     }
