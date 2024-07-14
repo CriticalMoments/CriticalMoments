@@ -7,11 +7,11 @@
 
 #import "CMBackgroundHandler.h"
 
+// TODO_P0 remove import, log code, and notification code
+#import "UserNotifications/UserNotifications.h"
+
 #import <BackgroundTasks/BackgroundTasks.h>
 #import <os/log.h>
-
-// TODO_P0 remove import
-#import "UserNotifications/UserNotifications.h"
 
 #define bgFetchTaskId @"io.criticalmoments.bg_fetch"
 #define bgProcessingTaskId @"io.criticalmoments.bg_process"
@@ -20,9 +20,12 @@
 @implementation CMBackgroundHandler
 
 + (void)registerBackgroundTasks {
+    // Simulators do not support background work APIs
+#ifdef TARGET_IPHONE_SIMULATOR
+    return;
+#endif
+    
     if (@available(iOS 13.0, *)) {
-        // Simulators do not support background work
-#ifndef TARGET_IPHONE_SIMULATOR
         for (NSString *taskId in allBackgroundIds) {
             BOOL registered =
                 [BGTaskScheduler.sharedScheduler registerForTaskWithIdentifier:taskId
@@ -34,7 +37,6 @@
                 [CMBackgroundHandler logSetupError:taskId];
             }
         }
-#endif
     }
 }
 
@@ -173,6 +175,7 @@
 // Only compiled in debug mode, won't run on release builds.
 + (void)devModeCheckBackgroundSetupCorrectly {
     // Check our 2 IDs are included in the app's Info.plist
+    // Don't simply error in callback because it isn't run on simulators, and we want devs to see this.
     NSArray *permittedIdentifiers =
         [[NSBundle mainBundle] objectForInfoDictionaryKey:@"BGTaskSchedulerPermittedIdentifiers"];
     for (NSString *requiredTaskId in allBackgroundIds) {
