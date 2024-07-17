@@ -27,6 +27,8 @@ const defaultDeliveryWindowLocalTimeEnd = maxWindowLocalTimeEnd
 
 var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
 
+const NotificaitonMaxIdealWaitTimeForever = -1
+
 type Notification struct {
 	ID         string
 	Title      string
@@ -54,8 +56,20 @@ type Notification struct {
 }
 
 type IdealDevlieryConditions struct {
-	Condition   Condition `json:"condition"`
-	MaxWaitTime int       `json:"maxWaitTime"`
+	Condition          Condition `json:"condition"`
+	MaxWaitTimeSeconds int       `json:"maxWaitTime"`
+}
+
+func (i *IdealDevlieryConditions) MaxWaitTime() time.Duration {
+	if i.WaitForever() {
+		// 200 years in case the caller skips the check WaitForever()
+		return time.Hour * 24 * 365 * 200
+	}
+	return time.Second * time.Duration(i.MaxWaitTimeSeconds)
+}
+
+func (i *IdealDevlieryConditions) WaitForever() bool {
+	return i.MaxWaitTimeSeconds == NotificaitonMaxIdealWaitTimeForever
 }
 
 type EventInstanceTypeEnum int
@@ -168,7 +182,8 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 		if conErr := n.IdealDevlieryConditions.Condition.Validate(); conErr != nil {
 			return fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID)
 		}
-		if n.IdealDevlieryConditions.MaxWaitTime < -1 || n.IdealDevlieryConditions.MaxWaitTime == 0 {
+		if n.IdealDevlieryConditions.MaxWaitTimeSeconds != NotificaitonMaxIdealWaitTimeForever &&
+			n.IdealDevlieryConditions.MaxWaitTimeSeconds < 1 {
 			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
 		}
 	}

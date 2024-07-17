@@ -232,7 +232,7 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if n.IdealDevlieryConditions.Condition.conditionString != "true" {
 		t.Fatal("failed to parse ideal delivery condition")
 	}
-	if n.IdealDevlieryConditions.MaxWaitTime != 10 {
+	if n.IdealDevlieryConditions.MaxWaitTime() != 10*time.Second {
 		t.Fatal("failed to parse ideal delivery max wait time")
 	}
 	if n.CancelationEvents == nil {
@@ -439,5 +439,26 @@ func TestHHMMStringParsing(t *testing.T) {
 		if err == nil {
 			t.Fatalf("Failed to error on %v", hhmmString)
 		}
+	}
+}
+
+func TestAccessors(t *testing.T) {
+	i := IdealDevlieryConditions{
+		MaxWaitTimeSeconds: NotificaitonMaxIdealWaitTimeForever,
+	}
+
+	if !i.WaitForever() {
+		t.Fatal("Wait forever incorrect")
+	}
+	if i.MaxWaitTime() < time.Hour*24*365*100 {
+		t.Fatal("Fallback to huge time failed")
+	}
+
+	i.MaxWaitTimeSeconds = 10
+	if i.WaitForever() {
+		t.Fatal("waitforever incorrect")
+	}
+	if i.MaxWaitTime() != time.Second*10 {
+		t.Fatal("conversion to duration failed")
 	}
 }

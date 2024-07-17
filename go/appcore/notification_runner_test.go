@@ -260,7 +260,10 @@ func TestDateWindowShift(t *testing.T) {
 	}
 
 	// Should shift to 10am
-	shiftedTime := shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime := shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Hour() != 10 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 10am, got %v", shiftedTime)
 	}
@@ -271,7 +274,10 @@ func TestDateWindowShift(t *testing.T) {
 	// make delivery window too soon. Should shift to next day start of window
 	n.DeliveryWindowTODStartMinutes = 7 * 60
 	n.DeliveryWindowTODEndMinutes = 8 * 60
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Hour() != 7 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 7am, got %v", shiftedTime)
 	}
@@ -282,7 +288,10 @@ func TestDateWindowShift(t *testing.T) {
 	// make delivery window okay, should not modify
 	n.DeliveryWindowTODStartMinutes = 7 * 60
 	n.DeliveryWindowTODEndMinutes = 11 * 60
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if !timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should meet filters")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Sub(testTime) != 0 {
 		t.Fatalf("Expected shifted time to be same as original, got %v", shiftedTime)
 	}
@@ -292,7 +301,10 @@ func TestDateWindowShift(t *testing.T) {
 		time.Sunday,
 		time.Saturday,
 	}
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if !timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should meet filters")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Sub(testTime) != 0 {
 		t.Fatalf("Expected shifted time to be same as original, got %v", shiftedTime)
 	}
@@ -305,7 +317,10 @@ func TestDateWindowShift(t *testing.T) {
 		time.Thursday,
 		time.Friday,
 	}
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	// time should be the same as the original
 	if shiftedTime.Hour() != testTime.Hour() || shiftedTime.Minute() != testTime.Minute() || shiftedTime.Second() != testTime.Second() {
 		t.Fatalf("Expected shifted time of day to be same as original, got %v", shiftedTime)
@@ -318,7 +333,10 @@ func TestDateWindowShift(t *testing.T) {
 	// should shift both time and date, next window is tomorrow
 	n.DeliveryWindowTODStartMinutes = 7 * 60
 	n.DeliveryWindowTODEndMinutes = 8 * 60
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Hour() != 7 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 7am, got %v", shiftedTime)
 	}
@@ -328,7 +346,10 @@ func TestDateWindowShift(t *testing.T) {
 
 	// Only allow on Wednesdays, should shift from Sunday to Wednesday
 	n.DeliveryDaysOfWeek = []time.Weekday{time.Wednesday}
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Hour() != 7 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 7am, got %v", shiftedTime)
 	}
@@ -341,7 +362,10 @@ func TestDateWindowShift(t *testing.T) {
 	n.DeliveryDaysOfWeek = []time.Weekday{time.Sunday}
 	n.DeliveryWindowTODStartMinutes = 0
 	n.DeliveryWindowTODEndMinutes = 24*60 - 1
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &dstTime)
+	if timeMeetsFilterConditions(&n, &dstTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &dstTime)
 	if shiftedTime.Hour() != 11 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 11am, got %v", shiftedTime)
 	}
@@ -357,7 +381,10 @@ func TestDateWindowShift(t *testing.T) {
 	// Okay in toronto, needs to shift in chicago
 	n.DeliveryWindowTODStartMinutes = 9 * 60
 	n.DeliveryWindowTODEndMinutes = 10 * 60
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &testTime)
+	if !timeMeetsFilterConditions(&n, &testTime) {
+		t.Fatal("Should meet filters")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &testTime)
 	if shiftedTime.Sub(testTime) != 0 {
 		t.Fatalf("Expected shifted time to be same as original, got %v", shiftedTime)
 	}
@@ -366,7 +393,10 @@ func TestDateWindowShift(t *testing.T) {
 		t.Fatal(err)
 	}
 	chicagoTime := testTime.In(chicagoTimeZone)
-	shiftedTime = shiftDeliveryTimeForAllowedWindows(&n, &chicagoTime)
+	if timeMeetsFilterConditions(&n, &chicagoTime) {
+		t.Fatal("Should not meet filters, needs to be shifted")
+	}
+	shiftedTime = shiftDeliveryTimeForFilters(&n, &chicagoTime)
 	if shiftedTime.Hour() != 9 || shiftedTime.Minute() != 0 || shiftedTime.Second() != 0 {
 		t.Fatalf("Expected shifted time to be 9am from 8:19am Chicago time, got %v", shiftedTime)
 	}
@@ -420,4 +450,278 @@ func TestScheduleCondition(t *testing.T) {
 	if sn.Notification.ID != "event3Notification" {
 		t.Fatal("should schedule notification 3")
 	}
+}
+
+func TestNotificationInIdealDeliveryWindow(t *testing.T) {
+	// Save the original timeNow function
+	originalTimeNow := timeNow
+	defer func() { timeNow = originalTimeNow }()
+
+	// Set custom time for testing
+	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
+	timeNow = func() time.Time {
+		return customTime
+	}
+
+	allDays := []time.Weekday{
+		time.Sunday,
+		time.Monday,
+		time.Tuesday,
+		time.Wednesday,
+		time.Thursday,
+		time.Friday,
+		time.Saturday,
+	}
+
+	tests := []struct {
+		name                  string
+		notification          *datamodel.Notification
+		nonIdealDeliveryTime  *time.Time
+		expectedInIdealWindow bool
+	}{
+		{
+			name:                  "nil notification",
+			notification:          nil,
+			nonIdealDeliveryTime:  &customTime,
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "nil IdealDevlieryConditions",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions:       nil,
+				DeliveryDaysOfWeek:            allDays,
+				DeliveryWindowTODStartMinutes: 0,
+				DeliveryWindowTODEndMinutes:   24*60 - 1,
+			},
+			nonIdealDeliveryTime:  &customTime,
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "nil nonIdealDeliveryTime",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions:       &datamodel.IdealDevlieryConditions{},
+				DeliveryDaysOfWeek:            allDays,
+				DeliveryWindowTODStartMinutes: 0,
+				DeliveryWindowTODEndMinutes:   24*60 - 1,
+			},
+			nonIdealDeliveryTime:  nil,
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "nonIdealDeliveryTime in future",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+					MaxWaitTimeSeconds: 60 * 60,
+				},
+				DeliveryDaysOfWeek:            allDays,
+				DeliveryWindowTODStartMinutes: 0,
+				DeliveryWindowTODEndMinutes:   24*60 - 1,
+			},
+			nonIdealDeliveryTime: func() *time.Time {
+				t := customTime.Add(time.Hour)
+				return &t
+			}(),
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "MaxWaitTime exceeded",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+					MaxWaitTimeSeconds: 60,
+				},
+				DeliveryDaysOfWeek:            allDays,
+				DeliveryWindowTODStartMinutes: 0,
+				DeliveryWindowTODEndMinutes:   24*60 - 1,
+			},
+			nonIdealDeliveryTime: func() *time.Time {
+				t := customTime.Add(-time.Hour)
+				return &t
+			}(),
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "current day not in DeliveryDaysOfWeek",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+					MaxWaitTimeSeconds: 60 * 60,
+				},
+				DeliveryWindowTODStartMinutes: 0,
+				DeliveryWindowTODEndMinutes:   24*60 - 1,
+				DeliveryDaysOfWeek:            []time.Weekday{time.Monday},
+			},
+			nonIdealDeliveryTime: func() *time.Time {
+				t := customTime.Add(-time.Minute * 5)
+				return &t
+			}(),
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "current time not in DeliveryWindowTODStartMinutes",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+					MaxWaitTimeSeconds: 60 * 60,
+				},
+				DeliveryDaysOfWeek:            allDays,
+				DeliveryWindowTODStartMinutes: (customTime.Hour()-1)*60 + customTime.Minute(),
+				DeliveryWindowTODEndMinutes:   (customTime.Hour()-1)*60 + customTime.Minute() + 30,
+			},
+			nonIdealDeliveryTime: func() *time.Time {
+				t := customTime.Add(-time.Minute * 5)
+				return &t
+			}(),
+			expectedInIdealWindow: false,
+		},
+		{
+			name: "current time in ideal window",
+			notification: &datamodel.Notification{
+				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+					MaxWaitTimeSeconds: 60 * 60,
+				},
+				DeliveryDaysOfWeek:            []time.Weekday{customTime.Weekday()},
+				DeliveryWindowTODStartMinutes: (customTime.Hour()-1)*60 + customTime.Minute(),
+				DeliveryWindowTODEndMinutes:   (customTime.Hour()+1)*60 + customTime.Minute(),
+			},
+			nonIdealDeliveryTime: func() *time.Time {
+				t := customTime.Add(-time.Minute * 5)
+				return &t
+			}(),
+			expectedInIdealWindow: true,
+		},
+	}
+
+	for _, test := range tests {
+		if test.name != "current day not in DeliveryDaysOfWeek" {
+			continue
+		}
+		inIdealWindow := notificationInIdealDeliveryWindow(test.notification, test.nonIdealDeliveryTime)
+		if inIdealWindow != test.expectedInIdealWindow {
+			t.Errorf("notificationInIdealDeliveryWindow() = %v, want %v for test %s", inIdealWindow, test.expectedInIdealWindow, test.name)
+		}
+	}
+}
+
+func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
+	// Save and restore the original timeNow function
+	originalTimeNow := timeNow
+	defer func() { timeNow = originalTimeNow }()
+
+	// Set custom time for testing
+	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
+	timeNow = func() time.Time {
+		return customTime
+	}
+
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/conditionalNotifications.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	trueCondition, err := datamodel.NewCondition("true")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type testType struct {
+		name                 string
+		notification         datamodel.Notification
+		nonIdealDeliveryTime *time.Time
+		expectedShiftedTime  *time.Time
+	}
+
+	var buildValidNotification = func() datamodel.Notification {
+		return datamodel.Notification{
+			IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				Condition:          *trueCondition,
+				MaxWaitTimeSeconds: 60 * 60,
+			},
+			DeliveryDaysOfWeek:            []time.Weekday{time.Tuesday},
+			DeliveryWindowTODStartMinutes: 11 * 60,
+			DeliveryWindowTODEndMinutes:   13 * 60,
+		}
+	}
+
+	if customTime.Weekday() != time.Tuesday {
+		t.Fatal("customTime not in window")
+	}
+	validNotif := buildValidNotification()
+	if !timeMeetsFilterConditions(&validNotif, &customTime) {
+		t.Fatal("valid notification should be in delivery window of custom time")
+	}
+
+	var runTest = func(test testType) {
+		shiftedTime := ac.shiftDeliveryTimeForIdealWindow(&test.notification, test.nonIdealDeliveryTime)
+		if (shiftedTime == nil && test.expectedShiftedTime != nil) || (shiftedTime != nil && test.expectedShiftedTime == nil) {
+			t.Fatalf("Test %s: Expected shiftedTime %v, but got %v", test.name, test.expectedShiftedTime, shiftedTime)
+		}
+		if shiftedTime != nil && !shiftedTime.Equal(*test.expectedShiftedTime) {
+			t.Fatalf("Test %s: Expected shiftedTime %v, but got %v", test.name, *test.expectedShiftedTime, *shiftedTime)
+		}
+	}
+
+	runTest(testType{ // add_test_count
+		name:                 "valid in ideal window",
+		notification:         buildValidNotification(),
+		nonIdealDeliveryTime: &customTime,
+		expectedShiftedTime:  &customTime,
+	})
+
+	runTest(testType{ // add_test_count
+		name:                 "nil nonIdealDeliveryTime",
+		notification:         buildValidNotification(),
+		nonIdealDeliveryTime: nil,
+		expectedShiftedTime:  nil,
+	})
+
+	// For invalid condition, expect it to run at end of window since condition never passes
+	invalidConditionNotification := buildValidNotification()
+	invalidCondition, err := datamodel.NewCondition("invalid")
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalidConditionNotification.IdealDevlieryConditions.Condition = *invalidCondition
+	endOfIdealWindow := customTime.Add(time.Hour)
+	runTest(testType{ // add_test_count
+		name:                 "invalid condition",
+		notification:         invalidConditionNotification,
+		nonIdealDeliveryTime: &customTime,
+		expectedShiftedTime:  &endOfIdealWindow,
+	})
+
+	// Same for false condition: Expect it to run at end of window since condition never passes
+	falseCondition, err := datamodel.NewCondition("false")
+	if err != nil {
+		t.Fatal(err)
+	}
+	idealWithFalseCondition := buildValidNotification()
+	idealWithFalseCondition.IdealDevlieryConditions.Condition = *falseCondition
+	runTest(testType{ // add_test_count
+		name:                 "false condition should push back to end of window",
+		notification:         idealWithFalseCondition,
+		nonIdealDeliveryTime: &customTime,
+		expectedShiftedTime:  &endOfIdealWindow,
+	})
+
+	// Condition passes and in ideal window, but not in filters. Should still be at end of window, not now
+	filterFailNotification := buildValidNotification()
+	filterFailNotification.DeliveryWindowTODEndMinutes = 1
+	runTest(testType{ // add_test_count
+		name:                 "filters fail",
+		notification:         filterFailNotification,
+		nonIdealDeliveryTime: &customTime,
+		expectedShiftedTime:  &endOfIdealWindow,
+	})
+
+	// Wait forever with failing condition should not schedule at end of window
+	foreverNotif := buildValidNotification()
+	foreverNotif.IdealDevlieryConditions.Condition = *falseCondition
+	foreverNotif.IdealDevlieryConditions.MaxWaitTimeSeconds = -1
+	if !foreverNotif.IdealDevlieryConditions.WaitForever() {
+		t.Fatal("not setup correctly for wait forever")
+	}
+	runTest(testType{ // add_test_count
+		name:                 "wait forever",
+		notification:         foreverNotif,
+		nonIdealDeliveryTime: &customTime,
+		expectedShiftedTime:  nil,
+	})
 }

@@ -70,11 +70,10 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 		scheduledNotifications:   make([]*ScheduledNotification, 0),
 	}
 	for _, notification := range ac.config.Notifications {
-		if deliveryTimestamp := ac.deliveryTimeForNotification(notification); deliveryTimestamp != nil {
-			deliveryTimeShiftedToWindow := shiftDeliveryTimeForAllowedWindows(notification, deliveryTimestamp)
+		if deliveryTimestamp := ac.notificationDeliveryTime(notification); deliveryTimestamp != nil {
 			sn := ScheduledNotification{
 				Notification: notification,
-				scheduledAt:  deliveryTimeShiftedToWindow,
+				scheduledAt:  *deliveryTimestamp,
 			}
 			plan.scheduledNotifications = append(plan.scheduledNotifications, &sn)
 		} else {
@@ -85,7 +84,95 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 	return plan, nil
 }
 
-func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notification) *time.Time {
+// Get the delivery time of a notification
+// 1) First check when it should be delivered (static time, event based)
+// 2) Then consider ideal delivery window, delivering sooner or later if we have special targeting in mind
+// 3) Then consider the allowed time of day, and days of week for delivery
+func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification) *time.Time {
+	nonIdealDeliveryTime := ac.baseDeliveryTimeForNotification(notification)
+	idealDeliveryTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime)
+	shiftedDeliveryTime := shiftDeliveryTimeForFilters(notification, idealDeliveryTime)
+	return shiftedDeliveryTime
+}
+
+// timeNow is a mockable version of time.Now for testing
+var timeNow = time.Now
+
+// Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
+func notificationInIdealDeliveryWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time) bool {
+	if notification == nil ||
+		notification.IdealDevlieryConditions == nil ||
+		nonIdealDeliveryTime == nil {
+		return false
+	}
+
+	now := timeNow()
+
+	// Check current time is in the ideal delivery time.
+	// Must be after deliveryTime, but before dt+offset.
+	if nonIdealDeliveryTime.After(now) {
+		return false
+	}
+	if now.Sub(*nonIdealDeliveryTime) > notification.IdealDevlieryConditions.MaxWaitTime() {
+		return false
+	}
+
+	// Check TOD and DOW filters work for current time
+	if !timeMeetsFilterConditions(notification, &now) {
+		return false
+	}
+
+	// All checks passed, delivery time is in ideal window
+	return true
+}
+
+func timeMeetsFilterConditions(notification *datamodel.Notification, t *time.Time) bool {
+	if !slices.Contains(notification.DeliveryDaysOfWeek, t.Weekday()) {
+		return false
+	}
+	mintueOfDay := t.Hour()*60 + t.Minute()
+	if mintueOfDay < notification.DeliveryWindowTODStartMinutes ||
+		mintueOfDay > notification.DeliveryWindowTODEndMinutes {
+		return false
+	}
+
+	return true
+}
+
+// If we're in the ideal delivery window, and condition passes: now is new ideal delivery time
+// If we're in the ideal delivery window, and condition fails: delay delivery until end of ideal window
+func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time) *time.Time {
+	if nonIdealDeliveryTime == nil ||
+		notification == nil {
+		return nil
+	}
+
+	// Check if now is in ideal delivery window, and if the condition passes
+	inIdealDeliveryWindow := notificationInIdealDeliveryWindow(notification, nonIdealDeliveryTime)
+	if inIdealDeliveryWindow {
+		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDevlieryConditions.Condition)
+		if idealConditionResult && err == nil {
+			now := timeNow()
+			return &now
+		}
+	}
+
+	// Shift delivery time back to end of offset (or nil it out for offset=forever)
+	if notification.IdealDevlieryConditions != nil {
+		if notification.IdealDevlieryConditions.WaitForever() {
+			return nil
+		} else {
+			endOfIdealDeliveryWindow := nonIdealDeliveryTime.Add(notification.IdealDevlieryConditions.MaxWaitTime())
+			return &endOfIdealDeliveryWindow
+		}
+	}
+
+	// No ideal time, so return non ideal time
+	return nonIdealDeliveryTime
+}
+
+// Base delivery time for notification based on static delivery time and event time, ignoring ideal time and delivery window filters
+func (ac *Appcore) baseDeliveryTimeForNotification(notification *datamodel.Notification) *time.Time {
 	if canceled := ac.isNotificationCanceled(notification); canceled {
 		return nil
 	}
@@ -121,8 +208,15 @@ func (ac *Appcore) deliveryTimeForNotification(notification *datamodel.Notificat
 	return nil
 }
 
-// Move the time forward until it is in the delivery window (time of day, day of week)
-func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, deliveryTime *time.Time) time.Time {
+// Move the time forward until it is in the delivery window filters (time of day, day of week)
+func shiftDeliveryTimeForFilters(notification *datamodel.Notification, deliveryTime *time.Time) *time.Time {
+	if deliveryTime == nil || notification == nil {
+		return nil
+	}
+	if timeMeetsFilterConditions(notification, deliveryTime) {
+		return deliveryTime
+	}
+
 	newTime := *deliveryTime
 
 	// Shift hours first, if needed
@@ -145,7 +239,7 @@ func shiftDeliveryTimeForAllowedWindows(notification *datamodel.Notification, de
 		newTime = newTime.AddDate(0, 0, 1)
 	}
 
-	return newTime
+	return &newTime
 }
 
 func (ac *Appcore) isNotificationCanceled(notification *datamodel.Notification) bool {
