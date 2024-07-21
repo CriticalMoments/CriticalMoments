@@ -17,6 +17,7 @@
 #import "../utils/CMUtils.h"
 
 #import <UserNotifications/UserNotifications.h>
+#import <os/log.h>
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted, disableNotifications;
@@ -28,6 +29,7 @@
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @property(nonatomic, strong) CMNotificationsDelegate *notificationDelegate;
+@property(nonatomic, strong) CMBackgroundHandler *backgroundHandler;
 @end
 
 @implementation CriticalMoments
@@ -104,10 +106,7 @@ static CriticalMoments *sharedInstance = nil;
 
     // Registering BG work must be done before the end of app launch, do no defer
     //  https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)?language=objc
-    [CMBackgroundHandler registerBackgroundTasks];
-    // TODO_P0: needs to be here and not deferred? Tried background thread and never got called. Trying this.
-    // Schedule the background work
-    [CMBackgroundHandler scheduleBackgroundTask];
+    [self registerBackgroundHandler];
 
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
@@ -415,6 +414,26 @@ static CriticalMoments *sharedInstance = nil;
         }
     }
     return _currentTheme;
+}
+
+#pragma mark Background Work
+
+- (void)registerBackgroundHandler {
+    CMBackgroundHandler *bgh = [[CMBackgroundHandler alloc] initWithCm:self];
+    self.backgroundHandler = bgh;
+    [bgh registerBackgroundTasks];
+
+    // TODO_P0: does this really to be here (run before app launch) and not deferred at end of `start`? Need to try it
+    // deferred again. Maybe just dispatch here? Schedule the background work
+    [bgh scheduleBackgroundTask];
+}
+
+- (void)runAppcoreBackgroundWork {
+    NSError *error;
+    [_appcore performBackgroundWork:&error];
+    if (error) {
+        os_log_debug(OS_LOG_DEFAULT, "CriticalMoments: issue performing background work");
+    }
 }
 
 #pragma mark Notifications

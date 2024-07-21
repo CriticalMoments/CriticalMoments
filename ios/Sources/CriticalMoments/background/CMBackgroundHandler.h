@@ -7,12 +7,16 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../include/CriticalMoments.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CMBackgroundHandler : NSObject
 
-+ (void)registerBackgroundTasks;
-+ (void)scheduleBackgroundTask;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithCm:(CriticalMoments *)cm;
+- (void)registerBackgroundTasks;
+- (void)scheduleBackgroundTask;
 
 #ifdef DEBUG
 + (void)devModeCheckBackgroundSetupCorrectly;

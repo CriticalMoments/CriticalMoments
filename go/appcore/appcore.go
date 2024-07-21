@@ -668,3 +668,7 @@ func (ac *Appcore) ActionForNotification(notificationId string) error {
 	}
 	return nil
 }
+
+func (ac *Appcore) PerformBackgroundWork() error {
+	return ac.performBackgroundWorkForNotifications()
+}

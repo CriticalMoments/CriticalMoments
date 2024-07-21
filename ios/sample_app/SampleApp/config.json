@@ -1225,6 +1225,30 @@
           "deliveryTime": {
             "eventName": "demo_notification_5"
           }
+        },
+        "bgTestNotification": {
+          "title": "BG Notif From Config",
+          "body": "Not Charging",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "background_worker_ran"
+          },
+          "idealDeliveryConditions": {
+              "condition": "device_battery_state != 'charging' && device_battery_state != 'full'",
+              "maxWaitTime": -1
+          }
+        },
+        "bgTestNotificationCharging": {
+          "title": "BG Notif From Config",
+          "body": "Charging",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "background_worker_ran"
+          },
+          "idealDeliveryConditions": {
+              "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
+              "maxWaitTime": -1
+          }
         }
     }
 }

@@ -7,45 +7,57 @@
 
 #import "CMBackgroundHandler.h"
 
-// TODO_P0 remove import, log code, and notification code
-#import "UserNotifications/UserNotifications.h"
+#import "../CriticalMoments_private.h"
 
 #import <BackgroundTasks/BackgroundTasks.h>
 #import <os/log.h>
+
+@import Appcore;
 
 #define bgFetchTaskId @"io.criticalmoments.bg_fetch"
 #define bgProcessingTaskId @"io.criticalmoments.bg_process"
 #define allBackgroundIds @[ bgFetchTaskId, bgProcessingTaskId ]
 
+@interface CMBackgroundHandler ()
+
+@property(nonatomic, weak) CriticalMoments *cm;
+@property(nonatomic, strong) NSMutableArray<NSString *> *registeredTaskIds;
+
+@end
+
 @implementation CMBackgroundHandler
 
-+ (void)registerBackgroundTasks {
-    // Simulators do not support background work APIs
-#ifdef TARGET_IPHONE_SIMULATOR
-    return;
-#endif
-    
+- (instancetype)initWithCm:(CriticalMoments *)cm {
+    self = [super init];
+    if (self) {
+        self.cm = cm;
+        self.registeredTaskIds = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void)registerBackgroundTasks {
     if (@available(iOS 13.0, *)) {
         for (NSString *taskId in allBackgroundIds) {
+            CMBackgroundHandler *__weak weakSelf = self;
             BOOL registered =
                 [BGTaskScheduler.sharedScheduler registerForTaskWithIdentifier:taskId
                                                                     usingQueue:nil
                                                                  launchHandler:^(__kindof BGTask *_Nonnull task) {
-                                                                   [CMBackgroundHandler runBackgroundWorker:task];
+                                                                   [weakSelf runBackgroundWorker:task];
                                                                  }];
+
+            // Note: Simulator not supported. Test background tasks on device only.
             if (!registered) {
                 [CMBackgroundHandler logSetupError:taskId];
+            } else {
+                [self.registeredTaskIds addObject:taskId];
             }
         }
     }
 }
 
-+ (void)scheduleBackgroundTask {
-    // Simulators do not support background work APIs
-#ifdef TARGET_IPHONE_SIMULATOR
-    return;
-#endif
-
+- (void)scheduleBackgroundTask {
     if (@available(iOS 13.0, *)) {
         BGAppRefreshTaskRequest *fetchRequest = [[BGAppRefreshTaskRequest alloc] initWithIdentifier:bgFetchTaskId];
         // At least 15 mins from now
@@ -67,6 +79,10 @@
     }
 
     for (NSString *taskId in allBackgroundIds) {
+        if (![self.registeredTaskIds containsObject:taskId]) {
+            // Don't register if there isn't a handler for this taskId
+            continue;
+        }
         NSURL *logPath = [CMBackgroundHandler logPath:true withTaskId:taskId];
         NSString *logContents = [NSString stringWithContentsOfURL:logPath encoding:NSUTF8StringEncoding error:nil];
         NSLog(@"BG Debug Log [%@]:\n%@\n\n", taskId, logContents);
@@ -77,45 +93,16 @@
     }
 }
 
-+ (void)runBackgroundWorker:(BGTask *)task API_AVAILABLE(ios(13.0)) {
+- (void)runBackgroundWorker:(BGTask *)task API_AVAILABLE(ios(13.0)) {
     // Schedule next refresh
-    [CMBackgroundHandler scheduleBackgroundTask];
+    [self scheduleBackgroundTask];
 
     [CMBackgroundHandler logRunTimestamp:task.identifier];
-    [CMBackgroundHandler scheduleNotificationNow:task.identifier];
+    [self.cm runAppcoreBackgroundWork];
+    [self.cm sendEvent:@"background_worker_ran" builtIn:YES handler:nil];
     NSLog(@"CMBackground: worker ran - %@", task.identifier);
 
     [task setTaskCompletedWithSuccess:YES];
-}
-
-// TODO_P0 remove this
-+ (void)scheduleNotificationNow:(NSString *)taskId {
-    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-
-    if ([bgFetchTaskId isEqualToString:taskId]) {
-        content.title = @"Background Fetch";
-    } else {
-        content.title = @"Background Processing";
-    }
-    NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date]
-                                                          dateStyle:NSDateFormatterShortStyle
-                                                          timeStyle:NSDateFormatterFullStyle];
-
-    content.body = dateString;
-
-    UNNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1.0 repeats:NO];
-
-    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"notif_bg"
-                                                                          content:content
-                                                                          trigger:trigger];
-
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    [center addNotificationRequest:request
-             withCompletionHandler:^(NSError *_Nullable error) {
-               if (error) {
-                   NSLog(@"CriticalMoments: Error scheduling notification: %@", error);
-               }
-             }];
 }
 
 // TODO_P0 remove this
@@ -163,7 +150,18 @@
     }
 }
 
++ (BOOL)isSimulator {
+    char *simulatorId = getenv("SIMULATOR_MODEL_IDENTIFIER");
+    return simulatorId != NULL;
+    ;
+}
+
 + (void)logSetupError:(NSString *)taskId {
+    // Background tasks aren't supported on simulators. No need to log errors.
+    if (self.isSimulator) {
+        return;
+    }
+
     NSLog(@"CriticalMoments: failed to register background worker [%@]. Please ensure you follow all the steps in our "
           @"quick "
           @"start guide. https://docs.criticalmoments.io/quick-start",

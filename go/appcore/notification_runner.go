@@ -365,3 +365,8 @@ func (ac *Appcore) notificationsNeedUpdateForEvent(event *datamodel.Event) (bool
 
 	return false, nil
 }
+
+func (ac *Appcore) performBackgroundWorkForNotifications() error {
+	// TODO_P0: optimize this? Can check if any notifications are in ideal window and not update if not needed.
+	return ac.ForceUpdateNotificationPlan()
+}

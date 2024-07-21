@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)disableUserNotifications;
 - (BOOL)userNotificationsDisabled;
 
+/// Private API to perform appcore work in background
+- (void)runAppcoreBackgroundWork;
+
 @end
 
 NS_ASSUME_NONNULL_END
