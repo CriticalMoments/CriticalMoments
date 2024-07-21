@@ -13,7 +13,7 @@
   "scheduleCondition": "true",
   "idealDeliveryConditions": {
     "condition": "true",
-    "maxWaitTime": 10
+    "maxWaitTimeSeconds": 10
   },
   "cancelationEvents": ["event1", "event2"],
   "deliveryTime": {

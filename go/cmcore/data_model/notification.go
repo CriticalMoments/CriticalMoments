@@ -57,7 +57,7 @@ type Notification struct {
 
 type IdealDevlieryConditions struct {
 	Condition          Condition `json:"condition"`
-	MaxWaitTimeSeconds int       `json:"maxWaitTime"`
+	MaxWaitTimeSeconds int       `json:"maxWaitTimeSeconds"`
 }
 
 func (i *IdealDevlieryConditions) MaxWaitTime() time.Duration {
