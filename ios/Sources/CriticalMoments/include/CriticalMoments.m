@@ -117,15 +117,12 @@ static CriticalMoments *sharedInstance = nil;
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = [self startReturningError];
         if (error) {
-            NSLog(@"CriticalMoments: Critical Moments was unable to start! "
-                  @"%@",
-                  error);
+            os_log_error(OS_LOG_DEFAULT, "CriticalMoments: Critical Moments was unable to start!\nCMError: %@",
+                         error.localizedDescription);
 #if DEBUG
-            NSLog(@"CriticalMoments: throwing a "
-                  @"NSInternalInconsistencyException "
-                  @"to help find this issue. Exceptions are only thrown in "
-                  @"debug "
-                  @"mode, and will not crash apps built for release.");
+            os_log_fault(OS_LOG_DEFAULT,
+                         "CriticalMoments: throwing a NSInternalInconsistencyException to help find the issue above. "
+                         "Exceptions are only thrown in debug builds. This will not crash apps built for release.");
             @throw NSInternalInconsistencyException;
 #endif
         }
