@@ -352,7 +352,7 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 			pc = &datamodel.PrimaryConfig{}
 			err = json.Unmarshal(configFileData, &pc)
 			if err != nil {
-				return err
+				return datamodel.UserFriendlyJsonError(err, configFileData)
 			}
 		}
 	}
