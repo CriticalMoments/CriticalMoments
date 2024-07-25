@@ -1226,6 +1226,17 @@
             "eventName": "demo_notification_5"
           }
         },
+        "demoEventNotification6": {
+          "title": "Ideal Time",
+          "body": "Displayed when device charging, or after 24 hours of waiting.",
+          "deliveryTime": {
+            "eventName": "demo_notification_6"
+          },
+          "idealDeliveryConditions": {
+              "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
+              "maxWaitTimeSeconds": 86400
+          }
+        },
         "bgTestNotification": {
           "title": "BG Notif From Config",
           "body": "Not Charging",
@@ -1235,7 +1246,7 @@
           },
           "idealDeliveryConditions": {
               "condition": "device_battery_state != 'charging' && device_battery_state != 'full'",
-              "maxWaitTime": -1
+              "maxWaitTimeSeconds": -1
           }
         },
         "bgTestNotificationCharging": {
@@ -1247,7 +1258,7 @@
           },
           "idealDeliveryConditions": {
               "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
-              "maxWaitTime": -1
+              "maxWaitTimeSeconds": -1
           }
         }
     }

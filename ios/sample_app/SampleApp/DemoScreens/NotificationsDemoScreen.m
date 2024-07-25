@@ -44,7 +44,14 @@
         @"Reduce new-user churn by reminding users who abandon onboarding, reminding them to complete their setup.";
     comeBackDemo.actionCMEventName = @"enableComeBack";
 
-    [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo ]];
+    CMDemoAction *idealTimeNotification = [[CMDemoAction alloc] init];
+    idealTimeNotification.title = @"Wait for Ideal Delivery Time";
+    idealTimeNotification.subtitle =
+        @"This notification will wait up to 24 hours, and deliver when the device is charging.\n\nNote: It won't "
+        @"deliver immediatly after plugging in, but sometime when charging.";
+    idealTimeNotification.actionCMEventName = @"demo_notification_6";
+
+    [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo, idealTimeNotification ]];
 
     CMDemoAction *eventNotification = [[CMDemoAction alloc] init];
     eventNotification.title = @"Basic Notifications";
