@@ -13,6 +13,13 @@ type NotificationPlan struct {
 	scheduledNotifications   []*ScheduledNotification
 }
 
+// Expalainin the achitecture a bit here for notifications. It's a bit tricky due to restructions of iOS APIs.
+// Main thing to know: iOS doesn't store delivered notifications. It might have them, but it might not if they are cleared once the user dismisses them. So the pattern is "if they are scheduled, we assume they are delivered".
+// General idea: golang delivers truth from DB. It consistently can reproduce the same plan with identical delivery times (for a given now() time). iOS layer takes care of the rest.
+// CM iOS layer: deals with the golang plan. This including knowing if it already delviered a notification for a given timestamp (some assumtions of scheduled get delivered).
+// To handle lack of concrete "delivered", and async messages, we use a trick. iOS code pushes out delivery 1s; this gives us time to propagate cancelations or reschedules before it is delivered to the user. However go may say "that should have already fired and shouldn't fire twice" and keep the original time (in which case that's also okay).
+// iOS also makes the assumtion that notifications with old delivery times were already delivered. Since go is calling iOS to schedule as soon as the DB entries are set, this should be true.
+
 // Gomobile needs count and AtIndex accessors for UnscheduledNotifications and scheduledNotifications
 func (plan *NotificationPlan) UnscheduledNotificationCount() int {
 	return len(plan.unscheduledNotifications)
@@ -99,14 +106,12 @@ func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification
 var timeNow = time.Now
 
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
-func notificationInIdealDeliveryWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time) bool {
+func notificationInIdealDeliveryWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) bool {
 	if notification == nil ||
 		notification.IdealDevlieryConditions == nil ||
 		nonIdealDeliveryTime == nil {
 		return false
 	}
-
-	now := timeNow()
 
 	// Check current time is in the ideal delivery time.
 	// Must be after deliveryTime, but before dt+offset.
@@ -148,11 +153,11 @@ func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notif
 	}
 
 	// Check if now is in ideal delivery window, and if the condition passes
-	inIdealDeliveryWindow := notificationInIdealDeliveryWindow(notification, nonIdealDeliveryTime)
+	now := timeNow()
+	inIdealDeliveryWindow := notificationInIdealDeliveryWindow(notification, nonIdealDeliveryTime, now)
 	if inIdealDeliveryWindow {
 		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDevlieryConditions.Condition)
 		if idealConditionResult && err == nil {
-			now := timeNow()
 			return &now
 		}
 	}
