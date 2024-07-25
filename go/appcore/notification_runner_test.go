@@ -453,15 +453,8 @@ func TestScheduleCondition(t *testing.T) {
 }
 
 func TestNotificationInIdealDeliveryWindow(t *testing.T) {
-	// Save the original timeNow function
-	originalTimeNow := timeNow
-	defer func() { timeNow = originalTimeNow }()
-
-	// Set custom time for testing
+	// Set custom 'now' time for testing
 	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
-	timeNow = func() time.Time {
-		return customTime
-	}
 
 	allDays := []time.Weekday{
 		time.Sunday,
@@ -593,7 +586,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		if test.name != "current day not in DeliveryDaysOfWeek" {
 			continue
 		}
-		inIdealWindow := notificationInIdealDeliveryWindow(test.notification, test.nonIdealDeliveryTime)
+		inIdealWindow := notificationInIdealDeliveryWindow(test.notification, test.nonIdealDeliveryTime, customTime)
 		if inIdealWindow != test.expectedInIdealWindow {
 			t.Errorf("notificationInIdealDeliveryWindow() = %v, want %v for test %s", inIdealWindow, test.expectedInIdealWindow, test.name)
 		}
