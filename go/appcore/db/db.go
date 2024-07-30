@@ -218,6 +218,35 @@ func (db *DB) eventTimeByName(name string, first bool) (*time.Time, error) {
 	return &time, nil
 }
 
+func (db *DB) AllEventTimesByName(name string) ([]time.Time, error) {
+	if !db.started {
+		return nil, errors.New("CriticalMoments: DB not started")
+	}
+
+	rows, err := db.sqldb.Query(`SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at`, name)
+	if err == sql.ErrNoRows {
+		return []time.Time{}, nil
+	} else if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var times []time.Time
+	for rows.Next() {
+		var epochTime float64
+		err := rows.Scan(&epochTime)
+		if err != nil {
+			return nil, err
+		}
+
+		_, fractionalSeconds := math.Modf(epochTime)
+		nanoseconds := int64(fractionalSeconds * 1_000_000_000)
+		time := time.Unix(int64(epochTime), nanoseconds)
+		times = append(times, time)
+	}
+	return times, nil
+}
+
 type DBPropertyType int
 
 const (

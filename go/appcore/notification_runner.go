@@ -96,14 +96,12 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 // 2) Then consider ideal delivery window, delivering sooner or later if we have special targeting in mind
 // 3) Then consider the allowed time of day, and days of week for delivery
 func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification) *time.Time {
-	nonIdealDeliveryTime := ac.baseDeliveryTimeForNotification(notification)
-	idealDeliveryTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime)
+	now := time.Now()
+	nonIdealDeliveryTime := ac.baseDeliveryTimeForNotification(notification, now)
+	idealDeliveryTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime, now)
 	shiftedDeliveryTime := shiftDeliveryTimeForFilters(notification, idealDeliveryTime)
 	return shiftedDeliveryTime
 }
-
-// timeNow is a mockable version of time.Now for testing
-var timeNow = time.Now
 
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
 func notificationInIdealDeliveryWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) bool {
@@ -146,14 +144,13 @@ func timeMeetsFilterConditions(notification *datamodel.Notification, t *time.Tim
 
 // If we're in the ideal delivery window, and condition passes: now is new ideal delivery time
 // If we're in the ideal delivery window, and condition fails: delay delivery until end of ideal window
-func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time) *time.Time {
+func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) *time.Time {
 	if nonIdealDeliveryTime == nil ||
 		notification == nil {
 		return nil
 	}
 
 	// Check if now is in ideal delivery window, and if the condition passes
-	now := timeNow()
 	inIdealDeliveryWindow := notificationInIdealDeliveryWindow(notification, nonIdealDeliveryTime, now)
 	if inIdealDeliveryWindow {
 		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDevlieryConditions.Condition)
@@ -177,7 +174,7 @@ func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notif
 }
 
 // Base delivery time for notification based on static delivery time and event time, ignoring ideal time and delivery window filters
-func (ac *Appcore) baseDeliveryTimeForNotification(notification *datamodel.Notification) *time.Time {
+func (ac *Appcore) baseDeliveryTimeForNotification(notification *datamodel.Notification, now time.Time) *time.Time {
 	if canceled := ac.isNotificationCanceled(notification); canceled {
 		return nil
 	}
@@ -191,20 +188,15 @@ func (ac *Appcore) baseDeliveryTimeForNotification(notification *datamodel.Notif
 	if staticTimestamp := notification.DeliveryTime.Timestamp(); staticTimestamp != nil {
 		// Statically scheduled
 		// If time has passed, we should not schedule static time notification
-		if time.Now().After(*staticTimestamp) {
+		if now.After(*staticTimestamp) {
 			return nil
 		}
 		return staticTimestamp
 	} else if eventName := notification.DeliveryTime.EventName; eventName != nil {
 		// Event based scheduling
-		eventTime, err := eventTimeForDeliveryTime(ac, &notification.DeliveryTime)
-		if eventTime == nil || err != nil {
+		deliveryTime, err := deliveryTimeFromDB(ac, &notification.DeliveryTime)
+		if deliveryTime == nil || err != nil {
 			return nil
-		}
-		deliveryTime := eventTime
-		if notification.DeliveryTime.EventOffset != nil {
-			offsetTime := eventTime.Add(time.Duration(*notification.DeliveryTime.EventOffset) * time.Second)
-			deliveryTime = &offsetTime
 		}
 
 		return deliveryTime
@@ -278,13 +270,77 @@ func (ac *Appcore) isNotificationCanceled(notification *datamodel.Notification) 
 	return false
 }
 
-func eventTimeForDeliveryTime(ac *Appcore, dt *datamodel.DeliveryTime) (*time.Time, error) {
+func deliveryTimeFromDB(ac *Appcore, dt *datamodel.DeliveryTime) (*time.Time, error) {
+	var t *time.Time
+	var err error
+
+	offset := dt.EventOffsetDuration()
+
+	// Latest Once becomes first when there's zero offset. Use first logic since it's more efficient
+	isFirst := dt.EventInstance() == datamodel.EventInstanceTypeFirst || (offset == 0 && dt.EventInstance() == datamodel.EventInstanceTypeLatestOnce)
+
 	if dt.EventInstance() == datamodel.EventInstanceTypeLatest {
-		return ac.db.LatestEventTimeByName(*dt.EventName)
-	} else if dt.EventInstance() == datamodel.EventInstanceTypeFirst {
-		return ac.db.FirstEventTimeByName(*dt.EventName)
+		t, err = ac.db.LatestEventTimeByName(*dt.EventName)
+		if err != nil {
+			return nil, err
+		}
+	} else if isFirst {
+		t, err = ac.db.FirstEventTimeByName(*dt.EventName)
+		if err != nil {
+			return nil, err
+		}
+	} else if dt.EventInstance() == datamodel.EventInstanceTypeLatestOnce {
+		t, err = latestOnceEventTimeFromDB(ac, dt)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("invalid event instance type")
 	}
-	return nil, errors.New("invalid event instance type")
+
+	// no event is valid, not an error case
+	if t == nil {
+		return nil, nil
+	}
+
+	// Apply offset
+	offsetTime := t.Add(offset)
+	return &offsetTime, nil
+}
+
+// "event time" and not "delivery time", the caller must apply the offset
+func latestOnceEventTimeFromDB(ac *Appcore, dt *datamodel.DeliveryTime) (*time.Time, error) {
+	eventTimes, err := ac.db.AllEventTimesByName(*dt.EventName)
+	if err != nil {
+		return nil, err
+	}
+
+	return latestOnceEventTimeFromEventList(dt, eventTimes)
+}
+
+func latestOnceEventTimeFromEventList(dt *datamodel.DeliveryTime, eventTimes []time.Time) (*time.Time, error) {
+	// Latest once strategy: iterate through the events. The delivery time is the first event that is followed by a gap of at least the offset (+offset).
+	// This will consistently return the same delivery time from DB state without additional DB state.
+	if len(eventTimes) == 0 {
+		return nil, nil
+	}
+
+	offset := dt.EventOffsetDuration()
+
+	lastTime := eventTimes[0]
+	for i, eventTime := range eventTimes {
+		if i == 0 {
+			continue
+		}
+		lastScheduledTime := lastTime.Add(offset)
+		if eventTime.After(lastScheduledTime) {
+			// The notification should have been delivered at lastScheduledTime
+			break
+		}
+		lastTime = eventTime
+	}
+
+	return &lastTime, nil
 }
 
 func (ac *Appcore) notificationRunnerProcessEvent(event *datamodel.Event) error {
@@ -349,8 +405,9 @@ func (ac *Appcore) notificationsNeedUpdateForEvent(event *datamodel.Event) (bool
 			continue
 		}
 
-		// Latest case: always update test plan
-		if notif.DeliveryTime.EventInstance() == datamodel.EventInstanceTypeLatest {
+		// Latest case and LatestOnce case: always update test plan
+		if notif.DeliveryTime.EventInstance() == datamodel.EventInstanceTypeLatest ||
+			notif.DeliveryTime.EventInstance() == datamodel.EventInstanceTypeLatestOnce {
 			return true, nil
 		}
 		// First case: only update if this is the first event, and not already scheduled

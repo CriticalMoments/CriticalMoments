@@ -77,6 +77,8 @@ type EventInstanceTypeEnum int
 const (
 	// unknown, should not process. Could be type from future SDK
 	EventInstanceTypeUnknown EventInstanceTypeEnum = iota
+	// The notification's time is relative to the latest time the event occurred, but once it occurs it won't fire again
+	EventInstanceTypeLatestOnce
 	// The notification's time is relative to the latest time the event occurred
 	EventInstanceTypeLatest
 	// The notification's time is relative to the first time the event occurred
@@ -89,19 +91,28 @@ type DeliveryTime struct {
 
 	// Event based
 	EventName           *string `json:"eventName,omitempty"`
-	EventOffset         *int    `json:"eventOffset,omitempty"`
+	EventOffsetSeconds  *int    `json:"eventOffsetSeconds,omitempty"`
 	EventInstanceString *string `json:"eventInstance,omitempty"`
 }
 
 func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
-	// Default to latest for nil/empty, but not unrecognized
-	if dt.EventInstanceString == nil || *dt.EventInstanceString == "" || *dt.EventInstanceString == "latest" {
+	// Default to latest-once for nil/empty, but not unrecognized
+	if dt.EventInstanceString == nil || *dt.EventInstanceString == "" || *dt.EventInstanceString == "latest-once" {
+		return EventInstanceTypeLatestOnce
+	} else if *dt.EventInstanceString == "latest" {
 		return EventInstanceTypeLatest
 	}
-	if dt.EventInstanceString != nil && *dt.EventInstanceString == "first" {
+	if *dt.EventInstanceString == "first" {
 		return EventInstanceTypeFirst
 	}
 	return EventInstanceTypeUnknown
+}
+
+func (dt *DeliveryTime) EventOffsetDuration() time.Duration {
+	if dt.EventOffsetSeconds == nil {
+		return 0
+	}
+	return time.Duration(*dt.EventOffsetSeconds) * time.Second
 }
 
 type jsonNotification struct {
@@ -200,7 +211,7 @@ func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
 	if d.TimestampEpoch != nil && d.EventName != nil {
 		return "DeliveryTime cannot have both a Timestamp and an EventName defined."
 	}
-	if d.TimestampEpoch != nil && d.EventOffset != nil {
+	if d.TimestampEpoch != nil && d.EventOffsetSeconds != nil {
 		return "DeliveryTime cannot have both a Timestamp and an EventOffset defined."
 	}
 	if StrictDatamodelParsing {

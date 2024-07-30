@@ -94,8 +94,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if plan.ScheduledNotificationCount() != 0 {
 		t.Fatalf("Expected 0 scheduled notifications, got %d", plan.ScheduledNotificationCount())
 	}
-	if plan.UnscheduledNotificationCount() != 3 {
-		t.Fatalf("Expected 2 unscheduled notifications, got %d", plan.UnscheduledNotificationCount())
+	if plan.UnscheduledNotificationCount() != 5 {
+		t.Fatalf("Expected 5 unscheduled notifications, got %d", plan.UnscheduledNotificationCount())
 	}
 
 	// Fire event, should be scheduled for now (no offset)
@@ -119,8 +119,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli())) > 100 {
 		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn.ScheduledAtEpochMilliseconds())
 	}
-	if plan.UnscheduledNotificationCount() != 2 {
-		t.Fatalf("Expected 1 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
+	if plan.UnscheduledNotificationCount() != 4 {
+		t.Fatalf("Expected 4 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
 	}
 
 	// Fire event, should be scheduled for offset
@@ -161,12 +161,10 @@ func TestEventNotificationPlan(t *testing.T) {
 	if plan.ScheduledNotificationCount() != 2 {
 		t.Fatalf("Expected 2 scheduled notifications, got %d", plan.ScheduledNotificationCount())
 	}
-	first := plan.ScheduledNotificationAtIndex(0)
-	latest := plan.ScheduledNotificationAtIndex(1)
-	if first.Notification.ID != "event2Notification" {
-		// Index is interterminate
-		first = plan.ScheduledNotificationAtIndex(1)
-		latest = plan.ScheduledNotificationAtIndex(0)
+	first := scheduleNotificationWithName(plan.scheduledNotifications, "event2Notification")
+	latest := scheduleNotificationWithName(plan.scheduledNotifications, "event1Notification")
+	if first == nil || latest == nil {
+		t.Fatal("Expected event1 and event2 notifications to be scheduled")
 	}
 	// Check first has same time
 	if first.ScheduledAtEpochMilliseconds()-sn2.ScheduledAtEpochMilliseconds() != 0 {
@@ -200,6 +198,75 @@ func TestEventNotificationPlan(t *testing.T) {
 	if sn.Notification.ID != "event1Notification" {
 		t.Fatalf("Expected ScheduledNotificationAtIndex to return event notification, got %s", sn.Notification.ID)
 	}
+
+	// Test notification 4 with latest-once event instance
+	err = ac.SendClientEvent("event4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	events, err := ac.db.AllEventTimesByName("event4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(events) != 1 {
+		t.Fatalf("Expected 1 event, got %d", len(events))
+	}
+	plan = lb.lastNotificationPlan
+	if plan.ScheduledNotificationCount() != 2 {
+		t.Fatalf("Expected 2 scheduled notification, got %d", plan.ScheduledNotificationCount())
+	}
+	sn = scheduleNotificationWithName(plan.scheduledNotifications, "event4Notification")
+	if sn == nil {
+		t.Fatal("Expected event4 notification to be scheduled")
+	}
+	// Expect it to be 60 seconds from now, but not more than 50ms off
+	expectedTime := time.Now().Add(60 * time.Second)
+	diffTime := expectedTime.UnixMilli() - sn.ScheduledAtEpochMilliseconds()
+	if diffTime > 50 || diffTime < -50 {
+		t.Fatalf("Expected scheduledAt %v, got %v", expectedTime, sn.ScheduledAtEpochMilliseconds())
+	}
+
+	// Test event5 with latest-once event instance, but no offset. This is the same as "first".
+	expectedTime = time.Now()
+	err = ac.SendClientEvent("event5")
+	if err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(25 * time.Millisecond)
+	afterTime := time.Now()
+	err = ac.SendClientEvent("event5")
+	if err != nil {
+		t.Fatal(err)
+	}
+	events, err = ac.db.AllEventTimesByName("event5")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(events) != 2 {
+		t.Fatalf("Expected 2 events, got %d", len(events))
+	}
+	plan = lb.lastNotificationPlan
+	sn = scheduleNotificationWithName(plan.scheduledNotifications, "event5Notification")
+	if sn == nil {
+		t.Fatal("Expected event5 notification to be scheduled")
+	}
+	diffTime = expectedTime.UnixMilli() - sn.ScheduledAtEpochMilliseconds()
+	// Should be within 20ms of expected time (the first time, since offset is 0)
+	if diffTime > 20 || diffTime < -20 {
+		t.Fatalf("Expected scheduledAt %v, got %v", expectedTime, sn.ScheduledAtEpochMilliseconds())
+	}
+	if sn.ScheduledAtEpochMilliseconds() > afterTime.UnixMilli() {
+		t.Fatalf("Expected scheduledAt %v, got %v", expectedTime, sn.ScheduledAtEpochMilliseconds())
+	}
+}
+
+func scheduleNotificationWithName(sns []*ScheduledNotification, name string) *ScheduledNotification {
+	for _, sn := range sns {
+		if sn.Notification.ID == name {
+			return sn
+		}
+	}
+	return nil
 }
 
 func TestNotificationEventAction(t *testing.T) {
@@ -594,15 +661,8 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 }
 
 func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
-	// Save and restore the original timeNow function
-	originalTimeNow := timeNow
-	defer func() { timeNow = originalTimeNow }()
-
 	// Set custom time for testing
 	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
-	timeNow = func() time.Time {
-		return customTime
-	}
 
 	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/conditionalNotifications.json", t)
 	if err != nil {
@@ -642,7 +702,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 	}
 
 	var runTest = func(test testType) {
-		shiftedTime := ac.shiftDeliveryTimeForIdealWindow(&test.notification, test.nonIdealDeliveryTime)
+		shiftedTime := ac.shiftDeliveryTimeForIdealWindow(&test.notification, test.nonIdealDeliveryTime, customTime)
 		if (shiftedTime == nil && test.expectedShiftedTime != nil) || (shiftedTime != nil && test.expectedShiftedTime == nil) {
 			t.Fatalf("Test %s: Expected shiftedTime %v, but got %v", test.name, test.expectedShiftedTime, shiftedTime)
 		}
@@ -717,4 +777,79 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  nil,
 	})
+}
+
+func TestLatestOnceDeliveryTimeFromEventList(t *testing.T) {
+	eventName := "test"
+	offset := 300
+	dt := datamodel.DeliveryTime{
+		EventName:          &eventName,
+		EventOffsetSeconds: &offset,
+	}
+
+	// No events
+	tm, err := latestOnceEventTimeFromEventList(&dt, []time.Time{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tm != nil {
+		t.Fatal("Expected nil time")
+	}
+
+	// Many events at end
+	customTime := time.Now()
+	times := []time.Time{
+		customTime.Add(time.Second),
+		customTime.Add(2 * time.Second),
+		customTime.Add(3 * time.Second),
+		customTime.Add(4 * time.Second),
+	}
+	tm, err = latestOnceEventTimeFromEventList(&dt, times)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedTime := times[len(times)-1]
+	if !tm.Equal(expectedTime) {
+		t.Fatal("Expected last time returned")
+	}
+
+	// Offset 0 should return first
+	offset = 0
+	tm, err = latestOnceEventTimeFromEventList(&dt, times)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedTime = times[0]
+	if !tm.Equal(expectedTime) {
+		t.Fatal("Expected first time returned as offset is 0")
+	}
+
+	// Many events with gap larger than offset
+	offset = 300
+	times = []time.Time{
+		customTime.Add(time.Second),
+		customTime.Add(2 * time.Second),
+		customTime.Add(3 * time.Second), // i=2, after this there is a gap of 10 minutes (> offset)
+		customTime.Add(10 * time.Minute),
+		customTime.Add(11 * time.Minute),
+		customTime.Add(12 * time.Minute),
+	}
+	tm, err = latestOnceEventTimeFromEventList(&dt, times)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedTime = times[2]
+	if !tm.Equal(expectedTime) {
+		t.Fatal("Expected last time returned")
+	}
+
+	// adding another event shouldn't change the result
+	times = append(times, customTime.Add(13*time.Minute))
+	tm, err = latestOnceEventTimeFromEventList(&dt, times)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !tm.Equal(expectedTime) {
+		t.Fatal("Expected last time returned")
+	}
 }

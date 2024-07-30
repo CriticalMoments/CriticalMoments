@@ -654,3 +654,50 @@ func TestTimestampRoundingAndLatestPropHistory(t *testing.T) {
 		t.Fatal("LatestPropHistoryTime returned wrong time")
 	}
 }
+
+func TestAllEventTimesByName(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	// Should be empty to start
+	times, err := db.AllEventTimesByName("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(times) != 0 {
+		t.Fatal("Expected empty list")
+	}
+
+	// Insert a few events
+	startTime := time.Now()
+	for i := 0; i < 10; i++ {
+		// insert a row into events
+		e, err := datamodel.NewCustomEventWithName("test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = db.InsertEvent(e)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	times, err = db.AllEventTimesByName("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(times) != 10 {
+		t.Fatal("Expected 10 events")
+	}
+	// Check they are assending
+	var priorTime = startTime.Add(-1 * time.Second) // start time is inclusive
+	for i, tm := range times {
+		if tm.Before(priorTime) {
+			t.Fatal("Expected events in ascending order. Got ", tm, " before ", priorTime, " for event ", i)
+		}
+		if startTime.Sub(tm).Abs() > time.Second {
+			t.Fatal("Expected events within 1 second of start time. Got ", tm, " for event ", i)
+		}
+		priorTime = tm
+	}
+}

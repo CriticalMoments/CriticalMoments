@@ -174,8 +174,8 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.DeliveryTime.TimestampEpoch == nil || *n.DeliveryTime.TimestampEpoch != 1000 {
 		t.Fatal("failed to parse delivery time")
 	}
-	if n.DeliveryTime.EventInstanceString != nil || n.DeliveryTime.EventInstance() != EventInstanceTypeLatest {
-		t.Fatal("event instance should default to latest when not set")
+	if n.DeliveryTime.EventInstanceString != nil || n.DeliveryTime.EventInstance() != EventInstanceTypeLatestOnce {
+		t.Fatal("event instance should default to latest once when not set")
 	}
 }
 
@@ -241,7 +241,7 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if !slices.Equal(*n.CancelationEvents, []string{"event1", "event2"}) {
 		t.Fatal("failed to parse cancelation events")
 	}
-	if n.DeliveryTime.EventName == nil || *n.DeliveryTime.EventName != "some_event" || n.DeliveryTime.EventOffset == nil || *n.DeliveryTime.EventOffset != 300 {
+	if n.DeliveryTime.EventName == nil || *n.DeliveryTime.EventName != "some_event" || n.DeliveryTime.EventOffsetSeconds == nil || *n.DeliveryTime.EventOffsetSeconds != 300 {
 		t.Fatal("failed to parse delivery time")
 	}
 	if n.DeliveryTime.EventInstanceString == nil || n.DeliveryTime.EventInstance() != EventInstanceTypeFirst {
@@ -324,8 +324,8 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	}
 
 	// Case: Both TimestampEpoch and EventOffset are defined
-	eventOffset := 30
-	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffset: &eventOffset}
+	eventOffsetSeconds := 30
+	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffsetSeconds: &eventOffsetSeconds}
 	issue = dt.ValidateReturningUserReadableIssue()
 	if issue != "DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
@@ -346,20 +346,25 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	}
 
 	// Case: Valid EventOffset with EventName
-	dt = DeliveryTime{EventName: &eventName, EventOffset: &eventOffset}
+	dt = DeliveryTime{EventName: &eventName, EventOffsetSeconds: &eventOffsetSeconds}
 	issue = dt.ValidateReturningUserReadableIssue()
 	if issue != "" {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Empty/missing should detfault to latest
-	if dt.EventInstance() != EventInstanceTypeLatest {
-		t.Fatal("failed to return latest")
+	if dt.EventInstance() != EventInstanceTypeLatestOnce {
+		t.Fatal("failed to return latest for default")
 	}
 	s := ""
 	dt.EventInstanceString = &s
-	if dt.EventInstance() != EventInstanceTypeLatest {
-		t.Fatal("failed to return latest")
+	if dt.EventInstance() != EventInstanceTypeLatestOnce {
+		t.Fatal("failed to return latest once for empty string")
+	}
+	s = "latest-once"
+	dt.EventInstanceString = &s
+	if dt.EventInstance() != EventInstanceTypeLatestOnce {
+		t.Fatal("failed to return latest once")
 	}
 	s = "latest"
 	dt.EventInstanceString = &s
