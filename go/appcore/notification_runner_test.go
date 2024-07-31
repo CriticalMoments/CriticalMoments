@@ -298,6 +298,16 @@ func TestNotificationEventAction(t *testing.T) {
 	}
 }
 
+var allDays = []time.Weekday{
+	time.Sunday,
+	time.Monday,
+	time.Tuesday,
+	time.Wednesday,
+	time.Thursday,
+	time.Friday,
+	time.Saturday,
+}
+
 func TestDateWindowShift(t *testing.T) {
 	torontoTime, err := time.LoadLocation("America/Toronto")
 	if err != nil {
@@ -306,16 +316,6 @@ func TestDateWindowShift(t *testing.T) {
 	// Sunday, 9:19 am Toronto time
 	var testTimeEpoch int64 = 1720358361
 	testTime := time.Unix(testTimeEpoch, 0).In(torontoTime)
-
-	allDays := []time.Weekday{
-		time.Sunday,
-		time.Monday,
-		time.Tuesday,
-		time.Wednesday,
-		time.Thursday,
-		time.Friday,
-		time.Saturday,
-	}
 
 	n := datamodel.Notification{
 		DeliveryWindowTODStartMinutes: 10 * 60,
@@ -663,6 +663,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 	// Set custom time for testing
 	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
+	customTimePlusBgDelay := customTime.Add(checkTimeDelay)
 
 	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/conditionalNotifications.json", t)
 	if err != nil {
@@ -679,6 +680,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification         datamodel.Notification
 		nonIdealDeliveryTime *time.Time
 		expectedShiftedTime  *time.Time
+		bgCheckTime          *time.Time
 	}
 
 	var buildValidNotification = func() datamodel.Notification {
@@ -702,12 +704,18 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 	}
 
 	var runTest = func(test testType) {
-		shiftedTime := ac.shiftDeliveryTimeForIdealWindow(&test.notification, test.nonIdealDeliveryTime, customTime)
+		shiftedTime, bgCheckTime := ac.shiftDeliveryTimeForIdealWindow(&test.notification, test.nonIdealDeliveryTime, customTime)
 		if (shiftedTime == nil && test.expectedShiftedTime != nil) || (shiftedTime != nil && test.expectedShiftedTime == nil) {
 			t.Fatalf("Test %s: Expected shiftedTime %v, but got %v", test.name, test.expectedShiftedTime, shiftedTime)
 		}
 		if shiftedTime != nil && !shiftedTime.Equal(*test.expectedShiftedTime) {
 			t.Fatalf("Test %s: Expected shiftedTime %v, but got %v", test.name, *test.expectedShiftedTime, *shiftedTime)
+		}
+		if bgCheckTime == nil && test.bgCheckTime != nil || (bgCheckTime != nil && test.bgCheckTime == nil) {
+			t.Fatalf("Test %s: Expected bgCheckTime %v, but got %v", test.name, test.bgCheckTime, bgCheckTime)
+		}
+		if bgCheckTime != nil && !bgCheckTime.Equal(*test.bgCheckTime) {
+			t.Fatalf("Test %s: Expected bgCheckTime %v, but got %v", test.name, *test.bgCheckTime, *bgCheckTime)
 		}
 	}
 
@@ -716,6 +724,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         buildValidNotification(),
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  &customTime,
+		bgCheckTime:          nil,
 	})
 
 	runTest(testType{ // add_test_count
@@ -723,6 +732,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         buildValidNotification(),
 		nonIdealDeliveryTime: nil,
 		expectedShiftedTime:  nil,
+		bgCheckTime:          nil,
 	})
 
 	// For invalid condition, expect it to run at end of window since condition never passes
@@ -738,6 +748,8 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         invalidConditionNotification,
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  &endOfIdealWindow,
+		// technically could detect invalid condition and not schedule BG, but this is correct time had it been valid condition
+		bgCheckTime: &customTimePlusBgDelay,
 	})
 
 	// Same for false condition: Expect it to run at end of window since condition never passes
@@ -752,6 +764,8 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         idealWithFalseCondition,
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  &endOfIdealWindow,
+		// technically could detect false condition and not schedule BG, but this is correct time had it been condition which value can change
+		bgCheckTime: &customTimePlusBgDelay,
 	})
 
 	// Condition passes and in ideal window, but not in filters. Should still be at end of window, not now
@@ -762,9 +776,12 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         filterFailNotification,
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  &endOfIdealWindow,
+		// bgCheck time would be same as expectedShiftedTime, so no need for bg time
+		bgCheckTime: nil,
 	})
 
-	// Wait forever with failing condition should not schedule at end of window
+	// Wait forever with false condition should not schedule at end of window
+	// But should schedule BG check time to check if it changes
 	foreverNotif := buildValidNotification()
 	foreverNotif.IdealDevlieryConditions.Condition = *falseCondition
 	foreverNotif.IdealDevlieryConditions.MaxWaitTimeSeconds = -1
@@ -776,6 +793,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		notification:         foreverNotif,
 		nonIdealDeliveryTime: &customTime,
 		expectedShiftedTime:  nil,
+		bgCheckTime:          &customTimePlusBgDelay,
 	})
 }
 
@@ -851,5 +869,112 @@ func TestLatestOnceDeliveryTimeFromEventList(t *testing.T) {
 	}
 	if !tm.Equal(expectedTime) {
 		t.Fatal("Expected last time returned")
+	}
+}
+
+func TestNextBackgroundWorkTimeForNotifications(t *testing.T) {
+	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
+	customTimeBeforeDelay := customTime.Add(checkTimeDelay - time.Minute)
+	customTimePlusDay := customTime.Add(24 * time.Hour)
+
+	// nil notification should return nil
+	bgCheckTime := bgCheckTimeForIdealDeliveryWindow(nil, customTime, &customTimePlusDay)
+	if bgCheckTime != nil {
+		t.Fatal("Expected bgCheckTime to be set")
+	}
+
+	// 10 mins out should not return BG check time, as the delivery time is before first possible check time (15 minutes in the future)
+	notification := datamodel.Notification{
+		IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+			MaxWaitTimeSeconds: 60 * 60,
+		},
+		DeliveryDaysOfWeek:            allDays,
+		DeliveryWindowTODStartMinutes: 0,
+		DeliveryWindowTODEndMinutes:   24*60 - 1,
+	}
+	bgCheckTime = bgCheckTimeForIdealDeliveryWindow(&notification, customTime, &customTimeBeforeDelay)
+	if bgCheckTime != nil {
+		t.Fatal("Expected bgCheckTime to be nil when delivery time is before first possible check time")
+	}
+
+	// Expect 15 mins out when delivery time is past then
+	bgCheckTime = bgCheckTimeForIdealDeliveryWindow(&notification, customTime, &customTimePlusDay)
+	expectedTime := customTime.Add(checkTimeDelay)
+	if bgCheckTime == nil || !bgCheckTime.Equal(expectedTime) {
+		t.Fatalf("Expected bgCheckTime to be %v, got %v", expectedTime, bgCheckTime)
+	}
+
+	// expect 30 mins out when filters require it, plus 2 minutes buffer
+	notification.DeliveryWindowTODStartMinutes = 12*60 + 30 // 12:30, when customTime is 12:00
+	bgCheckTime = bgCheckTimeForIdealDeliveryWindow(&notification, customTime, &customTimePlusDay)
+	expectedTime = customTime.Add(30*time.Minute + filterTimeBuffer)
+	if bgCheckTime == nil || !bgCheckTime.Equal(expectedTime) {
+		t.Fatalf("Expected bgCheckTime to be %v, got %v", expectedTime, bgCheckTime)
+	}
+
+	// Exepect nil when delivery window pushes bgCheckTime past fallback time
+	notification.DeliveryDaysOfWeek = []time.Weekday{time.Sunday}
+	bgCheckTime = bgCheckTimeForIdealDeliveryWindow(&notification, customTime, &customTimePlusDay)
+	if bgCheckTime != nil {
+		t.Fatal("Expected bgCheckTime to be nil when delivery window pushes bgCheckTime past fallback time")
+	}
+}
+
+func TestTwoIdealTimeBackgroundTimes(t *testing.T) {
+	customTime := time.Date(2023, time.October, 10, 12, 0, 0, 0, time.UTC)
+
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/dualIdealNotifications.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := ac.generateNotificationPlanForTime(customTime)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.scheduledNotifications) != 0 {
+		t.Fatal("Expected scheduledNotifications to be 0 since no trigger events fired")
+	}
+	if plan.earliestBgCheckTimeEpochSeconds != 0 {
+		t.Fatal("Expected earliestBgCheckTimeEpochSeconds to be 0 since no trigger events fired")
+	}
+
+	// fire event1
+	err = ac.SendClientEvent("event1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan, err = ac.generateNotificationPlanForTime(customTime)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.scheduledNotifications) != 1 {
+		t.Fatal("Expected scheduledNotifications to be 1 since event1 fired")
+	}
+	// 15:00 is first possible time for bg check because of filters, plus 2 minutes buffer
+	expectedBgCheckTime := time.Date(2023, time.October, 10, 15, 00, 0, 0, time.UTC).Add(filterTimeBuffer)
+	if plan.earliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
+		t.Fatalf("Expected earliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.earliestBgCheckTimeEpochSeconds)
+	}
+
+	// fire event2 which doesn't have filters, so should check bg in 15 mins, and should select earlier of 2 bg check times
+	err = ac.SendClientEvent("event2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan, err = ac.generateNotificationPlanForTime(customTime)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.scheduledNotifications) != 2 {
+		t.Fatal("Expected scheduledNotifications to be 2 since event2 fired")
+	}
+	expectedBgCheckTime = customTime.Add(checkTimeDelay)
+	if plan.earliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
+		t.Fatalf("Expected earliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.earliestBgCheckTimeEpochSeconds)
 	}
 }

@@ -11,6 +11,9 @@ import (
 type NotificationPlan struct {
 	unscheduledNotifications []*datamodel.Notification
 	scheduledNotifications   []*ScheduledNotification
+
+	// The earliest time to run background work for notifications
+	earliestBgCheckTimeEpochSeconds int64
 }
 
 // Expalainin the achitecture a bit here for notifications. It's a bit tricky due to restructions of iOS APIs.
@@ -72,12 +75,21 @@ func (ac *Appcore) ForceUpdateNotificationPlan() error {
 }
 
 func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
+	now := time.Now()
+	return ac.generateNotificationPlanForTime(now)
+}
+
+func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationPlan, error) {
 	plan := NotificationPlan{
 		unscheduledNotifications: make([]*datamodel.Notification, 0),
 		scheduledNotifications:   make([]*ScheduledNotification, 0),
 	}
+
+	var earliestBgCheckTime *time.Time
+
 	for _, notification := range ac.config.Notifications {
-		if deliveryTimestamp := ac.notificationDeliveryTime(notification); deliveryTimestamp != nil {
+		deliveryTimestamp, bgCheckTime := ac.notificationDeliveryTime(notification, now)
+		if deliveryTimestamp != nil {
 			sn := ScheduledNotification{
 				Notification: notification,
 				scheduledAt:  *deliveryTimestamp,
@@ -86,6 +98,16 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 		} else {
 			plan.unscheduledNotifications = append(plan.unscheduledNotifications, notification)
 		}
+
+		if bgCheckTime != nil {
+			if earliestBgCheckTime == nil || earliestBgCheckTime.After(*bgCheckTime) {
+				earliestBgCheckTime = bgCheckTime
+			}
+		}
+	}
+
+	if earliestBgCheckTime != nil {
+		plan.earliestBgCheckTimeEpochSeconds = earliestBgCheckTime.Unix()
 	}
 
 	return plan, nil
@@ -95,12 +117,11 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 // 1) First check when it should be delivered (static time, event based)
 // 2) Then consider ideal delivery window, delivering sooner or later if we have special targeting in mind
 // 3) Then consider the allowed time of day, and days of week for delivery
-func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification) *time.Time {
-	now := time.Now()
+func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification, now time.Time) (deliveryTime *time.Time, bgCheckTime *time.Time) {
 	nonIdealDeliveryTime := ac.baseDeliveryTimeForNotification(notification, now)
-	idealDeliveryTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime, now)
+	idealDeliveryTime, bgCheckTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime, now)
 	shiftedDeliveryTime := shiftDeliveryTimeForFilters(notification, idealDeliveryTime)
-	return shiftedDeliveryTime
+	return shiftedDeliveryTime, bgCheckTime
 }
 
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
@@ -144,10 +165,16 @@ func timeMeetsFilterConditions(notification *datamodel.Notification, t *time.Tim
 
 // If we're in the ideal delivery window, and condition passes: now is new ideal delivery time
 // If we're in the ideal delivery window, and condition fails: delay delivery until end of ideal window
-func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) *time.Time {
+// Also: check what time we should schedule background checks for this notification's ideal delivery window, which meet the ideal delivery time (offset and filters)
+func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) (shiftedTime *time.Time, checkTime *time.Time) {
 	if nonIdealDeliveryTime == nil ||
 		notification == nil {
-		return nil
+		return nil, nil
+	}
+
+	// No ideal time window, so return non ideal time, and nil checkTime
+	if notification.IdealDevlieryConditions == nil {
+		return nonIdealDeliveryTime, nil
 	}
 
 	// Check if now is in ideal delivery window, and if the condition passes
@@ -155,22 +182,50 @@ func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notif
 	if inIdealDeliveryWindow {
 		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDevlieryConditions.Condition)
 		if idealConditionResult && err == nil {
-			return &now
+			// No need for checkTime, since the condition is currently met
+			return &now, nil
 		}
 	}
 
-	// Shift delivery time back to end of offset (or nil it out for offset=forever)
-	if notification.IdealDevlieryConditions != nil {
-		if notification.IdealDevlieryConditions.WaitForever() {
-			return nil
-		} else {
-			endOfIdealDeliveryWindow := nonIdealDeliveryTime.Add(notification.IdealDevlieryConditions.MaxWaitTime())
-			return &endOfIdealDeliveryWindow
-		}
+	// Shift delivery time back to end of offset, or nil it out for offset=forever
+	var shiftedDeliveryTime *time.Time
+
+	if notification.IdealDevlieryConditions.WaitForever() {
+		shiftedDeliveryTime = nil
+	} else {
+		endOfIdealDeliveryWindow := nonIdealDeliveryTime.Add(notification.IdealDevlieryConditions.MaxWaitTime())
+		shiftedDeliveryTime = &endOfIdealDeliveryWindow
 	}
 
-	// No ideal time, so return non ideal time
-	return nonIdealDeliveryTime
+	// Build a checkTime: the time to run background check for this notification's ideal delivery window
+	bgCheckTime := bgCheckTimeForIdealDeliveryWindow(notification, now, shiftedDeliveryTime)
+
+	return shiftedDeliveryTime, bgCheckTime
+}
+
+const checkTimeDelay = 15 * time.Minute
+const filterTimeBuffer = 2 * time.Minute
+
+// Build a bgCheckTime: the time to run background check for this notification's ideal delivery window
+func bgCheckTimeForIdealDeliveryWindow(notification *datamodel.Notification, now time.Time, shiftDeliveryTime *time.Time) *time.Time {
+	if notification == nil {
+		return nil
+	}
+
+	// Run at earliest 15 mins from now (too often uses quota), and first time meeting filters after that
+	var checkTime = now.Add(checkTimeDelay)
+	filterShiftedCheckTime := shiftDeliveryTimeForFilters(notification, &checkTime)
+	if filterShiftedCheckTime != nil && filterShiftedCheckTime.After(checkTime) {
+		// Add small buffer time after the first possible time passing the filter. Too close, and it might fire seconds before the filter time, garunteeing a failure.
+		checkTime = filterShiftedCheckTime.Add(filterTimeBuffer)
+	}
+
+	// We don't want to run background after the shiftDeliveryTime, as we'll have already delivered by then
+	if shiftDeliveryTime != nil && checkTime.After(*shiftDeliveryTime) {
+		return nil
+	}
+
+	return &checkTime
 }
 
 // Base delivery time for notification based on static delivery time and event time, ignoring ideal time and delivery window filters
