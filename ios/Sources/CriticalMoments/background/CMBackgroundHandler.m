@@ -57,24 +57,33 @@
     }
 }
 
-- (void)scheduleBackgroundTask {
+- (void)scheduleBackgroundTaskAtEpochTime:(int64_t)epochTime {
     if (@available(iOS 13.0, *)) {
-        BGAppRefreshTaskRequest *fetchRequest = [[BGAppRefreshTaskRequest alloc] initWithIdentifier:bgFetchTaskId];
-        // At least 15 mins from now
-        fetchRequest.earliestBeginDate = [NSDate dateWithTimeIntervalSinceNow:15 * 60];
+        if (!epochTime) {
+            for (NSString *taskId in allBackgroundIds) {
+                [BGTaskScheduler.sharedScheduler cancelTaskRequestWithIdentifier:taskId];
+            }
+        } else {
+            NSDate *bgCheckTime = [NSDate dateWithTimeIntervalSince1970:epochTime];
+            BGAppRefreshTaskRequest *fetchRequest = [[BGAppRefreshTaskRequest alloc] initWithIdentifier:bgFetchTaskId];
+            // AppCore controls when we schedule, see logic there. Checks for next window when we might be in ideal
+            // time.
+            fetchRequest.earliestBeginDate = bgCheckTime;
+            NSError *error;
+            // This API replaces prior one of same ID, so no need to cancel first
+            BOOL success = [BGTaskScheduler.sharedScheduler submitTaskRequest:fetchRequest error:&error];
+            if (!success || error) {
+                [CMBackgroundHandler logSetupError:bgFetchTaskId];
+            }
 
-        NSError *error;
-        BOOL success = [BGTaskScheduler.sharedScheduler submitTaskRequest:fetchRequest error:&error];
-        if (!success || error) {
-            [CMBackgroundHandler logSetupError:bgFetchTaskId];
-        }
-
-        error = nil;
-        BGProcessingTaskRequest *processingRequest =
-            [[BGProcessingTaskRequest alloc] initWithIdentifier:bgProcessingTaskId];
-        success = [BGTaskScheduler.sharedScheduler submitTaskRequest:processingRequest error:&error];
-        if (!success || error) {
-            [CMBackgroundHandler logSetupError:bgProcessingTaskId];
+            error = nil;
+            BGProcessingTaskRequest *processingRequest =
+                [[BGProcessingTaskRequest alloc] initWithIdentifier:bgProcessingTaskId];
+            processingRequest.earliestBeginDate = bgCheckTime;
+            success = [BGTaskScheduler.sharedScheduler submitTaskRequest:processingRequest error:&error];
+            if (!success || error) {
+                [CMBackgroundHandler logSetupError:bgProcessingTaskId];
+            }
         }
     }
 
@@ -95,7 +104,10 @@
 
 - (void)runBackgroundWorker:(BGTask *)task API_AVAILABLE(ios(13.0)) {
     // Schedule next refresh
-    [self scheduleBackgroundTask];
+    AppcoreNotificationPlan *plan = [self.cm currentNotificationPlan:nil];
+    if (plan) {
+        [self scheduleBackgroundTaskAtEpochTime:plan.earliestBgCheckTimeEpochSeconds];
+    }
 
     [CMBackgroundHandler logRunTimestamp:task.identifier];
     [self.cm runAppcoreBackgroundWork];

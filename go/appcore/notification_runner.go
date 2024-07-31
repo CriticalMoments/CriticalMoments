@@ -13,7 +13,7 @@ type NotificationPlan struct {
 	scheduledNotifications   []*ScheduledNotification
 
 	// The earliest time to run background work for notifications
-	earliestBgCheckTimeEpochSeconds int64
+	EarliestBgCheckTimeEpochSeconds int64
 }
 
 // Expalainin the achitecture a bit here for notifications. It's a bit tricky due to restructions of iOS APIs.
@@ -74,6 +74,17 @@ func (ac *Appcore) ForceUpdateNotificationPlan() error {
 	return nil
 }
 
+func (ac *Appcore) FetchNotificationPlan() (*NotificationPlan, error) {
+	err := ac.initializeNotificationPlan()
+	if err != nil {
+		return nil, err
+	}
+	if ac.notificationPlan == nil {
+		return nil, errors.New("notification plan not initialized")
+	}
+	return ac.notificationPlan, nil
+}
+
 func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 	now := time.Now()
 	return ac.generateNotificationPlanForTime(now)
@@ -107,7 +118,7 @@ func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationP
 	}
 
 	if earliestBgCheckTime != nil {
-		plan.earliestBgCheckTimeEpochSeconds = earliestBgCheckTime.Unix()
+		plan.EarliestBgCheckTimeEpochSeconds = earliestBgCheckTime.Unix()
 	}
 
 	return plan, nil

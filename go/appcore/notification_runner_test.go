@@ -939,8 +939,8 @@ func TestTwoIdealTimeBackgroundTimes(t *testing.T) {
 	if len(plan.scheduledNotifications) != 0 {
 		t.Fatal("Expected scheduledNotifications to be 0 since no trigger events fired")
 	}
-	if plan.earliestBgCheckTimeEpochSeconds != 0 {
-		t.Fatal("Expected earliestBgCheckTimeEpochSeconds to be 0 since no trigger events fired")
+	if plan.EarliestBgCheckTimeEpochSeconds != 0 {
+		t.Fatal("Expected EarliestBgCheckTimeEpochSeconds to be 0 since no trigger events fired")
 	}
 
 	// fire event1
@@ -957,8 +957,8 @@ func TestTwoIdealTimeBackgroundTimes(t *testing.T) {
 	}
 	// 15:00 is first possible time for bg check because of filters, plus 2 minutes buffer
 	expectedBgCheckTime := time.Date(2023, time.October, 10, 15, 00, 0, 0, time.UTC).Add(filterTimeBuffer)
-	if plan.earliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
-		t.Fatalf("Expected earliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.earliestBgCheckTimeEpochSeconds)
+	if plan.EarliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
+		t.Fatalf("Expected EarliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.EarliestBgCheckTimeEpochSeconds)
 	}
 
 	// fire event2 which doesn't have filters, so should check bg in 15 mins, and should select earlier of 2 bg check times
@@ -974,7 +974,7 @@ func TestTwoIdealTimeBackgroundTimes(t *testing.T) {
 		t.Fatal("Expected scheduledNotifications to be 2 since event2 fired")
 	}
 	expectedBgCheckTime = customTime.Add(checkTimeDelay)
-	if plan.earliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
-		t.Fatalf("Expected earliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.earliestBgCheckTimeEpochSeconds)
+	if plan.EarliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
+		t.Fatalf("Expected EarliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.EarliestBgCheckTimeEpochSeconds)
 	}
 }

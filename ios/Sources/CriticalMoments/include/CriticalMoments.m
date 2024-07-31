@@ -7,6 +7,7 @@
 
 #import "CriticalMoments.h"
 
+#import "../CriticalMoments_private.h"
 #import "../appcore_integration/CMLibBindings.h"
 #import "../background/CMBackgroundHandler.h"
 #import "../messaging/CMBannerManager.h"
@@ -29,7 +30,7 @@
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @property(nonatomic, strong) CMNotificationsDelegate *notificationDelegate;
-@property(nonatomic, strong) CMBackgroundHandler *backgroundHandler;
+// @property in CriticalMoments_private: CMBackgroundHandler *backgroundHandler;
 @end
 
 @implementation CriticalMoments
@@ -419,10 +420,6 @@ static CriticalMoments *sharedInstance = nil;
     CMBackgroundHandler *bgh = [[CMBackgroundHandler alloc] initWithCm:self];
     self.backgroundHandler = bgh;
     [bgh registerBackgroundTasks];
-
-    // TODO_P0: does this really to be here (run before app launch) and not deferred at end of `start`? Need to try it
-    // deferred again. Maybe just dispatch here? Schedule the background work
-    [bgh scheduleBackgroundTask];
 }
 
 - (void)runAppcoreBackgroundWork {
@@ -441,6 +438,10 @@ static CriticalMoments *sharedInstance = nil;
 
 - (BOOL)userNotificationsDisabled {
     return _disableNotifications;
+}
+
+- (AppcoreNotificationPlan *)currentNotificationPlan:(NSError *_Nullable *_Nullable)error {
+    return [_appcore fetchNotificationPlan:error];
 }
 
 - (void)registerNotificationDelegate {

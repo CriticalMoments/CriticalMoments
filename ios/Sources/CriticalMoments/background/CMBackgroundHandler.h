@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithCm:(CriticalMoments *)cm;
 - (void)registerBackgroundTasks;
-- (void)scheduleBackgroundTask;
+- (void)scheduleBackgroundTaskAtEpochTime:(int64_t)epochTime;
 
 #ifdef DEBUG
 + (void)devModeCheckBackgroundSetupCorrectly;
