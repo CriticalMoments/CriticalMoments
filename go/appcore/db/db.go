@@ -81,8 +81,8 @@ func migrate(sqldb *sql.DB) error {
 			id INTEGER PRIMARY KEY,
 			name TEXT NOT NULL,
 			type INTEGER NOT NULL,
-			created_at DATETIME,
-			updated_at DATETIME
+			created_at REAL,
+			updated_at REAL
 		);
 
 		CREATE INDEX IF NOT EXISTS events_name_created_at ON events (name, created_at);
@@ -108,8 +108,8 @@ func migrate(sqldb *sql.DB) error {
 			real_value REAL,
 			numeric_value NUMERIC,
 			sample_type INTEGER NOT NULL,
-			created_at DATETIME,
-			updated_at DATETIME
+			created_at REAL,
+			updated_at REAL
 		);
 
 		CREATE INDEX IF NOT EXISTS property_history_name_created_at ON property_history (name, created_at);
@@ -181,10 +181,8 @@ func (db *DB) EventCountByNameWithLimit(name string, limit int) (int, error) {
 	return count, nil
 }
 
-// the "*1.0" is needed to convert the integer to a real number. If a time happens round to an integer, the golang
-// sqlite library will parse it as a time.Time instead of float64, causing an error
-const latestEventTimeByNameQuery = `SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
-const firstEventTimeByNameQuery = `SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at LIMIT 1`
+const latestEventTimeByNameQuery = `SELECT created_at FROM events WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+const firstEventTimeByNameQuery = `SELECT created_at FROM events WHERE name = ? ORDER BY created_at LIMIT 1`
 
 func (db *DB) LatestEventTimeByName(name string) (*time.Time, error) {
 	return db.eventTimeByName(name, false)
@@ -223,7 +221,7 @@ func (db *DB) AllEventTimesByName(name string) ([]time.Time, error) {
 		return nil, errors.New("CriticalMoments: DB not started")
 	}
 
-	rows, err := db.sqldb.Query(`SELECT created_at*1.0 FROM events WHERE name = ? ORDER BY created_at`, name)
+	rows, err := db.sqldb.Query(`SELECT created_at FROM events WHERE name = ? ORDER BY created_at`, name)
 	if err == sql.ErrNoRows {
 		return []time.Time{}, nil
 	} else if err != nil {
@@ -274,9 +272,7 @@ func DBPropertyTypeIntFromKind(k reflect.Kind) (DBPropertyType, error) {
 	}
 }
 
-// the "*1.0" is needed to convert the integer to a real number. If a time happens round to an integer, the golang
-// sqlite library will parse it as a time.Time instead of float64, causing an error
-const latestPropHistoryTimeByNameQuery = `SELECT created_at*1.0 FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
+const latestPropHistoryTimeByNameQuery = `SELECT created_at FROM property_history WHERE name = ? ORDER BY created_at DESC LIMIT 1`
 
 func (db *DB) latestPropertyHistoryTime(name string) (*time.Time, error) {
 	if !db.started {
