@@ -450,7 +450,7 @@ static CriticalMoments *sharedInstance = nil;
     }
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     id<UNUserNotificationCenterDelegate> existingDelegate = center.delegate;
-    _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate];
+    _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate andCm:self];
     center.delegate = _notificationDelegate;
 }
 

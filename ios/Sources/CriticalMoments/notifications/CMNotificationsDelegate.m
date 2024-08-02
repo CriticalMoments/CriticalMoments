@@ -15,15 +15,17 @@
 @interface CMNotificationsDelegate ()
 
 @property(nonatomic, weak) id<UNUserNotificationCenterDelegate> originalDelegate;
+@property(nonatomic, weak) CriticalMoments *cm;
 
 @end
 
 @implementation CMNotificationsDelegate
 
-- (id)initWithOriginalDelegate:(id<UNUserNotificationCenterDelegate>)originalDelegate {
+- (id)initWithOriginalDelegate:(id<UNUserNotificationCenterDelegate>)originalDelegate andCm:(CriticalMoments *)cm {
     self = [super init];
     if (self) {
         self.originalDelegate = originalDelegate;
+        self.cm = cm;
     }
     return self;
 }
@@ -31,6 +33,12 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    // Log an event for this notification delivery.
+    // Note: this isn't guaranteed to be fired for every event, as they can be sent when in the background.
+    NSString *notificationEventId =
+        [NSString stringWithFormat:@"notifications:delivered:%@", notification.request.identifier];
+    [self.cm sendEvent:notificationEventId];
+
     // Prefer original delegate's behaviour if available
     if ([self.originalDelegate respondsToSelector:@selector(userNotificationCenter:
                                                            willPresentNotification:withCompletionHandler:)]) {
@@ -48,6 +56,10 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
     didReceiveNotificationResponse:(UNNotificationResponse *)response
              withCompletionHandler:(void (^)(void))completionHandler {
+    // Log an event for this notification tap.
+    NSString *notificationEventId =
+        [NSString stringWithFormat:@"notifications:tapped:%@", response.notification.request.identifier];
+    [self.cm sendEvent:notificationEventId];
 
     // Handle this notification if it's for CriticalMoments
     NSString *notifId = response.notification.request.identifier;
@@ -83,7 +95,8 @@
     if (!currentDelegate || ![currentDelegate isKindOfClass:[CMNotificationsDelegate class]]) {
         os_log_error(OS_LOG_DEFAULT,
                      "CriticalMoments: Setup Issue\n\nThe CM notification delegate is not registered. As a result, "
-                     "tapping notifications from CM will not trigger the correct action. This is likely because a "
+                     "tapping notifications from CM will not trigger the correct action and notifications may fire "
+                     "more than once. This is likely because a "
                      "custom UNUserNotificationCenterDelegate was registered after starting CriticalMoments.\n\nTo "
                      "resolve, register your custom UNUserNotificationCenterDelegate before calling "
                      "`CriticalMoments.shared.start()`. Your delegate will still be called for any notification not "
