@@ -7,7 +7,8 @@
       "body": "body",
       "scheduleCondition": "eventCount('event3con') > 0",
       "deliveryTime": {
-        "eventName": "event3"
+        "eventName": "event3",
+        "eventInstance": "latest"
       }
     }
   }

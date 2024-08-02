@@ -22,6 +22,7 @@ const (
 	AppEnteredForegroundBuiltInEvent string = "app_entered_foreground"
 	AppEnteredBackgroundBuiltInEvent string = "app_entered_background"
 	AppTerminatedBuiltInEvent        string = "app_terminated"
+	AppBgWorkBuiltInEvent            string = "background_worker_ran"
 )
 
 var (
@@ -31,6 +32,7 @@ var (
 		AppEnteredForegroundBuiltInEvent: true,
 		AppEnteredBackgroundBuiltInEvent: true,
 		AppTerminatedBuiltInEvent:        true,
+		AppBgWorkBuiltInEvent:            true,
 	}
 )
 

@@ -74,6 +74,7 @@
 		E0446E742A0DC0170069E5BD /* SnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SnapshotTests.m; sourceTree = "<group>"; };
 		E0446E762A0DC2430069E5BD /* SampleAppCoreViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleAppCoreViewController.h; sourceTree = "<group>"; };
 		E0446E772A0DC2430069E5BD /* SampleAppCoreViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAppCoreViewController.m; sourceTree = "<group>"; };
+		E05BA1BD2C40903B00986E8D /* SampleApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SampleApp.entitlements; sourceTree = "<group>"; };
 		E069BFAF2A217A9E00A4B65E /* ConditionsDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConditionsDemoScreen.h; sourceTree = "<group>"; };
 		E069BFB02A217A9E00A4B65E /* ConditionsDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConditionsDemoScreen.m; sourceTree = "<group>"; };
 		E07B774929F9B202001521F4 /* CMDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMDemoScreen.h; sourceTree = "<group>"; };
@@ -184,6 +185,7 @@
 		E0B545EB29F407C2002A25A8 /* SampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				E05BA1BD2C40903B00986E8D /* SampleApp.entitlements */,
 				E07B774829F9B1CD001521F4 /* DemoScreens */,
 				E0B545EC29F407C2002A25A8 /* AppDelegate.h */,
 				E0B545ED29F407C2002A25A8 /* AppDelegate.m */,
@@ -554,6 +556,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SampleApp/SampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;
@@ -597,6 +600,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SampleApp/SampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = NO;

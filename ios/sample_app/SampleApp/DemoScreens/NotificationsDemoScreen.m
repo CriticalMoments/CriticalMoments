@@ -21,7 +21,7 @@
                         @"icon.\n\nCritical Moments can deliver "
                         @"notifications without a push server. It can also optimize the ideal delivery time to "
                         @"increase engagement.";
-        // self.buttonLink = @"https://docs.criticalmoments.io/actions/alerts";
+        self.buttonLink = @"https://docs.criticalmoments.io/notifications/intro-to-notifications";
 
         [self buildSections];
     }
@@ -44,7 +44,14 @@
         @"Reduce new-user churn by reminding users who abandon onboarding, reminding them to complete their setup.";
     comeBackDemo.actionCMEventName = @"enableComeBack";
 
-    [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo ]];
+    CMDemoAction *idealTimeNotification = [[CMDemoAction alloc] init];
+    idealTimeNotification.title = @"Wait for Ideal Delivery Time";
+    idealTimeNotification.subtitle =
+        @"This notification will wait up to 24 hours, and deliver when the device is charging.\n\nNote: It won't "
+        @"deliver immediately after plugging in, but sometime when charging.";
+    idealTimeNotification.actionCMEventName = @"demo_notification_6";
+
+    [self addSection:@"Use Case Demos" withActions:@[ comeBackDemo, idealTimeNotification ]];
 
     CMDemoAction *eventNotification = [[CMDemoAction alloc] init];
     eventNotification.title = @"Basic Notifications";

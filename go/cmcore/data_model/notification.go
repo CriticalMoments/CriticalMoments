@@ -27,6 +27,8 @@ const defaultDeliveryWindowLocalTimeEnd = maxWindowLocalTimeEnd
 
 var validInterruptionLevels = []string{"active", "critical", "passive", "timeSensitive"}
 
+const NotificaitonMaxIdealWaitTimeForever = -1
+
 type Notification struct {
 	ID         string
 	Title      string
@@ -54,8 +56,20 @@ type Notification struct {
 }
 
 type IdealDevlieryConditions struct {
-	Condition   Condition `json:"condition"`
-	MaxWaitTime int       `json:"maxWaitTime"`
+	Condition          Condition `json:"condition"`
+	MaxWaitTimeSeconds int       `json:"maxWaitTimeSeconds"`
+}
+
+func (i *IdealDevlieryConditions) MaxWaitTime() time.Duration {
+	if i.WaitForever() {
+		// 200 years in case the caller skips the check WaitForever()
+		return time.Hour * 24 * 365 * 200
+	}
+	return time.Second * time.Duration(i.MaxWaitTimeSeconds)
+}
+
+func (i *IdealDevlieryConditions) WaitForever() bool {
+	return i.MaxWaitTimeSeconds == NotificaitonMaxIdealWaitTimeForever
 }
 
 type EventInstanceTypeEnum int
@@ -63,6 +77,8 @@ type EventInstanceTypeEnum int
 const (
 	// unknown, should not process. Could be type from future SDK
 	EventInstanceTypeUnknown EventInstanceTypeEnum = iota
+	// The notification's time is relative to the latest time the event occurred, but once it occurs it won't fire again
+	EventInstanceTypeLatestOnce
 	// The notification's time is relative to the latest time the event occurred
 	EventInstanceTypeLatest
 	// The notification's time is relative to the first time the event occurred
@@ -75,19 +91,28 @@ type DeliveryTime struct {
 
 	// Event based
 	EventName           *string `json:"eventName,omitempty"`
-	EventOffset         *int    `json:"eventOffset,omitempty"`
+	EventOffsetSeconds  *int    `json:"eventOffsetSeconds,omitempty"`
 	EventInstanceString *string `json:"eventInstance,omitempty"`
 }
 
 func (dt *DeliveryTime) EventInstance() EventInstanceTypeEnum {
-	// Default to latest for nil/empty, but not unrecognized
-	if dt.EventInstanceString == nil || *dt.EventInstanceString == "" || *dt.EventInstanceString == "latest" {
+	// Default to latest-once for nil/empty, but not unrecognized
+	if dt.EventInstanceString == nil || *dt.EventInstanceString == "" || *dt.EventInstanceString == "latest-once" {
+		return EventInstanceTypeLatestOnce
+	} else if *dt.EventInstanceString == "latest" {
 		return EventInstanceTypeLatest
 	}
-	if dt.EventInstanceString != nil && *dt.EventInstanceString == "first" {
+	if *dt.EventInstanceString == "first" {
 		return EventInstanceTypeFirst
 	}
 	return EventInstanceTypeUnknown
+}
+
+func (dt *DeliveryTime) EventOffsetDuration() time.Duration {
+	if dt.EventOffsetSeconds == nil {
+		return 0
+	}
+	return time.Duration(*dt.EventOffsetSeconds) * time.Second
 }
 
 type jsonNotification struct {
@@ -168,7 +193,8 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 		if conErr := n.IdealDevlieryConditions.Condition.Validate(); conErr != nil {
 			return fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID)
 		}
-		if n.IdealDevlieryConditions.MaxWaitTime < -1 || n.IdealDevlieryConditions.MaxWaitTime == 0 {
+		if n.IdealDevlieryConditions.MaxWaitTimeSeconds != NotificaitonMaxIdealWaitTimeForever &&
+			n.IdealDevlieryConditions.MaxWaitTimeSeconds < 1 {
 			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
 		}
 	}
@@ -185,7 +211,7 @@ func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
 	if d.TimestampEpoch != nil && d.EventName != nil {
 		return "DeliveryTime cannot have both a Timestamp and an EventName defined."
 	}
-	if d.TimestampEpoch != nil && d.EventOffset != nil {
+	if d.TimestampEpoch != nil && d.EventOffsetSeconds != nil {
 		return "DeliveryTime cannot have both a Timestamp and an EventOffset defined."
 	}
 	if StrictDatamodelParsing {
