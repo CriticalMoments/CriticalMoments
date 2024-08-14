@@ -2,6 +2,7 @@ package appcore
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"time"
 
@@ -125,14 +126,39 @@ func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationP
 }
 
 // Get the delivery time of a notification
-// 1) First check when it should be delivered (static time, event based)
-// 2) Then consider ideal delivery window, delivering sooner or later if we have special targeting in mind
-// 3) Then consider the allowed time of day, and days of week for delivery
+// 1) First check if it was already delivered and shouldn't be delivered again
+// 2) Then check when it should be delivered (static time, event based)
+// 3) Then consider ideal delivery window, delivering sooner or later if we have special targeting in mind
+// 4) Then consider the allowed time of day, and days of week for delivery
 func (ac *Appcore) notificationDeliveryTime(notification *datamodel.Notification, now time.Time) (deliveryTime *time.Time, bgCheckTime *time.Time) {
+	alreadyDeliveredTime, err := ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if err != nil {
+		fmt.Printf("CriticalMoments: error getting already delivered time for %v: %v\n", notification.UniqueID(), err)
+		// continue, but don't reschedule
+		return nil, nil
+	}
+	if alreadyDeliveredTime != nil {
+		// Already delivered this single delivery notif, don't schedule again or ask for bg time to check
+		return nil, nil
+	}
+
 	nonIdealDeliveryTime := ac.baseDeliveryTimeForNotification(notification, now)
 	idealDeliveryTime, bgCheckTime := ac.shiftDeliveryTimeForIdealWindow(notification, nonIdealDeliveryTime, now)
 	shiftedDeliveryTime := shiftDeliveryTimeForFilters(notification, idealDeliveryTime)
 	return shiftedDeliveryTime, bgCheckTime
+}
+
+func (ac *Appcore) notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification *datamodel.Notification) (*time.Time, error) {
+	if notification == nil {
+		return nil, nil
+	}
+	if notification.DeliveryTime.EventInstance() == datamodel.EventInstanceTypeLatest {
+		// Latest case is repeating, so it's not a 'SingleDeliveryNotification'
+		return nil, nil
+	}
+
+	deliveryEvent := fmt.Sprintf("notifications:delivered:%s", notification.UniqueID())
+	return ac.db.LatestEventTimeByName(deliveryEvent)
 }
 
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window

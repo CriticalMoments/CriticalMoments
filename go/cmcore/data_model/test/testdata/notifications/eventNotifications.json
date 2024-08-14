@@ -50,6 +50,20 @@
         "eventName": "event5",
         "eventInstance": "latest-once"
       }
+    },
+    "event6Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event6",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "latest-once"
+      },
+      "idealDeliveryConditions": {
+          "condition": "true",
+          "maxWaitTimeSeconds": 1200
+      }
     }
   },
   "actions": {

@@ -94,8 +94,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if plan.ScheduledNotificationCount() != 0 {
 		t.Fatalf("Expected 0 scheduled notifications, got %d", plan.ScheduledNotificationCount())
 	}
-	if plan.UnscheduledNotificationCount() != 5 {
-		t.Fatalf("Expected 5 unscheduled notifications, got %d", plan.UnscheduledNotificationCount())
+	if plan.UnscheduledNotificationCount() != 6 {
+		t.Fatalf("Expected 6 unscheduled notifications, got %d", plan.UnscheduledNotificationCount())
 	}
 
 	// Fire event, should be scheduled for now (no offset)
@@ -119,8 +119,8 @@ func TestEventNotificationPlan(t *testing.T) {
 	if math.Abs(float64(sn.ScheduledAtEpochMilliseconds()-time.Now().UnixMilli())) > 100 {
 		t.Fatalf("Expected ScheduledAtEpoch to return now, got %d", sn.ScheduledAtEpochMilliseconds())
 	}
-	if plan.UnscheduledNotificationCount() != 4 {
-		t.Fatalf("Expected 4 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
+	if plan.UnscheduledNotificationCount() != 5 {
+		t.Fatalf("Expected 5 unscheduled notification, got %d", plan.UnscheduledNotificationCount())
 	}
 
 	// Fire event, should be scheduled for offset
@@ -976,5 +976,234 @@ func TestTwoIdealTimeBackgroundTimes(t *testing.T) {
 	expectedBgCheckTime = customTime.Add(checkTimeDelay)
 	if plan.EarliestBgCheckTimeEpochSeconds != expectedBgCheckTime.Unix() {
 		t.Fatalf("Expected EarliestBgCheckTimeEpochSeconds to be %v, got %v", expectedBgCheckTime.Unix(), plan.EarliestBgCheckTimeEpochSeconds)
+	}
+}
+
+func TestNotificationAlreadyDeliveredTime(t *testing.T) {
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/notifications/eventNotifications.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	lb := testLibBindings{}
+	ac.RegisterLibraryBindings(&lb)
+
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Event 1: A "Latest" event which repeats
+
+	notification := ac.config.Notifications["event1Notification"]
+	if notification.DeliveryTime.EventInstance() != datamodel.EventInstanceTypeLatest {
+		t.Fatal("Expected event1 to be a latest event")
+	}
+	// No delivery time since it hasn't been delivered yet
+	alreadyDeliveredTime, err := ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+
+	// Fire event simulating past delivery time
+	// String from iOS side, so don't just change it. Part of test is that we're aligned with iOS SDK
+	eventTime := time.Now()
+	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event1Notification")
+	if err != nil {
+		t.Fatal(err)
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	// since event1Notification is "latest", it should still be nil
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected non-nil delivery time and nil error")
+	}
+	// Check it's integration into notificationDeliveryTime
+	nDelTime, bgCheckTime := ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+
+	// Event 2: a first event which fires does not repeat
+	notification = ac.config.Notifications["event2Notification"]
+	if notification.DeliveryTime.EventInstance() != datamodel.EventInstanceTypeFirst {
+		t.Fatal("Expected event2 to be a first event")
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+
+	// Fire event simulating past delivery time
+	eventTime = time.Now()
+	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event2Notification")
+	if err != nil {
+		t.Fatal(err)
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	// expect a delivery time since event2Notification is "first" event instance
+	if alreadyDeliveredTime == nil || err != nil {
+		t.Fatal("Expected non-nil delivery time and nil error")
+	}
+	// check eventTime within 5ms of alreadyDeliveredTime
+	delta := alreadyDeliveredTime.Sub(eventTime)
+	if delta < -5*time.Millisecond || delta > 5*time.Millisecond {
+		t.Fatal("Expected eventTime to be within 5ms of alreadyDeliveredTime")
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	// Firing again should not matter
+	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event2Notification")
+	if err != nil {
+		t.Fatal(err)
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+
+	// Check it's integration into notificationDeliveryTime
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time (already delivered) and nil error")
+	}
+
+	// Event 4: a "latest-once" event with offset. Should push back on multiple events, fire on last event, then not fire again
+	notification = ac.config.Notifications["event4Notification"]
+	if notification.DeliveryTime.EventInstance() != datamodel.EventInstanceTypeLatestOnce {
+		t.Fatal("Expected event4 to be a latest-once event")
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	approxEventTime := time.Now()
+	err = ac.SendClientEvent("event4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime == nil || bgCheckTime != nil {
+		t.Fatal("Expected non-nil delivery time and nil error")
+	}
+	diff := approxEventTime.Sub(*nDelTime) + time.Minute // event has 60s offset
+	if diff < -5*time.Millisecond || diff > 5*time.Millisecond {
+		t.Fatal("Expected nDelTime to be within 5ms of approxEventTime")
+	}
+	time.Sleep(5 * time.Millisecond)
+	err = ac.SendClientEvent("event4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	nDelTimeSecond, bgCheckTimeSecond := ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTimeSecond == nil || bgCheckTimeSecond != nil {
+		t.Fatal("Expected non-nil delivery time and nil error")
+	}
+	if !nDelTimeSecond.After(*nDelTime) {
+		t.Fatal("Second event should have pushed back delivery time")
+	}
+	// a delivery should take precedence over a push back for latest-once
+	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event4Notification")
+	if err != nil {
+		t.Fatal(err)
+	}
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime == nil || err != nil {
+		t.Fatal("Expected non-nil delivery time and nil error")
+	}
+	diff = time.Since(*alreadyDeliveredTime)
+	if diff < -5*time.Millisecond || diff > 5*time.Millisecond {
+		t.Fatal("Expected alreadyDeliveredTime to be within 5ms of now")
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, eventTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time (already delivered) and nil error")
+	}
+
+	// Event 6: latest-once with ideal time and offset. Test BG worker.
+	notification = ac.config.Notifications["event6Notification"]
+	if notification.DeliveryTime.EventInstance() != datamodel.EventInstanceTypeLatestOnce ||
+		notification.IdealDevlieryConditions == nil ||
+		notification.IdealDevlieryConditions.MaxWaitTimeSeconds != 1200 ||
+		*notification.DeliveryTime.EventOffsetSeconds != 60 {
+		t.Fatal("Expected event6 to be a latest-once event with expected config")
+	}
+	// check not already schedule or delivered
+	alreadyDeliveredTime, err = ac.notificationAlreadyDeliveredTimeForSingleDeliveryNotification(notification)
+	if alreadyDeliveredTime != nil || err != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, time.Now())
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil error")
+	}
+	eventTime = time.Now()
+	err = ac.SendClientEvent("event6")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedDeliveryTimeBeforeOffset := eventTime.Add(21 * time.Minute) // event has 60s offset, plus 20 min ideal wait time
+
+	// Check 2 types of cases: before offset should not be schedule for now, after offset should be scheduled for now.
+	cases := map[time.Time]bool{
+		eventTime.Add(time.Second):                  false,
+		eventTime.Add(30 * time.Second):             false,
+		eventTime.Add(59 * time.Second):             false,
+		eventTime.Add(61 * time.Second):             true,
+		eventTime.Add(15*time.Minute + time.Second): true,
+	}
+
+	for runTime, afterOffset := range cases {
+
+		// 1s after event, should still be scheduled for the fallback delivery time, with a bg check time of checkTimeDelay from now
+		nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, runTime)
+		if nDelTime == nil {
+			t.Fatal("Expected non-nil delivery time")
+		}
+
+		var expectedDeliveryTime time.Time
+		if afterOffset {
+			// condition is hardcoded to true, so should be scheduled for now
+			expectedDeliveryTime = runTime
+			if bgCheckTime != nil {
+				t.Fatal("Expected nil bgCheckTime as we are delivering now and don't need future runtime")
+			}
+		} else {
+			// before offset so should wait for the fallback time to deliver
+			expectedDeliveryTime = expectedDeliveryTimeBeforeOffset
+			// Should have bg check time of checkTimeDelay from event time to check ideal conditions. Should be checkTimeDelay from now (as we're checking now)
+			expectedBackgroundCheckTimeBeforeOffset := runTime.Add(checkTimeDelay)
+			if bgCheckTime == nil || !bgCheckTime.Equal(expectedBackgroundCheckTimeBeforeOffset) {
+				t.Fatal("Expected background check time since we aren't firing")
+			}
+		}
+
+		diff = expectedDeliveryTime.Sub(*nDelTime)
+		if diff < -5*time.Millisecond || diff > 5*time.Millisecond {
+			t.Fatal("Expected nDelTime to be within 5ms of expected time")
+		}
+	}
+	shouldDeliverNowTime := eventTime.Add(61 * time.Second)
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, shouldDeliverNowTime)
+	if !nDelTime.Equal(shouldDeliverNowTime) || bgCheckTime != nil {
+		t.Fatal("Expected now delivery time and nil bgCheckTime")
+	}
+	// Send event to simulate delivery, should not reschedule after
+	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event6Notification")
+	if err != nil {
+		t.Fatal(err)
+	}
+	nDelTime, bgCheckTime = ac.notificationDeliveryTime(notification, shouldDeliverNowTime)
+	if nDelTime != nil || bgCheckTime != nil {
+		t.Fatal("Expected nil delivery time and nil bgCheckTime")
 	}
 }
