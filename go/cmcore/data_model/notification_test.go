@@ -449,7 +449,7 @@ func TestHHMMStringParsing(t *testing.T) {
 
 func TestAccessors(t *testing.T) {
 	i := IdealDeliveryConditions{
-		MaxWaitTimeSeconds: NotificaitonMaxIdealWaitTimeForever,
+		MaxWaitTimeSeconds: NotificationMaxIdealWaitTimeForever,
 	}
 
 	if !i.WaitForever() {

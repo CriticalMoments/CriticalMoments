@@ -427,7 +427,7 @@ static CriticalMoments *sharedInstance = nil;
     NSError *error;
     [_appcore performBackgroundWork:&error];
     if (error) {
-        os_log_debug(OS_LOG_DEFAULT, "CriticalMoments: issue performing background work");
+        os_log_error(OS_LOG_DEFAULT, "CriticalMoments: issue performing background work");
     }
 }
 
