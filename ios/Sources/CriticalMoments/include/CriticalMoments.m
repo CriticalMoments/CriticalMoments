@@ -7,8 +7,11 @@
 
 #import "CriticalMoments.h"
 
+#import "../CriticalMoments_private.h"
 #import "../appcore_integration/CMLibBindings.h"
+#import "../background/CMBackgroundHandler.h"
 #import "../messaging/CMBannerManager.h"
+#import "../notifications/CMNotificationHandler.h"
 #import "../notifications/CMNotificationsDelegate.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
@@ -16,6 +19,7 @@
 #import "../utils/CMUtils.h"
 
 #import <UserNotifications/UserNotifications.h>
+#import <os/log.h>
 
 @interface CriticalMoments ()
 @property(nonatomic) BOOL queuesStarted, disableNotifications;
@@ -27,6 +31,7 @@
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @property(nonatomic, strong) CMNotificationsDelegate *notificationDelegate;
+@property(nonatomic, strong) CMNotificationHandler *notificationHandler;
 @end
 
 @implementation CriticalMoments
@@ -101,6 +106,10 @@ static CriticalMoments *sharedInstance = nil;
     // deferred.
     [self registerNotificationDelegate];
 
+    // Registering BG work must be done before the end of app launch, do no defer
+    //  https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)?language=objc
+    [self registerBackgroundHandler];
+
     // Nested dispatch to main then background. Why?
     // We want critical moments to start on background thread, but we want it to
     // start after the app setup is done. Some property providers will provide
@@ -110,15 +119,12 @@ static CriticalMoments *sharedInstance = nil;
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = [self startReturningError];
         if (error) {
-            NSLog(@"CriticalMoments: Critical Moments was unable to start! "
-                  @"%@",
-                  error);
+            os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: Critical Moments was unable to start!\nCMError: %@",
+                         error.localizedDescription);
 #if DEBUG
-            NSLog(@"CriticalMoments: throwing a "
-                  @"NSInternalInconsistencyException "
-                  @"to help find this issue. Exceptions are only thrown in "
-                  @"debug "
-                  @"mode, and will not crash apps built for release.");
+            os_log_fault(OS_LOG_DEFAULT,
+                         "CriticalMoments: throwing a NSInternalInconsistencyException to help find the issue above. "
+                         "Exceptions are only thrown in debug builds. This will not crash apps built for release.");
             @throw NSInternalInconsistencyException;
 #endif
         }
@@ -187,6 +193,11 @@ static CriticalMoments *sharedInstance = nil;
 
     // We've started now. Can resume the two worker queues.
     [self startQueues];
+
+#ifdef DEBUG
+    // check everything is setup correctly
+    [self devModeCheckSetupCorrectly];
+#endif
 
     return nil;
 }
@@ -404,6 +415,22 @@ static CriticalMoments *sharedInstance = nil;
     return _currentTheme;
 }
 
+#pragma mark Background Work
+
+- (void)registerBackgroundHandler {
+    CMBackgroundHandler *bgh = [[CMBackgroundHandler alloc] initWithCm:self];
+    self.backgroundHandler = bgh;
+    [bgh registerBackgroundTasks];
+}
+
+- (void)runAppcoreBackgroundWork {
+    NSError *error;
+    [_appcore performBackgroundWork:&error];
+    if (error) {
+        os_log_error(OS_LOG_DEFAULT, "CriticalMoments: issue performing background work");
+    }
+}
+
 #pragma mark Notifications
 
 - (void)disableUserNotifications {
@@ -414,14 +441,25 @@ static CriticalMoments *sharedInstance = nil;
     return _disableNotifications;
 }
 
+- (AppcoreNotificationPlan *)currentNotificationPlan:(NSError *_Nullable *_Nullable)error {
+    return [_appcore fetchNotificationPlan:error];
+}
+
+- (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan {
+    [self.notificationHandler updateNotificationPlan:notifPlan];
+}
+
 - (void)registerNotificationDelegate {
     if (_disableNotifications) {
         return;
     }
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     id<UNUserNotificationCenterDelegate> existingDelegate = center.delegate;
-    _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate];
+    _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate andCm:self];
     center.delegate = _notificationDelegate;
+
+    CMNotificationHandler *notificationHandler = [[CMNotificationHandler alloc] initWithCm:self];
+    self.notificationHandler = notificationHandler;
 }
 
 - (void)actionForNotification:(NSString *)identifier {
@@ -503,5 +541,17 @@ static CriticalMoments *sharedInstance = nil;
 - (void)removeAllBanners {
     [CMBannerManager.shared removeAllAppWideMessages];
 }
+
+#ifdef DEBUG
+// Not compiled into release builds, only debug.
+// Checks everything is setup correctly and setup logs issues for devs to see
+- (void)devModeCheckSetupCorrectly {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                     [CMBackgroundHandler devModeCheckBackgroundSetupCorrectly];
+                     [CMNotificationsDelegate devModeCheckNotificationDelegateSetupCorrectly];
+                   });
+}
+#endif
 
 @end

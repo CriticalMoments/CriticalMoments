@@ -6,6 +6,7 @@
 //
 
 #import "../CriticalMoments_private.h"
+#import "../background/CMBackgroundHandler.h"
 #import "../utils/CMEventSender.h"
 #import "include/CriticalMoments.h"
 
@@ -51,6 +52,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// Private API to disable notification, as NSUserNotificationCenter isn't available in SPM tests
 - (void)disableUserNotifications;
 - (BOOL)userNotificationsDisabled;
+
+/// Private API to perform appcore work in background
+- (void)runAppcoreBackgroundWork;
+
+/// Access the background handler, internal only, private API
+@property(nonatomic, strong) CMBackgroundHandler *backgroundHandler;
+
+// Private API to get the current notification plan
+- (AppcoreNotificationPlan *)currentNotificationPlan:(NSError *_Nullable *_Nullable)error;
+
+// Private API to update the current notification plan
+- (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan;
 
 @end
 

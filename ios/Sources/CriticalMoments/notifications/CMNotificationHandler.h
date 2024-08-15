@@ -7,13 +7,18 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../include/CriticalMoments.h"
+
 @import Appcore;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CMNotificationHandler : NSObject
 
-+ (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithCm:(CriticalMoments *)cm;
+
+- (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan;
 
 @end
 

@@ -1152,14 +1152,14 @@
     },
     "notifications": {
         "comeBackDemo": {
-          "title": "Complete your setup!",
+          "title": "Complete Setup",
           "sound": "default",
-          "body": "[Your app's value prop here]. It only takes 2 minutes!",
+          "body": "[Sample Content] It only takes 2 minutes to start healthy habbits with LifeTracker.",
           "scheduleCondition": "eventCount('enableComeBack') > 0",
           "deliveryTime": {
             "eventName": "app_entered_background",
             "eventInstance": "latest",
-            "eventOffset": 5
+            "eventOffsetSeconds": 5
           }
         },
         "pastDueNotification": {
@@ -1181,7 +1181,7 @@
           "cancelationEvents": ["cancel_notification"],
           "deliveryTime": {
             "eventName": "trigger_notification_event",
-            "eventOffset": 600
+            "eventOffsetSeconds": 600
           }
         },
         "demoEventNotificationTap": {
@@ -1189,7 +1189,8 @@
           "body": "Notification triggered by an in app event. Tap to launch in-app action.",
           "tapActionName": "nested_alert",
           "deliveryTime": {
-            "eventName": "demo_notification_1"
+            "eventName": "demo_notification_1",
+            "eventInstance": "latest"
           }
         },
         "demoEventNotification2": {
@@ -1198,7 +1199,8 @@
           "tapActionName": "nested_alert",
           "deliveryTime": {
             "eventName": "demo_notification_2",
-            "eventOffset": 5
+            "eventInstance": "latest",
+            "eventOffsetSeconds": 5
           }
         },
         "demoEventNotification3": {
@@ -1206,6 +1208,7 @@
           "body": "Open your iOS homescreen to see the badge on the CM icon.",
           "badgeCount": 42,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_3"
           }
         },
@@ -1214,6 +1217,7 @@
           "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
           "badgeCount": 0,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_4"
           }
         },
@@ -1223,6 +1227,7 @@
           "interruptionLevel": "critical",
           "relevanceScore": 1.0,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_5"
           }
         }

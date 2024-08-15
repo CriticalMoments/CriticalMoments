@@ -8,6 +8,7 @@
 #import "CMLibBindings.h"
 
 #import "../CriticalMoments_private.h"
+#import "../background/CMBackgroundHandler.h"
 #import "../messaging/CMAlert.h"
 #import "../messaging/CMAlert_private.h"
 #import "../messaging/CMBannerManager.h"
@@ -172,7 +173,9 @@
     }
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [CMNotificationHandler updateNotificationPlan:notifPlan];
+      [self.cm updateNotificationPlan:notifPlan];
+
+      [self.cm.backgroundHandler scheduleBackgroundTaskAtEpochTime:notifPlan.earliestBgCheckTimeEpochSeconds];
     });
     return YES;
 }

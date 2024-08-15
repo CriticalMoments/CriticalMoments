@@ -17,7 +17,7 @@
       "tapActionName": "bannerAction",
       "deliveryTime": {
         "eventName": "event2",
-        "eventOffset": 60,
+        "eventOffsetSeconds": 60,
         "eventInstance": "first"
       }
     },
@@ -28,8 +28,41 @@
       "tapActionName": "bannerAction",
       "deliveryTime": {
         "eventName": "event3",
-        "eventOffset": 60,
+        "eventOffsetSeconds": 60,
         "eventInstance": "first"
+      }
+    },
+    "event4Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event4",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "latest-once"
+      }
+    },
+    "event5Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event5",
+        "eventInstance": "latest-once"
+      }
+    },
+    "event6Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event6",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "latest-once"
+      },
+      "idealDeliveryConditions": {
+          "condition": "true",
+          "maxWaitTimeSeconds": 1200
       }
     }
   },

@@ -21,7 +21,7 @@
                         @"icon.\n\nCritical Moments can deliver "
                         @"notifications without a push server. It can also optimize the ideal delivery time to "
                         @"increase engagement.";
-        // self.buttonLink = @"https://docs.criticalmoments.io/actions/alerts";
+        self.buttonLink = @"https://docs.criticalmoments.io/notifications/intro-to-notifications";
 
         [self buildSections];
     }
