@@ -17,7 +17,7 @@ type NotificationPlan struct {
 	EarliestBgCheckTimeEpochSeconds int64
 }
 
-// Expalainin the achitecture a bit here for notifications. It's a bit tricky due to restructions of iOS APIs.
+// Explaining the achitecture a bit here for notifications. It's a bit tricky due to restructions of iOS APIs.
 // Main thing to know: iOS doesn't store delivered notifications. It might have them, but it might not if they are cleared once the user dismisses them. So the pattern is "if they are scheduled, we assume they are delivered".
 // General idea: golang delivers truth from DB. It consistently can reproduce the same plan with identical delivery times (for a given now() time). iOS layer takes care of the rest.
 // CM iOS layer: deals with the golang plan. This including knowing if it already delviered a notification for a given timestamp (some assumtions of scheduled get delivered).

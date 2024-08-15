@@ -103,8 +103,7 @@
     }
 
     [self.cm runAppcoreBackgroundWork];
-    [self.cm sendEvent:@"background_worker_ran" builtIn:YES handler:nil];
-    NSLog(@"CMBackground: worker ran - %@", task.identifier);
+    [self.cm sendEvent:DatamodelAppBgWorkBuiltInEvent builtIn:YES handler:nil];
 
     [task setTaskCompletedWithSuccess:YES];
 }
