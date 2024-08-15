@@ -1189,7 +1189,8 @@
           "body": "Notification triggered by an in app event. Tap to launch in-app action.",
           "tapActionName": "nested_alert",
           "deliveryTime": {
-            "eventName": "demo_notification_1"
+            "eventName": "demo_notification_1",
+            "eventInstance": "latest"
           }
         },
         "demoEventNotification2": {
@@ -1198,6 +1199,7 @@
           "tapActionName": "nested_alert",
           "deliveryTime": {
             "eventName": "demo_notification_2",
+            "eventInstance": "latest",
             "eventOffsetSeconds": 5
           }
         },
@@ -1206,6 +1208,7 @@
           "body": "Open your iOS homescreen to see the badge on the CM icon.",
           "badgeCount": 42,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_3"
           }
         },
@@ -1214,6 +1217,7 @@
           "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
           "badgeCount": 0,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_4"
           }
         },
@@ -1223,102 +1227,8 @@
           "interruptionLevel": "critical",
           "relevanceScore": 1.0,
           "deliveryTime": {
+            "eventInstance": "latest",
             "eventName": "demo_notification_5"
-          }
-        },
-        "demoEventNotification6": {
-          "title": "Ideal Time",
-          "body": "Displayed when device charging, or after 24 hours of waiting.",
-          "deliveryTime": {
-            "eventName": "demo_notification_6"
-          },
-          "idealDeliveryConditions": {
-              "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
-              "maxWaitTimeSeconds": 86400
-          }
-        },
-        "devNotification1": {
-          "title": "dev notification SCREEN_UP",
-          "body": "Displayed when screen_brightness >0.01",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventOffsetSeconds": 300,
-            "eventInstance": "latest"
-          },
-          "idealDeliveryConditions": {
-              "condition": "screen_brightness > 0.01",
-              "maxWaitTimeSeconds": 8640000
-          }
-        },
-        "devNotification11": {
-          "title": "dev notification SCREEN_UP + !flat",
-          "body": "Displayed when screen_brightness >0.01",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventOffsetSeconds": 300,
-            "eventInstance": "latest"
-          },
-          "idealDeliveryConditions": {
-              "condition": "screen_brightness > 0.01 && device_orientation != 'face_up' && device_orientation != 'face_down'",
-              "maxWaitTimeSeconds": 8640000
-          }
-        },
-        "devNotification2": {
-          "title": "dev notification !FG",
-          "body": "Displayed when !foreground",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventOffsetSeconds": 300,
-            "eventInstance": "latest"
-          },
-          "idealDeliveryConditions": {
-              "condition": "!foreground",
-              "maxWaitTimeSeconds": 8640000
-          }
-        },
-        "devNotification3": {
-          "title": "dev notification SCREEN_LOW",
-          "body": "Displayed when screen_brightness <0.01",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventOffsetSeconds": 300,
-            "eventInstance": "latest"
-          },
-          "idealDeliveryConditions": {
-              "condition": "screen_brightness < 0.01",
-              "maxWaitTimeSeconds": 8640000
-          }
-        },
-        "bgTestNotification": {
-          "title": "BG Notif From Config",
-          "body": "Not Charging",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventInstance": "latest-once",
-            "eventOffsetSeconds": 15
-          },
-          "idealDeliveryConditions": {
-              "condition": "device_battery_state != 'charging' && device_battery_state != 'full'",
-              "maxWaitTimeSeconds": -1
-          }
-        },
-        "bgTestNotificationCharging": {
-          "title": "BG Notif From Config",
-          "body": "Charging",
-          "msg": "TODO_P0 remove this",
-          "deliveryTime": {
-            "eventName": "app_entered_background",
-            "eventInstance": "latest-once",
-            "eventOffsetSeconds": 15
-          },
-          "idealDeliveryConditions": {
-              "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
-              "maxWaitTimeSeconds": -1
           }
         }
     }
