@@ -157,8 +157,7 @@ func (ac *Appcore) notificationAlreadyDeliveredTimeForSingleDeliveryNotification
 		return nil, nil
 	}
 
-	deliveryEvent := fmt.Sprintf("notifications:delivered:%s", notification.UniqueID())
-	return ac.db.LatestEventTimeByName(deliveryEvent)
+	return ac.db.LatestEventTimeByName(notification.DeliveredEventName())
 }
 
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
@@ -521,6 +520,5 @@ func (ac *Appcore) notificationsNeedUpdateForEvent(event *datamodel.Event) (bool
 }
 
 func (ac *Appcore) performBackgroundWorkForNotifications() error {
-	// TODO_P0: optimize this? Can check if any notifications are in ideal window and not update if not needed.
 	return ac.ForceUpdateNotificationPlan()
 }

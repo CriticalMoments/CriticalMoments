@@ -173,7 +173,7 @@
     }
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [CMNotificationHandler updateNotificationPlan:notifPlan];
+      [self.cm updateNotificationPlan:notifPlan];
 
       [self.cm.backgroundHandler scheduleBackgroundTaskAtEpochTime:notifPlan.earliestBgCheckTimeEpochSeconds];
     });

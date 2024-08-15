@@ -92,13 +92,6 @@
             // Don't register if there isn't a handler for this taskId
             continue;
         }
-        NSURL *logPath = [CMBackgroundHandler logPath:true withTaskId:taskId];
-        NSString *logContents = [NSString stringWithContentsOfURL:logPath encoding:NSUTF8StringEncoding error:nil];
-        NSLog(@"BG Debug Log [%@]:\n%@\n\n", taskId, logContents);
-
-        logPath = [CMBackgroundHandler logPath:false withTaskId:taskId];
-        logContents = [NSString stringWithContentsOfURL:logPath encoding:NSUTF8StringEncoding error:nil];
-        NSLog(@"BG Release Log [%@]:\n%@\n\n", taskId, logContents);
     }
 }
 
@@ -109,57 +102,11 @@
         [self scheduleBackgroundTaskAtEpochTime:plan.earliestBgCheckTimeEpochSeconds];
     }
 
-    [CMBackgroundHandler logRunTimestamp:task.identifier];
     [self.cm runAppcoreBackgroundWork];
     [self.cm sendEvent:@"background_worker_ran" builtIn:YES handler:nil];
     NSLog(@"CMBackground: worker ran - %@", task.identifier);
 
     [task setTaskCompletedWithSuccess:YES];
-}
-
-// TODO_P0 remove this
-+ (NSURL *)logPath:(BOOL)debug withTaskId:(NSString *)taskId {
-    NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
-                                                                 inDomains:NSUserDomainMask] lastObject];
-
-    NSURL *criticalMomentsDataDir = [appSupportDir URLByAppendingPathComponent:@"critical_moments_test_data"];
-    NSError *error;
-    BOOL s = [NSFileManager.defaultManager createDirectoryAtURL:criticalMomentsDataDir
-                                    withIntermediateDirectories:YES
-                                                     attributes:nil
-                                                          error:&error];
-    if (!s || error) {
-        NSLog(@"error: %@", error);
-    }
-    NSString *filename = [NSString stringWithFormat:@"%@.log", taskId];
-    if (debug) {
-        filename = [NSString stringWithFormat:@"%@_debug.log", taskId];
-    }
-    NSURL *bgLogFile = [criticalMomentsDataDir URLByAppendingPathComponent:filename];
-    return bgLogFile;
-}
-
-// TODO_P0 remove this
-+ (void)logRunTimestamp:(NSString *)taskId {
-    NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date]
-                                                          dateStyle:NSDateFormatterShortStyle
-                                                          timeStyle:NSDateFormatterFullStyle];
-
-#ifdef DEBUG
-    NSURL *logPath = [CMBackgroundHandler logPath:true withTaskId:taskId];
-#else
-    NSURL *logPath = [CMBackgroundHandler logPath:false withTaskId:taskId];
-#endif
-    NSString *logContents = [NSString stringWithContentsOfURL:logPath encoding:NSUTF8StringEncoding error:nil];
-    NSString *newContent = dateString;
-    if (logContents) {
-        newContent = [NSString stringWithFormat:@"%@\n%@", logContents, dateString];
-    }
-    NSError *error;
-    BOOL s = [newContent writeToURL:logPath atomically:YES encoding:NSUTF8StringEncoding error:&error];
-    if (!s || error) {
-        NSLog(@"error: %@", error);
-    }
 }
 
 + (BOOL)isSimulator {

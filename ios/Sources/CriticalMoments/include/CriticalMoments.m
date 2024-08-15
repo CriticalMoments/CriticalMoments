@@ -11,6 +11,7 @@
 #import "../appcore_integration/CMLibBindings.h"
 #import "../background/CMBackgroundHandler.h"
 #import "../messaging/CMBannerManager.h"
+#import "../notifications/CMNotificationHandler.h"
 #import "../notifications/CMNotificationsDelegate.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
@@ -30,7 +31,7 @@
 @property(nonatomic, strong) dispatch_queue_t actionQueue;
 @property(nonatomic, strong) dispatch_queue_t eventQueue;
 @property(nonatomic, strong) CMNotificationsDelegate *notificationDelegate;
-// @property in CriticalMoments_private: CMBackgroundHandler *backgroundHandler;
+@property(nonatomic, strong) CMNotificationHandler *notificationHandler;
 @end
 
 @implementation CriticalMoments
@@ -444,6 +445,10 @@ static CriticalMoments *sharedInstance = nil;
     return [_appcore fetchNotificationPlan:error];
 }
 
+- (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan {
+    [self.notificationHandler updateNotificationPlan:notifPlan];
+}
+
 - (void)registerNotificationDelegate {
     if (_disableNotifications) {
         return;
@@ -452,6 +457,9 @@ static CriticalMoments *sharedInstance = nil;
     id<UNUserNotificationCenterDelegate> existingDelegate = center.delegate;
     _notificationDelegate = [[CMNotificationsDelegate alloc] initWithOriginalDelegate:existingDelegate andCm:self];
     center.delegate = _notificationDelegate;
+
+    CMNotificationHandler *notificationHandler = [[CMNotificationHandler alloc] initWithCm:self];
+    self.notificationHandler = notificationHandler;
 }
 
 - (void)actionForNotification:(NSString *)identifier {

@@ -1006,9 +1006,8 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 	}
 
 	// Fire event simulating past delivery time
-	// String from iOS side, so don't just change it. Part of test is that we're aligned with iOS SDK
 	eventTime := time.Now()
-	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event1Notification")
+	err = ac.SendClientEvent(notification.DeliveredEventName())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1035,7 +1034,7 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 
 	// Fire event simulating past delivery time
 	eventTime = time.Now()
-	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event2Notification")
+	err = ac.SendClientEvent(notification.DeliveredEventName())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1054,7 +1053,7 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 		t.Fatal("Expected nil delivery time and nil error")
 	}
 	// Firing again should not matter
-	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event2Notification")
+	err = ac.SendClientEvent(notification.DeliveredEventName())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1112,7 +1111,7 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 		t.Fatal("Second event should have pushed back delivery time")
 	}
 	// a delivery should take precedence over a push back for latest-once
-	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event4Notification")
+	err = ac.SendClientEvent(notification.DeliveredEventName())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1198,7 +1197,7 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 		t.Fatal("Expected now delivery time and nil bgCheckTime")
 	}
 	// Send event to simulate delivery, should not reschedule after
-	err = ac.SendClientEvent("notifications:delivered:io.criticalmoments.notifications.event6Notification")
+	err = ac.SendClientEvent(notification.DeliveredEventName())
 	if err != nil {
 		t.Fatal(err)
 	}

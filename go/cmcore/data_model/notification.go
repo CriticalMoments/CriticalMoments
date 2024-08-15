@@ -355,6 +355,10 @@ func (n *Notification) UniqueID() string {
 	return fmt.Sprintf("%v%v", NotificationUniqueIDPrefix, n.ID)
 }
 
+func (n *Notification) DeliveredEventName() string {
+	return fmt.Sprintf("notifications:delivered:%v", n.UniqueID())
+}
+
 // Gomobile accessors. Gomobiledoesn't support pointers
 func (n *Notification) GetRelevanceScore() float64 {
 	return *n.RelevanceScore
