@@ -119,7 +119,7 @@ static CriticalMoments *sharedInstance = nil;
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = [self startReturningError];
         if (error) {
-            os_log_error(OS_LOG_DEFAULT, "CriticalMoments: Critical Moments was unable to start!\nCMError: %@",
+            os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: Critical Moments was unable to start!\nCMError: %@",
                          error.localizedDescription);
 #if DEBUG
             os_log_fault(OS_LOG_DEFAULT,
