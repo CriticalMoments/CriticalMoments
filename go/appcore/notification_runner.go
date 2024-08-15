@@ -163,7 +163,7 @@ func (ac *Appcore) notificationAlreadyDeliveredTimeForSingleDeliveryNotification
 // Checks if this notification has an ideal delivery window and now is currently in the time-range of that window
 func notificationInIdealDeliveryWindow(notification *datamodel.Notification, nonIdealDeliveryTime *time.Time, now time.Time) bool {
 	if notification == nil ||
-		notification.IdealDevlieryConditions == nil ||
+		notification.IdealDeliveryConditions == nil ||
 		nonIdealDeliveryTime == nil {
 		return false
 	}
@@ -173,7 +173,7 @@ func notificationInIdealDeliveryWindow(notification *datamodel.Notification, non
 	if nonIdealDeliveryTime.After(now) {
 		return false
 	}
-	if now.Sub(*nonIdealDeliveryTime) > notification.IdealDevlieryConditions.MaxWaitTime() {
+	if now.Sub(*nonIdealDeliveryTime) > notification.IdealDeliveryConditions.MaxWaitTime() {
 		return false
 	}
 
@@ -209,14 +209,14 @@ func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notif
 	}
 
 	// No ideal time window, so return non ideal time, and nil checkTime
-	if notification.IdealDevlieryConditions == nil {
+	if notification.IdealDeliveryConditions == nil {
 		return nonIdealDeliveryTime, nil
 	}
 
 	// Check if now is in ideal delivery window, and if the condition passes
 	inIdealDeliveryWindow := notificationInIdealDeliveryWindow(notification, nonIdealDeliveryTime, now)
 	if inIdealDeliveryWindow {
-		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDevlieryConditions.Condition)
+		idealConditionResult, err := ac.propertyRegistry.evaluateCondition(&notification.IdealDeliveryConditions.Condition)
 		if idealConditionResult && err == nil {
 			// No need for checkTime, since the condition is currently met
 			return &now, nil
@@ -226,10 +226,10 @@ func (ac *Appcore) shiftDeliveryTimeForIdealWindow(notification *datamodel.Notif
 	// Shift delivery time back to end of offset, or nil it out for offset=forever
 	var shiftedDeliveryTime *time.Time
 
-	if notification.IdealDevlieryConditions.WaitForever() {
+	if notification.IdealDeliveryConditions.WaitForever() {
 		shiftedDeliveryTime = nil
 	} else {
-		endOfIdealDeliveryWindow := nonIdealDeliveryTime.Add(notification.IdealDevlieryConditions.MaxWaitTime())
+		endOfIdealDeliveryWindow := nonIdealDeliveryTime.Add(notification.IdealDeliveryConditions.MaxWaitTime())
 		shiftedDeliveryTime = &endOfIdealDeliveryWindow
 	}
 

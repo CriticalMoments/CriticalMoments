@@ -546,9 +546,9 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 			expectedInIdealWindow: false,
 		},
 		{
-			name: "nil IdealDevlieryConditions",
+			name: "nil IdealDeliveryConditions",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions:       nil,
+				IdealDeliveryConditions:       nil,
 				DeliveryDaysOfWeek:            allDays,
 				DeliveryWindowTODStartMinutes: 0,
 				DeliveryWindowTODEndMinutes:   24*60 - 1,
@@ -559,7 +559,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "nil nonIdealDeliveryTime",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions:       &datamodel.IdealDevlieryConditions{},
+				IdealDeliveryConditions:       &datamodel.IdealDeliveryConditions{},
 				DeliveryDaysOfWeek:            allDays,
 				DeliveryWindowTODStartMinutes: 0,
 				DeliveryWindowTODEndMinutes:   24*60 - 1,
@@ -570,7 +570,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "nonIdealDeliveryTime in future",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 					MaxWaitTimeSeconds: 60 * 60,
 				},
 				DeliveryDaysOfWeek:            allDays,
@@ -586,7 +586,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "MaxWaitTime exceeded",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 					MaxWaitTimeSeconds: 60,
 				},
 				DeliveryDaysOfWeek:            allDays,
@@ -602,7 +602,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "current day not in DeliveryDaysOfWeek",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 					MaxWaitTimeSeconds: 60 * 60,
 				},
 				DeliveryWindowTODStartMinutes: 0,
@@ -618,7 +618,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "current time not in DeliveryWindowTODStartMinutes",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 					MaxWaitTimeSeconds: 60 * 60,
 				},
 				DeliveryDaysOfWeek:            allDays,
@@ -634,7 +634,7 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 		{
 			name: "current time in ideal window",
 			notification: &datamodel.Notification{
-				IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+				IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 					MaxWaitTimeSeconds: 60 * 60,
 				},
 				DeliveryDaysOfWeek:            []time.Weekday{customTime.Weekday()},
@@ -682,7 +682,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 
 	var buildValidNotification = func() datamodel.Notification {
 		return datamodel.Notification{
-			IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+			IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 				Condition:          *trueCondition,
 				MaxWaitTimeSeconds: 60 * 60,
 			},
@@ -738,7 +738,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	invalidConditionNotification.IdealDevlieryConditions.Condition = *invalidCondition
+	invalidConditionNotification.IdealDeliveryConditions.Condition = *invalidCondition
 	endOfIdealWindow := customTime.Add(time.Hour)
 	runTest(testType{ // add_test_count
 		name:                 "invalid condition",
@@ -755,7 +755,7 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 		t.Fatal(err)
 	}
 	idealWithFalseCondition := buildValidNotification()
-	idealWithFalseCondition.IdealDevlieryConditions.Condition = *falseCondition
+	idealWithFalseCondition.IdealDeliveryConditions.Condition = *falseCondition
 	runTest(testType{ // add_test_count
 		name:                 "false condition should push back to end of window",
 		notification:         idealWithFalseCondition,
@@ -780,9 +780,9 @@ func TestShiftDeliveryTimeForIdealWindow(t *testing.T) {
 	// Wait forever with false condition should not schedule at end of window
 	// But should schedule BG check time to check if it changes
 	foreverNotif := buildValidNotification()
-	foreverNotif.IdealDevlieryConditions.Condition = *falseCondition
-	foreverNotif.IdealDevlieryConditions.MaxWaitTimeSeconds = -1
-	if !foreverNotif.IdealDevlieryConditions.WaitForever() {
+	foreverNotif.IdealDeliveryConditions.Condition = *falseCondition
+	foreverNotif.IdealDeliveryConditions.MaxWaitTimeSeconds = -1
+	if !foreverNotif.IdealDeliveryConditions.WaitForever() {
 		t.Fatal("not setup correctly for wait forever")
 	}
 	runTest(testType{ // add_test_count
@@ -882,7 +882,7 @@ func TestNextBackgroundWorkTimeForNotifications(t *testing.T) {
 
 	// 10 mins out should not return BG check time, as the delivery time is before first possible check time (15 minutes in the future)
 	notification := datamodel.Notification{
-		IdealDevlieryConditions: &datamodel.IdealDevlieryConditions{
+		IdealDeliveryConditions: &datamodel.IdealDeliveryConditions{
 			MaxWaitTimeSeconds: 60 * 60,
 		},
 		DeliveryDaysOfWeek:            allDays,
@@ -1128,8 +1128,8 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 	// Event 6: latest-once with ideal time and offset. Test BG worker.
 	notification = ac.config.Notifications["event6Notification"]
 	if notification.DeliveryTime.EventInstance() != datamodel.EventInstanceTypeLatestOnce ||
-		notification.IdealDevlieryConditions == nil ||
-		notification.IdealDevlieryConditions.MaxWaitTimeSeconds != 1200 ||
+		notification.IdealDeliveryConditions == nil ||
+		notification.IdealDeliveryConditions.MaxWaitTimeSeconds != 1200 ||
 		*notification.DeliveryTime.EventOffsetSeconds != 60 {
 		t.Fatal("Expected event6 to be a latest-once event with expected config")
 	}

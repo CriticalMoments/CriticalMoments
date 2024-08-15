@@ -51,16 +51,16 @@ type Notification struct {
 	DeliveryWindowTODStartMinutes int
 	DeliveryWindowTODEndMinutes   int
 
-	IdealDevlieryConditions *IdealDevlieryConditions
+	IdealDeliveryConditions *IdealDeliveryConditions
 	CancelationEvents       *[]string
 }
 
-type IdealDevlieryConditions struct {
+type IdealDeliveryConditions struct {
 	Condition          Condition `json:"condition"`
 	MaxWaitTimeSeconds int       `json:"maxWaitTimeSeconds"`
 }
 
-func (i *IdealDevlieryConditions) MaxWaitTime() time.Duration {
+func (i *IdealDeliveryConditions) MaxWaitTime() time.Duration {
 	if i.WaitForever() {
 		// 200 years in case the caller skips the check WaitForever()
 		return time.Hour * 24 * 365 * 200
@@ -68,7 +68,7 @@ func (i *IdealDevlieryConditions) MaxWaitTime() time.Duration {
 	return time.Second * time.Duration(i.MaxWaitTimeSeconds)
 }
 
-func (i *IdealDevlieryConditions) WaitForever() bool {
+func (i *IdealDeliveryConditions) WaitForever() bool {
 	return i.MaxWaitTimeSeconds == NotificaitonMaxIdealWaitTimeForever
 }
 
@@ -135,7 +135,7 @@ type jsonNotification struct {
 	DeliveryWindowTODStart string `json:"deliveryTimeOfDayStart,omitempty"`
 	DeliveryWindowTODEnd   string `json:"deliveryTimeOfDayEnd,omitempty"`
 
-	IdealDeliveryConditions *IdealDevlieryConditions `json:"idealDeliveryConditions,omitempty"`
+	IdealDeliveryConditions *IdealDeliveryConditions `json:"idealDeliveryConditions,omitempty"`
 	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
 }
 
@@ -189,12 +189,12 @@ func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool)
 			}
 		}
 	}
-	if n.IdealDevlieryConditions != nil {
-		if conErr := n.IdealDevlieryConditions.Condition.Validate(); conErr != nil {
+	if n.IdealDeliveryConditions != nil {
+		if conErr := n.IdealDeliveryConditions.Condition.Validate(); conErr != nil {
 			return fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID)
 		}
-		if n.IdealDevlieryConditions.MaxWaitTimeSeconds != NotificaitonMaxIdealWaitTimeForever &&
-			n.IdealDevlieryConditions.MaxWaitTimeSeconds < 1 {
+		if n.IdealDeliveryConditions.MaxWaitTimeSeconds != NotificaitonMaxIdealWaitTimeForever &&
+			n.IdealDeliveryConditions.MaxWaitTimeSeconds < 1 {
 			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
 		}
 	}
@@ -241,7 +241,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	n.Body = jn.Body
 	n.Sound = jn.Sound
 	n.ActionName = jn.ActionName
-	n.IdealDevlieryConditions = jn.IdealDeliveryConditions
+	n.IdealDeliveryConditions = jn.IdealDeliveryConditions
 	n.CancelationEvents = jn.CancelationEvents
 	n.DeliveryTime = jn.DeliveryTime
 	n.RelevanceScore = jn.RelevanceScore

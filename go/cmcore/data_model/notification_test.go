@@ -165,7 +165,7 @@ func TestJsonParsingMinimalFieldsNotif(t *testing.T) {
 	if n.DeliveryWindowTODEndMinutes != defaultDeliveryWindowLocalTimeEnd {
 		t.Fatal("failed to parse default delivery end time")
 	}
-	if n.IdealDevlieryConditions != nil {
+	if n.IdealDeliveryConditions != nil {
 		t.Fatal("failed to parse ideal delivery conditions")
 	}
 	if n.CancelationEvents != nil {
@@ -226,13 +226,13 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 	if n.DeliveryWindowTODEndMinutes != 23*60+59 {
 		t.Fatal("failed to parse delivery end time")
 	}
-	if n.IdealDevlieryConditions == nil {
+	if n.IdealDeliveryConditions == nil {
 		t.Fatal("failed to parse ideal delivery conditions")
 	}
-	if n.IdealDevlieryConditions.Condition.conditionString != "true" {
+	if n.IdealDeliveryConditions.Condition.conditionString != "true" {
 		t.Fatal("failed to parse ideal delivery condition")
 	}
-	if n.IdealDevlieryConditions.MaxWaitTime() != 10*time.Second {
+	if n.IdealDeliveryConditions.MaxWaitTime() != 10*time.Second {
 		t.Fatal("failed to parse ideal delivery max wait time")
 	}
 	if n.CancelationEvents == nil {
@@ -448,7 +448,7 @@ func TestHHMMStringParsing(t *testing.T) {
 }
 
 func TestAccessors(t *testing.T) {
-	i := IdealDevlieryConditions{
+	i := IdealDeliveryConditions{
 		MaxWaitTimeSeconds: NotificaitonMaxIdealWaitTimeForever,
 	}
 
