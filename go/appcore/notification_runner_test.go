@@ -650,9 +650,6 @@ func TestNotificationInIdealDeliveryWindow(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if test.name != "current day not in DeliveryDaysOfWeek" {
-			continue
-		}
 		inIdealWindow := notificationInIdealDeliveryWindow(test.notification, test.nonIdealDeliveryTime, customTime)
 		if inIdealWindow != test.expectedInIdealWindow {
 			t.Errorf("notificationInIdealDeliveryWindow() = %v, want %v for test %s", inIdealWindow, test.expectedInIdealWindow, test.name)
