@@ -1159,7 +1159,7 @@
           "deliveryTime": {
             "eventName": "app_entered_background",
             "eventInstance": "latest",
-            "eventOffset": 5
+            "eventOffsetSeconds": 5
           }
         },
         "pastDueNotification": {
@@ -1181,7 +1181,7 @@
           "cancelationEvents": ["cancel_notification"],
           "deliveryTime": {
             "eventName": "trigger_notification_event",
-            "eventOffset": 600
+            "eventOffsetSeconds": 600
           }
         },
         "demoEventNotificationTap": {
@@ -1198,7 +1198,7 @@
           "tapActionName": "nested_alert",
           "deliveryTime": {
             "eventName": "demo_notification_2",
-            "eventOffset": 5
+            "eventOffsetSeconds": 5
           }
         },
         "demoEventNotification3": {
@@ -1237,12 +1237,70 @@
               "maxWaitTimeSeconds": 86400
           }
         },
+        "devNotification1": {
+          "title": "dev notification SCREEN_UP",
+          "body": "Displayed when screen_brightness >0.01",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventOffsetSeconds": 300,
+            "eventInstance": "latest"
+          },
+          "idealDeliveryConditions": {
+              "condition": "screen_brightness > 0.01",
+              "maxWaitTimeSeconds": 8640000
+          }
+        },
+        "devNotification11": {
+          "title": "dev notification SCREEN_UP + !flat",
+          "body": "Displayed when screen_brightness >0.01",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventOffsetSeconds": 300,
+            "eventInstance": "latest"
+          },
+          "idealDeliveryConditions": {
+              "condition": "screen_brightness > 0.01 && device_orientation != 'face_up' && device_orientation != 'face_down'",
+              "maxWaitTimeSeconds": 8640000
+          }
+        },
+        "devNotification2": {
+          "title": "dev notification !FG",
+          "body": "Displayed when !foreground",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventOffsetSeconds": 300,
+            "eventInstance": "latest"
+          },
+          "idealDeliveryConditions": {
+              "condition": "!foreground",
+              "maxWaitTimeSeconds": 8640000
+          }
+        },
+        "devNotification3": {
+          "title": "dev notification SCREEN_LOW",
+          "body": "Displayed when screen_brightness <0.01",
+          "msg": "TODO_P0 remove this",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventOffsetSeconds": 300,
+            "eventInstance": "latest"
+          },
+          "idealDeliveryConditions": {
+              "condition": "screen_brightness < 0.01",
+              "maxWaitTimeSeconds": 8640000
+          }
+        },
         "bgTestNotification": {
           "title": "BG Notif From Config",
           "body": "Not Charging",
           "msg": "TODO_P0 remove this",
           "deliveryTime": {
-            "eventName": "background_worker_ran"
+            "eventName": "app_entered_background",
+            "eventInstance": "latest-once",
+            "eventOffsetSeconds": 15
           },
           "idealDeliveryConditions": {
               "condition": "device_battery_state != 'charging' && device_battery_state != 'full'",
@@ -1254,7 +1312,9 @@
           "body": "Charging",
           "msg": "TODO_P0 remove this",
           "deliveryTime": {
-            "eventName": "background_worker_ran"
+            "eventName": "app_entered_background",
+            "eventInstance": "latest-once",
+            "eventOffsetSeconds": 15
           },
           "idealDeliveryConditions": {
               "condition": "device_battery_state == 'charging' || device_battery_state == 'full'",
