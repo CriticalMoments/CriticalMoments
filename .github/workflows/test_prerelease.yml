@@ -1,6 +1,8 @@
 name: Pre-release Tests
 
-on: push
+on:
+  release:
+    types: [created]
 
 jobs:
   build_and_test:
