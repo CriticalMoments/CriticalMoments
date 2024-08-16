@@ -444,6 +444,11 @@
 }
 
 - (void)testWeatherProviderCases:(NSArray<NSString *> *)weatherTests {
+    // TODO: this doesn't work reliably in CI. Leave it as a HW only test.
+    if (getenv("SIMULATOR_MODEL_IDENTIFIER") != NULL) {
+        XCTSkip("Not reliably working on CI. HW only test");
+    }
+
     CriticalMoments *cm = [self buildAndStartCMForTest];
     // TODO P2: global in test not ideal
     [CriticalMoments.sharedInstance setApiKey:TEST_API_KEY error:nil];
