@@ -1,0 +1,27 @@
+name: Check For P0 Issues
+on:
+  pull_request:
+    branches:
+      - main
+      - vnext
+  push:
+    branches:
+      - main
+      - vnext
+
+jobs:
+  p0-check:
+    name: Check for P0 issues
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check for P0 issue comments
+      run: |
+        todos=true
+        grep -r TODO_P0 --exclude-dir=.git --exclude-dir=.github --exclude-dir=tools . || todos=false
+        if [[ $todos == true ]]
+        then
+          echo "TODO_P0 issues found"
+          exit 1
+        fi

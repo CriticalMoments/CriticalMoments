@@ -1,0 +1,24 @@
+{
+  "title": "title",
+  "body": "body",
+  "sound": "default",
+  "relevanceScore": 0.5,
+  "interruptionLevel": "passive",
+  "badgeCount": 10,
+  "launchImageName": "storyboard1",
+  "tapActionName": "actionName",
+  "deliveryDaysOfWeek": "Monday,Tuesday",
+  "deliveryTimeOfDayStart": "01:30",
+  "deliveryTimeOfDayEnd": "23:59",
+  "scheduleCondition": "true",
+  "idealDeliveryConditions": {
+    "condition": "true",
+    "maxWaitTimeSeconds": 10
+  },
+  "cancelationEvents": ["event1", "event2"],
+  "deliveryTime": {
+    "eventName": "some_event",
+    "eventOffsetSeconds": 300,
+    "eventInstance": "first"
+  }
+} 

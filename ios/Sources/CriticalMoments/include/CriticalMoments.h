@@ -20,10 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// init is not available. Use sharedInstance for all use cases.
 - (instancetype)init NS_UNAVAILABLE;
 
-/**
- The default instance of critical moments. You should always use this instance
- */
+/// :nodoc:
 + (CriticalMoments *)sharedInstance;
+
+/**
+ The default instance of Critical Moments. You should always use this instance.
+ */
++ (CriticalMoments *)shared;
 
 #pragma mark Setup
 
@@ -56,7 +59,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setApiKey:(NSString *)apiKey error:(NSError **)error;
 
 /**
- Set a local development Config URL for critical moments.
+ Set a local development config file for Critical Moments by name. Path will be looked up in your main bundle.
+
+ For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
+ guide for how to create this file: https://docs.criticalmoments.io/quick-start
+
+ This local config file will not be used on release builds / app store builds. You must also set a production config URL
+ with setProductionConfigUrl for those builds.
+
+ @param configFileName the name of the config file (e.g. `cmConfig.json`). The full path will be looked up in your main
+ bundle.
+ */
+- (void)setDevelopmentConfigName:(NSString *)configFileName;
+
+/**
+ Set a local development config URL for Critical Moments.
 
  For local development you may use a local and unsigned JSON config file built into the app binary. See the Quick Start
  guide for how to create this file: https://docs.criticalmoments.io/quick-start
@@ -77,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param urlString the URL string of the json config file. Should begin with `https://`
  @warning Be sure to secure who can upload files to this URL path. This config
  file can present messages directly to your users, and you should treat security
- seriously, as you would your app update release process or webpage secuirty.
+ seriously, as you would your app update release process or webpage security.
  */
 - (void)setReleaseConfigUrl:(NSString *)urlString;
 
@@ -110,13 +127,13 @@ in the config file's namedConditions section.
  Configuration documentation: https://docs.criticalmoments.io/conditional-targeting/named-conditions
 
  The result is returned through the provided handler asynchronously. The result is asynchronous because some conditions
-can use properties which are asyncronous (checking network state, battery state, and many others).  It is not called on
+can use properties which are asynchronous (checking network state, battery state, and many others).  It is not called on
 the main thread, so be sure to dispatch to the main thread if calling into UI libraries.
 
  @param name The name of this condition. Must be provided and can not be an empty string.
  The name is used as a lookup the condition-string of a namedCondition in the config file.
  @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occured evaluating the condition. The boolean value is false for any error, including if the
+returns any errors occurred evaluating the condition. The boolean value is false for any error, including if the
 condition is not found in the config.
  @warning Be sure to provide a unique name to each use case. Reusing names (even if the current conditional logic is
 currently equivalent) will make it impossible to override each usage independently from remote configuration.
@@ -219,6 +236,22 @@ currently equivalent) will make it impossible to override each usage independent
  failed, just that some field(s) failed.
  */
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
+
+#pragma mark Notifications
+
+/**
+ Requests a person’s authorization to allow local and remote notifications for your app, using the standard system
+ prompt to the user.
+
+ This API calls the system's requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
+ schedule any queued notifications.
+
+ @param completionHandler Optional. A handler to be called back immediately after permissions are granted or denied.
+ `prompted` returns true if the user saw a permission prompt for this call, and false if the user had made the
+ authorization decision in the past.
+ */
+- (void)requestNotificationPermissionWithCompletionHandler:
+    (void (^_Nullable)(BOOL prompted, BOOL granted, NSError *__nullable error))completionHandler;
 
 #ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Simple "ping" method for testing end to end integrations

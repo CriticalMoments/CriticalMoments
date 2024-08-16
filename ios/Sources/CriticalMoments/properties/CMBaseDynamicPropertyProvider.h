@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, CMPropertyProviderType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-// intented to be subclassed
+// intended to be subclassed
 @interface CMDynamicPropertyProviderWrapper : NSObject <AppcoreLibPropertyProvider>
 
 - (instancetype)init NS_UNAVAILABLE;

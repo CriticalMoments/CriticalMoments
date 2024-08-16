@@ -7,7 +7,7 @@ on:
 jobs:
   build_and_test:
     name: Build and analyse default scheme using xcodebuild command
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
       - uses: actions/checkout@v4
@@ -25,8 +25,16 @@ jobs:
       - name: Go verify module integrity
         run: cd go && go mod verify && cd ..
 
-      - name: Select xcode
-        run: sudo xcode-select -switch /Applications/Xcode_14.2.app && /usr/bin/xcodebuild -version
+      - name: Select xcode 15.4 for Appcore
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app && /usr/bin/xcodebuild -version
+
+      # TODO: we don't want to build appcore in release, but looks like we have been doing it for a while. We'd rather test the binary release here.
+      - name: Build go appcore xcframework
+        run: ./go/build_appcore.sh
+
+      - name: Select xcode 15.2 for iOS
+        run: sudo xcode-select -switch /Applications/Xcode_15.2.app && /usr/bin/xcodebuild -version
 
       - name: Build and test iOS Package and SampleApp
-        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=16.2,name=iPhone 14 Pro' -skip-testing:SampleAppTests/SnapshotTests test && cd ../..
+        run: cd ios/sample_app && xcodebuild -scheme SampleApp -testPlan TestPlan -destination 'platform=iOS Simulator,OS=17.2,name=iPhone 15 Pro' -skip-testing:SampleAppTests/SnapshotTests test
+

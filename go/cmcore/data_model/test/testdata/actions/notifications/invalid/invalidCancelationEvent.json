@@ -1,0 +1,7 @@
+{
+  "title": "title",
+  "cancelationEvents": ["event1", ""],
+  "deliveryTime": {
+    "timestamp": 1000
+  }
+}

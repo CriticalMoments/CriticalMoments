@@ -40,6 +40,11 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.screen didAppear:self];
+}
+
 - (CMDemoAction *)actionForIndexPath:(NSIndexPath *)indexPath {
     return [[self.screen.sections objectAtIndex:indexPath.section].actions objectAtIndex:indexPath.row];
 }

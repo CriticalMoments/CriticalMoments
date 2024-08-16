@@ -1,0 +1,79 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "notifications": {
+    "event1Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event1",
+        "eventInstance": "latest"
+      }
+    },
+    "event2Notification": {
+      "title": "title",
+      "body": "body",
+      "cancelationEvents": ["cancel2event"],
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event2",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "first"
+      }
+    },
+    "event3Notification": {
+      "title": "title",
+      "body": "body",
+      "cancelationEvents": ["cancel3event"],
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event3",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "first"
+      }
+    },
+    "event4Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event4",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "latest-once"
+      }
+    },
+    "event5Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event5",
+        "eventInstance": "latest-once"
+      }
+    },
+    "event6Notification": {
+      "title": "title",
+      "body": "body",
+      "tapActionName": "bannerAction",
+      "deliveryTime": {
+        "eventName": "event6",
+        "eventOffsetSeconds": 60,
+        "eventInstance": "latest-once"
+      },
+      "idealDeliveryConditions": {
+          "condition": "true",
+          "maxWaitTimeSeconds": 1200
+      }
+    }
+  },
+  "actions": {
+    "namedActions": {
+      "bannerAction": {
+          "actionType": "banner",
+          "actionData": {
+              "body": "Hello world, but on a banner!"
+          }
+      }
+    }
+  }
+}

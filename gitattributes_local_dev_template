@@ -1,7 +1,7 @@
 # Git LFS config
 # This is needed if you want to add snapshot test results, or run snapshot tests.
 # Copy it to your local .git/info/attributes file to add/remove test snapshots from git.
-# Not included in a in-repo .gitattributes file because it interefers with SPM install
+# Not included in a in-repo .gitattributes file because it interferes with SPM install
 # as xcode doesn't have lfs installed.
 
 ios/sample_app/SampleAppTests/__Snapshots__/** filter=lfs diff=lfs merge=lfs -text

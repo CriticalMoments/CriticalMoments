@@ -89,7 +89,7 @@ static NSURL *bundleUrl = nil;
 
 + (NSError *)deleteDatabase {
     // This is only for the demo app. You really really shouldn't emulate this in a client app. This code is not
-    // guarunteed to work over time, not is deleting the database file a good idea.
+    // guaranteed to work over time, not is deleting the database file a good idea.
     NSURL *appSupportDir = [[NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory
                                                                  inDomains:NSUserDomainMask] lastObject];
 

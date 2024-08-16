@@ -16,7 +16,12 @@
         UIDevice.currentDevice.batteryMonitoringEnabled = YES;
     }
 
-    return UIDevice.currentDevice.batteryLevel;
+    float batteryLevel = UIDevice.currentDevice.batteryLevel;
+    // wired computers and simulators report -1. Let's return 1.0 since their battery is effectively "full".
+    if (batteryLevel == -1.0) {
+        return 1.0;
+    }
+    return batteryLevel;
 }
 
 - (CMPropertyProviderType)type {

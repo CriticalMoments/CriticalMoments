@@ -31,26 +31,6 @@ then
     exit 1
 fi
 
-# update the Info.plist to work around https://github.com/golang/go/issues/66018
-# this is a temporary fix until the issue is resolved in gomobile
-cp -f ./appcore/build_tools/frameworkInfo.plist ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Info.plist 
-cp -f ./appcore/build_tools/frameworkInfo.plist ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Info.plist 
-cp -f ./appcore/build_tools/xcframeworkInfo.plist ./appcore/build/Appcore.xcframework/Info.plist
-rm ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Appcore
-rm ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Appcore
-rm ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Headers
-rm ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Headers
-rm ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Modules
-rm ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Modules
-rm ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Resources
-rm ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Resources
-cp -r ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Versions/A/* ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework
-cp -r ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Versions/A/* ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework
-rm -r ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Versions
-rm -r ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Versions
-rm -r ./appcore/build/Appcore.xcframework/ios-arm64/Appcore.framework/Resources
-rm -r ./appcore/build/Appcore.xcframework/ios-arm64_x86_64-simulator/Appcore.framework/Resources
-
 echo "Build succeeded!"
 find . -type f ! -iname ".DS_Store" ! -iname ".go_*_hashlist" -exec md5 {} \; > ./appcore/build/.go_folder_last_build_hashlist
 exit 0

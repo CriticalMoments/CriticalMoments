@@ -45,7 +45,7 @@
     CMDemoAction *warmCondition = [[CMDemoAction alloc] init];
     warmCondition.title = @"Current Temperature";
     warmCondition.subtitle =
-        @"Condition true if it over 20 degrees celcius outside.\n\n(weather_approx_location_temperature > 20)";
+        @"Condition true if it over 20 degrees celsius outside.\n\n(weather_approx_location_temperature > 20)";
     warmCondition.actionCMActionName = @"conditional_warm";
     warmCondition.skipInUiTesting = true;
     [warmCondition addResetTestTarget:self action:@selector(dismissAlerts)];
@@ -117,7 +117,17 @@
     compoundCondition.skipInUiTesting = true;
     [compoundCondition addResetTestTarget:self action:@selector(dismissAlerts)];
 
-    [self addSection:@"Compound conditions" withActions:@[ compoundCondition ]];
+    CMDemoAction *appReviewCondition = [[CMDemoAction alloc] init];
+    appReviewCondition.title = @"App Review Template";
+    appReviewCondition.subtitle =
+        @"Condition checks if now would be an appriopiate time for an app review, checking for conditions like low "
+        @"battery, device flat on table, user distracted (in car, on phone call), app installed too recently (7 days), "
+        @"and more. See our app review guide at docs.criticalmoments.io for the full template.";
+    appReviewCondition.actionCMActionName = @"app_review_template";
+    appReviewCondition.skipInUiTesting = true;
+    [appReviewCondition addResetTestTarget:self action:@selector(dismissAlerts)];
+
+    [self addSection:@"Compound conditions" withActions:@[ compoundCondition, appReviewCondition ]];
 
     CMDemoAction *osVersion = [[CMDemoAction alloc] init];
     osVersion.title = @"Function Example";

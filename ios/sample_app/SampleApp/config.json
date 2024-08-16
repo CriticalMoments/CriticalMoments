@@ -232,7 +232,7 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "User Action Simulated",
-                    "message": "We've simulated the user completeing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
+                    "message": "We've simulated the user completing this action.\n\nThe state of the system has updated as the user is further along their user journey.\n\nThe evaluation demos may now produce different results."
                 }
             },
             "app_out_of_date": {
@@ -266,7 +266,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 3,
                                     "pageSectionData": {
-                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best expereince",
+                                        "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best experience",
                                         "scaleFactor": 1.3
                                     }
                                 }
@@ -317,7 +317,7 @@
                                     "pageSectionType": "body",
                                     "topSpacingScale": 3,
                                     "pageSectionData": {
-                                        "bodyText": "We're currently expereincing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resovled soon.",
+                                        "bodyText": "We're currently experiencing a temporary issue with our service.\n\nYour data is safe.\n\nOur team is hard at work and we we expect to have it resolved soon.",
                                         "scaleFactor": 1.3
                                     }
                                 }
@@ -503,6 +503,13 @@
                     }
                 }
             },
+            "enableComeBackAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Onboarding Alert Scheduled",
+                    "message": "Dismiss this app, and a notification will remind you to complete onboarding 5 seconds later.\n\nIn a real app, you would use a longer delay, such as 15 minutes."
+                }
+            },
             "show_notice_alert": {
                 "actionType": "alert",
                 "actionData": {
@@ -612,7 +619,15 @@
                 "actionType": "alert",
                 "actionData": {
                     "title": "Nested Action",
-                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a infomation sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
+                    "message": "Your last action/tap was linked to this alert action entirely through config. Pretty cool!\n\nYou could link many other actions here instead of an alert including showing a information sheet, deeplinking into part of your app, launching Safari with a link or nothing at all!"
+                }
+            },
+            "app_review_template": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "/* Device condition checks we suggest for almost all apps */ device_battery_level > 0.2 &&  !device_low_power_mode &&  has_active_network &&  !low_data_mode && device_orientation != 'face_up' &&  device_orientation != 'face_down' &&  foreground &&   /* Optional device checks. You decide if these make sense for your app */ !other_audio_playing &&  !on_call &&  !has_car_audio &&  /* Check last prompt time was not in last 21 days. Note: this uses the 'ask_for_review' action we fire below.  */ (   eventCount('ask_for_review') == 0 || latestEventTime('ask_for_review') < now() - duration('504h') ) &&  /* Check the app wasn't installed in last week */ app_install_date < now() - duration('168h') &&  /* Check their app version isn't too old. Comment out until you have old clients you no longer want to request reviews on */ /* versionGreaterThan(app_version, '2.4.0') && */  /* Check the app version isn't in the 'known buggy versions' list. Commented out until you have versions you wish to add. */ /* app_version not in ['buggy_version_1', 'buggy_version_2'] && */  /* Out of date OS check */ !versionLessThan(os_version, '16.0') &&  /* only prompt users who's native language is supported in your UI. Uncomment once you set the correct values in the list. */ /* locale_language_code IN ['en', 'es', 'de'] && */  /* Trailing true to make editing this template easier, as lines above end in '&&' */ true",
+                    "passedActionName": "conditional_true_alert",
+                    "failedActionName": "conditional_false_alert"
                 }
             },
             "conditional_true_alert": {
@@ -656,7 +671,7 @@
             "conditional_warm": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_temperature > 20)",
+                    "condition": "((weather_approx_location_temperature ?? 0) > 20)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -664,7 +679,7 @@
             "conditional_cloudy": {
                 "actionType": "conditional_action",
                 "actionData": {
-                    "condition": "(weather_approx_location_cloud_cover > 0.5)",
+                    "condition": "((weather_approx_location_cloud_cover ?? 0) > 0.5)",
                     "passedActionName": "conditional_true_alert",
                     "failedActionName": "conditional_false_alert"
                 }
@@ -1119,6 +1134,10 @@
             "subscribe_trigger": {
                 "eventName": "completed_task",
                 "actionName": "journey_goal_3"
+            },
+            "enableComeBackInstructions": {
+                "eventName": "enableComeBack",
+                "actionName": "enableComeBackAlert"
             }
         }
     },
@@ -1126,9 +1145,91 @@
         "namedConditions": {
             "custom_feature_1": "false",
             "app_not_recently_installed": "app_install_date < now() - duration('10m')",
-            "weather_warm": "(weather_approx_location_temperature > 20)",
+            "weather_warm": "((weather_approx_location_temperature ?? 0) > 20)",
             "ab_test_group_for_experiment_five": "(randForKey('experiment5', stableRand()) % 100) < 25 && !(is_pro_user ?? false)",
             "is_iphone_with_recent_os": "device_model_class == 'iPhone' && !versionLessThan(os_version, '17.0')"
+        }
+    },
+    "notifications": {
+        "comeBackDemo": {
+          "title": "Complete Setup",
+          "sound": "default",
+          "body": "[Sample Content] It only takes 2 minutes to start healthy habbits with LifeTracker.",
+          "scheduleCondition": "eventCount('enableComeBack') > 0",
+          "deliveryTime": {
+            "eventName": "app_entered_background",
+            "eventInstance": "latest",
+            "eventOffsetSeconds": 5
+          }
+        },
+        "pastDueNotification": {
+          "title": "Too old, should not show",
+          "body": "Too old, should not show",
+          "deliveryTime": {
+            "timestamp": 1000
+          }
+        },
+        "futureNotification": {
+          "title": "Future",
+          "body": "For test cases, in 2040",
+          "deliveryTime": {
+            "timestamp": 2224580934
+          }
+        },
+        "eventTriggeredNotification": {
+          "title": "event triggered",
+          "cancelationEvents": ["cancel_notification"],
+          "deliveryTime": {
+            "eventName": "trigger_notification_event",
+            "eventOffsetSeconds": 600
+          }
+        },
+        "demoEventNotificationTap": {
+          "title": "Demo Notification",
+          "body": "Notification triggered by an in app event. Tap to launch in-app action.",
+          "tapActionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_1",
+            "eventInstance": "latest"
+          }
+        },
+        "demoEventNotification2": {
+          "title": "Delayed Demo Notification",
+          "body": "Notification triggered after 5s delay. Tap to launch in-app action.",
+          "tapActionName": "nested_alert",
+          "deliveryTime": {
+            "eventName": "demo_notification_2",
+            "eventInstance": "latest",
+            "eventOffsetSeconds": 5
+          }
+        },
+        "demoEventNotification3": {
+          "title": "Badge Set on Homescreen",
+          "body": "Open your iOS homescreen to see the badge on the CM icon.",
+          "badgeCount": 42,
+          "deliveryTime": {
+            "eventInstance": "latest",
+            "eventName": "demo_notification_3"
+          }
+        },
+        "demoEventNotification4": {
+          "title": "Badge Removed on Homescreen",
+          "body": "Open your iOS homescreen to see the badge is no longer on the CM icon.",
+          "badgeCount": 0,
+          "deliveryTime": {
+            "eventInstance": "latest",
+            "eventName": "demo_notification_4"
+          }
+        },
+        "demoEventNotification5": {
+          "title": "Critical Notification",
+          "body": "Display a 'critical' level notification, which will get priority on lockscreen.",
+          "interruptionLevel": "critical",
+          "relevanceScore": 1.0,
+          "deliveryTime": {
+            "eventInstance": "latest",
+            "eventName": "demo_notification_5"
+          }
         }
     }
 }

@@ -247,6 +247,13 @@ func TestInsertAndRetrieve(t *testing.T) {
 	if math.Abs(time.Since(*ct).Seconds()) > 0.01 {
 		t.Fatal("LatestEventTimeByName returned wrong time")
 	}
+	ft, err := db.FirstEventTimeByName(e.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ft.Compare(*ct) != 0 {
+		t.Fatal("First and latest event time should return same result when there's only one event")
+	}
 
 	// insert another event
 	time.Sleep(time.Millisecond * 2)
@@ -257,6 +264,10 @@ func TestInsertAndRetrieve(t *testing.T) {
 	ct2, err := db.LatestEventTimeByName(e.Name)
 	if err != nil {
 		t.Fatal(err)
+	}
+	ft2, _ := db.FirstEventTimeByName(e.Name)
+	if ft2.Compare(*ct) != 0 {
+		t.Fatal("FirstEventTimeByName should return same result as the first latest")
 	}
 	// Confirm latest is sorting correctly
 	if ct2.Compare(*ct) != 1 {
@@ -641,5 +652,52 @@ func TestTimestampRoundingAndLatestPropHistory(t *testing.T) {
 	}
 	if math.Abs(float64(ct.Unix())-1710791550.0) > 0.1 {
 		t.Fatal("LatestPropHistoryTime returned wrong time")
+	}
+}
+
+func TestAllEventTimesByName(t *testing.T) {
+	db := testBuildTestDb(t)
+	defer db.Close()
+
+	// Should be empty to start
+	times, err := db.AllEventTimesByName("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(times) != 0 {
+		t.Fatal("Expected empty list")
+	}
+
+	// Insert a few events
+	startTime := time.Now()
+	for i := 0; i < 10; i++ {
+		// insert a row into events
+		e, err := datamodel.NewCustomEventWithName("test")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = db.InsertEvent(e)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	times, err = db.AllEventTimesByName("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(times) != 10 {
+		t.Fatal("Expected 10 events")
+	}
+	// Check they are assending
+	var priorTime = startTime.Add(-1 * time.Second) // start time is inclusive
+	for i, tm := range times {
+		if tm.Before(priorTime) {
+			t.Fatal("Expected events in ascending order. Got ", tm, " before ", priorTime, " for event ", i)
+		}
+		if startTime.Sub(tm).Abs() > time.Second {
+			t.Fatal("Expected events within 1 second of start time. Got ", tm, " for event ", i)
+		}
+		priorTime = tm
 	}
 }

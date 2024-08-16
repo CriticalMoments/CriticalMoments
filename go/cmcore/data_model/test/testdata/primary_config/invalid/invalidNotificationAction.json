@@ -1,0 +1,14 @@
+{
+    "configVersion": "v1",
+    "appId": "io.criticalmoments.demo",
+    "notifications": {
+        "testNotification": {
+            "title": "Notification title",
+            "body": "Notification body",
+            "tapActionName": "action_does_not_exist",
+            "deliveryTime": {
+              "eventName": "some_event"
+            }
+        }
+    }
+}

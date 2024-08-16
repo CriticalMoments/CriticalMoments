@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <UIKit/UIKit.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class CMDemoScreen;
@@ -54,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addSection:(NSString *)section withActions:(NSArray<CMDemoAction *> *)actions;
 - (void)addActionToRootSection:(CMDemoAction *)action;
+- (void)didAppear:(UIViewController *)vc;
 
 @end
 

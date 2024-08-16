@@ -82,7 +82,7 @@
         }
 
         // The avg center point of all the samples should be close(ish) to start, as noise should average out.
-        // This ensures we're not always going in the same fixed direction, which would be reversable.
+        // This ensures we're not always going in the same fixed direction, which would be reversible.
         double avgLat = totalLat / (double)(locationsPerRun);
         double avgLong = totalLong / (double)(locationsPerRun);
         CLLocation *avgNoisedLocation = [[CLLocation alloc] initWithLatitude:avgLat longitude:avgLong];
@@ -98,7 +98,7 @@
     // it.
     XCTAssert(diffFromExpected < (0.05 * amountOfNoise) && diffFromExpected > (-0.05 * amountOfNoise));
 
-    // Confirm that on average, the center point of ther noised samples is close to the point we're starting with
+    // Confirm that on average, the center point of there noised samples is close to the point we're starting with
     // This is probalistic, but with n=150k shouldn't really fail. If it fails 1 our of a thousands times don't sweat
     // it.
     XCTAssert(totalAvgOffsets / (double)totalLocations < amountOfNoise * 0.1);

@@ -1,0 +1,33 @@
+{
+  "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
+  "notifications": {
+    "event1Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event1",
+        "eventOffsetSeconds": 300
+      },
+      "idealDeliveryConditions": {
+          "condition": "false",
+          "maxWaitTimeSeconds": 86400
+      },
+      "deliveryTimeOfDayStart": "15:00",
+      "deliveryTimeOfDayEnd": "23:59"
+    },
+    "event2Notification": {
+      "title": "title",
+      "body": "body",
+      "deliveryTime": {
+        "eventName": "event2",
+        "eventOffsetSeconds": 300,
+        "eventInstance": "first"
+      },
+      "idealDeliveryConditions": {
+          "condition": "false",
+          "maxWaitTimeSeconds": 86400
+      }
+    }
+  }
+}

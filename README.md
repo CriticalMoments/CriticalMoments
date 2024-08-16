@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml" target="_blank"><img src="https://github.com/CriticalMoments/CriticalMoments/actions/workflows/test_release.yml/badge.svg" alt="Release Tests"></a>
-  <a href="https://github.com/CriticalMoments/CriticalMoments/blob/main/test_count.sh"><img src="https://img.shields.io/badge/Test_Case_Count-2190-brightgreen?logo=github&labelColor=32383f&logoColor=969da4" alt="Test Case Count" /></a>
+  <a href="https://github.com/CriticalMoments/CriticalMoments/blob/main/test_count.sh"><img src="https://img.shields.io/badge/Test_Case_Count-2533-brightgreen?logo=github&labelColor=32383f&logoColor=969da4" alt="Test Case Count" /></a>
 </p>
 
 <p align="center">
