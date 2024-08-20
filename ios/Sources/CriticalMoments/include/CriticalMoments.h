@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  Initializtion that should be performed before calling start:
 
  - Set critical moments API key (required)
- - Set critical moments config URLs (required). See setDevelopmentConfigUrl: and setReleaseConfigUrl:
+ - Set critical moments config URLs (required). See setDevelopmentConfigName: and setReleaseConfigUrl:
  - Setup a default theme from code (optional). Can also be done through config.
  or not at all.
  */
