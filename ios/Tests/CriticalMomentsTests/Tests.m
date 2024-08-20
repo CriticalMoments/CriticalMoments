@@ -511,4 +511,22 @@
     return cm;
 }
 
+- (void)testConfigEscaping {
+    // https://github.com/CriticalMoments/CriticalMoments/issues/110
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    [cm disableUserNotifications];
+    NSBundle *testBundle = [NSBundle bundleForClass:self.class];
+    NSURL *resourceBundleId =
+        [testBundle.bundleURL URLByAppendingPathComponent:@"CriticalMoments_CriticalMomentsTests.bundle"];
+    NSBundle *resourceBundle = [NSBundle bundleWithURL:resourceBundleId];
+
+    BOOL success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/testConfig.json" fromBundle:resourceBundle];
+    XCTAssert(success, @"Existing config file should be found");
+    success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/fakeConfig.json" fromBundle:resourceBundle];
+    XCTAssert(!success, @"Non existent config file should be not found");
+    success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/testConfig withspace.json"
+                                           fromBundle:resourceBundle];
+    XCTAssert(success, @"Existing config file with charaters to escape should be found");
+}
+
 @end

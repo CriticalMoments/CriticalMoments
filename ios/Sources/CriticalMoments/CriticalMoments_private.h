@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Internal only -- use start in product
 - (NSError *)startReturningError;
 
+// Internal only
+- (BOOL)setDevelopmentConfigNameWithSuccess:(NSString *)configFileName fromBundle:(NSBundle *_Nullable)bundle;
+
 // Internal only -- for testing and built in event
 - (void)sendEvent:(NSString *)eventName
           builtIn:(bool)builtIn

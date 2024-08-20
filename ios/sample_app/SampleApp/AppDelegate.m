@@ -37,7 +37,8 @@
 #endif
 
     [CriticalMoments.sharedInstance setDevelopmentConfigName:@"config.json"];
-    NSString *webBasedConfigUrl = @"https://storage.googleapis.com/critical-moments-test-cases/sampleAppTestConfig.cmconfig";
+    NSString *webBasedConfigUrl =
+        @"https://storage.googleapis.com/critical-moments-test-cases/sampleAppTestConfig.cmconfig";
     [CriticalMoments.sharedInstance setReleaseConfigUrl:webBasedConfigUrl];
     [CriticalMoments.sharedInstance start];
 

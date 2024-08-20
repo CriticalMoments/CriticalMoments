@@ -256,10 +256,24 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)setDevelopmentConfigName:(NSString *)configFileName {
+    BOOL success = [self setDevelopmentConfigNameWithSuccess:configFileName fromBundle:nil];
+    if (!success) {
+        os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: unable to find config file: %@", configFileName);
+    }
+}
+
+- (BOOL)setDevelopmentConfigNameWithSuccess:(NSString *)configFileName fromBundle:(NSBundle *_Nullable)bundle {
+    if (!bundle) {
+        bundle = NSBundle.mainBundle;
+    }
     NSString *extension = [configFileName pathExtension];
     NSString *resourceName = [configFileName stringByDeletingPathExtension];
-    NSURL *localConfigUrl = [[NSBundle mainBundle] URLForResource:resourceName withExtension:extension];
-    [self setDevelopmentConfigUrl:localConfigUrl.absoluteString];
+    NSURL *localConfigUrl = [bundle URLForResource:resourceName withExtension:extension];
+    if (!localConfigUrl) {
+        return false;
+    }
+    [self setDevelopmentConfigUrl:localConfigUrl.path];
+    return true;
 }
 
 - (void)setDevelopmentConfigUrl:(NSString *)urlString {
