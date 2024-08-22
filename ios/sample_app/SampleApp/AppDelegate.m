@@ -37,8 +37,8 @@
 #endif
 
     [CriticalMoments.sharedInstance setDevelopmentConfigName:@"config.json"];
-    NSString *webBasedConfigUrl =
-        @"https://storage.googleapis.com/critical-moments-test-cases/sampleAppTestConfig.cmconfig";
+    // Deployed via github pages. Manually build using sign_sample_app_config.sh, then merge that to the docs branch
+    NSString *webBasedConfigUrl = @"https://criticalmoments.github.io/CriticalMoments/sample_app_config.cmconfig";
     [CriticalMoments.sharedInstance setReleaseConfigUrl:webBasedConfigUrl];
     [CriticalMoments.sharedInstance start];
 
