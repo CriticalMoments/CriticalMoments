@@ -23,7 +23,7 @@ defaults:
 
 jobs:
   # Build job
-  build_docs_and_config:
+  build:
     runs-on: macos-14
     env:
       JSON_CONFIG: './ios/sample_app/SampleApp/config.json'
