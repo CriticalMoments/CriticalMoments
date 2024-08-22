@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a criticalmoments.io config file to GitHub Pages (including signing)
-name: Deploy Critical Moments config to Github Pages
+name: Deploy docs and config to Github Pages
 
 # TODO specific branch like docs_release
 on: push
@@ -26,7 +26,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      JSON_CONFIG: 'ios/sample_app/SampleApp/config.json'
+      JSON_CONFIG: './ios/sample_app/SampleApp/config.json'
       SIGNED_NAME: 'cmConfigSigned.cmconfig'
     steps:
       - name: Checkout
@@ -39,7 +39,7 @@ jobs:
       - name: Sign Config File
         run: |
           mkdir -p public && \
-          status_code=$(curl -s -X POST --data-binary @${JSON_CONFIG} -w "%{response_code}" --header "Content-Type: application/json" https://criticalmoments.io/account/api/sign_config -o ./public/${SIGNED_NAME}) && \
+          status_code=$(curl -s -X POST --data-binary @"${JSON_CONFIG}" -w "%{response_code}" --header "Content-Type: application/json" https://criticalmoments.io/account/api/sign_config -o ./public/${SIGNED_NAME}) && \
           if [ $status_code != "200" ]; then echo "Error signing config: $status_code"; cat ./public/${SIGNED_NAME}; exit 1; fi
 
       - name: Install Jazzy
