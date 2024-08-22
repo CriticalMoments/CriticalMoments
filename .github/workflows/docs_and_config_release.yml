@@ -26,7 +26,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      JSON_CONFIG: 'config.json'
+      JSON_CONFIG: 'ios/sample_app/SampleApp/config.json'
       SIGNED_NAME: 'cmConfigSigned.cmconfig'
     steps:
       - name: Checkout
