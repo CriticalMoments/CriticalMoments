@@ -1,0 +1,66 @@
+# Sample workflow for building and deploying a criticalmoments.io config file to GitHub Pages (including signing)
+name: Deploy Critical Moments config to Github Pages
+
+# TODO specific branch like docs_release
+on: push
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# Default to bash
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    env:
+      JSON_CONFIG: 'config.json'
+      SIGNED_NAME: 'cmConfigSigned.cmconfig'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Sign Config File
+        run: |
+          mkdir -p public && \
+          status_code=$(curl -s -X POST --data-binary @${JSON_CONFIG} -w "%{response_code}" --header "Content-Type: application/json" https://criticalmoments.io/account/api/sign_config -o ./public/${SIGNED_NAME}) && \
+          if [ $status_code != "200" ]; then echo "Error signing config: $status_code"; cat ./public/${SIGNED_NAME}; exit 1; fi
+
+      - name: Install Jazzy
+        run: gem install jazzy
+
+      - name: Build Docs
+        run: jazzy -o public
+
+      - name: Upload Github Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
