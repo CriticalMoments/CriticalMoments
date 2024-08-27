@@ -272,7 +272,8 @@ static CriticalMoments *sharedInstance = nil;
     if (!localConfigUrl) {
         return false;
     }
-    [self setDevelopmentConfigUrl:localConfigUrl.path];
+    NSString *filePath = [NSString stringWithFormat:@"file://%@", localConfigUrl.path];
+    [self setDevelopmentConfigUrl:filePath];
     return true;
 }
 
