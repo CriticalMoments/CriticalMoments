@@ -338,7 +338,11 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)checkNamedCondition:(NSString *)name handler:(void (^)(bool, NSError *_Nullable))handler {
-    __block void (^blockHandler)(bool result, NSError *_Nullable error) = handler;
+    [self checkNamedCondition:name completionHandler:handler];
+}
+
+- (void)checkNamedCondition:(NSString *)name completionHandler:(void (^_Nonnull)(bool, NSError *_Nullable))result {
+    __block void (^blockHandler)(bool result, NSError *_Nullable error) = result;
     __block NSString *blockName = name;
     dispatch_async(_actionQueue, ^{
       NSError *error;
@@ -390,30 +394,54 @@ static CriticalMoments *sharedInstance = nil;
 #pragma mark Custom Properties
 
 - (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error {
-    [_appcore registerClientStringProperty:name value:value error:error];
+    [self setStringProperty:value forKey:name error:error];
+}
+
+- (BOOL)setStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error {
+    return [_appcore registerClientStringProperty:name value:value error:error];
 }
 
 - (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
-    [_appcore registerClientBoolProperty:name value:value error:error];
+    [self setBoolProperty:value forKey:name error:error];
+}
+
+- (BOOL)setBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    return [_appcore registerClientBoolProperty:name value:value error:error];
 }
 
 - (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
-    [_appcore registerClientFloatProperty:name value:value error:error];
+    [self setFloatProperty:value forKey:name error:error];
+}
+
+- (BOOL)setFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    return [_appcore registerClientFloatProperty:name value:value error:error];
 }
 
 - (void)registerIntegerProperty:(long long)value
                          forKey:(NSString *)name
                           error:(NSError *_Nullable __autoreleasing *)error {
-    [_appcore registerClientIntProperty:name value:value error:error];
+    [self setIntegerProperty:value forKey:name error:error];
+}
+
+- (BOOL)setIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    return [_appcore registerClientIntProperty:name value:value error:error];
 }
 
 - (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
+    [self setTimeProperty:value forKey:name error:error];
+}
+
+- (BOOL)setTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error {
     int64_t goTime = [CMUtils dateToGoTime:value];
-    [_appcore registerClientTimeProperty:name value:goTime error:error];
+    return [_appcore registerClientTimeProperty:name value:goTime error:error];
 }
 
 - (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
-    [_appcore registerClientPropertiesFromJson:jsonData error:error];
+    [self setPropertiesFromJson:jsonData error:error];
+}
+
+- (BOOL)setPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error {
+    return [_appcore registerClientPropertiesFromJson:jsonData error:error];
 }
 
 #pragma mark Current Theme
