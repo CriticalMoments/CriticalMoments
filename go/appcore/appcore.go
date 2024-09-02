@@ -559,38 +559,21 @@ func (ac *Appcore) SetLogEvents(logEvents bool) {
 	ac.eventManager.logEvents = logEvents
 }
 
-var errRegisterAfterStart = errors.New("Appcore already started. Properties must be registered before starting")
-
 // Repeitive, but gomobile doesn't allow for `interface{}`
 // Panic catching is one level down stack here, but still there.
 func (ac *Appcore) RegisterStaticStringProperty(key string, value string) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticIntProperty(key string, value int) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticFloatProperty(key string, value float64) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticBoolProperty(key string, value bool) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerStaticProperty(key, value)
 }
 func (ac *Appcore) RegisterStaticTimeProperty(key string, value int64) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	if value == LibPropertyProviderNilIntValue {
 		return ac.propertyRegistry.registerStaticProperty(key, nil)
 	}
@@ -598,33 +581,18 @@ func (ac *Appcore) RegisterStaticTimeProperty(key string, value int64) error {
 	return ac.propertyRegistry.registerStaticProperty(key, timeVal)
 }
 func (ac *Appcore) RegisterClientStringProperty(key string, value string) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
 }
 func (ac *Appcore) RegisterClientIntProperty(key string, value int) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
 }
 func (ac *Appcore) RegisterClientFloatProperty(key string, value float64) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
 }
 func (ac *Appcore) RegisterClientBoolProperty(key string, value bool) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerClientProperty(key, value)
 }
 func (ac *Appcore) RegisterClientTimeProperty(key string, value int64) error {
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	if value == LibPropertyProviderNilIntValue {
 		return ac.propertyRegistry.registerClientProperty(key, nil)
 	}
@@ -640,9 +608,6 @@ func (ac *Appcore) RegisterLibPropertyProvider(key string, dpp LibPropertyProvid
 		}
 	}()
 
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerLibPropertyProvider(key, dpp)
 }
 
@@ -654,9 +619,6 @@ func (ac *Appcore) RegisterClientPropertiesFromJson(jsonData []byte) (returnErr 
 		}
 	}()
 
-	if ac.started {
-		return errRegisterAfterStart
-	}
 	return ac.propertyRegistry.registerClientPropertiesFromJson(jsonData)
 }
 

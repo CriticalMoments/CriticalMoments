@@ -363,7 +363,6 @@
 
 - (void)testRegisteringProperties {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
-    NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     // Registering built in properties should fail
     NSError *error;
@@ -399,26 +398,35 @@
 
     [self startCMForTest:cm];
 
-    // registering after start should error
-    success = [cm setStringProperty:@"hello" forKey:@"stringy2" error:&error];
-    XCTAssert(!success && error, @"allowed registration after start");
-
     // Fetching set properties should work (both short and long form accessors)
-    XCTestExpectation *wait = [[XCTestExpectation alloc] init];
-    [expectations addObject:wait];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
     [cm checkInternalTestCondition:
             @"user_signup_date == unixTimeSeconds(1698093984) && stringy =='hello' && custom_stringy "
             @"== 'hello' && "
-            @"stringy2 == nil && js == 'a' && jb == true && jn == 3.3 && referral_source == 'test_source' && "
+            @"set_after == nil && js == 'a' && jb == true && jn == 3.3 && referral_source == 'test_source' && "
             @"user_signed_in && user_referral_count == 42 && total_purchase_value == 3.14"
                            handler:^(bool result, NSError *_Nullable er2) {
                              XCTAssert(!er2, @"test condition errored");
                              XCTAssert(result, @"test condition false");
-                             [wait fulfill];
+                             [expectation fulfill];
+                           }];
+    // Wait as we have a race with setStringProperty below
+    [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+    // registering after start should work, and quering it should return updated value
+    success = [cm setStringProperty:@"hello" forKey:@"set_after" error:&error];
+    XCTAssert(success && !error, @"allowed registration after start");
+
+    XCTestExpectation *waitRegisterAfter = [[XCTestExpectation alloc] init];
+    [cm checkInternalTestCondition:@"set_after == 'hello'"
+                           handler:^(bool result, NSError *_Nullable er2) {
+                             XCTAssert(!er2, @"test condition errored");
+                             XCTAssert(result, @"test condition false");
+                             [waitRegisterAfter fulfill];
                            }];
 
     // Both should have run, and returned correct results
-    [self waitForExpectations:expectations timeout:5.0];
+    [self waitForExpectations:@[ waitRegisterAfter ] timeout:5.0];
 }
 
 - (void)testRegisteringPropertiesLegacy {
@@ -458,10 +466,6 @@
     XCTAssertNil(error, @"failed to register json properties");
 
     [self startCMForTest:cm];
-
-    // registering after start should error
-    [cm registerStringProperty:@"hello" forKey:@"stringy2" error:&error];
-    XCTAssertNotNil(error, @"allowed registration after start");
 
     // Fetching set properties should work (both short and long form accessors)
     XCTestExpectation *wait = [[XCTestExpectation alloc] init];
