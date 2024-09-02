@@ -363,6 +363,74 @@
 
 - (void)testRegisteringProperties {
     CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+
+    // Registering built in properties should fail
+    NSError *error;
+    BOOL success = [cm setStringProperty:@"hello" forKey:@"platform" error:&error];
+    XCTAssert(!success && error != nil, @"did not error on built in property");
+    error = nil;
+
+    // Register well known property with wrong type should fail
+    success = [cm setStringProperty:@"hello" forKey:@"user_signup_date" error:&error];
+    XCTAssert(!success && error, @"did not error on type missmatch");
+    error = nil;
+
+    // Register well known property with correct type should work, each type
+    NSDate *signupDate = [NSDate dateWithTimeIntervalSince1970:1698093984];
+    success = [cm setTimeProperty:signupDate forKey:@"user_signup_date" error:&error];
+    XCTAssert(success && !error, @"failed to register well known property");
+    success = [cm setStringProperty:@"test_source" forKey:@"referral_source" error:&error];
+    XCTAssert(success && !error, @"failed to register well known property");
+    success = [cm setBoolProperty:true forKey:@"user_signed_in" error:&error];
+    XCTAssert(success && !error, @"failed to register well known property");
+    success = [cm setIntegerProperty:42 forKey:@"user_referral_count" error:&error];
+    XCTAssert(success && !error, @"failed to register well known property");
+    success = [cm setFloatProperty:3.14 forKey:@"total_purchase_value" error:&error];
+    XCTAssert(success && !error, @"failed to register well known property");
+
+    // Registering custom propety should work
+    success = [cm setStringProperty:@"hello" forKey:@"stringy" error:&error];
+    XCTAssert(success && !error, @"failed to register custom property");
+
+    NSString *jsonString = @"{\"js\": \"a\", \"jb\": true, \"jn\": 3.3}";
+    success = [cm setPropertiesFromJson:[jsonString dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+    XCTAssert(success && !error, @"failed to register json properties");
+
+    [self startCMForTest:cm];
+
+    // Fetching set properties should work (both short and long form accessors)
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] init];
+    [cm checkInternalTestCondition:
+            @"user_signup_date == unixTimeSeconds(1698093984) && stringy =='hello' && custom_stringy "
+            @"== 'hello' && "
+            @"set_after == nil && js == 'a' && jb == true && jn == 3.3 && referral_source == 'test_source' && "
+            @"user_signed_in && user_referral_count == 42 && total_purchase_value == 3.14"
+                           handler:^(bool result, NSError *_Nullable er2) {
+                             XCTAssert(!er2, @"test condition errored");
+                             XCTAssert(result, @"test condition false");
+                             [expectation fulfill];
+                           }];
+    // Wait as we have a race with setStringProperty below
+    [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+    // registering after start should work, and quering it should return updated value
+    success = [cm setStringProperty:@"hello" forKey:@"set_after" error:&error];
+    XCTAssert(success && !error, @"allowed registration after start");
+
+    XCTestExpectation *waitRegisterAfter = [[XCTestExpectation alloc] init];
+    [cm checkInternalTestCondition:@"set_after == 'hello'"
+                           handler:^(bool result, NSError *_Nullable er2) {
+                             XCTAssert(!er2, @"test condition errored");
+                             XCTAssert(result, @"test condition false");
+                             [waitRegisterAfter fulfill];
+                           }];
+
+    // Both should have run, and returned correct results
+    [self waitForExpectations:@[ waitRegisterAfter ] timeout:5.0];
+}
+
+- (void)testRegisteringPropertiesLegacy {
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
     NSMutableArray<XCTestExpectation *> *expectations = [[NSMutableArray alloc] init];
 
     // Registering built in properties should fail
@@ -398,10 +466,6 @@
     XCTAssertNil(error, @"failed to register json properties");
 
     [self startCMForTest:cm];
-
-    // registering after start should error
-    [cm registerStringProperty:@"hello" forKey:@"stringy2" error:&error];
-    XCTAssertNotNil(error, @"allowed registration after start");
 
     // Fetching set properties should work (both short and long form accessors)
     XCTestExpectation *wait = [[XCTestExpectation alloc] init];
@@ -509,6 +573,24 @@
     CriticalMoments *cmShared = [CriticalMoments shared];
     XCTAssertEqual(cm, cmShared, @"shared instance mismatch");
     return cm;
+}
+
+- (void)testConfigEscaping {
+    // https://github.com/CriticalMoments/CriticalMoments/issues/110
+    CriticalMoments *cm = [[CriticalMoments alloc] initInternal];
+    [cm disableUserNotifications];
+    NSBundle *testBundle = [NSBundle bundleForClass:self.class];
+    NSURL *resourceBundleId =
+        [testBundle.bundleURL URLByAppendingPathComponent:@"CriticalMoments_CriticalMomentsTests.bundle"];
+    NSBundle *resourceBundle = [NSBundle bundleWithURL:resourceBundleId];
+
+    BOOL success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/testConfig.json" fromBundle:resourceBundle];
+    XCTAssert(success, @"Existing config file should be found");
+    success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/fakeConfig.json" fromBundle:resourceBundle];
+    XCTAssert(!success, @"Non existent config file should be not found");
+    success = [cm setDevelopmentConfigNameWithSuccess:@"TestResources/testConfig withspace.json"
+                                           fromBundle:resourceBundle];
+    XCTAssert(success, @"Existing config file with charaters to escape should be found");
 }
 
 @end

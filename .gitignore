@@ -2,6 +2,7 @@
  #
  # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+ios/sample_app/build_local_appcore
 **/.DS_Store
 
 .vscode

@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  Initializtion that should be performed before calling start:
 
  - Set critical moments API key (required)
- - Set critical moments config URLs (required). See setDevelopmentConfigUrl: and setReleaseConfigUrl:
+ - Set critical moments config URLs (required). See setDevelopmentConfigName: and setReleaseConfigUrl:
  - Setup a default theme from code (optional). Can also be done through config.
  or not at all.
  */
@@ -120,6 +120,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Feature Flags / Named Conditions
 
+/// :nodoc: Our old format. Renamed the selectors for swift async bindings.
+- (void)checkNamedCondition:(NSString *_Nonnull)name
+                    handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+
 /**
  Checks a named condition string, returning the result of evaluating it. The provided name is used to lookup a condition
 in the config file's namedConditions section.
@@ -132,14 +136,13 @@ the main thread, so be sure to dispatch to the main thread if calling into UI li
 
  @param name The name of this condition. Must be provided and can not be an empty string.
  The name is used as a lookup the condition-string of a namedCondition in the config file.
- @param handler A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occurred evaluating the condition. The boolean value is false for any error, including if the
-condition is not found in the config.
+ @param result Returns the boolean result of the condition evaluation. The boolean value is false for any error,
+including if the condition is not found in the config. Also returns/throws any errors occurred evaluating the condition.
  @warning Be sure to provide a unique name to each use case. Reusing names (even if the current conditional logic is
 currently equivalent) will make it impossible to override each usage independently from remote configuration.
  */
 - (void)checkNamedCondition:(NSString *_Nonnull)name
-                    handler:(void (^_Nonnull)(bool result, NSError *_Nullable error))handler;
+          completionHandler:(void (^_Nonnull)(bool result, NSError *_Nullable error))result;
 
 #ifdef IS_CRITICAL_MOMENTS_INTERNAL
 // Private, only for internal use (demo app/testing).
@@ -177,40 +180,60 @@ currently equivalent) will make it impossible to override each usage independent
 
 #pragma mark Properties
 
-/**
- Register a custom or well-known string property for use in the CM condition engine.
-
- @param value The property value
- @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
- @param error Any errors encountered setting the property
- */
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
 - (void)registerStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
 /**
- Register a custom or well-known integer (int64) property for use in the CM condition engine.
+ Set a custom or well-known string property for use in the CM condition engine.
 
  @param value The property value
  @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
  @param error Any errors encountered setting the property
+ @return True if call was successful. An error will be returned/thrown if false.
  */
+- (BOOL)setStringProperty:(NSString *)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
 - (void)registerIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
 
 /**
- Register a custom or well-known boolean property for use in the CM condition engine.
+ Set a custom or well-known integer (int64) property for use in the CM condition engine.
 
  @param value The property value
  @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
  @param error Any errors encountered setting the property
+ @return True if call was successful. An error will be returned/thrown if false.
  */
+- (BOOL)setIntegerProperty:(long long)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
 - (void)registerBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
 
 /**
- Register a custom or well-known floating point (double) property for use in the CM condition engine.
+ Set a custom or well-known boolean property for use in the CM condition engine.
 
  @param value The property value
  @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
  @param error Any errors encountered setting the property
+ @return True if call was successful. An error will be returned/thrown if false.
  */
+- (BOOL)setBoolProperty:(BOOL)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
 - (void)registerFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/**
+ Set a custom or well-known floating point (double) property for use in the CM condition engine.
+
+ @param value The property value
+ @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
+ @param error Any errors encountered setting the property
+ @return True if call was successful. An error will be returned/thrown if false.
+ */
+- (BOOL)setFloatProperty:(double)value forKey:(NSString *)name error:(NSError *_Nullable *)error;
+
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
+- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error;
 
 /**
  Register a custom or well-known timestamp property (NSDate) for use in the CM condition engine.
@@ -218,11 +241,15 @@ currently equivalent) will make it impossible to override each usage independent
  @param value The property value
  @param name The property key/name.  Can be used in conditions as "name" or "custom_name"
  @param error Any errors encountered setting the property
+ @return True if call was successful. An error will be returned/thrown if false.
  */
-- (void)registerTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error;
+- (BOOL)setTimeProperty:(NSDate *)value forKey:(NSString *)name error:(NSError *_Nullable __autoreleasing *)error;
+
+/// :nodoc: Old format. New format below to take advantage of swift bindings.
+- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
 /**
- Register a set of custom or well-known properties from JSON formatted data.
+ Set a set of custom or well-known properties from JSON formatted data.
 
  The JSON object should be a single level JSON object, with string keys and bool, string or number values.
 
@@ -234,8 +261,9 @@ currently equivalent) will make it impossible to override each usage independent
  @param jsonData The json data, in the format described above
  @param error Any errors encountered setting these properties. An error does not necessarily indicate that all fields
  failed, just that some field(s) failed.
+ @return True if call was successful. An error will be returned/thrown if false.
  */
-- (void)registerPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
+- (BOOL)setPropertiesFromJson:(NSData *)jsonData error:(NSError *_Nullable __autoreleasing *)error;
 
 #pragma mark Notifications
 
@@ -246,9 +274,10 @@ currently equivalent) will make it impossible to override each usage independent
  This API calls the system's requestAuthorizationWithOptions. If the user approves authorization, Critical Moments will
  schedule any queued notifications.
 
- @param completionHandler Optional. A handler to be called back immediately after permissions are granted or denied.
- `prompted` returns true if the user saw a permission prompt for this call, and false if the user had made the
- authorization decision in the past.
+ @param completionHandler Optional. In swift, return 2 values from an async call to this function.
+ This is returned after permissions are granted or denied in the prompt.
+ Returns two values. The first BOOL indicates if a permission prompt was shown. The second BOOL indicates if the user
+ allowed notifications.
  */
 - (void)requestNotificationPermissionWithCompletionHandler:
     (void (^_Nullable)(BOOL prompted, BOOL granted, NSError *__nullable error))completionHandler;
