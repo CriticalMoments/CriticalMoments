@@ -182,7 +182,7 @@ rendering when you call start.</p>
 
 <ul>
 <li>Set critical moments API key (required)</li>
-<li>Set critical moments config URLs (required). See setDevelopmentConfigUrl: and setReleaseConfigUrl:</li>
+<li>Set critical moments config URLs (required). See setDevelopmentConfigName: and setReleaseConfigUrl:</li>
 <li>Setup a default theme from code (optional). Can also be done through config.
 or not at all.</li>
 </ul>
@@ -583,9 +583,9 @@ builds. Disabled by default.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)checkNamedCondition:handler:"></a>
-                    <a name="//apple_ref/objc/Method/-checkNamedCondition:handler:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)checkNamedCondition:handler:">-checkNamedCondition:<wbr>handler:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)checkNamedCondition:completionHandler:"></a>
+                    <a name="//apple_ref/objc/Method/-checkNamedCondition:completionHandler:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)checkNamedCondition:completionHandler:">-checkNamedCondition:<wbr>completionHandler:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -614,13 +614,12 @@ currently equivalent) will make it impossible to override each usage independent
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
                           <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">checkNamedCondition</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">_Nonnull</span><span class="p">)</span><span class="nv">name</span>
-                    <span class="nf">handler</span><span class="p">:</span>
-                        <span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">_Nonnull</span><span class="p">)(</span><span class="kt">_Bool</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">))</span><span class="nv">handler</span><span class="p">;</span></code></pre>
+          <span class="nf">completionHandler</span><span class="p">:(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">_Nonnull</span><span class="p">)(</span><span class="kt">_Bool</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">))</span><span class="nv">result</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">handler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Bool</span><span class="p">,</span> <span class="p">(</span><span class="kd">any</span> <span class="kt">Error</span><span class="p">)?)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">checkNamedCondition</span><span class="p">(</span><span class="n">_</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">async</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -644,14 +643,13 @@ The name is used as a lookup the condition-string of a namedCondition in the con
                             <tr>
                               <td>
                                 <code>
-                                <em>handler</em>
+                                <em>result</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>A callback block which will be called async with the boolean result of the condition evaluation. It also
-returns any errors occurred evaluating the condition. The boolean value is false for any error, including if the
-condition is not found in the config.</p>
+                                  <p>Returns the boolean result of the condition evaluation. The boolean value is false for any error,
+including if the condition is not found in the config. Also returns/throws any errors occurred evaluating the condition.</p>
                                 </div>
                               </td>
                             </tr>
@@ -677,9 +675,9 @@ condition is not found in the config.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerStringProperty:forKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerStringProperty:forKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerStringProperty:forKey:error:">-registerStringProperty:<wbr>forKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setStringProperty:forKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setStringProperty:forKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setStringProperty:forKey:error:">-setStringProperty:<wbr>forKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -687,21 +685,21 @@ condition is not found in the config.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Register a custom or well-known string property for use in the CM condition engine.</p>
+                        <p>Set a custom or well-known string property for use in the CM condition engine.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerStringProperty</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">value</span>
-                        <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                         <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setStringProperty</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">value</span>
+                   <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+                    <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerStringProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setStringProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -748,15 +746,19 @@ condition is not found in the config.</p>
                           </tbody>
                         </table>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerIntegerProperty:forKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerIntegerProperty:forKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerIntegerProperty:forKey:error:">-registerIntegerProperty:<wbr>forKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setIntegerProperty:forKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setIntegerProperty:forKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setIntegerProperty:forKey:error:">-setIntegerProperty:<wbr>forKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -764,21 +766,21 @@ condition is not found in the config.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Register a custom or well-known integer (int64) property for use in the CM condition engine.</p>
+                        <p>Set a custom or well-known integer (int64) property for use in the CM condition engine.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerIntegerProperty</span><span class="p">:(</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="nv">value</span>
-                         <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                          <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setIntegerProperty</span><span class="p">:(</span><span class="kt">long</span> <span class="kt">long</span><span class="p">)</span><span class="nv">value</span>
+                    <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+                     <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerIntegerProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Int64</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setIntegerProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Int64</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -825,15 +827,19 @@ condition is not found in the config.</p>
                           </tbody>
                         </table>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerBoolProperty:forKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerBoolProperty:forKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerBoolProperty:forKey:error:">-registerBoolProperty:<wbr>forKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setBoolProperty:forKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setBoolProperty:forKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setBoolProperty:forKey:error:">-setBoolProperty:<wbr>forKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -841,21 +847,21 @@ condition is not found in the config.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Register a custom or well-known boolean property for use in the CM condition engine.</p>
+                        <p>Set a custom or well-known boolean property for use in the CM condition engine.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerBoolProperty</span><span class="p">:(</span><span class="n">BOOL</span><span class="p">)</span><span class="nv">value</span>
-                      <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                       <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setBoolProperty</span><span class="p">:(</span><span class="n">BOOL</span><span class="p">)</span><span class="nv">value</span>
+                 <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+                  <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerBoolProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setBoolProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -902,15 +908,19 @@ condition is not found in the config.</p>
                           </tbody>
                         </table>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerFloatProperty:forKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerFloatProperty:forKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerFloatProperty:forKey:error:">-registerFloatProperty:<wbr>forKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setFloatProperty:forKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setFloatProperty:forKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setFloatProperty:forKey:error:">-setFloatProperty:<wbr>forKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -918,21 +928,21 @@ condition is not found in the config.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Register a custom or well-known floating point (double) property for use in the CM condition engine.</p>
+                        <p>Set a custom or well-known floating point (double) property for use in the CM condition engine.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerFloatProperty</span><span class="p">:(</span><span class="kt">double</span><span class="p">)</span><span class="nv">value</span>
-                       <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                        <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setFloatProperty</span><span class="p">:(</span><span class="kt">double</span><span class="p">)</span><span class="nv">value</span>
+                  <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+                   <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerFloatProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setFloatProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -979,15 +989,19 @@ condition is not found in the config.</p>
                           </tbody>
                         </table>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerTimeProperty:forKey:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerTimeProperty:forKey:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerTimeProperty:forKey:error:">-registerTimeProperty:<wbr>forKey:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setTimeProperty:forKey:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setTimeProperty:forKey:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setTimeProperty:forKey:error:">-setTimeProperty:<wbr>forKey:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1002,14 +1016,14 @@ condition is not found in the config.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerTimeProperty</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="nv">value</span>
-                      <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
-                       <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setTimeProperty</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="nv">value</span>
+                 <span class="nf">forKey</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+                  <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerTimeProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Date</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setTimeProperty</span><span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Date</span><span class="p">,</span> <span class="n">forKey</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -1056,15 +1070,19 @@ condition is not found in the config.</p>
                           </tbody>
                         </table>
                       </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
+                      </div>
                     </section>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:objc(cs)CriticalMoments(im)registerPropertiesFromJson:error:"></a>
-                    <a name="//apple_ref/objc/Method/-registerPropertiesFromJson:error:" class="dashAnchor"></a>
-                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)registerPropertiesFromJson:error:">-registerPropertiesFromJson:<wbr>error:<wbr></a>
+                    <a name="/c:objc(cs)CriticalMoments(im)setPropertiesFromJson:error:"></a>
+                    <a name="//apple_ref/objc/Method/-setPropertiesFromJson:error:" class="dashAnchor"></a>
+                    <a class="token" href="#/c:objc(cs)CriticalMoments(im)setPropertiesFromJson:error:">-setPropertiesFromJson:<wbr>error:<wbr></a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -1072,7 +1090,7 @@ condition is not found in the config.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Register a set of custom or well-known properties from JSON formatted data.</p>
+                        <p>Set a set of custom or well-known properties from JSON formatted data.</p>
 
 <p>The JSON object should be a single level JSON object, with string keys and bool, string or number values.</p>
 
@@ -1086,13 +1104,13 @@ as possible.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Objective-C</p>
-                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">registerPropertiesFromJson</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">jsonData</span>
-                             <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
+                          <pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="n">BOOL</span><span class="p">)</span><span class="nf">setPropertiesFromJson</span><span class="p">:(</span><span class="n">nonnull</span> <span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">jsonData</span>
+                        <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">_Nullable</span> <span class="o">*</span><span class="n">_Nullable</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span></code></pre>
 
                         </div>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">registerProperties</span><span class="p">(</span><span class="n">fromJson</span> <span class="nv">jsonData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">NSErrorPointer</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">setPropertiesFromJson</span><span class="p">(</span><span class="n">_</span> <span class="nv">jsonData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>
@@ -1127,6 +1145,10 @@ failed, just that some field(s) failed.</p>
                             </tr>
                           </tbody>
                         </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True if call was successful. An error will be returned/thrown if false.</p>
                       </div>
                     </section>
                   </div>
@@ -1190,9 +1212,10 @@ schedule any queued notifications.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Optional. A handler to be called back immediately after permissions are granted or denied.
-<code>prompted</code> returns true if the user saw a permission prompt for this call, and false if the user had made the
-authorization decision in the past.</p>
+                                  <p>Optional. In swift, return 2 values from an async call to this function.
+This is returned after permissions are granted or denied in the prompt.
+Returns two values. The first BOOL indicates if a permission prompt was shown. The second BOOL indicates if the user
+allowed notifications.</p>
                                 </div>
                               </td>
                             </tr>
@@ -1210,7 +1233,7 @@ authorization decision in the past.</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2024 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2024-08-15)</p>
+      <p>&copy; 2024 <a class="link" href="https://criticalmoments.io" target="_blank" rel="external noopener">Critical Moments</a>. All rights reserved. (Last updated: 2024-09-02)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
     </section>
   </body>

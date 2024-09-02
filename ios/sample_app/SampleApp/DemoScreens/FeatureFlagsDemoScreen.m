@@ -69,7 +69,7 @@
                                             : @"Offer: Explore Caribbean Vacation Deals";
                       action.subtitle = @"Show different offers to "
                                         @"different users based on local weather. Caribbean when cold, and Europe when "
-                                        @"warm.\n\nCondition: (weather_approx_location_temperature > 10)";
+                                        @"warm.\n\nCondition: (weather_approx_location_temperature > 20)";
                       [self addSection:@"Live Weather Example" withActions:@[ action ]];
                     }];
 
