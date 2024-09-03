@@ -1203,3 +1203,14 @@ func TestNotificationAlreadyDeliveredTime(t *testing.T) {
 		t.Fatal("Expected nil delivery time and nil bgCheckTime")
 	}
 }
+
+func TestCallingUpdatePlanWithoutConfig(t *testing.T) {
+	ac := Appcore{}
+	err := ac.ForceUpdateNotificationPlan()
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if err.Error() != "notification plan not initialized" {
+		t.Fatal("Expected error")
+	}
+}

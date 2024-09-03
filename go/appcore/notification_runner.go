@@ -92,6 +92,9 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 }
 
 func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationPlan, error) {
+	if !ac.started || ac.config == nil {
+		return NotificationPlan{}, errors.New("notification plan not initialized")
+	}
 	plan := NotificationPlan{
 		unscheduledNotifications: make([]*datamodel.Notification, 0),
 		scheduledNotifications:   make([]*ScheduledNotification, 0),
