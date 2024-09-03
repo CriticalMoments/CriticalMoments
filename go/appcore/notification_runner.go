@@ -61,7 +61,12 @@ func (ac *Appcore) initializeNotificationPlan() error {
 	return nil
 }
 
+var errAcNotStarted = errors.New("appcore not started")
+
 func (ac *Appcore) ForceUpdateNotificationPlan() error {
+	if !ac.started || ac.config == nil {
+		return errAcNotStarted
+	}
 	plan, err := ac.generateNotificationPlan()
 	if err != nil {
 		return err
@@ -81,7 +86,7 @@ func (ac *Appcore) FetchNotificationPlan() (*NotificationPlan, error) {
 		return nil, err
 	}
 	if ac.notificationPlan == nil {
-		return nil, errors.New("notification plan not initialized")
+		return nil, errAcNotStarted
 	}
 	return ac.notificationPlan, nil
 }
