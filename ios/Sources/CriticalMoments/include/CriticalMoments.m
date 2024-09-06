@@ -13,6 +13,7 @@
 #import "../messaging/CMBannerManager.h"
 #import "../notifications/CMNotificationHandler.h"
 #import "../notifications/CMNotificationsDelegate.h"
+#import "../properties/CMPermissionsPropertyProvider.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMNotificationObserver.h"
@@ -593,6 +594,7 @@ static CriticalMoments *sharedInstance = nil;
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                      [CMBackgroundHandler devModeCheckBackgroundSetupCorrectly];
                      [CMNotificationsDelegate devModeCheckNotificationDelegateSetupCorrectly];
+                     [CMBluetoothPermissionsPropertyProvider devModeCheckBluetoothSetupCorrectly];
                    });
 }
 #endif

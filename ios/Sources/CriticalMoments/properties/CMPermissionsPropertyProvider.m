@@ -10,6 +10,7 @@
 @import UserNotifications;
 @import Contacts;
 @import CoreBluetooth;
+#import <os/log.h>
 
 @implementation CMNotificationPermissionsPropertyProvider
 
@@ -239,5 +240,22 @@ API_AVAILABLE(ios(14))
         return @"authorized";
     }
 }
+
+#ifdef DEBUG
+// Check everything is setup correctly, and log a warning if not.
+// Only compiled in debug mode, won't run on release builds.
++ (void)devModeCheckBluetoothSetupCorrectly {
+    // Check our 2 IDs are included in the app's Info.plist
+    // Don't simply error in callback because it isn't run on simulators, and we want devs to see this.
+    NSString *bluetoothUsageDescription =
+        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSBluetoothAlwaysUsageDescription"];
+    if (bluetoothUsageDescription.length == 0) {
+        os_log_error(OS_LOG_DEFAULT,
+                     "CriticalMoments: Setup Issue\nPlease set NSBluetoothAlwaysUsageDescription in your Info.plist "
+                     "file. See docs for details: https://docs.criticalmoments.io/quick-start#update-your-info.plist "
+                     "\n\nThis warning log is only in debug builds.");
+    }
+}
+#endif
 
 @end
