@@ -76,6 +76,7 @@
         @"app_state": @"app_state in ['active', 'inactive', 'background', 'unknown']", // add_test_count
         @"app_start_time": @"now() >= app_start_time && now() - duration('5m') < app_start_time", // add_test_count
         @"session_start_time": @"now() >= session_start_time && now() - duration('5m') < session_start_time", // add_test_count
+        @"is_debug_build": @"is_debug_build in [true, false]", // add_test_count
         
         // Audio
         @"has_headphones": @"has_headphones in [true,false]", // add_test_count

@@ -282,6 +282,10 @@ func (ac *Appcore) Start(allowDebugLoad bool) (returnErr error) {
 	if err != nil {
 		return err
 	}
+	err = ac.RegisterStaticBoolProperty("is_debug_build", allowDebugLoad)
+	if err != nil {
+		return err
+	}
 
 	if err := ac.propertyRegistry.validateProperties(); err != nil {
 		return err
