@@ -367,6 +367,9 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 		return err
 	}
 	ac.config = pc
+	if pc.ConfigVersion != "v1" {
+		fmt.Printf("CriticalMoments: the CM configVersion should be \"v1\". Was: \"%v\"\n", pc.ConfigVersion)
+	}
 	err = ac.postConfigSetup()
 	if err != nil {
 		return err
