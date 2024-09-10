@@ -19,6 +19,10 @@
 #import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
 
+#if DEBUG
+@import Foundation;
+#endif
+
 #import <UserNotifications/UserNotifications.h>
 #import <os/log.h>
 
@@ -100,6 +104,13 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
+#if DEBUG
+    // No need to start in SwiftUI preview mode, and it will break previews.
+    if ([@"1" isEqualToString:NSProcessInfo.processInfo.environment[@"XCODE_RUNNING_FOR_PREVIEWS"]]) {
+        return;
+    }
+#endif
+
     // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
     [self.notificationObserver start];
 
