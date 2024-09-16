@@ -10,7 +10,7 @@ jobs:
       with:
         go-version-file: 'go/go.mod'
         cache-dependency-path: go/go.sum
-    - uses: dominikh/staticcheck-action@v1.3.0
+    - uses: dominikh/staticcheck-action@v1.3.1
       with:
         working-directory: 'go'
         install-go: false
