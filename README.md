@@ -25,6 +25,14 @@ The **Mobile Growth** SDK.
 
 We’ve designed the [Critical Moments SDK](https://criticalmoments.io) to be the ultimate growth tool for iOS apps. Our goal is to automate tedious and repetitive growth tasks while providing powerful new growth tools.
 
+
+## Table of Contents
+1. [How It Works](#how-it-works-)
+2. [What Makes Critical Moments Special](#what-makes-critical-moments-special)
+3. [Quick Start](#quick-start-)
+4. [Demo App](#demo-app-)
+5. [Homepage, Docs, License & Copyright](#homepage-)
+
 ## How It Works 👩‍💻
 
 ### Step 1: Install our SDK
@@ -71,7 +79,7 @@ Critical Moments is designed from the ground up for user privacy. All logic is r
 
 *Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
 
-### Powerful Config-Based Growth Plans 📈
+### Powerful Config-Driven Growth Plans 📈
 
 Our growth config file format supports lets you build complex growth logic, entirely in config. Connect events in your app to messaging, notifications, paywalls, review prompts, and much more. Check for the perfect moment with conditions. Non-technical team members can contribute, without writing code. Update anytime your config anytime, without App Store updates. 
 
