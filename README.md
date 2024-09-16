@@ -47,7 +47,7 @@ Yes, really—a growth plan defined in JSON. Defining your growth plan in a conf
 - **Improve your app rating**: use our template to [ask users to rate you at the perfect moment](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), increasing your rating and rating volume.
 - **Optimize revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 targeting properties built-in](https://docs.criticalmoments.io/conditional-targeting/built-in-properties)
 - **In-app messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Make announcements with [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
-- **Smart feature flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can update based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties). 
+- **Smart feature flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can be updated based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties). 
 
 ### Step 3: Update Anytime, Without App Updates
 
@@ -81,11 +81,11 @@ Critical Moments is designed from the ground up for user privacy. All logic is r
 
 ### Powerful Config-Driven Growth Plans 📈
 
-Our growth config file format supports lets you build complex growth logic, entirely in config. Connect events in your app to messaging, notifications, paywalls, review prompts, and much more. Check for the perfect moment with conditions. Non-technical team members can contribute, without writing code. Update anytime your config anytime, without App Store updates. 
+Our growth config file format supports building complex growth logic, entirely in config. Connect events in your app to messaging, notifications, paywalls, review prompts, and much more. Check for the perfect moment with conditions. Non-technical team members can contribute, without writing code. Update anytime your config anytime, without App Store updates. 
 
 ### Local User-Engagement Database 📙
 
-Our SDK automatically starts building a on-device database of user actions. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
+Our SDK automatically starts building an on-device database of user actions. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
 
 ## Quick Start 🚀
 
