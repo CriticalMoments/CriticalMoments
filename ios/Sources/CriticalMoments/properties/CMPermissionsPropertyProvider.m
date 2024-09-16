@@ -110,6 +110,9 @@
     case CNAuthorizationStatusAuthorized:
         result = @"authorized";
         break;
+    case CNAuthorizationStatusLimited:
+        result = @"limited";
+        break;
     }
     return result;
 }
