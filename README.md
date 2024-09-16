@@ -91,6 +91,10 @@ Our SDK automatically starts building a on-device database of user actions. The 
 
 Read our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide to get up and running in minutes. 
 
+## Demo App 
+
+Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
+
 ## Homepage 🏠
 
 Check out our [homepage](https://criticalmoments.io) for information about Critical Moments, pricing, and account login.
@@ -98,10 +102,6 @@ Check out our [homepage](https://criticalmoments.io) for information about Criti
 ## Documentation 👩‍💻
 
 Check out our [documentation](https://docs.criticalmoments.io) for details on how to use Critical Moments.
-
-## Demo App 
-
-Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
 
 ## License
 
