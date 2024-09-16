@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+  <a href="https://docs.criticalmoments.io/quick-start"><strong>Quick Start</strong></a> •
   <a href="https://criticalmoments.io"><strong>Homepage</strong></a> •
   <a href="https://docs.criticalmoments.io"><strong>Documentation</strong></a> • 
   <a href="https://github.com/CriticalMoments/CriticalMoments/issues"><strong>Issues</strong></a>
@@ -21,7 +22,7 @@
 
 The **Mobile Growth** SDK. 
 
-We’ve designed the [Critical Moments SDK](https://criticalmoments.io) to be the ultimate growth tool for mobile apps. Our goal is to automate tedious and repetitive growth tasks while providing powerful new growth tools.
+We’ve designed the [Critical Moments SDK](https://criticalmoments.io) to be the ultimate growth tool for iOS apps. Our goal is to automate tedious and repetitive growth tasks while providing powerful new growth tools.
 
 ## How It Works 👩‍💻
 
@@ -88,6 +89,10 @@ Check out our [homepage](https://criticalmoments.io) for information about Criti
 ## Documentation 👩‍💻
 
 Check out our [documentation](https://docs.criticalmoments.io) for details on how to use Critical Moments.
+
+## Demo App 
+
+Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
 
 ## License
 
