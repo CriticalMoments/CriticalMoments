@@ -22,7 +22,7 @@ jobs:
       run: cd go && if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") | wc -l)" -gt 0 ]; then exit 1; fi && cd ..
 
     - name: Run clang-format style 
-      uses: jidicula/clang-format-action@v4.10.1
+      uses: jidicula/clang-format-action@v4.13.0
       with:
         clang-format-version: '13'
         check-path: 'ios'
