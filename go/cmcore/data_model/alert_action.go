@@ -90,29 +90,29 @@ func unpackAlertFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTy
 }
 
 func (a *AlertAction) Validate() bool {
-	return a.ValidateReturningUserReadableIssue() == ""
+	return a.ValidateReturningUserReadableIssue() == nil
 }
 
-func (a *AlertAction) ValidateReturningUserReadableIssue() string {
+func (a *AlertAction) ValidateReturningUserReadableIssue() *UserPresentableError {
 	if a.Title == "" && a.Message == "" {
-		return "Alerts must have a title and/or a message. Both can not be blank."
+		return NewUserPresentableError("Alerts must have a title and/or a message. Both can not be blank.")
 	}
 	if !slices.Contains(alertStyles, a.Style) {
-		return "Alert style must be 'dialog' or 'large'"
+		return NewUserPresentableError("Alert style must be 'dialog' or 'large'")
 	}
 	if !a.ShowOkButton && a.OkButtonActionName != "" {
-		return "For an alert, the okay button is hidden via 'showOkButton:false' but an Ok action name is specified. Either show the okay button or remove the action."
+		return NewUserPresentableError("For an alert, the okay button is hidden via 'showOkButton:false' but an Ok action name is specified. Either show the okay button or remove the action.")
 	}
 	if !a.ShowOkButton && len(a.CustomButtons) == 0 {
-		return "Alert must have an ok button and/or custom buttons."
+		return NewUserPresentableError("Alert must have an ok button and/or custom buttons.")
 	}
 	for i, customButtom := range a.CustomButtons {
 		if customButtonIssue := customButtom.ValidateReturningUserReadableIssue(); customButtonIssue != "" {
-			return fmt.Sprintf("For an alert, button at index %v had issue \"%v\"", i, customButtonIssue)
+			return NewUserPresentableError(fmt.Sprintf("For an alert, button at index %v had issue \"%v\"", i, customButtonIssue))
 		}
 	}
 
-	return ""
+	return nil
 }
 
 func (b *AlertActionCustomButton) Validate() bool {
@@ -178,10 +178,9 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	}
 	a.CustomButtons = customButtons
 
-	if validationIssue := a.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+	if userReadableIssue := a.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
+		return userReadableIssue
 	}
-
 	return nil
 }
 

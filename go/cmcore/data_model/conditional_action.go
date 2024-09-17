@@ -28,21 +28,21 @@ func unpackConditionalActionFromJson(rawJson json.RawMessage, ac *ActionContaine
 }
 
 func (c *ConditionalAction) Validate() bool {
-	return c.ValidateReturningUserReadableIssue() == ""
+	return c.ValidateReturningUserReadableIssue() == nil
 }
 
-func (c *ConditionalAction) ValidateReturningUserReadableIssue() string {
+func (c *ConditionalAction) ValidateReturningUserReadableIssue() *UserPresentableError {
 	if c.Condition == nil {
-		return "Conditional actions must have a condition"
+		return NewUserPresentableError("Conditional actions must have a condition")
 	}
 	if err := c.Condition.Validate(); err != nil {
-		return fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition)
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition.conditionString), err)
 	}
 	if c.PassedActionName == "" {
-		return "Conditional actions must include a passedActionName to run if condition passes (failedActionName is optional)"
+		return NewUserPresentableError("Conditional actions must include a passedActionName to run if condition passes (failedActionName is optional)")
 	}
 
-	return ""
+	return nil
 }
 func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	var jc jsonConditionalAction
@@ -55,8 +55,8 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	c.PassedActionName = jc.PassedActionName
 	c.FailedActionName = jc.FailedActionName
 
-	if validationIssue := c.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+	if userErr := c.ValidateReturningUserReadableIssue(); userErr != nil {
+		return userErr
 	}
 
 	return nil

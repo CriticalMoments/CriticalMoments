@@ -6,8 +6,8 @@ type UnknownAction struct {
 	ActionType string
 }
 
-func (u *UnknownAction) ValidateReturningUserReadableIssue() string {
-	return ""
+func (u *UnknownAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+	return nil
 }
 
 func (u *UnknownAction) AllEmbeddedThemeNames() ([]string, error) {

@@ -71,7 +71,7 @@ type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
 	AllEmbeddedConditions() ([]*Condition, error)
-	ValidateReturningUserReadableIssue() string
+	ValidateReturningUserReadableIssue() *UserPresentableError
 	PerformAction(ab ActionBindings, actionName string) error
 }
 
@@ -122,23 +122,23 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (ac *ActionContainer) ValidateReturningUserReadableIssue() string {
+func (ac *ActionContainer) ValidateReturningUserReadableIssue() *UserPresentableError {
 	if ac.ActionType == "" {
-		return "Empty actionType not permitted"
+		return NewUserPresentableError("Empty actionType not permitted")
 	}
 	// Check the type hasn't been changed to something unsupported.
 	_, ok := actionTypeRegistry[ac.ActionType]
 	if !ok {
 		_, ok := ac.actionData.(*UnknownAction)
 		if !ok {
-			return "Internal error. Code 776232923."
+			return NewUserPresentableError("Internal error. Code 776232923.")
 		}
 	}
 
 	if ac.actionData == nil {
 		// the action type data interface should be set after unmarshaling.
 		// This is a code issue if it occurs, not a data issue
-		return fmt.Sprintf("Action type %v has internal issues", ac.ActionType)
+		return NewUserPresentableError(fmt.Sprintf("Action type %v has internal issues", ac.ActionType))
 	}
 
 	return ac.actionData.ValidateReturningUserReadableIssue()

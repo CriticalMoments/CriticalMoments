@@ -27,27 +27,29 @@ func unpackLinkFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTyp
 }
 
 func (l *LinkAction) Validate() bool {
-	return l.ValidateReturningUserReadableIssue() == ""
+	return l.ValidateReturningUserReadableIssue() == nil
 }
 
-func (l *LinkAction) ValidateReturningUserReadableIssue() string {
+func (l *LinkAction) ValidateReturningUserReadableIssue() *UserPresentableError {
 	if l.UrlString == "" {
-		return "Link actions must have a url"
+		return NewUserPresentableError("Link actions must have a url")
 	}
 	url, err := url.Parse(l.UrlString)
 	// We don't want to accept schemeless URLs ("/local/path")
 	// We do accept "Opaque" URLs as iOS uses this ("app-settings:root=Sounds") https://pkg.go.dev/net/url#URL
-	if err != nil || url == nil || url.Scheme == "" {
-		return fmt.Sprintf("Link action url string is not a valid URL: \"%v\"", l.UrlString)
+	if err != nil {
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Link action url string is not a valid URL: \"%v\"", l.UrlString), err)
+	} else if url == nil || url.Scheme == "" {
+		return NewUserPresentableError(fmt.Sprintf("Link action url string is not a valid URL: \"%v\"", l.UrlString))
 	}
 	// Embedded browser option only available for scheme http(s)
 	if l.UseEmbeddedBrowser {
 		if url.Scheme != "https" && url.Scheme != "http" {
-			return "For a link action, useEmbeddedBrowser is set to true, but the link is not a http/https link. Only web links can be opened in the embedded browser. Either disable useEmbeddedBrowser, or change the link to a web link."
+			return NewUserPresentableError("For a link action, useEmbeddedBrowser is set to true, but the link is not a http/https link. Only web links can be opened in the embedded browser. Either disable useEmbeddedBrowser, or change the link to a web link.")
 		}
 	}
 
-	return ""
+	return nil
 }
 
 func (l *LinkAction) UnmarshalJSON(data []byte) error {
@@ -66,10 +68,9 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 	l.UrlString = jl.UrlString
 	l.UseEmbeddedBrowser = useEmbeddedBrowser
 
-	if validationIssue := l.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+	if userReadableIssue := l.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
+		return userReadableIssue
 	}
-
 	return nil
 }
 
