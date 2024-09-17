@@ -45,6 +45,9 @@ type Appcore struct {
 	// Notifications
 	notificationPlan      *NotificationPlan
 	seenCancelationEvents map[string]*bool
+
+	// Developer mode
+	developerMode bool
 }
 
 func NewAppcore() *Appcore {
@@ -562,8 +565,10 @@ func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme)
 	return ac.config.ThemeWithName(themeName)
 }
 
-func (ac *Appcore) SetLogEvents(logEvents bool) {
-	ac.eventManager.logEvents = logEvents
+// TODO_P0: use this
+func (ac *Appcore) SetDeveloperMode(developerMode bool) {
+	ac.developerMode = developerMode
+	ac.eventManager.logEvents = developerMode
 }
 
 // Repeitive, but gomobile doesn't allow for `interface{}`
