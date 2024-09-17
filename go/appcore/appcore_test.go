@@ -882,7 +882,7 @@ func TestSetLogEvents(t *testing.T) {
 	if ac.eventManager.logEvents {
 		t.Fatal("logEvents should be false by default")
 	}
-	ac.SetLogEvents(true)
+	ac.SetDeveloperMode(true)
 	if !ac.eventManager.logEvents {
 		t.Fatal("logEvents should be true after setting")
 	}
