@@ -24,7 +24,7 @@ jobs:
     - name: Run clang-format style 
       uses: jidicula/clang-format-action@v4.13.0
       with:
-        clang-format-version: '13'
+        clang-format-version: '15'
         check-path: 'ios'
         fallback-style: 'WebKit'
         include-regex: '^.*\.((((c|C)(c|pp|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))|(ino|pde|proto|cu|m))$'
