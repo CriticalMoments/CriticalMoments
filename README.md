@@ -23,8 +23,8 @@
 
 The **Mobile Growth** SDK. 
 
-We’ve designed the [Critical Moments SDK](https://criticalmoments.io) to be the ultimate growth tool for iOS apps. Our goal is to automate tedious and repetitive growth tasks while providing powerful new growth tools.
-
+> 1) Automate tedious and repetitive growth tasks
+> 2) Provides powerful new growth tools
 
 ## Table of Contents
 1. [How It Works](#how-it-works-)
