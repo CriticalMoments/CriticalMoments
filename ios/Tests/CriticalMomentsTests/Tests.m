@@ -359,7 +359,9 @@
             XCTAssert(false, @"Code assumes EKAuthorizationStatusWriteOnly == 4 for SDK back compat");
         }
     }
+#endif
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 180000
     if (@available(iOS 18.0, *)) {
         if (CNAuthorizationStatusLimited != 4) {
             XCTAssert(false, @"Code assumes CNAuthorizationStatusLimited == 4");
