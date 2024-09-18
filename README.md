@@ -21,12 +21,12 @@
 
 # Critical Moments
 
-The **Mobile Growth** SDK. 
+Our **Mobile Growth SDK** is designed to: 
 
-> 1) Automate tedious and repetitive growth tasks
-> 2) Provide powerful new growth tools
+> 1) Automate tedious and repetitive growth tasks.
+> 2) Provide powerful new growth tools.
 
-## Overview
+## Overview 🔭
 
 - **Growth plans defined in JSON**: Push updates anytime without app store reviews. Make updates without writing new code. Proven templates to get you started.
 - **Rich Growth Features**: [smart notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), [app-reviews](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [paywall timing](https://criticalmoments.io/features/grow_revenue), [native modal UI](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [app-wide banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [smart-feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide), and [more](https://docs.criticalmoments.io/concepts-overview). 
@@ -42,7 +42,7 @@ The **Mobile Growth** SDK.
 5. [Quick Start](#quick-start-)
 6. [Demo App](#demo-app-)
 7. [Documentation](#documentation-)
-8. [License & Copyright](#license)
+8. [Contact Us, License & Copyright](#contact-us-)
 
 ## How It Works 👩‍💻
 
@@ -52,7 +52,7 @@ Install our SDK and integrate into your app following our [Quick-Start Guide](ht
 
 ### Step 2: Create your growth plan in JSON
 
-Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). Adding features can be done without additional code, and custom hooks are available if you want deeper integrations.
+Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). You can add features without any additional code, and if you want deeper integrations, custom hooks are available.
 
 Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications) to get started with ready-to-deploy and proven growth tactics. We're building a [growing library](https://criticalmoments.io/blog) of examples you can use for inspiration.
 
@@ -66,7 +66,7 @@ Once your initial growth plan is deployed, you can update anytime without waitin
 - **Improve your App Rating**: use our template to [ask users to rate your app at the perfect moment](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), increasing your rating and rating volume.
 - **Optimize Revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 built-in targeting properties](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
 - **In-app Messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Options include [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
-- **Smart Feature Flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can updated realtime based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
+- **Smart Feature Flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can be updated in real-time based on over [100 real-time device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
 - **Over The Air Updates**: Update your growth plan anytime [without app updates](https://docs.criticalmoments.io/remote-control-service). Quickly recover from unexpected bugs, outages, deprecations, and other critical events.
 
 
@@ -99,7 +99,7 @@ Our SDK automatically starts building an on-device database of user engagement h
 
 Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device. Read about our privacy architecture [here](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data).
 
-Note: Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
+Note: Some optional services like GeoIP location and weather require external services. These are clearly outlined in our docs. They are completely optional, do not collect user identifiers, and do not store logs long-term.
 
 ## Quick Start 🚀
 
@@ -117,11 +117,20 @@ Our [documentation](https://docs.criticalmoments.io) includes:
  - Guides for [increasing app ratings](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [reducing churn with notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), and [smart feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) 
  - [Detailed technical docs](https://docs.criticalmoments.io/concepts-overview)
 
-## License
+## Contact Us 👋
+
+We're here to help!
+
+Can't find an answer in our docs? Need help? Find a bug? Feel free to reach out!
+
+- Email: [support@criticalmoments.io](mailto:support@criticalmoments.io) 
+- Bug tracker: [GitHub Issues](https://github.com/CriticalMoments/CriticalMoments/issues)
+
+## License ⚖️
 
 Critical Moments requires you to purchase a license to use it in production apps. See our [pricing page](https://criticalmoments.io/pricing) for details. The code of the SDK is fully source-available, and in this repo.
 
-## Copyright
+## Copyright ©️
 
 Copyright (c) 2023 Chesterfield Laboratories Inc.
 
