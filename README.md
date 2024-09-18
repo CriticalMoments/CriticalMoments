@@ -52,7 +52,7 @@ Install our SDK and integrate into your app following our [Quick-Start Guide](ht
 
 ### Step 2: Create your growth plan in JSON
 
-Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). ou can add features without any additional code. If you want deeper integrations, custom hooks are available.
+Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). You can add features without any additional code. If you want deeper integrations, custom hooks are available.
 
 Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications) to get started with ready-to-deploy and proven growth tactics. We're building a [growing library](https://criticalmoments.io/blog) of examples you can use for inspiration.
 
