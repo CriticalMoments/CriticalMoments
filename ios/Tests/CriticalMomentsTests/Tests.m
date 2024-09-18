@@ -13,6 +13,7 @@
 #import "CriticalMoments.h"
 #import "CriticalMoments_private.h"
 @import EventKit;
+@import Contacts;
 #import "../../Sources/CriticalMoments/properties/CMLocationPropertyProvider.h"
 
 // This key is only valid for test bundle "com.apple.dt.xctest.tool"
@@ -356,6 +357,12 @@
 
         if (4 != EKAuthorizationStatusWriteOnly) {
             XCTAssert(false, @"Code assumes EKAuthorizationStatusWriteOnly == 4 for SDK back compat");
+        }
+    }
+
+    if (@available(iOS 18.0, *)) {
+        if (CNAuthorizationStatusLimited != 4) {
+            XCTAssert(false, @"Code assumes CNAuthorizationStatusLimited == 4");
         }
     }
 #endif

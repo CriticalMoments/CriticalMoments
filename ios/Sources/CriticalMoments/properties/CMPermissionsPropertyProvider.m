@@ -110,10 +110,13 @@
     case CNAuthorizationStatusAuthorized:
         result = @"authorized";
         break;
-    case CNAuthorizationStatusLimited:
+        // CNAuthorizationStatusLimited. Use constant to allow compiling without warnings on iOS < 18. Test case to
+        // ensure CNAuthorizationStatusLimited==4
+    case 4:
         result = @"limited";
         break;
     }
+
     return result;
 }
 
