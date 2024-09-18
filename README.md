@@ -32,7 +32,7 @@ The **Mobile Growth** SDK.
 - **Rich Growth Features**: [smart notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), [app-reviews](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [paywall timing](https://criticalmoments.io/features/grow_revenue), [native modal UI](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [app-wide banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [smart-feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide), and [more](https://docs.criticalmoments.io/concepts-overview). 
 - **Powerful Targeting**: deliver the [right action at the perfect moment](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) with over 100 built-in targeting properties. 
   - Example: `device_battery_level > 0.2 && eventCount('app_start') > 3 && app_install_date < now() - duration('24h') && photo_library_permission == 'authorized'`
-- [**Next Level Privacy**](#user-privacy-): 100% local, zero data collection
+- **Next Level Privacy**: [100% local, zero data collection](#user-privacy-)
 
 ## Table of Contents
 1. [How It Works](#how-it-works-)
@@ -111,7 +111,11 @@ Want to see Critical Moments in action? Download our [demo app from TestFlight](
 
 ## Documentation 👩‍💻
 
-Check out our [documentation](https://docs.criticalmoments.io) for details on how to use Critical Moments.
+Our [documentation](https://docs.criticalmoments.io) includes:
+
+ - [Quick Start Guide](https://docs.criticalmoments.io/quick-start)
+ - Guides for [increasing app ratings](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [reducing churn with notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), and [smart feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) 
+ - [Detailed technical docs](https://docs.criticalmoments.io/concepts-overview)
 
 ## License
 
