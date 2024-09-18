@@ -32,7 +32,7 @@ The **Mobile Growth** SDK.
 - **Powerful features**: [smart notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), [app-reviews](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [paywall timing](https://criticalmoments.io/features/grow_revenue), [native modal UI](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [app-wide banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [smart-feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide), and [more](https://docs.criticalmoments.io/concepts-overview). 
 - **Smart Targeting**: deliver the [right action at the perfect moment](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) with over 100 built-in targeting properties. 
   - Example: `device_battery_level > 0.2 && eventCount('app_start') > 3 && app_install_date < now() - duration('24h') && photo_library_permission == 'authorized'`
-- [**Next level privacy**](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data): 100% local, zero data collection
+- [**Next level privacy**](#user-privacy-): 100% local, zero data collection
 
 ## Table of Contents
 1. [How It Works](#how-it-works-)
@@ -94,7 +94,7 @@ Our SDK automatically starts building an on-device database of user engagement h
 
 ## User Privacy 🔑🔒
 
-Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device.
+Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device. Read about our privacy architecture [here](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data).
 
 Note: Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
 
