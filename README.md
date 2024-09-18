@@ -21,17 +21,28 @@
 
 # Critical Moments
 
-The **Mobile Growth** SDK. 
+Our **Mobile Growth SDK** is designed to: 
 
-We’ve designed the [Critical Moments SDK](https://criticalmoments.io) to be the ultimate growth tool for iOS apps. Our goal is to automate tedious and repetitive growth tasks while providing powerful new growth tools.
+> 1) Automate tedious and repetitive growth tasks.
+> 2) Provide powerful new growth tools.
 
+## Overview 🔭
+
+- **Growth plans defined in JSON**: Push updates anytime without app store reviews. Make updates without writing new code. Proven templates to get you started.
+- **Rich Growth Features**: [smart notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), [app-reviews](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [paywall timing](https://criticalmoments.io/features/grow_revenue), [native modal UI](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [app-wide banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [smart-feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide), and [more](https://docs.criticalmoments.io/concepts-overview). 
+- **Powerful Targeting**: deliver the [right action at the perfect moment](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) with over 100 built-in targeting properties. 
+  - Example: `device_battery_level > 0.2 && eventCount('app_start') > 3 && app_install_date < now() - duration('24h') && photo_library_permission == 'authorized'`
+- **Next Level Privacy**: [100% local, zero data collection](#user-privacy-)
 
 ## Table of Contents
 1. [How It Works](#how-it-works-)
-2. [What Makes Critical Moments Special](#what-makes-critical-moments-special)
-3. [Quick Start](#quick-start-)
-4. [Demo App](#demo-app-)
-5. [Homepage, Docs, License & Copyright](#homepage-)
+2. [Feature Overview](#feature-overview-)
+3. [Powerful Targeting](#powerful-targeting-)
+4. [User Privacy](#user-privacy-)
+5. [Quick Start](#quick-start-)
+6. [Demo App](#demo-app-)
+7. [Documentation](#documentation-)
+8. [Contact Us, License & Copyright](#contact-us-)
 
 ## How It Works 👩‍💻
 
@@ -41,28 +52,29 @@ Install our SDK and integrate into your app following our [Quick-Start Guide](ht
 
 ### Step 2: Create your growth plan in JSON
 
-Yes, really—a growth plan defined in JSON. Defining your growth plan in a config file allows you to update it over the air without app updates, deploy new growth tools without new code, change targeting logic anytime, and easily use our [growing library](https://criticalmoments.io/blog) of pre-defined and proven growth tactics. 
+Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). ou can add features without any additional code. If you want deeper integrations, custom hooks are available.
 
-- **Add notifications**: we have templates to [increase activation](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#increase-activation-rate), [reduce churn](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#reduce-long-term-churn), and [custom notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#step-5-add-custom-notification) 
-- **Improve your app rating**: use our template to [ask users to rate you at the perfect moment](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), increasing your rating and rating volume.
-- **Optimize revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 targeting properties built-in](https://docs.criticalmoments.io/conditional-targeting/built-in-properties)
-- **In-app messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Make announcements with [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
-- **Smart feature flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can be updated based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties). 
+Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications) to get started with ready-to-deploy and proven growth tactics. We're building a [growing library](https://criticalmoments.io/blog) of examples you can use for inspiration.
 
 ### Step 3: Update Anytime, Without App Updates
 
-Once your initial growth plan is deployed, you can update anytime without app updates. This helps in a number of ways:
+Once your initial growth plan is deployed, you can update anytime without waiting for app reviews or App Store updates. Add growth features without new code, anytime, over the air. Update and tune your user targeting logic, including in past app releases.
 
-- [Disaster Recovery](https://criticalmoments.io/features/disaster_recovery): Quickly recover from unexpected bugs, outages, deprecations, and other critical events without negative reviews
-- Deploy new growth tactics without additional engineering work, and outside app-release cycles
-- Make targeted announcements like pricing changes and legal updates with [in-app messaging](https://criticalmoments.io/features/in_app_messaging)
-- Encourage any users on outdated or buggy releases to update their app
+## Feature Overview 🔧
 
-## What Makes Critical Moments Special?
+- **Notifications**:  Our [smart notifications](https://criticalmoments.io/features/notifications) target delivery to the perfect moment, considering realtime device condition. Start with our templates to [increase activation](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#increase-activation-rate), [reduce churn](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#reduce-long-term-churn), and [custom notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#step-5-add-custom-notification).
+- **Improve your App Rating**: use our template to [ask users to rate your app at the perfect moment](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), increasing your rating and rating volume.
+- **Optimize Revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 built-in targeting properties](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
+- **In-app Messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Options include [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
+- **Smart Feature Flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can be updated in real-time based on over [100 real-time device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
+- **Over The Air Updates**: Update your growth plan anytime [without app updates](https://docs.criticalmoments.io/remote-control-service). Quickly recover from unexpected bugs, outages, deprecations, and other critical events.
 
-### Powerful Targeting 🎯
 
-With Critical Moments, you can target users with the right actions at the perfect moment.
+## Powerful Targeting 🎯
+
+With Critical Moments, you can target users with the right actions at the perfect moment:
+
+### Targeting Conditions
 
 Our simple [string-based conditional statements](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) can check over [100 built-in properties](https://docs.criticalmoments.io/conditional-targeting/built-in-properties), custom properties, in-app events, and user engagement history. 
 
@@ -73,41 +85,52 @@ Some examples:
 - `has_watch || location_city == 'Toronto' || has_car_audio || on_call || has_bt_headset || network_connection_type == 'cellular'`
 - `weather_condition IN ['Rain', 'Thunderstorms'] || weather_cloud_cover > 0.80`
 
-### User Privacy 🔑🔒
+### Targeting Events
 
-Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device*.
+Define exactly when actions should occur, based on in-app event triggers.
 
-*Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
-
-### Powerful Config-Driven Growth Plans 📈
-
-Our growth config file format supports building complex growth logic, entirely in config. Connect events in your app to messaging, notifications, paywalls, review prompts, and much more. Check for the perfect moment with conditions. Non-technical team members can contribute, without writing code. Update anytime your config anytime, without App Store updates. 
+The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) or [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) with a single line of code. 
 
 ### Local User-Engagement Database 📙
 
-Our SDK automatically starts building an on-device database of user actions. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
+Our SDK automatically starts building an on-device database of user engagement history. Use this database when targeting user-messaging, reviews, notifications, paywalls and more! For example: `eventCount('session_start') > 3 && latestEventTime('asked_to_subscribe') < now() - duration('24h') && !propertyEver('has_paid_subscription', true)`
+
+## User Privacy 🔑🔒
+
+Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device. Learn more about our privacy architecture in [our blog post](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data).
+
+Note: Some optional services like GeoIP location and weather require external services. These are clearly outlined in our docs. They are completely optional, do not collect user identifiers, and do not store logs long-term.
 
 ## Quick Start 🚀
 
-Read our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide to get up and running in minutes. 
+Our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide will get you up and running with the Critical Moments SDK in just a few minutes.
 
 ## Demo App 
 
-Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
-
-## Homepage 🏠
-
-Check out our [homepage](https://criticalmoments.io) for information about Critical Moments, pricing, and account login.
+Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) for a hands-on experience, or view [the source code on GitHub](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app) to understand the implementation details.
 
 ## Documentation 👩‍💻
 
-Check out our [documentation](https://docs.criticalmoments.io) for details on how to use Critical Moments.
+Our [documentation](https://docs.criticalmoments.io) includes:
 
-## License
+ - [Quick Start Guide](https://docs.criticalmoments.io/quick-start)
+ - Guides for [increasing app ratings](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [reducing churn with notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), and [smart feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) 
+ - [Detailed technical docs](https://docs.criticalmoments.io/concepts-overview)
+
+## Contact Us 👋
+
+We're here to help!
+
+Can't find an answer in our docs? Need help with integration, have a bug report, or a feature request? Feel free to reach out!
+
+- Email: [support@criticalmoments.io](mailto:support@criticalmoments.io) 
+- Bug tracker: [GitHub Issues](https://github.com/CriticalMoments/CriticalMoments/issues)
+
+## License ⚖️
 
 Critical Moments requires you to purchase a license to use it in production apps. See our [pricing page](https://criticalmoments.io/pricing) for details. The code of the SDK is fully source-available, and in this repo.
 
-## Copyright
+## Copyright ©️
 
 Copyright (c) 2023 Chesterfield Laboratories Inc.
 
