@@ -41,7 +41,8 @@ The **Mobile Growth** SDK.
 4. [User Privacy](#user-privacy-)
 5. [Quick Start](#quick-start-)
 6. [Demo App](#demo-app-)
-7. [Homepage, Docs, License & Copyright](#homepage-)
+7. [Documentation](#documentation-)
+8. [License & Copyright](#license)
 
 ## How It Works 👩‍💻
 
@@ -107,10 +108,6 @@ Read our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide to get
 ## Demo App 
 
 Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
-
-## Homepage 🏠
-
-Check out our [homepage](https://criticalmoments.io) for information about Critical Moments, pricing, and account login.
 
 ## Documentation 👩‍💻
 
