@@ -52,13 +52,13 @@ Install our SDK and integrate into your app following our [Quick-Start Guide](ht
 
 ### Step 2: Create your growth plan in JSON
 
-Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). You can add features without any additional code, and if you want deeper integrations, custom hooks are available.
+Yes, really — [a growth plan defined in JSON](https://docs.criticalmoments.io/config-file-structure). ou can add features without any additional code. If you want deeper integrations, custom hooks are available.
 
 Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications) to get started with ready-to-deploy and proven growth tactics. We're building a [growing library](https://criticalmoments.io/blog) of examples you can use for inspiration.
 
 ### Step 3: Update Anytime, Without App Updates
 
-Once your initial growth plan is deployed, you can update anytime without waiting for app reviews or app store updates. Add growth features without new code, anytime, over the air. Update and tune your user targeting logic, including in past app releases.
+Once your initial growth plan is deployed, you can update anytime without waiting for app reviews or App Store updates. Add growth features without new code, anytime, over the air. Update and tune your user targeting logic, including in past app releases.
 
 ## Feature Overview 🔧
 
@@ -97,17 +97,17 @@ Our SDK automatically starts building an on-device database of user engagement h
 
 ## User Privacy 🔑🔒
 
-Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device. Read about our privacy architecture [here](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data).
+Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device. Learn more about our privacy architecture in [our blog post](https://criticalmoments.io/blog/how_to_target_users_without_collecting_data).
 
 Note: Some optional services like GeoIP location and weather require external services. These are clearly outlined in our docs. They are completely optional, do not collect user identifiers, and do not store logs long-term.
 
 ## Quick Start 🚀
 
-Read our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide to get up and running in minutes. 
+Our [Quick-Start](https://docs.criticalmoments.io/quick-start) guide will get you up and running with the Critical Moments SDK in just a few minutes.
 
 ## Demo App 
 
-Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) or view the source code [on Github](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app).
+Want to see Critical Moments in action? Download our [demo app from TestFlight](https://testflight.apple.com/join/uSwscwu0) for a hands-on experience, or view [the source code on GitHub](https://github.com/CriticalMoments/CriticalMoments/tree/main/ios/sample_app) to understand the implementation details.
 
 ## Documentation 👩‍💻
 
