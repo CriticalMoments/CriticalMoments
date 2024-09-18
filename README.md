@@ -121,7 +121,7 @@ Our [documentation](https://docs.criticalmoments.io) includes:
 
 We're here to help!
 
-Can't find an answer in our docs? Need help? Find a bug? Feel free to reach out!
+Can't find an answer in our docs? Need help with integration, have a bug report, or a feature request? Feel free to reach out!
 
 - Email: [support@criticalmoments.io](mailto:support@criticalmoments.io) 
 - Bug tracker: [GitHub Issues](https://github.com/CriticalMoments/CriticalMoments/issues)
