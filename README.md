@@ -57,7 +57,7 @@ Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-no
 
 ### Step 3: Update Anytime, Without App Updates
 
-Once your initial growth plan is deployed, you can update anytime without app reviews or updates. Add growth features without new code anytime. Update and tune your user targeting logic over-the-air.
+Once your initial growth plan is deployed, you can update anytime without app reviews or app store updates. Add growth features without new code, anytime, over the air. Update and tune your user targeting logic, including in past app releases.
 
 ## Feature Overview 🔧
 
@@ -86,11 +86,13 @@ Some examples:
 
 ### Targeting Events
 
-TODO
+Define exactly when actions should occur, based on in-app event triggers.
+
+The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) with a single line of code. 
 
 ### Local User-Engagement Database 📙
 
-Our SDK automatically starts building an on-device database of user engagement history. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
+Our SDK automatically starts building an on-device database of user engagement history. Use this database when targeting user-messaging, reviews, notifications, paywalls and more! For example: `eventCount('session_start') > 3 && latestEventTime('asked_to_subscribe') < now() - duration('24h') && !propertyEver('has_paid_subscription', true)`
 
 ## User Privacy 🔑🔒
 
