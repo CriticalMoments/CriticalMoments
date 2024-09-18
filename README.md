@@ -36,10 +36,12 @@ The **Mobile Growth** SDK.
 
 ## Table of Contents
 1. [How It Works](#how-it-works-)
-2. [What Makes Critical Moments Special](#what-makes-critical-moments-special)
-3. [Quick Start](#quick-start-)
-4. [Demo App](#demo-app-)
-5. [Homepage, Docs, License & Copyright](#homepage-)
+2. [Feature Overview](#feature-overview-)
+3. [Powerful Targeting](#powerful-targeting-)
+4. [Privacy](#user-privacy-)
+5. [Quick Start](#quick-start-)
+6. [Demo App](#demo-app-)
+7. [Homepage, Docs, License & Copyright](#homepage-)
 
 ## How It Works 👩‍💻
 
@@ -57,18 +59,17 @@ Use our [guides](https://docs.criticalmoments.io/guides/reduce-app-churn-with-no
 
 Once your initial growth plan is deployed, you can update anytime without app reviews or updates. Add growth features without new code anytime. Update and tune your user targeting logic over-the-air.
 
-## What Makes Critical Moments Special?
-
-### Rich Features 🔧
+## Feature Overview 🔧
 
 - **Notifications**: we have templates to [increase activation](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#increase-activation-rate), [reduce churn](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#reduce-long-term-churn), and [custom notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications#step-5-add-custom-notification). Our [smart notifications](https://criticalmoments.io/features/notifications) allow targeting the perfect moment for delivery, considering realtime device condition.
 - **Improve your app rating**: use our template to [ask users to rate you at the perfect moment](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), increasing your rating and rating volume.
-- **Optimize revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 targeting properties built-in](https://docs.criticalmoments.io/conditional-targeting/built-in-properties)
+- **Optimize revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 targeting properties built-in](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
 - **In-app messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Make announcements with [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
-- **Smart feature flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can be updated based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
+- **Smart feature flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can updated realtime based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
 - [**Disaster Recovery**](https://criticalmoments.io/features/disaster_recovery): Quickly recover from unexpected bugs, outages, deprecations, and other critical events without negative reviews or flooding customer support.
 
-### Powerful Targeting 🎯
+
+## Powerful Targeting 🎯
 
 With Critical Moments, you can target users with the right actions at the perfect moment.
 
@@ -81,11 +82,13 @@ Some examples:
 - `has_watch || location_city == 'Toronto' || has_car_audio || on_call || has_bt_headset || network_connection_type == 'cellular'`
 - `weather_condition IN ['Rain', 'Thunderstorms'] || weather_cloud_cover > 0.80`
 
-### User Privacy 🔑🔒
+## User Privacy 🔑🔒
 
 Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device*.
 
 *Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
+
+## TODO
 
 ### Powerful Config-Driven Growth Plans 📈
 
