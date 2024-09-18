@@ -28,7 +28,7 @@ The **Mobile Growth** SDK.
 
 ## Overview
 
-- **Growth plans defined in JSON**: Push updates anytime without app store reviews and make updates without writing new code.
+- **Growth plans defined in JSON**: Push updates anytime without app store reviews. Make updates without writing new code.
 - **Powerful features**: [smart notifications](https://docs.criticalmoments.io/guides/reduce-app-churn-with-notifications), [app-reviews](https://docs.criticalmoments.io/guides/improve-your-app-store-rating), [paywall timing](https://criticalmoments.io/features/grow_revenue), [native modal UI](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [app-wide banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [smart-feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide), and [more](https://docs.criticalmoments.io/concepts-overview). 
 - **Smart Targeting**: deliver the [right action at the perfect moment](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) with over 100 built-in targeting properties. 
   - Example: `device_battery_level > 0.2 && eventCount('app_start') > 3 && app_install_date < now() - duration('24h') && photo_library_permission == 'authorized'`
@@ -38,7 +38,7 @@ The **Mobile Growth** SDK.
 1. [How It Works](#how-it-works-)
 2. [Feature Overview](#feature-overview-)
 3. [Powerful Targeting](#powerful-targeting-)
-4. [Privacy](#user-privacy-)
+4. [User Privacy](#user-privacy-)
 5. [Quick Start](#quick-start-)
 6. [Demo App](#demo-app-)
 7. [Homepage, Docs, License & Copyright](#homepage-)
@@ -73,6 +73,8 @@ Once your initial growth plan is deployed, you can update anytime without app re
 
 With Critical Moments, you can target users with the right actions at the perfect moment.
 
+### Targeting Conditions
+
 Our simple [string-based conditional statements](https://docs.criticalmoments.io/conditional-targeting/intro-to-conditions) can check over [100 built-in properties](https://docs.criticalmoments.io/conditional-targeting/built-in-properties), custom properties, in-app events, and user engagement history. 
 
 Some examples: 
@@ -82,21 +84,19 @@ Some examples:
 - `has_watch || location_city == 'Toronto' || has_car_audio || on_call || has_bt_headset || network_connection_type == 'cellular'`
 - `weather_condition IN ['Rain', 'Thunderstorms'] || weather_cloud_cover > 0.80`
 
-## User Privacy 🔑🔒
+### Targeting Events
 
-Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device*.
-
-*Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
-
-## TODO
-
-### Powerful Config-Driven Growth Plans 📈
-
-Our growth config file format supports building complex growth logic, entirely in config. Connect events in your app to messaging, notifications, paywalls, review prompts, and much more. Check for the perfect moment with conditions. Non-technical team members can contribute, without writing code. Update anytime your config anytime, without App Store updates. 
+TODO
 
 ### Local User-Engagement Database 📙
 
-Our SDK automatically starts building an on-device database of user actions. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
+Our SDK automatically starts building an on-device database of user engagement history. The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) and [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) in a single line of code. Use this database when targeting user-messaging, reviews, notifications, paywalls and more!
+
+## User Privacy 🔑🔒
+
+Critical Moments is designed from the ground up for user privacy. All logic is run locally on their own device. We don’t collect any information about your users. A default installation makes zero calls to our servers from the user’s device.
+
+Note: Some optional services like GeoIP location and weather require a service. These services are clearly outlined in our docs, are completely optional, don’t collect user identifiers, and don’t store logs long-term.
 
 ## Quick Start 🚀
 
