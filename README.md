@@ -67,7 +67,7 @@ Once your initial growth plan is deployed, you can update anytime without waitin
 - **Optimize Revenue**: ask users to [upgrade at the perfect moment](https://criticalmoments.io/features/grow_revenue), with [over 100 built-in targeting properties](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
 - **In-app Messaging**: add [fully native messaging UI](https://docs.criticalmoments.io/actions-in-app-messaging/actions-overview) without writing any code. Options include [banners](https://docs.criticalmoments.io/actions-in-app-messaging/banners), [modals](https://docs.criticalmoments.io/actions-in-app-messaging/modals), [alerts](https://docs.criticalmoments.io/actions-in-app-messaging/alerts), [browser](https://docs.criticalmoments.io/actions-in-app-messaging/open-link), and more. All [themed](https://docs.criticalmoments.io/themes/theme-overview) to match your brand.
 - **Smart Feature Flags**: define [feature flags](https://docs.criticalmoments.io/guides/feature-flags-guide) that can updated realtime based on over [100 realtime device conditions \(low battery, has network, permissions, etc\)](https://docs.criticalmoments.io/conditional-targeting/built-in-properties).
-- [**Over The Air Updates**](https://docs.criticalmoments.io/remote-control-service): Update your growth plan anytime without app updates. Quickly recover from unexpected bugs, outages, deprecations, and other critical events.
+- **Over The Air Updates**: Update your growth plan anytime [without app updates](https://docs.criticalmoments.io/remote-control-service). Quickly recover from unexpected bugs, outages, deprecations, and other critical events.
 
 
 ## Powerful Targeting 🎯
