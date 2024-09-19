@@ -1211,3 +1211,15 @@ func TestCallingUpdatePlanWithoutConfig(t *testing.T) {
 		t.Fatal("Expected not started error")
 	}
 }
+
+func TestNotificationPlanPanic(t *testing.T) {
+	// Note: fixed root cause of panic, so not really expecting a panic here, but can force it to ensure defer panic is handled
+	ac := Appcore{}
+	plan, err := ac.FetchNotificationPlan()
+	if err == nil {
+		t.Fatal("Expected error")
+	}
+	if plan != nil {
+		t.Fatal("Expected nil plan")
+	}
+}
