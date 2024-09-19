@@ -273,7 +273,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	var jpc jsonPrimaryConfig
 	err := json.Unmarshal(data, &jpc)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Unable to parse config -- invalid json", err)
+		return NewUserPresentableErrorWSource("Invalid Critical Moments config file: ", err)
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
@@ -452,7 +452,8 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 		}
 	}
 	for actionName, action := range pc.namedActions {
-		if actionValidationIssue := action.ValidateReturningUserReadableIssue(); actionValidationIssue != "" {
+		if actionValidationIssue := action.ValidateReturningUserReadableIssue(); actionValidationIssue != nil {
+			// TODO_P0 log more in debug mode, including source
 			return fmt.Sprintf("Action \"%v\" had issue: %v", actionName, actionValidationIssue)
 		}
 	}
