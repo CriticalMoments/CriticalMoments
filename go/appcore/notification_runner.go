@@ -63,7 +63,14 @@ func (ac *Appcore) initializeNotificationPlan() error {
 
 var errAcNotStarted = errors.New("appcore not started")
 
-func (ac *Appcore) ForceUpdateNotificationPlan() error {
+func (ac *Appcore) ForceUpdateNotificationPlan() (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in ForceUpdateNotificationPlan: %v", r)
+		}
+	}()
+
 	if !ac.started || ac.config == nil {
 		return errAcNotStarted
 	}
