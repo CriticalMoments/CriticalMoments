@@ -13,10 +13,15 @@
 #import "../messaging/CMBannerManager.h"
 #import "../notifications/CMNotificationHandler.h"
 #import "../notifications/CMNotificationsDelegate.h"
+#import "../properties/CMPermissionsPropertyProvider.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
+
+#if DEBUG
+@import Foundation;
+#endif
 
 #import <UserNotifications/UserNotifications.h>
 #import <os/log.h>
@@ -90,6 +95,10 @@ static CriticalMoments *sharedInstance = nil;
     return @"objcPong";
 }
 
+- (dispatch_queue_t)getActionQueue {
+    return self.actionQueue;
+}
+
 - (NSString *)goPing {
     return AppcoreGoPing();
 }
@@ -99,6 +108,13 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
+#if DEBUG
+    // No need to start in SwiftUI preview mode, and it will break previews.
+    if ([@"1" isEqualToString:NSProcessInfo.processInfo.environment[@"XCODE_RUNNING_FOR_PREVIEWS"]]) {
+        return;
+    }
+#endif
+
     // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
     [self.notificationObserver start];
 
@@ -539,7 +555,13 @@ static CriticalMoments *sharedInstance = nil;
                               }
                               if (granted) {
                                   // Schedule any CM notifications that need to be scheduled now
-                                  [_appcore forceUpdateNotificationPlan:nil];
+                                  NSError *error;
+                                  [_appcore forceUpdateNotificationPlan:&error];
+                                  if (error) {
+                                      NSLog(@"CriticalMoments: error in "
+                                            @"requestNotificationPermissionWithCompletionHandler: %@",
+                                            error.localizedDescription);
+                                  }
                               }
                             }];
     }];
@@ -593,6 +615,7 @@ static CriticalMoments *sharedInstance = nil;
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                      [CMBackgroundHandler devModeCheckBackgroundSetupCorrectly];
                      [CMNotificationsDelegate devModeCheckNotificationDelegateSetupCorrectly];
+                     [CMBluetoothPermissionsPropertyProvider devModeCheckBluetoothSetupCorrectly];
                    });
 }
 #endif

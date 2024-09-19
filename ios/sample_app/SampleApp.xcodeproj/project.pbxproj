@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0265E042C90B73700D869BE /* SwiftUIViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */; };
 		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E0368DB22AF7FE4600A513B7 /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0368DB12AF7FE4600A513B7 /* testConfig.json */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
@@ -52,6 +53,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIViewTest.swift; sourceTree = "<group>"; };
 		E0368DB12AF7FE4600A513B7 /* testConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = testConfig.json; path = ../../Tests/CriticalMomentsTests/TestResources/testConfig.json; sourceTree = "<group>"; };
 		E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSnapshotTests.swift; sourceTree = "<group>"; };
 		E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SampleAppTests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				E0446E632A0970A10069E5BD /* config.json */,
 				E03F9BA72B6D8267006EA449 /* InfoHeader.h */,
 				E03F9BA82B6D8267006EA449 /* InfoHeader.m */,
+				E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */,
 			);
 			path = SampleApp;
 			sourceTree = "<group>";
@@ -295,6 +298,7 @@
 				TargetAttributes = {
 					E0B545E829F407C2002A25A8 = {
 						CreatedOnToolsVersion = 14.3;
+						LastSwiftMigration = 1540;
 					};
 					E0B5460329F407C3002A25A8 = {
 						CreatedOnToolsVersion = 14.3;
@@ -361,6 +365,7 @@
 				E07B774B29F9B202001521F4 /* CMDemoScreen.m in Sources */,
 				E0EC791F2C395EF0004F60A6 /* NotificationsDemoScreen.m in Sources */,
 				E07B775129FA0144001521F4 /* Utils.m in Sources */,
+				E0265E042C90B73700D869BE /* SwiftUIViewTest.swift in Sources */,
 				E07B774E29F9B69D001521F4 /* BannerDemoScreen.m in Sources */,
 				E03F9BA62B6D79D6006EA449 /* ConversionDemoScreen.m in Sources */,
 				E0B545FF29F407C3002A25A8 /* main.m in Sources */,
@@ -556,6 +561,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SampleApp/SampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -591,6 +597,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.demo-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -600,6 +608,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SampleApp/SampleApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -631,6 +640,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "io.criticalmoments.demo-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -638,6 +648,7 @@
 		E0B5461C29F407C3002A25A8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -665,6 +676,7 @@
 		E0B5461D29F407C3002A25A8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;

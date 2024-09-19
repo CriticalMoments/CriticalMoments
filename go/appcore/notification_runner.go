@@ -61,7 +61,19 @@ func (ac *Appcore) initializeNotificationPlan() error {
 	return nil
 }
 
-func (ac *Appcore) ForceUpdateNotificationPlan() error {
+var errAcNotStarted = errors.New("appcore not started")
+
+func (ac *Appcore) ForceUpdateNotificationPlan() (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in ForceUpdateNotificationPlan: %v", r)
+		}
+	}()
+
+	if !ac.started || ac.config == nil {
+		return errAcNotStarted
+	}
 	plan, err := ac.generateNotificationPlan()
 	if err != nil {
 		return err
@@ -75,13 +87,20 @@ func (ac *Appcore) ForceUpdateNotificationPlan() error {
 	return nil
 }
 
-func (ac *Appcore) FetchNotificationPlan() (*NotificationPlan, error) {
+func (ac *Appcore) FetchNotificationPlan() (np *NotificationPlan, returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			np = nil
+			returnErr = fmt.Errorf("panic in FetchNotificationPlan: %v", r)
+		}
+	}()
 	err := ac.initializeNotificationPlan()
 	if err != nil {
 		return nil, err
 	}
 	if ac.notificationPlan == nil {
-		return nil, errors.New("notification plan not initialized")
+		return nil, errAcNotStarted
 	}
 	return ac.notificationPlan, nil
 }
@@ -92,6 +111,9 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 }
 
 func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationPlan, error) {
+	if !ac.started || ac.config == nil {
+		return NotificationPlan{}, errAcNotStarted
+	}
 	plan := NotificationPlan{
 		unscheduledNotifications: make([]*datamodel.Notification, 0),
 		scheduledNotifications:   make([]*ScheduledNotification, 0),

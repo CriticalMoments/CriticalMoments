@@ -48,6 +48,7 @@ func buildTestBuiltInProps(propTypes map[string]*datamodel.CMPropertyConfig) map
 	props := map[string]*datamodel.CMPropertyConfig{
 		"app_start_time":     {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"is_debug_build":     {Type: reflect.Bool, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 	}
 
 	for k, v := range propTypes {
@@ -699,6 +700,14 @@ func TestLoadingSignedConfig(t *testing.T) {
 	if ac.config == nil || ac.config.ConfigVersion != "v1" {
 		t.Fatal("Failed to load signed config")
 	}
+	// is_debug_build should be false
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("is_debug_build", t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result != false {
+		t.Fatal("is_debug_build should be false")
+	}
 }
 
 func TestLoadingEmptyUnsignedConfig(t *testing.T) {
@@ -727,6 +736,24 @@ func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
 	err = ac.Start(true)
 	if err != nil || ac.config == nil || ac.config.AppId != "io.criticalmoments.demo" {
 		t.Fatal("Should not load json config unless in debug mode")
+	}
+}
+
+func TestDebugBuild(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("is_debug_build", t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result != true {
+		t.Fatal("is_debug_build should be true")
 	}
 }
 
