@@ -638,6 +638,12 @@ func (ac *Appcore) ActionForNotification(notificationId string) error {
 	return nil
 }
 
-func (ac *Appcore) PerformBackgroundWork() error {
+func (ac *Appcore) PerformBackgroundWork() (returnErr error) {
+	defer func() {
+		// We never intentionally panic in CM, but we want to recover if we do
+		if r := recover(); r != nil {
+			returnErr = fmt.Errorf("panic in PerformBackgroundWork: %v", r)
+		}
+	}()
 	return ac.performBackgroundWorkForNotifications()
 }
