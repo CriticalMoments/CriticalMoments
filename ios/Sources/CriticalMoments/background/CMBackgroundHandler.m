@@ -98,7 +98,12 @@
 
 - (void)runBackgroundWorker:(BGTask *)task API_AVAILABLE(ios(13.0)) {
     // Schedule next refresh. Currently only notifications need it, but can introduce others here as well.
-    AppcoreNotificationPlan *plan = [self.cm currentNotificationPlan:nil];
+    NSError *error;
+    AppcoreNotificationPlan *plan = [self.cm currentNotificationPlan:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: error getting notification plan in runBackgroundWorker: %@",
+              error.localizedDescription);
+    }
     if (plan) {
         [self scheduleBackgroundTaskAtEpochTime:plan.earliestBgCheckTimeEpochSeconds];
     }

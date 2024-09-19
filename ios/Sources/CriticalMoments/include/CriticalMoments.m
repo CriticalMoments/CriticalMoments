@@ -555,7 +555,13 @@ static CriticalMoments *sharedInstance = nil;
                               }
                               if (granted) {
                                   // Schedule any CM notifications that need to be scheduled now
-                                  [_appcore forceUpdateNotificationPlan:nil];
+                                  NSError *error;
+                                  [_appcore forceUpdateNotificationPlan:&error];
+                                  if (error) {
+                                      NSLog(@"CriticalMoments: error in "
+                                            @"requestNotificationPermissionWithCompletionHandler: %@",
+                                            error.localizedDescription);
+                                  }
                               }
                             }];
     }];

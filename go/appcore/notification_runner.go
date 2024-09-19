@@ -112,7 +112,6 @@ func (ac *Appcore) generateNotificationPlan() (NotificationPlan, error) {
 
 func (ac *Appcore) generateNotificationPlanForTime(now time.Time) (NotificationPlan, error) {
 	if !ac.started || ac.config == nil {
-		fmt.Println("CriticalMoments: notification plan can not be generated before appcore is initialized")
 		return NotificationPlan{}, errors.New("notification plan not generated, appcore not initialized")
 	}
 	plan := NotificationPlan{
