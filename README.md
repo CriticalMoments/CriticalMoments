@@ -91,7 +91,7 @@ Define exactly when actions should occur, based on in-app event triggers.
 
 The most [commonly needed actions are tracked automatically](https://docs.criticalmoments.io/events/built-in-events). [Add your own custom events](https://docs.criticalmoments.io/events/event-overview) or [properties](https://docs.criticalmoments.io/conditional-targeting/custom-properties) with a single line of code. 
 
-### Local User-Engagement Database 📙
+### Local User-Engagement Database
 
 Our SDK automatically starts building an on-device database of user engagement history. Use this database when targeting user-messaging, reviews, notifications, paywalls and more! For example: `eventCount('session_start') > 3 && latestEventTime('asked_to_subscribe') < now() - duration('24h') && !propertyEver('has_paid_subscription', true)`
 
