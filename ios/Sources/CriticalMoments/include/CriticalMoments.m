@@ -95,6 +95,10 @@ static CriticalMoments *sharedInstance = nil;
     return @"objcPong";
 }
 
+- (dispatch_queue_t)getActionQueue {
+    return self.actionQueue;
+}
+
 - (NSString *)goPing {
     return AppcoreGoPing();
 }

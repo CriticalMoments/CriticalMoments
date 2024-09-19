@@ -38,11 +38,12 @@
 
 - (void)registerBackgroundTasks {
     if (@available(iOS 13.0, *)) {
+        dispatch_queue_t cmActionQueue = [self.cm getActionQueue];
         for (NSString *taskId in allBackgroundIds) {
             CMBackgroundHandler *__weak weakSelf = self;
             BOOL registered =
                 [BGTaskScheduler.sharedScheduler registerForTaskWithIdentifier:taskId
-                                                                    usingQueue:nil
+                                                                    usingQueue:cmActionQueue
                                                                  launchHandler:^(__kindof BGTask *_Nonnull task) {
                                                                    [weakSelf runBackgroundWorker:task];
                                                                  }];

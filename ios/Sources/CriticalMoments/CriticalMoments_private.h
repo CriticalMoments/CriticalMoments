@@ -68,6 +68,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Private API to update the current notification plan
 - (void)updateNotificationPlan:(AppcoreNotificationPlan *_Nullable)notifPlan;
 
+// Allow readonly access to queue
+- (dispatch_queue_t)getActionQueue;
+
 @end
 
 NS_ASSUME_NONNULL_END
