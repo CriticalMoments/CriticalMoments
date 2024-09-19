@@ -172,7 +172,7 @@ func (c *Condition) Validate() error {
 	// Run this even if not strict. It is checking the format of the condition as well
 	fields, err := c.ExtractIdentifiers()
 	if err != nil {
-		return err
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Error parsing condition string: %v", c.conditionString), err)
 	}
 
 	if StrictDatamodelParsing {

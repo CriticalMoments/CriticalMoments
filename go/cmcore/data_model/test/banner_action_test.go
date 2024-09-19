@@ -53,7 +53,7 @@ func TestJsonParsingInvalidBanners(t *testing.T) {
 			t.Fatalf("Parsed action when invalid: %v", file.Name())
 		}
 		// All errors should be user readable! We want to be able to tell user what was wrong
-		_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+		_, ok := err.(*datamodel.UserPresentableError)
 		if !ok {
 			t.Fatalf("Banner parsing issue didn't return user presentable error: %v", file.Name())
 		}

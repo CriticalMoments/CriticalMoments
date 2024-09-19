@@ -171,7 +171,7 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 				t.Fatalf("Parsed theme when invalid: %v", file.Name())
 			}
 			// All errors should be user readable! We want to be able to tell user what was wrong
-			_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+			_, ok := err.(*datamodel.UserPresentableError)
 			if !ok {
 				t.Fatalf("Theme parsing issue didn't return user presentable error: %v", file.Name())
 			}

@@ -272,9 +272,6 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 			t.Fatalf("Allowed invalid json: %v", testFile)
 		}
 		errorString := err.Error()
-		if upError, ok := err.(*UserPresentableError); ok {
-			errorString = upError.UserErrorString()
-		}
 		if !strings.Contains(errorString, expectedError) {
 			t.Fatalf("Allowed invalid: %v, expected error: %v, got error: %v", testFile, expectedError, errorString)
 		}
