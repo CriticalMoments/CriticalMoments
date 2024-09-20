@@ -31,7 +31,7 @@ func (err *UserPresentableError) Error() string {
 	if err.SourceError == nil {
 		return err.userReadableErrorString
 	}
-	return fmt.Sprintf("%v (Source Error: %v)", err.userReadableErrorString, err.SourceError)
+	return fmt.Sprintf("%v\n  Source Error: %v)", err.userReadableErrorString, err.SourceError)
 }
 
 func (err *UserPresentableError) UserReadableErrorString() string {
