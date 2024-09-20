@@ -11,27 +11,27 @@ import (
 func TestInvalidBannerMissingField(t *testing.T) {
 	b := datamodel.BannerAction{}
 
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Banners should require body")
 	}
 	b.Body = "Banner body"
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Minimal banner failed validation")
 	}
 	b.MaxLineCount = -2
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Banner allowed negative max line count")
 	}
 	b.MaxLineCount = 4
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Minimal banner failed validation")
 	}
 	b.PreferredPosition = "invalid"
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Banner allowed invalid position")
 	}
 	b.PreferredPosition = datamodel.BannerPositionBottom
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Banner disallowed valid position")
 	}
 }
@@ -53,7 +53,7 @@ func TestJsonParsingInvalidBanners(t *testing.T) {
 			t.Fatalf("Parsed action when invalid: %v", file.Name())
 		}
 		// All errors should be user readable! We want to be able to tell user what was wrong
-		_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+		_, ok := err.(*datamodel.UserPresentableError)
 		if !ok {
 			t.Fatalf("Banner parsing issue didn't return user presentable error: %v", file.Name())
 		}
@@ -80,7 +80,7 @@ func TestJsonParsingMinimalFieldsBanner(t *testing.T) {
 		t.Fatal()
 	}
 	banner := ac.BannerAction
-	if banner == nil || !banner.Validate() {
+	if banner == nil || !banner.Valid() {
 		t.Fatal()
 	}
 	if banner.Body != "Hello world, but on a banner!" {
@@ -115,7 +115,7 @@ func TestJsonParsingAllFieldsBanner(t *testing.T) {
 		t.Fatal()
 	}
 	banner := ac.BannerAction
-	if banner == nil || !banner.Validate() {
+	if banner == nil || !banner.Valid() {
 		t.Fatal()
 	}
 	if banner.Body != "Hello world, but on a banner!" {

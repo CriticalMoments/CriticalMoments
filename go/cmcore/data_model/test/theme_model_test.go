@@ -16,106 +16,106 @@ func minValidTheme() datamodel.Theme {
 }
 
 func TestBuiltinThemesValid(t *testing.T) {
-	if !datamodel.TestTheme().Validate() {
+	if !datamodel.TestTheme().Valid() {
 		t.Fatal()
 	}
 }
 
 func TestColorValidation(t *testing.T) {
 	theme := minValidTheme()
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal()
 	}
 	// Too long
 	theme.BannerBackgroundColor = "#fffffff"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// Too Short
 	theme.BannerBackgroundColor = "#fffff"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// No #
 	theme.BannerBackgroundColor = "ffffff"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// No # long
 	theme.BannerBackgroundColor = "fffffff"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// invalid char: out of range
 	theme.BannerBackgroundColor = "#00000g"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// invalid char: uppercase
 	theme.BannerBackgroundColor = "#00000A"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// invalid char: out of range, position 1
 	theme.BannerBackgroundColor = "#.00000"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal()
 	}
 	// all valid chars part 1
 	theme.BannerBackgroundColor = "#012345"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal()
 	}
 	// all valid chars part 2
 	theme.BannerBackgroundColor = "#6789ab"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal()
 	}
 	// all valid chars part 3
 	theme.BannerBackgroundColor = "#cdefff"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal()
 	}
 
 	// Each color should validate -- allows nil (above), allows valid, disallows invalid
 	theme.BannerForegroundColor = "#x"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal("allowed invalid color")
 	}
 	theme.BannerForegroundColor = "#000000"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal("disallowed valid color")
 	}
 	theme.PrimaryColor = "#x"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal("allowed invalid color")
 	}
 	theme.PrimaryColor = "#000000"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal("disallowed valid color")
 	}
 	theme.PrimaryTextColor = "#x"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal("allowed invalid color")
 	}
 	theme.PrimaryTextColor = "#000000"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal("disallowed valid color")
 	}
 	theme.SecondaryTextColor = "#x"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal("allowed invalid color")
 	}
 	theme.SecondaryTextColor = "#000000"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal("disallowed valid color")
 	}
 	theme.BackgroundColor = "#x"
-	if theme.Validate() {
+	if theme.Valid() {
 		t.Fatal("allowed invalid color")
 	}
 	theme.BackgroundColor = "#000000"
-	if !theme.Validate() {
+	if !theme.Valid() {
 		t.Fatal("disallowed valid color")
 	}
 }
@@ -125,7 +125,7 @@ func TestFontScaleValidation(t *testing.T) {
 	validValues := []float64{1.0, 0.8, 0.9, 1.2, 2.0, 1.5, 0.5}
 	for _, valid := range validValues {
 		theme.FontScale = valid
-		if !theme.Validate() {
+		if !theme.Valid() {
 			t.Fatalf("Font scale %v expected to be valid", valid)
 		}
 	}
@@ -133,7 +133,7 @@ func TestFontScaleValidation(t *testing.T) {
 	invalidValues := []float64{-1.0, 0.1, 0.499999, 2.000001, 0.0}
 	for _, invalid := range invalidValues {
 		theme.FontScale = invalid
-		if theme.Validate() {
+		if theme.Valid() {
 			t.Fatalf("Font scale %v expected to be invalid", invalid)
 		}
 	}
@@ -163,7 +163,7 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 			if err != nil {
 				t.Fatalf("Theme failed to parse: %v", file.Name())
 			}
-			if !theme.Validate() {
+			if !theme.Valid() {
 				t.Fatalf("Theme failed to validate: %v", file.Name())
 			}
 		} else {
@@ -171,7 +171,7 @@ func testJsonFolder(basePath string, expectSuccess bool, t *testing.T) {
 				t.Fatalf("Parsed theme when invalid: %v", file.Name())
 			}
 			// All errors should be user readable! We want to be able to tell user what was wrong
-			_, ok := interface{}(err).(datamodel.UserPresentableErrorI)
+			_, ok := err.(*datamodel.UserPresentableError)
 			if !ok {
 				t.Fatalf("Theme parsing issue didn't return user presentable error: %v", file.Name())
 			}

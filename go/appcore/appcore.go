@@ -45,6 +45,9 @@ type Appcore struct {
 	// Notifications
 	notificationPlan      *NotificationPlan
 	seenCancelationEvents map[string]*bool
+
+	// Allow forcing a specific parse mode for testing
+	forceParseModeForStrict *bool
 }
 
 func NewAppcore() *Appcore {
@@ -353,6 +356,13 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 			if !allowParsingUnsigned {
 				return err
 			}
+			if ac.forceParseModeForStrict != nil {
+				// Allow forcing a specific parse mode for testing
+				datamodel.StrictDatamodelParsing = *ac.forceParseModeForStrict
+			} else {
+				// Default to strict parsing when debugging a local unsigned file. This helps find issues and makes errors more descriptive.
+				datamodel.StrictDatamodelParsing = true
+			}
 			pc = &datamodel.PrimaryConfig{}
 			err = json.Unmarshal(configFileData, &pc)
 			if err != nil {
@@ -562,8 +572,9 @@ func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme)
 	return ac.config.ThemeWithName(themeName)
 }
 
-func (ac *Appcore) SetLogEvents(logEvents bool) {
-	ac.eventManager.logEvents = logEvents
+// set developer mode: log events for now, later we'll add condition evals, triggers, etc
+func (ac *Appcore) SetDeveloperMode(developerMode bool) {
+	ac.eventManager.logEvents = developerMode
 }
 
 // Repeitive, but gomobile doesn't allow for `interface{}`

@@ -8,32 +8,32 @@ import (
 
 func TestLinkActionValidators(t *testing.T) {
 	l := LinkAction{}
-	if l.Validate() {
+	if l.Valid() {
 		t.Fatal("Links require a url")
 	}
 	l.UrlString = "This_isnt_a_url"
-	if l.Validate() {
+	if l.Valid() {
 		t.Fatal("Links require a valid url and should not validate")
 	}
 	l.UrlString = "app-settings:root=Photos"
-	if !l.Validate() {
+	if !l.Valid() {
 		t.Fatal("Link vaidation failed for valid opaque url")
 	}
 	l.UrlString = "/Local/Urls/Dont/Count"
-	if l.Validate() {
+	if l.Valid() {
 		t.Fatal("Links require a valid scheme and should not validate")
 	}
 	l.UrlString = "../Relative/Urls/Dont/Count"
-	if l.Validate() {
+	if l.Valid() {
 		t.Fatal("Links require a valid scheme and should not validate")
 	}
 	l.UrlString = "https://scosman.net/asdf?t=5"
-	if !l.Validate() {
-		t.Fatal(l.ValidateReturningUserReadableIssue())
+	if !l.Valid() {
+		t.Fatal(l.Check())
 	}
 	l.UrlString = "custom://any_scheme_is_okay/asdf.ext"
-	if !l.Validate() {
-		t.Fatal(l.ValidateReturningUserReadableIssue())
+	if !l.Valid() {
+		t.Fatal(l.Check())
 	}
 }
 
@@ -41,19 +41,19 @@ func TestLinkActionValidateEmbedded(t *testing.T) {
 	l := LinkAction{
 		UrlString: "app-settings:main",
 	}
-	if !l.Validate() {
+	if !l.Valid() {
 		t.Fatal("Valid link failed to validate")
 	}
 	l.UseEmbeddedBrowser = true
-	if l.Validate() {
+	if l.Valid() {
 		t.Fatal("Open embedded browser with no web url should fail")
 	}
 	l.UrlString = "https://scosman.net"
-	if !l.Validate() {
+	if !l.Valid() {
 		t.Fatal("Valid link failed to validate")
 	}
 	l.UrlString = "http://scosman.net"
-	if !l.Validate() {
+	if !l.Valid() {
 		t.Fatal("Valid link failed to validate")
 	}
 }

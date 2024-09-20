@@ -139,87 +139,87 @@ type jsonNotification struct {
 	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
 }
 
-func (a *Notification) Validate() bool {
-	return a.ValidateReturningUserReadableIssue() == ""
+func (a *Notification) Valid() bool {
+	return a.Check() == nil
 }
 
-func (n *Notification) ValidateReturningUserReadableIssue() string {
-	return n.ValidateReturningUserReadableIssueIgnoreID(false)
+func (n *Notification) Check() UserPresentableErrorInterface {
+	return n.CheckIgnoreID(false)
 }
 
-func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool) string {
+func (n *Notification) CheckIgnoreID(ignoreID bool) UserPresentableErrorInterface {
 	// ID is set later from primary config map ID
 	if !ignoreID && n.ID == "" {
-		return "Notification must have ID"
+		return NewUserPresentableError("Notification must have ID")
 	}
 	if n.Title == "" &&
 		n.Body == "" &&
 		n.BadgeCount < 0 {
-		return "Notifications must have one or more of: title, body, or badgeCount."
+		return NewUserPresentableError("Notifications must have one or more of: title, body, or badgeCount.")
+	}
+	if n.DeliveryWindowTODStartMinutes < 0 || n.DeliveryWindowTODStartMinutes > maxWindowLocalTimeEnd {
+		return NewUserPresentableError("Notifications must have a deliveryTimeOfDayStart between 0 and 23:59 mins.")
 	}
 	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {
-		return "Notifications must have a deliveryTimeOfDayStart between 0 and 23:59 mins."
-	}
-	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {
-		return "Notifications must have a deliveryTimeOfDayEnd between 0 and 23:59 mins."
+		return NewUserPresentableError("Notifications must have a deliveryTimeOfDayEnd between 0 and 23:59 mins.")
 	}
 	if n.DeliveryWindowTODStartMinutes > n.DeliveryWindowTODEndMinutes {
-		return "Notifications must have a deliveryTimeOfDayStart before deliveryTimeOfDayEnd."
+		return NewUserPresentableError("Notifications must have a deliveryTimeOfDayStart before deliveryTimeOfDayEnd.")
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
-		return "Notifications must have at least one day of week valid for delivery."
+		return NewUserPresentableError("Notifications must have at least one day of week valid for delivery in deliveryDaysOfWeek.")
 	}
 	if n.RelevanceScore != nil && (*n.RelevanceScore < 0 || *n.RelevanceScore > 1) {
-		return "Relevance score must be between 0 and 1 if provided."
+		return NewUserPresentableError("Notification relevanceScore must be between 0 and 1 if provided.")
 	}
 	if StrictDatamodelParsing && n.InterruptionLevel != "" {
 		if !slices.Contains(validInterruptionLevels, n.InterruptionLevel) {
-			return fmt.Sprintf("Interruption level must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel)
+			return NewUserPresentableError(fmt.Sprintf("Notification interruptionLevel must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel))
 		}
 	}
 	if n.ScheduleCondition != nil {
 		if err := n.ScheduleCondition.Validate(); err != nil {
-			return fmt.Sprintf("Invalid condition in notification [%v]", n.ID)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Notification has invalid scheduleCondition [%v]", n.ScheduleCondition.conditionString), err)
 		}
 	}
 	if n.CancelationEvents != nil {
 		for _, event := range *n.CancelationEvents {
 			if event == "" {
-				return fmt.Sprintf("Notification '%v' has an blank cancelation event", n.ID)
+				return NewUserPresentableError("Notification has an empty string in cancelationEvents. Remove it, or specify a non-empty string.")
 			}
 		}
 	}
 	if n.IdealDeliveryConditions != nil {
 		if conErr := n.IdealDeliveryConditions.Condition.Validate(); conErr != nil {
-			return fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Notification idealDeliveryCondition invalid for notification with id '%v'", n.ID), conErr)
 		}
 		if n.IdealDeliveryConditions.MaxWaitTimeSeconds != NotificationMaxIdealWaitTimeForever &&
 			n.IdealDeliveryConditions.MaxWaitTimeSeconds < 1 {
-			return "Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0."
+			return NewUserPresentableError("Notifications must have a maxWaitTimeSeconds for ideal delivery condition. Valid values are -1 (forever) or values greater than 0.")
 		}
 	}
-	if dtErr := n.DeliveryTime.ValidateReturningUserReadableIssue(); dtErr != "" {
-		return "Notification has invalid delivery time: " + dtErr
+	if dtErr := n.DeliveryTime.Check(); dtErr != nil {
+		return NewUserPresentableErrorWSource("Notification has invalid delivery time", dtErr)
 	}
-	return ""
+	return nil
 }
 
-func (d *DeliveryTime) ValidateReturningUserReadableIssue() string {
+func (d *DeliveryTime) Check() UserPresentableErrorInterface {
 	if d.TimestampEpoch == nil && d.EventName == nil {
-		return "DeliveryTime must have either a Timestamp or an EventName defined."
+		return NewUserPresentableError("Notification DeliveryTime must have either a Timestamp or an EventName defined.")
 	}
 	if d.TimestampEpoch != nil && d.EventName != nil {
-		return "DeliveryTime cannot have both a Timestamp and an EventName defined."
+		return NewUserPresentableError("Notification DeliveryTime cannot have both a Timestamp and an EventName defined.")
 	}
 	if d.TimestampEpoch != nil && d.EventOffsetSeconds != nil {
-		return "DeliveryTime cannot have both a Timestamp and an EventOffset defined."
+		return NewUserPresentableError("Notification DeliveryTime cannot have both a Timestamp and an EventOffset defined.")
 	}
 	if StrictDatamodelParsing {
 		if d.EventInstance() == EventInstanceTypeUnknown {
-			return fmt.Sprintf("Notification event instance must be 'first' or 'latest' (default), got '%v'", d.EventInstanceString)
+			return NewUserPresentableError(fmt.Sprintf("Notification eventInstance must be 'first', 'latest', or 'latest-once' (default), got '%v'", d.EventInstanceString))
 		}
 	}
-	return ""
+	return nil
 }
 
 func (d *DeliveryTime) Timestamp() *time.Time {
@@ -285,9 +285,9 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	if jn.DeliveryWindowTODEnd != "" {
 		deliveryEnd, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODEnd)
 		if err != nil && StrictDatamodelParsing {
-			return NewUserPresentableError("Invalid deliveryTimeOfDayEnd. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
+			return NewUserPresentableError("Invalid notification 'deliveryTimeOfDayEnd'. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
 		} else if err != nil {
-			fmt.Printf("CriticalMoments: invalid deliveryTimeOfDayEnd [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
+			fmt.Printf("CriticalMoments: invalid notification 'deliveryTimeOfDayEnd' [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
 			n.DeliveryWindowTODEndMinutes = defaultDeliveryWindowLocalTimeEnd
 		} else {
 			n.DeliveryWindowTODEndMinutes = deliveryEnd
@@ -297,11 +297,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	}
 
 	// ignore ID which is set later from primary config
-	if validationIssue := n.ValidateReturningUserReadableIssueIgnoreID(true); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return n.CheckIgnoreID(true)
 }
 
 func parseMinutesFromHHMMString(i string) (int, error) {

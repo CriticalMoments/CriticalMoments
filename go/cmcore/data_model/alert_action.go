@@ -89,45 +89,45 @@ func unpackAlertFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTy
 	return &alert, nil
 }
 
-func (a *AlertAction) Validate() bool {
-	return a.ValidateReturningUserReadableIssue() == ""
+func (a *AlertAction) Valid() bool {
+	return a.Check() == nil
 }
 
-func (a *AlertAction) ValidateReturningUserReadableIssue() string {
+func (a *AlertAction) Check() UserPresentableErrorInterface {
 	if a.Title == "" && a.Message == "" {
-		return "Alerts must have a title and/or a message. Both can not be blank."
+		return NewUserPresentableError("Alerts must have a title and/or a message. Both can not be blank.")
 	}
 	if !slices.Contains(alertStyles, a.Style) {
-		return "Alert style must be 'dialog' or 'large'"
+		return NewUserPresentableError("Alert style must be 'dialog' or 'large'")
 	}
 	if !a.ShowOkButton && a.OkButtonActionName != "" {
-		return "For an alert, the okay button is hidden via 'showOkButton:false' but an Ok action name is specified. Either show the okay button or remove the action."
+		return NewUserPresentableError("For an alert, the okay button is hidden via 'showOkButton:false' but an Ok action name is specified. Either show the okay button or remove the action.")
 	}
 	if !a.ShowOkButton && len(a.CustomButtons) == 0 {
-		return "Alert must have an ok button and/or custom buttons."
+		return NewUserPresentableError("Alert must have an ok button and/or custom buttons.")
 	}
 	for i, customButtom := range a.CustomButtons {
-		if customButtonIssue := customButtom.ValidateReturningUserReadableIssue(); customButtonIssue != "" {
-			return fmt.Sprintf("For an alert, button at index %v had issue \"%v\"", i, customButtonIssue)
+		if customButtonIssue := customButtom.Check(); customButtonIssue != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("For an alert, button at index %v had issue.", i), customButtonIssue)
 		}
 	}
 
-	return ""
+	return nil
 }
 
-func (b *AlertActionCustomButton) Validate() bool {
-	return b.ValidateReturningUserReadableIssue() == ""
+func (b *AlertActionCustomButton) Valid() bool {
+	return b.Check() == nil
 }
 
-func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
+func (b *AlertActionCustomButton) Check() UserPresentableErrorInterface {
 	if b.Label == "" {
-		return "Custom alert buttons must have a label"
+		return NewUserPresentableError("Custom alert buttons must have a label")
 	}
 	if !slices.Contains(alertActionStyles, b.Style) {
-		return fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style)
+		return NewUserPresentableError(fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style))
 	}
 
-	return ""
+	return nil
 }
 
 func (a *AlertAction) UnmarshalJSON(data []byte) error {
@@ -153,7 +153,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		} else {
 			// Backwards compatibility -- default to dialog if this client doesn't recognize the style
 			if StrictDatamodelParsing {
-				styleErr := fmt.Sprintf("invalid alert style found in config file: \"%v\"", *ja.Style)
+				styleErr := fmt.Sprintf("invalid 'style' tag found in config file under an alert action: \"%v\"", *ja.Style)
 				return NewUserPresentableError(styleErr)
 			}
 		}
@@ -178,11 +178,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	}
 	a.CustomButtons = customButtons
 
-	if validationIssue := a.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return a.Check()
 }
 
 func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, error) {
@@ -193,7 +189,7 @@ func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, 
 		} else {
 			// Backwards compatibility: fall back to default style if this isn't recognized by this client
 			if StrictDatamodelParsing {
-				btnStyleErr := fmt.Sprintf("alert action style \"%v\" is not a valid style", *jb.Style)
+				btnStyleErr := fmt.Sprintf("invalid alert action 'style' tag found in config. \"%v\" is not a valid style", *jb.Style)
 				return nil, NewUserPresentableError(btnStyleErr)
 			}
 		}

@@ -39,24 +39,24 @@ func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionT
 	return &banner, nil
 }
 
-func (ba *BannerAction) Validate() bool {
-	return ba.ValidateReturningUserReadableIssue() == ""
+func (ba *BannerAction) Valid() bool {
+	return ba.Check() == nil
 }
 
-func (b *BannerAction) ValidateReturningUserReadableIssue() string {
+func (b *BannerAction) Check() UserPresentableErrorInterface {
 	if b.Body == "" {
-		return "Banners must have body text"
+		return NewUserPresentableError("Banners must have body text")
 	}
 	if b.MaxLineCount != BannerMaxLineCountSystemDefault && b.MaxLineCount < 0 {
 		// Technically -1 allowed, but that's an internal between cmcore and libraries
 		// Not user facing or a value they should put in json or see in libraries
-		return "Banner max line count must be a positive integer, or 0 for no limit"
+		return NewUserPresentableError("Banner max line count must be a positive integer, or 0 for no limit")
 	}
 	if b.PreferredPosition != "" && b.PreferredPosition != BannerPositionTop && b.PreferredPosition != BannerPositionBottom {
-		return fmt.Sprintf("Banner preferred position must be empty, top or bottom. \"%v\" is not valid", b.PreferredPosition)
+		return NewUserPresentableError(fmt.Sprintf("Banner preferred position must be empty, top or bottom. \"%v\" is not valid", b.PreferredPosition))
 	}
 
-	return ""
+	return nil
 }
 
 func (banner *BannerAction) UnmarshalJSON(data []byte) error {
@@ -87,11 +87,7 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.CustomThemeName = ja.CustomThemeName
 	banner.PreferredPosition = preferredPosition
 
-	if validationIssue := banner.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return banner.Check()
 }
 
 func (b *BannerAction) AllEmbeddedThemeNames() ([]string, error) {

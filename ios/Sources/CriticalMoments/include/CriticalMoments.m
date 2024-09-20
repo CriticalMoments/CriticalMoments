@@ -325,8 +325,13 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+// replaced by setDeveloperMode
 - (void)setLogEvents:(bool)logEvents {
-    [self.appcore setLogEvents:logEvents];
+    [self setDeveloperMode:logEvents];
+}
+
+- (void)setDeveloperMode:(bool)devMode {
+    [self.appcore setDeveloperMode:devMode];
 }
 
 - (void)sendEvent:(NSString *)eventName {

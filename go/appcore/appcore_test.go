@@ -115,10 +115,23 @@ func (lb *testLibBindings) UpdateNotificationPlan(notifPlan *NotificationPlan) e
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
-	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// This file was designed to test non-strict parsing. It has "future" types which should fallback.
+	mode := false
+	ac.forceParseModeForStrict = &mode
+	return ac, nil
 }
 
 func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
+	t.Cleanup(func() {
+		// Appcore may mutate global state, so let's reset it
+		datamodel.StrictDatamodelParsing = false
+	})
+
 	ac := NewAppcore()
 	configPath, err := filepath.Abs(path)
 	if err != nil {
@@ -882,7 +895,7 @@ func TestSetLogEvents(t *testing.T) {
 	if ac.eventManager.logEvents {
 		t.Fatal("logEvents should be false by default")
 	}
-	ac.SetLogEvents(true)
+	ac.SetDeveloperMode(true)
 	if !ac.eventManager.logEvents {
 		t.Fatal("logEvents should be true after setting")
 	}

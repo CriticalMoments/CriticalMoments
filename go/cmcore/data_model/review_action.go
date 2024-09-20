@@ -11,8 +11,8 @@ func unpackReviewFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionT
 	return &ReviewAction{}, nil
 }
 
-func (l *ReviewAction) ValidateReturningUserReadableIssue() string {
-	return ""
+func (l *ReviewAction) Check() UserPresentableErrorInterface {
+	return nil
 }
 
 func (r *ReviewAction) AllEmbeddedThemeNames() ([]string, error) {

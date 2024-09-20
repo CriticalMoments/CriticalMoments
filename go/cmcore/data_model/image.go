@@ -14,7 +14,7 @@ const (
 )
 
 type imageTypeInterface interface {
-	ValidateReturningUserReadableIssue() string
+	Check() UserPresentableErrorInterface
 }
 
 var (
@@ -63,7 +63,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := imageTypeRegistry[i.ImageType]
 	if !ok {
-		errString := fmt.Sprintf("Unsupported image type: \"%v\" found in config file.", i.ImageType)
+		errString := fmt.Sprintf("Unsupported 'imageType' tag in config: \"%v\" is not a valid image type.", i.ImageType)
 		if StrictDatamodelParsing {
 			return NewUserPresentableError(errString)
 		} else {
@@ -74,43 +74,39 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	} else {
 		imageData, err := unpacker(ji.RawSectionData, i)
 		if err != nil {
-			return NewUserPresentableErrorWSource("Issue parsing image section.", err)
+			return NewUserPresentableErrorWSource("Unknown issue parsing image section of modal page.", err)
 		}
 		i.imageData = imageData
 	}
 
-	if validationIssue := i.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return i.Check()
 }
 
-func (i *Image) ValidateReturningUserReadableIssue() string {
+func (i *Image) Check() UserPresentableErrorInterface {
 	if i.Height <= 0 {
-		return "Image height must be > 0"
+		return NewUserPresentableError("Image height must be > 0")
 	}
 
 	if i.imageData == nil {
-		return "Invalid image"
+		return NewUserPresentableError("Invalid image in config -- no imageData map, which is required.")
 	}
-	if verr := i.imageData.ValidateReturningUserReadableIssue(); verr != "" {
+	if verr := i.imageData.Check(); verr != nil {
 		return verr
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(imageTypeRegistry), i.ImageType) {
-		return fmt.Sprintf("Image with unknown type: %v", i.ImageType)
+		return NewUserPresentableError(fmt.Sprintf("Image with invalid 'type' tag: %v", i.ImageType))
 	}
 
-	return ""
+	return nil
 }
 
 // Unknown image
 
 type UnknownImage struct{}
 
-func (u *UnknownImage) ValidateReturningUserReadableIssue() string {
-	return ""
+func (u *UnknownImage) Check() UserPresentableErrorInterface {
+	return nil
 }
 
 // Local image
@@ -133,12 +129,12 @@ func unpackLocalImage(data map[string]interface{}, i *Image) (imageTypeInterface
 	return &id, nil
 }
 
-func (li *LocalImage) ValidateReturningUserReadableIssue() string {
+func (li *LocalImage) Check() UserPresentableErrorInterface {
 	if li.Path == "" {
-		return "Local images must include a path."
+		return NewUserPresentableError("Local images must include a path.")
 	}
 
-	return ""
+	return nil
 }
 
 // System symbol image
@@ -211,39 +207,39 @@ func unpackSymbolImage(data map[string]interface{}, i *Image) (imageTypeInterfac
 		SecondaryColor: secondaryColor,
 	}
 
-	if errString := id.ValidateReturningUserReadableIssue(); errString != "" {
-		return nil, NewUserPresentableError(errString)
+	if err := id.Check(); err != nil {
+		return nil, err
 	}
 
 	i.SymbolImageData = &id
 	return &id, nil
 }
 
-func (si *SymbolImage) ValidateReturningUserReadableIssue() string {
+func (si *SymbolImage) Check() UserPresentableErrorInterface {
 	if si.SymbolName == "" {
-		return "Symbol images must include a symbolName."
+		return NewUserPresentableError("Symbol images must include a symbolName.")
 	}
 
 	if si.Weight != "" && !slices.Contains(symbolWeights, si.Weight) {
 		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return fmt.Sprintf("Invalid SF Symbold weight: %v", si.Weight)
+			return NewUserPresentableError(fmt.Sprintf("Invalid SF Symbol image 'weight' tag in imageData in config: '%v'", si.Weight))
 		}
 	}
 
 	if si.Mode != "" && !slices.Contains(symbolModes, si.Mode) {
 		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return fmt.Sprintf("invalid SF Symbold mode: %v", si.Mode)
+			return NewUserPresentableError(fmt.Sprintf("invalid SF Symbol 'mode' tag in imageData in config: '%v'", si.Mode))
 		}
 	}
 
 	colors := []string{si.PrimaryColor, si.SecondaryColor}
 	for _, color := range colors {
 		if !stringColorIsValidAllowEmpty(color) {
-			return fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\".", color)
+			return NewUserPresentableError(fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\".", color))
 		}
 	}
 
-	return ""
+	return nil
 }

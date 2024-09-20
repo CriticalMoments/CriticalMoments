@@ -146,7 +146,7 @@ func TestPageParsingMinimal(t *testing.T) {
 
 func TestPageValidation(t *testing.T) {
 	p := Page{}
-	if p.ValidateReturningUserReadableIssue() != "" {
+	if p.Check() != nil {
 		t.Fatal("should allow empty page when not strict for backwards compat")
 	}
 	// Strict mode should fail
@@ -154,7 +154,7 @@ func TestPageValidation(t *testing.T) {
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if p.ValidateReturningUserReadableIssue() == "" {
+	if p.Check() == nil {
 		t.Fatal("Allowed page with no sections in strict mode")
 	}
 	StrictDatamodelParsing = false
@@ -169,19 +169,19 @@ func TestPageValidation(t *testing.T) {
 		},
 	}
 	p.Sections[0].pageSectionData = p.Sections[0].TitleData
-	if verr := p.ValidateReturningUserReadableIssue(); verr != "" {
-		t.Fatal("Didn't allow valid page: " + verr)
+	if verr := p.Check(); verr != nil {
+		t.Fatal("Didn't allow valid page: ", verr)
 	}
 
 	// Needs to be future proof, client accept/ignore types it doesn't recognize
 	p.Sections[0].PageSectionType = "invalidType"
-	if p.ValidateReturningUserReadableIssue() != "" {
+	if p.Check() != nil {
 		t.Fatal("Didn't allow valid page")
 	}
 
 	p.Sections[0].PageSectionType = SectionTypeEnumTitle
 	p.Sections[0].TitleData.Title = ""
-	if p.ValidateReturningUserReadableIssue() == "" {
+	if p.Check() == nil {
 		t.Fatal("Allowed page with invalid subsection")
 	}
 	p.Sections[0].TitleData.Title = "title"
@@ -190,7 +190,7 @@ func TestPageValidation(t *testing.T) {
 	p.Buttons = []*Button{
 		{},
 	}
-	if p.ValidateReturningUserReadableIssue() == "" {
+	if p.Check() == nil {
 		t.Fatal("Allowed page with invalid button")
 	}
 	p.Buttons = []*Button{
@@ -199,7 +199,7 @@ func TestPageValidation(t *testing.T) {
 			Style: ButtonStyleEnumNormal,
 		},
 	}
-	if p.ValidateReturningUserReadableIssue() != "" {
+	if p.Check() != nil {
 		t.Fatal("Disallowed valid button")
 	}
 }
@@ -208,22 +208,22 @@ func TestTitlePageSectionValidation(t *testing.T) {
 	s := PageSection{
 		PageSectionType: SectionTypeEnumTitle,
 	}
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed title section with no title data")
 	}
 	s.TitleData = &TitlePageSection{
 		ScaleFactor: 1.0,
 	}
 	s.pageSectionData = s.TitleData
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed title section with no title string")
 	}
 	s.TitleData.Title = "title"
-	if s.ValidateReturningUserReadableIssue() != "" {
+	if s.Check() != nil {
 		t.Fatal("Valid title failed validation")
 	}
 	s.TitleData.ScaleFactor = -1.0
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed title section with negative scale")
 	}
 }
@@ -232,27 +232,27 @@ func TestBodyPageSectionValidation(t *testing.T) {
 	s := PageSection{
 		PageSectionType: SectionTypeEnumBodyText,
 	}
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed body section with no data")
 	}
 	s.BodyData = &BodyPageSection{
 		ScaleFactor: 1.0,
 	}
 	s.pageSectionData = s.BodyData
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed body section with no body")
 	}
 	s.BodyData.BodyText = "body"
-	if s.ValidateReturningUserReadableIssue() != "" {
+	if s.Check() != nil {
 		t.Fatal("Valid body failed validation")
 	}
 	s.BodyData.ScaleFactor = -1.0
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Allowed section with negative scale")
 	}
 	s.BodyData.ScaleFactor = 1.0
 	s.PageSectionType = "futureType"
-	if s.ValidateReturningUserReadableIssue() != "" {
+	if s.Check() != nil {
 		t.Fatal("future proof type causes breaking error")
 	}
 
@@ -261,7 +261,7 @@ func TestBodyPageSectionValidation(t *testing.T) {
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if s.ValidateReturningUserReadableIssue() == "" {
+	if s.Check() == nil {
 		t.Fatal("Strict passed validation on invalid type")
 	}
 

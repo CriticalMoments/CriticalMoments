@@ -39,7 +39,7 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		p.Sections = jp.PageData.Sections
 		p.Buttons = jp.PageData.Buttons
 	} else {
-		typeErr := "pageType must be 'stack'"
+		typeErr := "Page 'pageType' tag must be 'stack'"
 		if StrictDatamodelParsing {
 			return NewUserPresentableError(typeErr)
 		} else {
@@ -47,34 +47,30 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if validationIssue := p.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return p.Check()
 }
 
-func (p *Page) ValidateReturningUserReadableIssue() string {
+func (p *Page) Check() UserPresentableErrorInterface {
 	if len(p.Sections) == 0 {
 		// back-compat: allow zero sections when not strict
 		if StrictDatamodelParsing {
-			return "page with 0 sections is not valid"
+			return NewUserPresentableError("page with 0 sections is not valid")
 		}
 	}
 
-	for _, section := range p.Sections {
-		if valErr := section.ValidateReturningUserReadableIssue(); valErr != "" {
-			return valErr
+	for i, section := range p.Sections {
+		if valErr := section.Check(); valErr != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Page has an invalid section at index [%v]", i), valErr)
 		}
 	}
 
-	for _, button := range p.Buttons {
-		if valErr := button.ValidateReturningUserReadableIssue(); valErr != "" {
-			return valErr
+	for i, button := range p.Buttons {
+		if valErr := button.Check(); valErr != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Page has an invalid button at index [%v]", i), valErr)
 		}
 	}
 
-	return ""
+	return nil
 }
 
 const (
@@ -84,7 +80,7 @@ const (
 )
 
 type pageSectionTypeInterface interface {
-	ValidateReturningUserReadableIssue() string
+	Check() UserPresentableErrorInterface
 }
 
 var (
@@ -132,7 +128,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	unpacker, ok := pageSectionTypeRegistry[js.PageSectionType]
 	if !ok {
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file", s.PageSectionType))
+			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported page section 'type' tag: \"%v\" found in config file", s.PageSectionType))
 		} else {
 			// back-compat -- fallback to unknown section type
 			s.pageSectionData = UnknownSection{}
@@ -145,38 +141,34 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 		s.pageSectionData = pageSectionData
 	}
 
-	if validationIssue := s.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return s.Check()
 }
 
-func (s *PageSection) ValidateReturningUserReadableIssue() string {
+func (s *PageSection) Check() UserPresentableErrorInterface {
 	if s.TopSpacingScale < 0 {
-		return "Top space scale for a page section must be >= 0"
+		return NewUserPresentableError("Top space scale for a page section must be >= 0")
 	}
 
 	if s.pageSectionData == nil {
-		return "Invalid section in page"
+		return NewUserPresentableError("Invalid section in page -- nil section data")
 	}
-	if verr := s.pageSectionData.ValidateReturningUserReadableIssue(); verr != "" {
+	if verr := s.pageSectionData.Check(); verr != nil {
 		return verr
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(pageSectionTypeRegistry), s.PageSectionType) {
-		return fmt.Sprintf("Page section with unknown type: %v", s.PageSectionType)
+		return NewUserPresentableError(fmt.Sprintf("Page section with unknown 'type' tag: %v", s.PageSectionType))
 	}
 
-	return ""
+	return nil
 }
 
 // Unknown section
 
 type UnknownSection struct{}
 
-func (u UnknownSection) ValidateReturningUserReadableIssue() string {
-	return ""
+func (u UnknownSection) Check() UserPresentableErrorInterface {
+	return nil
 }
 
 // Title Section
@@ -231,15 +223,15 @@ func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 	return td, nil
 }
 
-func (t TitlePageSection) ValidateReturningUserReadableIssue() string {
+func (t TitlePageSection) Check() UserPresentableErrorInterface {
 	if t.Title == "" {
-		return "Page section of type title must have a title string."
+		return NewUserPresentableError("Page section of type title must have a title string.")
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type title must have a positive scaleFactor"
+		return NewUserPresentableError("Page section of type title must have a positive scaleFactor")
 	}
 
-	return ""
+	return nil
 }
 
 // Body Section
@@ -291,15 +283,15 @@ func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionType
 	return bd, nil
 }
 
-func (t BodyPageSection) ValidateReturningUserReadableIssue() string {
+func (t BodyPageSection) Check() UserPresentableErrorInterface {
 	if t.BodyText == "" {
-		return "Page section of type body must have a bodyText."
+		return NewUserPresentableError("Page section of type body must have a bodyText.")
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type body must have a positive scaleFactor"
+		return NewUserPresentableError("Page section of type body must have a positive scaleFactor")
 	}
 
-	return ""
+	return nil
 }
 
 // Image Section
