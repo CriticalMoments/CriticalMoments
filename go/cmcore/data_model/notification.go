@@ -167,35 +167,35 @@ func (n *Notification) CheckIgnoreID(ignoreID bool) UserPresentableErrorInterfac
 		return NewUserPresentableError("Notifications must have a deliveryTimeOfDayStart before deliveryTimeOfDayEnd.")
 	}
 	if len(n.DeliveryDaysOfWeek) == 0 {
-		return NewUserPresentableError("Notifications must have at least one day of week valid for delivery.")
+		return NewUserPresentableError("Notifications must have at least one day of week valid for delivery in deliveryDaysOfWeek.")
 	}
 	if n.RelevanceScore != nil && (*n.RelevanceScore < 0 || *n.RelevanceScore > 1) {
-		return NewUserPresentableError("Relevance score must be between 0 and 1 if provided.")
+		return NewUserPresentableError("Notification relevanceScore must be between 0 and 1 if provided.")
 	}
 	if StrictDatamodelParsing && n.InterruptionLevel != "" {
 		if !slices.Contains(validInterruptionLevels, n.InterruptionLevel) {
-			return NewUserPresentableError(fmt.Sprintf("Interruption level must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel))
+			return NewUserPresentableError(fmt.Sprintf("Notification interruptionLevel must be one of %v, got %v", validInterruptionLevels, n.InterruptionLevel))
 		}
 	}
 	if n.ScheduleCondition != nil {
 		if err := n.ScheduleCondition.Validate(); err != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition in notification ID [%v]", n.ID), err)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Notification has invalid scheduleCondition [%v]", n.ScheduleCondition.conditionString), err)
 		}
 	}
 	if n.CancelationEvents != nil {
 		for _, event := range *n.CancelationEvents {
 			if event == "" {
-				return NewUserPresentableError(fmt.Sprintf("Notification '%v' has an blank cancelation event", n.ID))
+				return NewUserPresentableError("Notification has an empty string in cancelationEvents. Remove it, or specify a non-empty string.")
 			}
 		}
 	}
 	if n.IdealDeliveryConditions != nil {
 		if conErr := n.IdealDeliveryConditions.Condition.Validate(); conErr != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Ideal delivery condition invalid for notification with id '%v'", n.ID), conErr)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Notification idealDeliveryCondition invalid for notification with id '%v'", n.ID), conErr)
 		}
 		if n.IdealDeliveryConditions.MaxWaitTimeSeconds != NotificationMaxIdealWaitTimeForever &&
 			n.IdealDeliveryConditions.MaxWaitTimeSeconds < 1 {
-			return NewUserPresentableError("Notifications must have a max wait time for ideal delivery condition. Valid values are -1 (forever) or values greater than 0.")
+			return NewUserPresentableError("Notifications must have a maxWaitTimeSeconds for ideal delivery condition. Valid values are -1 (forever) or values greater than 0.")
 		}
 	}
 	if dtErr := n.DeliveryTime.Check(); dtErr != nil {
@@ -206,17 +206,17 @@ func (n *Notification) CheckIgnoreID(ignoreID bool) UserPresentableErrorInterfac
 
 func (d *DeliveryTime) Check() UserPresentableErrorInterface {
 	if d.TimestampEpoch == nil && d.EventName == nil {
-		return NewUserPresentableError("DeliveryTime must have either a Timestamp or an EventName defined.")
+		return NewUserPresentableError("Notification DeliveryTime must have either a Timestamp or an EventName defined.")
 	}
 	if d.TimestampEpoch != nil && d.EventName != nil {
-		return NewUserPresentableError("DeliveryTime cannot have both a Timestamp and an EventName defined.")
+		return NewUserPresentableError("Notification DeliveryTime cannot have both a Timestamp and an EventName defined.")
 	}
 	if d.TimestampEpoch != nil && d.EventOffsetSeconds != nil {
-		return NewUserPresentableError("DeliveryTime cannot have both a Timestamp and an EventOffset defined.")
+		return NewUserPresentableError("Notification DeliveryTime cannot have both a Timestamp and an EventOffset defined.")
 	}
 	if StrictDatamodelParsing {
 		if d.EventInstance() == EventInstanceTypeUnknown {
-			return NewUserPresentableError(fmt.Sprintf("Notification event instance must be 'first' or 'latest' (default), got '%v'", d.EventInstanceString))
+			return NewUserPresentableError(fmt.Sprintf("Notification eventInstance must be 'first', 'latest', or 'latest-once' (default), got '%v'", d.EventInstanceString))
 		}
 	}
 	return nil

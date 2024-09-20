@@ -28,28 +28,24 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 	t.EventName = jt.EventName
 	t.Condition = jt.Condition
 
-	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return t.Check()
 }
 
-func (t *Trigger) Validate() bool {
-	return t.ValidateReturningUserReadableIssue() == ""
+func (t *Trigger) Valid() bool {
+	return t.Check() == nil
 }
 
-func (t *Trigger) ValidateReturningUserReadableIssue() string {
+func (t *Trigger) Check() UserPresentableErrorInterface {
 	if t.EventName == "" {
-		return "All triggers require an event"
+		return NewUserPresentableError("Triggers require an eventName")
 	}
 	if t.ActionName == "" {
-		return "All triggers require an action name"
+		return NewUserPresentableError("Triggers require an actionName")
 	}
 	if t.Condition != nil {
 		if err := t.Condition.Validate(); err != nil {
-			return fmt.Sprintf("Condition in trigger is not valid: [[%v]]", t.Condition.conditionString)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Condition in trigger is not valid: [[%v]]", t.Condition.conditionString), err)
 		}
 	}
-	return ""
+	return nil
 }

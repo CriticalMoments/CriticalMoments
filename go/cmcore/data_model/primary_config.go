@@ -454,9 +454,8 @@ func (pc *PrimaryConfig) checkNested() UserPresentableErrorInterface {
 		}
 	}
 	for triggerName, trigger := range pc.namedTriggers {
-		if triggerIssue := trigger.ValidateReturningUserReadableIssue(); triggerIssue != "" {
-			// TODO_P0
-			return NewUserPresentableError(fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue))
+		if triggerIssue := trigger.Check(); triggerIssue != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Trigger \"%v\" had issue", triggerName), triggerIssue)
 		}
 	}
 	for notificationID, notification := range pc.Notifications {
@@ -551,13 +550,6 @@ func (pc *PrimaryConfig) validateFallbackNames() string {
 			if !ok {
 				return fmt.Sprintf("Theme \"%v\" specified fallback theme \"%v\", which doesn't exist", themeName, theme.FallbackThemeName)
 			}
-		}
-	}
-
-	if pc.defaultTheme != nil && pc.defaultTheme.FallbackThemeName != "" {
-		_, ok := pc.namedThemes[pc.defaultTheme.FallbackThemeName]
-		if !ok {
-			return fmt.Sprintf("defaultTheme specified fallback theme \"%v\", which doesn't exist", pc.defaultTheme.FallbackThemeName)
 		}
 	}
 

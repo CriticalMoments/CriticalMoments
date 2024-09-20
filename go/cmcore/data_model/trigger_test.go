@@ -8,19 +8,19 @@ import (
 
 func TestTriggerJsonValidation(t *testing.T) {
 	trigger := Trigger{}
-	if trigger.Validate() {
+	if trigger.Valid() {
 		t.Fatal()
 	}
 	trigger.EventName = "my_event"
-	if trigger.Validate() {
+	if trigger.Valid() {
 		t.Fatal()
 	}
 	trigger.ActionName = "my_action"
-	if !trigger.Validate() {
+	if !trigger.Valid() {
 		t.Fatal()
 	}
 	trigger.EventName = ""
-	if trigger.Validate() {
+	if trigger.Valid() {
 		t.Fatal()
 	}
 }
@@ -46,7 +46,7 @@ func TestTriggerParsingValidTrigger(t *testing.T) {
 	if trigger.Condition.conditionString != "3 > 2" {
 		t.Fatal()
 	}
-	if !trigger.Validate() {
+	if !trigger.Valid() {
 		t.Fatal()
 	}
 }
@@ -64,7 +64,7 @@ func TestTriggerParsingInvalidTrigger(t *testing.T) {
 	if trigger.ActionName != "" || trigger.EventName != "" {
 		t.Fatal("trigger parse issue")
 	}
-	if trigger.Validate() {
+	if trigger.Valid() {
 		t.Fatal("validated empty trigger")
 	}
 }
@@ -81,7 +81,7 @@ func TestTriggerParsingInvalidConditionTrigger(t *testing.T) {
 	if trigger.ActionName != "my_action" || trigger.EventName != "my_event" {
 		t.Fatal("trigger parse issue")
 	}
-	if trigger.Validate() {
+	if trigger.Valid() {
 		t.Fatal("validated trigger with invalid condition")
 	}
 }

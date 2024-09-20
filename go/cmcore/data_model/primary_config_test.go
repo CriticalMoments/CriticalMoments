@@ -641,16 +641,33 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 	}
 }
 func TestInvalidsError(t *testing.T) {
-	invalidJson := []string{
-		// Fallback name checks
-		"invalidFallbackAction1.json",
-		"invalidFallbackTheme2.json",        // add_test_count
-		"invalidFallbackTheme1.json",        // add_test_count
-		"invalidNotificationAction.json",    // add_test_count
-		"invalidNotificationCondition.json", // add_test_count
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
+	// Check these have useful descriptions passed back up
+	// we want 2 elemnts to be a good description (why there is two for each):
+	// 1. the root problem
+	// 2. where in the config it is (named notification "asdf")
+	invalidJson := map[string]string{
+		// Root Problems
+		"specified fallback action \"missing\", which doesn't exist":     "invalidFallbackAction1.json",       // add_test_count
+		"\"missingTheme\", which doesn't exist":                          "invalidFallbackTheme2.json",        // add_test_count
+		"specified fallback theme \"missingTheme\", which doesn't exist": "invalidFallbackTheme1.json",        // add_test_count
+		"has action name 'action_does_not_exist', which does not exist":  "invalidNotificationAction.json",    // add_test_count
+		"invalid(condition) ???":                                         "invalidNotificationCondition.json", // add_test_count
+		"nexpected token Operator(\"?\"":                                 "invalidNotificationCondition.json", // add_test_count
+
+		// Where in the config
+		"Action \"action2\"":                                     "invalidFallbackAction1.json",       // add_test_count
+		"Theme \"themeX\" specified":                             "invalidFallbackTheme2.json",        // add_test_count
+		"Theme \"def_theme\"":                                    "invalidFallbackTheme1.json",        // add_test_count
+		"Notification 'testNotification' has":                    "invalidNotificationAction.json",    // add_test_count
+		"Error parsing condition string: invalid(condition) ???": "invalidNotificationCondition.json", // add_test_count
 	}
 
-	for _, invalidFile := range invalidJson {
+	for expectedError, invalidFile := range invalidJson {
 		testFileData, err := os.ReadFile("./test/testdata/primary_config/invalid/" + invalidFile)
 		if err != nil {
 			t.Fatal(err)
@@ -658,7 +675,10 @@ func TestInvalidsError(t *testing.T) {
 		pc := PrimaryConfig{}
 		err = json.Unmarshal(testFileData, &pc)
 		if err == nil {
-			t.Fatalf("Failed to disallow invalid primary config: %v\n\n%v", invalidFile, err)
+			t.Fatalf("Failed to disallow invalid primary config: %v", invalidFile)
+		}
+		if !strings.Contains(err.Error(), expectedError) {
+			t.Fatalf("Unexpected error for %v. Expected: %v, Got: %v", invalidFile, expectedError, err.Error())
 		}
 	}
 }

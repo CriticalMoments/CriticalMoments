@@ -1,11 +1,13 @@
 {
   "configVersion": "v1",
+  "appId": "io.criticalmoments.demo",
   "themes": {
-    "defaultTheme": {
-      "bannerBackgroundColor": "invalidNewColorFormat",
-      "fallback": "missingTheme"
-    },
+    "defaultTheme": "def_theme",
     "namedThemes": {
+      "def_theme": {
+        "bannerBackgroundColor": "#ffffff",
+        "fallback": "missingTheme"
+      },
       "fbTheme": {}
     }
   }

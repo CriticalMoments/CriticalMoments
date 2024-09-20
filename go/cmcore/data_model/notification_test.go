@@ -252,7 +252,7 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 func TestJsonParsingInvalidNotif(t *testing.T) {
 	cases := map[string]string{
 		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Error parsing condition string: true > 1",
-		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "blank cancelation event",                                    // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "Notification has an empty string in cancelationEvents",      // add_test_case
 		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json":       "Notification badgeCount must be greater than or equal to 0", // add_test_case
 	}
 
@@ -307,7 +307,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	// Case: Both TimestampEpoch and EventName are nil
 	dt := DeliveryTime{}
 	issue := dt.Check().Error()
-	if issue != "DeliveryTime must have either a Timestamp or an EventName defined." {
+	if issue != "Notification DeliveryTime must have either a Timestamp or an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
@@ -316,7 +316,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	eventName := "event"
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventName: &eventName}
 	issue = dt.Check().Error()
-	if issue != "DeliveryTime cannot have both a Timestamp and an EventName defined." {
+	if issue != "Notification DeliveryTime cannot have both a Timestamp and an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
@@ -324,7 +324,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	eventOffsetSeconds := 30
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffsetSeconds: &eventOffsetSeconds}
 	issue = dt.Check().Error()
-	if issue != "DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
+	if issue != "Notification DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
