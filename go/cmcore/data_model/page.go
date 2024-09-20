@@ -41,13 +41,17 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 	} else {
 		typeErr := "Page 'pageType' tag must be 'stack'"
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(typeErr)
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError(typeErr))
 		} else {
 			fmt.Printf("CriticalMoments: %v. Ignoring, but if not expected check your config file.\n", typeErr)
 		}
 	}
 
-	return p.Check()
+	if err := p.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (p *Page) Check() UserPresentableErrorInterface {
@@ -128,7 +132,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	unpacker, ok := pageSectionTypeRegistry[js.PageSectionType]
 	if !ok {
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported page section 'type' tag: \"%v\" found in config file", s.PageSectionType))
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported page section 'type' tag: \"%v\" found in config file", s.PageSectionType)))
 		} else {
 			// back-compat -- fallback to unknown section type
 			s.pageSectionData = UnknownSection{}
@@ -141,7 +145,11 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 		s.pageSectionData = pageSectionData
 	}
 
-	return s.Check()
+	if err := s.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (s *PageSection) Check() UserPresentableErrorInterface {

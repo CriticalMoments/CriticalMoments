@@ -54,7 +54,10 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	c.PassedActionName = jc.PassedActionName
 	c.FailedActionName = jc.FailedActionName
 
-	return c.Check()
+	if err := c.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+	return nil
 }
 
 func (c *ConditionalAction) AllEmbeddedThemeNames() ([]string, error) {

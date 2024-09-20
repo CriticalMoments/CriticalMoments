@@ -114,7 +114,7 @@ func TestJsonParsingInvalidConditionalActionCondition(t *testing.T) {
 		t.Fatal("Invalid conditionals should not parse")
 	}
 
-	upErr, ok := err.(*UserPresentableError)
+	upErr, ok := err.(UserPresentableErrorInterface)
 	if !ok {
 		t.Fatal("Invalid conditionals should return user presentable error")
 	}

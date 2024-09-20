@@ -272,7 +272,7 @@ func (t *Theme) UnmarshalJSON(data []byte) error {
 
 	uperr := parseThemeFromJsonTheme(t, &jt)
 	if uperr != nil {
-		return uperr
+		return NewUserErrorForJsonIssue(data, uperr)
 	}
 
 	return nil

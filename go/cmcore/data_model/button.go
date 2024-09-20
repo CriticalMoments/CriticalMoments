@@ -57,14 +57,18 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 	}
 	if !slices.Contains(buttonStyles, b.Style) {
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("invalid button 'style' tag found in config (for a modal button): \"%v\"", b.Style))
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError(fmt.Sprintf("invalid button 'style' tag found in config (for a modal button): \"%v\"", b.Style)))
 		} else {
 			// Backwards compatibility: fallback to normal if this client doesn't recognize the style
 			b.Style = ButtonStyleEnumNormal
 		}
 	}
 
-	return b.Check()
+	if err := b.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (b *Button) Check() UserPresentableErrorInterface {

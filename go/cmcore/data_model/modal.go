@@ -54,7 +54,11 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 	m.CustomThemeName = jm.CustomThemeName
 	m.ShowCloseButton = showCloseButton
 
-	return m.Check()
+	if err := m.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (m *ModalAction) AllEmbeddedThemeNames() ([]string, error) {

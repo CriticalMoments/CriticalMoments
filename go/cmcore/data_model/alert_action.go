@@ -154,7 +154,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 			// Backwards compatibility -- default to dialog if this client doesn't recognize the style
 			if StrictDatamodelParsing {
 				styleErr := fmt.Sprintf("invalid 'style' tag found in config file under an alert action: \"%v\"", *ja.Style)
-				return NewUserPresentableError(styleErr)
+				return NewUserErrorForJsonIssue(data, NewUserPresentableError(styleErr))
 			}
 		}
 	}
@@ -171,14 +171,18 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		for _, customButtonJson := range *ja.CustomButtons {
 			b, err := customButtonFromJson(&customButtonJson)
 			if err != nil {
-				return err
+				return NewUserErrorForJsonIssue(data, err)
 			}
 			customButtons = append(customButtons, b)
 		}
 	}
 	a.CustomButtons = customButtons
 
-	return a.Check()
+	if err := a.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, error) {

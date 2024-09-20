@@ -295,8 +295,8 @@ func TestUserPresentableErrorForCondition(t *testing.T) {
 		if err == nil {
 			t.Fatalf("Validate allowed invalid condition: %s", conditionString)
 		}
-		if err.UserReadableErrorString() != fmt.Sprintf("Error parsing condition string: %s", conditionString) {
-			t.Fatalf("UserReadableErrorString not set correctly for condition: %s", conditionString)
+		if !strings.Contains(err.UserReadableErrorString(), fmt.Sprintf("Error parsing condition string: %s", conditionString)) {
+			t.Fatalf("UserReadableErrorString not set correctly for condition: %s. Expected: %s, Got: %s", conditionString, fmt.Sprintf("Error parsing condition string: %s", conditionString), err.UserReadableErrorString())
 		}
 		if !strings.Contains(err.Error(), expectedErrorSubstring) {
 			t.Fatalf("UserErrorString failed to explain main issue for condition: %s. Expected: %s, Got: %s", conditionString, expectedErrorSubstring, err.Error())
