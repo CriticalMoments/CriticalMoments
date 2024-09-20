@@ -11,7 +11,7 @@ func unpackReviewFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionT
 	return &ReviewAction{}, nil
 }
 
-func (l *ReviewAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (l *ReviewAction) Check() UserPresentableErrorInterface {
 	return nil
 }
 

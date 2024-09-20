@@ -71,7 +71,7 @@ type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
 	AllEmbeddedConditions() ([]*Condition, error)
-	ValidateReturningUserReadableIssue() UserPresentableErrorInterface
+	Check() UserPresentableErrorInterface
 	PerformAction(ab ActionBindings, actionName string) error
 }
 
@@ -122,7 +122,7 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (ac *ActionContainer) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (ac *ActionContainer) Check() UserPresentableErrorInterface {
 	if ac.ActionType == "" {
 		return NewUserPresentableError("Empty actionType not permitted")
 	}
@@ -141,7 +141,7 @@ func (ac *ActionContainer) ValidateReturningUserReadableIssue() UserPresentableE
 		return NewUserPresentableError(fmt.Sprintf("Action type %v has internal issues", ac.ActionType))
 	}
 
-	return ac.actionData.ValidateReturningUserReadableIssue()
+	return ac.actionData.Check()
 }
 
 func (ac *ActionContainer) PerformAction(ab ActionBindings, actionName string) error {

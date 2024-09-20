@@ -26,11 +26,11 @@ func unpackLinkFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTyp
 	return &link, nil
 }
 
-func (l *LinkAction) Validate() bool {
-	return l.ValidateReturningUserReadableIssue() == nil
+func (l *LinkAction) Valid() bool {
+	return l.Check() == nil
 }
 
-func (l *LinkAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (l *LinkAction) Check() UserPresentableErrorInterface {
 	if l.UrlString == "" {
 		return NewUserPresentableError("Link actions must have a url")
 	}
@@ -68,10 +68,7 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 	l.UrlString = jl.UrlString
 	l.UseEmbeddedBrowser = useEmbeddedBrowser
 
-	if userReadableIssue := l.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
-		return userReadableIssue
-	}
-	return nil
+	return l.Check()
 }
 
 func (l *LinkAction) AllEmbeddedThemeNames() ([]string, error) {

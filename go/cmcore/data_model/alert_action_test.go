@@ -16,54 +16,54 @@ func TestAlertActionValidators(t *testing.T) {
 		ShowOkButton: true,
 		Style:        AlertActionStyleEnumDialog,
 	}
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Style = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty style")
 	}
 	a.Style = "asdf"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid style")
 	}
 	a.Style = AlertActionStyleEnumLarge
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Title = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow empty title if message still provided")
 	}
 	a.Message = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should not allow empty title and message")
 	}
 	a.Title = "New title"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow title and not message")
 	}
 	a.ShowOkButton = false
 	a.OkButtonActionName = "action"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should not allow an okay actio when ok button hidden")
 	}
 	a.ShowOkButton = true
 	a.OkButtonActionName = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow okay without an action")
 	}
 	cb := AlertActionCustomButton{}
 	a.CustomButtons = []*AlertActionCustomButton{&cb}
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should vaidate buttons as well")
 	}
 	a.CustomButtons = []*AlertActionCustomButton{}
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal()
 	}
 	a.ShowOkButton = false
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Alert requires ok or custom buttons, but allowed neither")
 	}
 }
@@ -119,7 +119,7 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 		t.Fatal("failed to parse fallback action name")
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "For real?" {
@@ -189,7 +189,7 @@ func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
 		t.Fatal()
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "For real?" {
@@ -227,7 +227,7 @@ func TestJsonParsingOkayDisabledAlert(t *testing.T) {
 		t.Fatal()
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.ShowOkButton {
@@ -276,7 +276,7 @@ func TestJsonParsingFuture(t *testing.T) {
 	}
 
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "hello from the future" {
@@ -309,7 +309,7 @@ func TestJsonParsingFutureButton(t *testing.T) {
 	}
 
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.CustomButtons[0].Style != AlertActionButtonStyleEnumDefault {

@@ -452,7 +452,7 @@ func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
 		}
 	}
 	for actionName, action := range pc.namedActions {
-		if actionValidationIssue := action.ValidateReturningUserReadableIssue(); actionValidationIssue != nil {
+		if actionValidationIssue := action.Check(); actionValidationIssue != nil {
 			// TODO_P0 log more in debug mode, including source
 			return fmt.Sprintf("Action \"%v\" had issue: %v", actionName, actionValidationIssue)
 		}

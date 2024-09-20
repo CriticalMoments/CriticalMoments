@@ -26,11 +26,11 @@ func unpackModalFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTy
 	return &modal, nil
 }
 
-func (m *ModalAction) Validate() bool {
-	return m.ValidateReturningUserReadableIssue() == nil
+func (m *ModalAction) Valid() bool {
+	return m.Check() == nil
 }
 
-func (m *ModalAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (m *ModalAction) Check() UserPresentableErrorInterface {
 	if m.Content == nil {
 		return NewUserPresentableError("Modals must have content")
 	}
@@ -58,10 +58,7 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 	m.CustomThemeName = jm.CustomThemeName
 	m.ShowCloseButton = showCloseButton
 
-	if userReadableIssue := m.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
-		return userReadableIssue
-	}
-	return nil
+	return m.Check()
 }
 
 func (m *ModalAction) AllEmbeddedThemeNames() ([]string, error) {

@@ -39,11 +39,11 @@ func unpackBannerFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionT
 	return &banner, nil
 }
 
-func (ba *BannerAction) Validate() bool {
-	return ba.ValidateReturningUserReadableIssue() == nil
+func (ba *BannerAction) Valid() bool {
+	return ba.Check() == nil
 }
 
-func (b *BannerAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (b *BannerAction) Check() UserPresentableErrorInterface {
 	if b.Body == "" {
 		return NewUserPresentableError("Banners must have body text")
 	}
@@ -87,10 +87,7 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.CustomThemeName = ja.CustomThemeName
 	banner.PreferredPosition = preferredPosition
 
-	if userReadableIssue := banner.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
-		return userReadableIssue
-	}
-	return nil
+	return banner.Check()
 }
 
 func (b *BannerAction) AllEmbeddedThemeNames() ([]string, error) {

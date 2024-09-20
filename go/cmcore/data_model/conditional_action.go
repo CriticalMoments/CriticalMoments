@@ -26,11 +26,11 @@ func unpackConditionalActionFromJson(rawJson json.RawMessage, ac *ActionContaine
 	return &condition, nil
 }
 
-func (c *ConditionalAction) Validate() bool {
-	return c.ValidateReturningUserReadableIssue() == nil
+func (c *ConditionalAction) Valid() bool {
+	return c.Check() == nil
 }
 
-func (c *ConditionalAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (c *ConditionalAction) Check() UserPresentableErrorInterface {
 	if c.Condition == nil {
 		return NewUserPresentableError("Conditional actions must have a condition")
 	}
@@ -54,11 +54,7 @@ func (c *ConditionalAction) UnmarshalJSON(data []byte) error {
 	c.PassedActionName = jc.PassedActionName
 	c.FailedActionName = jc.FailedActionName
 
-	if userErr := c.ValidateReturningUserReadableIssue(); userErr != nil {
-		return userErr
-	}
-
-	return nil
+	return c.Check()
 }
 
 func (c *ConditionalAction) AllEmbeddedThemeNames() ([]string, error) {

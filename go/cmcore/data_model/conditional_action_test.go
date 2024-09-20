@@ -18,15 +18,15 @@ func testHelperNewCondition(s string, t *testing.T) *Condition {
 
 func TestConditionalActionValidators(t *testing.T) {
 	c := ConditionalAction{}
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional actions require a condition")
 	}
 	c.Condition = testHelperNewCondition("(network_connection_type == 'wifi')", t)
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional actions require a passed action")
 	}
 	c.PassedActionName = "pass_action"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid")
 	}
 	an, err := c.AllEmbeddedActionNames()
@@ -34,19 +34,19 @@ func TestConditionalActionValidators(t *testing.T) {
 		t.Fatal("Failed to return action name for pass action")
 	}
 	c.Condition.conditionString = "not_a_valid_var > 5"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should validate condition validity but non-strict okay")
 	}
 	c.Condition = nil
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional action require condition")
 	}
 	c.Condition = testHelperNewCondition("true", t)
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid")
 	}
 	c.FailedActionName = "fail_action"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid with or without failed_action")
 	}
 	an, err = c.AllEmbeddedActionNames()
@@ -60,7 +60,7 @@ func TestConditionalActionValidators(t *testing.T) {
 	}()
 	// Check it calls nested validators. Can't construct a problematic condition without reflection
 	c.Condition.conditionString = "not_a_valid_func() > 5"
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional action should validate condition validity")
 	}
 }

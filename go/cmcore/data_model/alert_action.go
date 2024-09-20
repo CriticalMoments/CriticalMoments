@@ -89,11 +89,11 @@ func unpackAlertFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTy
 	return &alert, nil
 }
 
-func (a *AlertAction) Validate() bool {
-	return a.ValidateReturningUserReadableIssue() == nil
+func (a *AlertAction) Valid() bool {
+	return a.Check() == nil
 }
 
-func (a *AlertAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
+func (a *AlertAction) Check() UserPresentableErrorInterface {
 	if a.Title == "" && a.Message == "" {
 		return NewUserPresentableError("Alerts must have a title and/or a message. Both can not be blank.")
 	}
@@ -178,10 +178,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	}
 	a.CustomButtons = customButtons
 
-	if userReadableIssue := a.ValidateReturningUserReadableIssue(); userReadableIssue != nil {
-		return userReadableIssue
-	}
-	return nil
+	return a.Check()
 }
 
 func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, error) {
