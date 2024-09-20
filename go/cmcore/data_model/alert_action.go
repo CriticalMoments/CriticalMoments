@@ -153,7 +153,7 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 		} else {
 			// Backwards compatibility -- default to dialog if this client doesn't recognize the style
 			if StrictDatamodelParsing {
-				styleErr := fmt.Sprintf("invalid alert style found in config file: \"%v\"", *ja.Style)
+				styleErr := fmt.Sprintf("invalid 'style' tag found in config file under an alert action: \"%v\"", *ja.Style)
 				return NewUserPresentableError(styleErr)
 			}
 		}
@@ -189,7 +189,7 @@ func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, 
 		} else {
 			// Backwards compatibility: fall back to default style if this isn't recognized by this client
 			if StrictDatamodelParsing {
-				btnStyleErr := fmt.Sprintf("alert action style \"%v\" is not a valid style", *jb.Style)
+				btnStyleErr := fmt.Sprintf("invalid alert action 'style' tag found in config. \"%v\" is not a valid style", *jb.Style)
 				return nil, NewUserPresentableError(btnStyleErr)
 			}
 		}

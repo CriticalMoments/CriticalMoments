@@ -39,7 +39,7 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		p.Sections = jp.PageData.Sections
 		p.Buttons = jp.PageData.Buttons
 	} else {
-		typeErr := "pageType must be 'stack'"
+		typeErr := "Page 'pageType' tag must be 'stack'"
 		if StrictDatamodelParsing {
 			return NewUserPresentableError(typeErr)
 		} else {
@@ -128,7 +128,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	unpacker, ok := pageSectionTypeRegistry[js.PageSectionType]
 	if !ok {
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported section type: \"%v\" found in config file", s.PageSectionType))
+			return NewUserPresentableError(fmt.Sprintf("CriticalMoments: Unsupported page section 'type' tag: \"%v\" found in config file", s.PageSectionType))
 		} else {
 			// back-compat -- fallback to unknown section type
 			s.pageSectionData = UnknownSection{}
@@ -157,7 +157,7 @@ func (s *PageSection) Check() UserPresentableErrorInterface {
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(pageSectionTypeRegistry), s.PageSectionType) {
-		return NewUserPresentableError(fmt.Sprintf("Page section with unknown type: %v", s.PageSectionType))
+		return NewUserPresentableError(fmt.Sprintf("Page section with unknown 'type' tag: %v", s.PageSectionType))
 	}
 
 	return nil

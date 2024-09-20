@@ -103,12 +103,12 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	if ok && unpacker != nil {
 		actionData, err = unpacker(jac.RawActionData, ac)
 		if err != nil {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking type \"%v\"", jac.ActionType), err)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Issue unpacking actionType \"%v\"", jac.ActionType), err)
 		}
 	} else {
 		// Allow backwards compatibility, defaulting to no-op
 		if StrictDatamodelParsing {
-			typeErr := fmt.Sprintf("unsupported action type found in config file: \"%v\"", jac.ActionType)
+			typeErr := fmt.Sprintf("Unsupported actionType found in config file: \"%v\"", jac.ActionType)
 			return NewUserPresentableError(typeErr)
 		} else {
 			actionData = &UnknownAction{ActionType: jac.ActionType}
@@ -131,14 +131,14 @@ func (ac *ActionContainer) Check() UserPresentableErrorInterface {
 	if !ok {
 		_, ok := ac.actionData.(*UnknownAction)
 		if !ok {
-			return NewUserPresentableError("Internal error. Code 776232923.")
+			return NewUserPresentableError("Internal error parsing an Action. Code 776232923.")
 		}
 	}
 
 	if ac.actionData == nil {
 		// the action type data interface should be set after unmarshaling.
 		// This is a code issue if it occurs, not a data issue
-		return NewUserPresentableError(fmt.Sprintf("Action type %v has internal issues", ac.ActionType))
+		return NewUserPresentableError(fmt.Sprintf("actionType '%v' has internal issues", ac.ActionType))
 	}
 
 	return ac.actionData.Check()
@@ -146,7 +146,7 @@ func (ac *ActionContainer) Check() UserPresentableErrorInterface {
 
 func (ac *ActionContainer) PerformAction(ab ActionBindings, actionName string) error {
 	if ac.actionData == nil {
-		return errors.New("attempted to perform action without AD interface")
+		return errors.New("attempted to perform action without actionData interface")
 	}
 	err := ac.actionData.PerformAction(ab, actionName)
 

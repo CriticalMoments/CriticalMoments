@@ -182,7 +182,7 @@ func (c *Condition) Validate() UserPresentableErrorInterface {
 		for _, methodName := range fields.Methods {
 			if _, ok := AllBuiltInDynamicFunctions[methodName]; !ok {
 				if _, ok := StaticConditionHelperFunctions()[methodName]; !ok {
-					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
+					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized. Method: '%v', in condition: [[ %v ]]", methodName, c.conditionString))
 				}
 			}
 		}
@@ -210,7 +210,7 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 	var conditionString *string
 	err := json.Unmarshal(data, &conditionString)
 	if err != nil {
-		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition String [[ %s ]]", string(data)), err)
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition string [[ %s ]]", string(data)), err)
 	}
 	c.conditionString = *conditionString
 

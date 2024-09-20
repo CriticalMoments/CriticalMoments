@@ -300,7 +300,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 			} else if appcoreBuiltInTheme != nil {
 				pc.defaultTheme = appcoreBuiltInTheme
 			} else if StrictDatamodelParsing {
-				return NewUserPresentableError("Default theme specified in config doesn't exist")
+				return NewUserPresentableError("Default theme specified in 'defaultThemeName' tag in config doesn't exist")
 			} else {
 				fmt.Println("CriticalMoments: WARNING - Default theme specified in config doesn't exist. Will fallback to system default theme.")
 			}

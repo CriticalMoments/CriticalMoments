@@ -127,6 +127,11 @@ func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
 }
 
 func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
+	t.Cleanup(func() {
+		// Appcore may mutate global state, so let's reset it
+		datamodel.StrictDatamodelParsing = false
+	})
+
 	ac := NewAppcore()
 	configPath, err := filepath.Abs(path)
 	if err != nil {

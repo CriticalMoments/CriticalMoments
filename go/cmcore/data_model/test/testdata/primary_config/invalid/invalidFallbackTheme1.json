@@ -2,7 +2,7 @@
   "configVersion": "v1",
   "appId": "io.criticalmoments.demo",
   "themes": {
-    "defaultTheme": "def_theme",
+    "defaultThemeName": "def_theme",
     "namedThemes": {
       "def_theme": {
         "bannerBackgroundColor": "#ffffff",

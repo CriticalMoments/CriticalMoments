@@ -285,9 +285,9 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	if jn.DeliveryWindowTODEnd != "" {
 		deliveryEnd, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODEnd)
 		if err != nil && StrictDatamodelParsing {
-			return NewUserPresentableError("Invalid deliveryTimeOfDayEnd. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
+			return NewUserPresentableError("Invalid notification 'deliveryTimeOfDayEnd'. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
 		} else if err != nil {
-			fmt.Printf("CriticalMoments: invalid deliveryTimeOfDayEnd [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
+			fmt.Printf("CriticalMoments: invalid notification 'deliveryTimeOfDayEnd' [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
 			n.DeliveryWindowTODEndMinutes = defaultDeliveryWindowLocalTimeEnd
 		} else {
 			n.DeliveryWindowTODEndMinutes = deliveryEnd

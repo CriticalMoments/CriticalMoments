@@ -63,7 +63,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := imageTypeRegistry[i.ImageType]
 	if !ok {
-		errString := fmt.Sprintf("Unsupported image type: \"%v\" found in config file.", i.ImageType)
+		errString := fmt.Sprintf("Unsupported 'imageType' tag in config: \"%v\" is not a valid image type.", i.ImageType)
 		if StrictDatamodelParsing {
 			return NewUserPresentableError(errString)
 		} else {
@@ -74,7 +74,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	} else {
 		imageData, err := unpacker(ji.RawSectionData, i)
 		if err != nil {
-			return NewUserPresentableErrorWSource("Issue parsing image section.", err)
+			return NewUserPresentableErrorWSource("Unknown issue parsing image section of modal page.", err)
 		}
 		i.imageData = imageData
 	}
@@ -88,14 +88,14 @@ func (i *Image) Check() UserPresentableErrorInterface {
 	}
 
 	if i.imageData == nil {
-		return NewUserPresentableError("Invalid image -- no data")
+		return NewUserPresentableError("Invalid image in config -- no imageData map, which is required.")
 	}
 	if verr := i.imageData.Check(); verr != nil {
 		return verr
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(imageTypeRegistry), i.ImageType) {
-		return NewUserPresentableError(fmt.Sprintf("Image with unknown type: %v", i.ImageType))
+		return NewUserPresentableError(fmt.Sprintf("Image with invalid 'type' tag: %v", i.ImageType))
 	}
 
 	return nil
@@ -223,14 +223,14 @@ func (si *SymbolImage) Check() UserPresentableErrorInterface {
 	if si.Weight != "" && !slices.Contains(symbolWeights, si.Weight) {
 		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("Invalid SF Symbold weight: %v", si.Weight))
+			return NewUserPresentableError(fmt.Sprintf("Invalid SF Symbol image 'weight' tag in imageData in config: '%v'", si.Weight))
 		}
 	}
 
 	if si.Mode != "" && !slices.Contains(symbolModes, si.Mode) {
 		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("invalid SF Symbold mode: %v", si.Mode))
+			return NewUserPresentableError(fmt.Sprintf("invalid SF Symbold 'mode' tag in imageData in config: '%v'", si.Mode))
 		}
 	}
 
