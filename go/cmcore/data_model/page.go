@@ -84,7 +84,7 @@ const (
 )
 
 type pageSectionTypeInterface interface {
-	ValidateReturningUserReadableIssue() string
+	Check() UserPresentableErrorInterface
 }
 
 var (
@@ -160,8 +160,9 @@ func (s *PageSection) ValidateReturningUserReadableIssue() string {
 	if s.pageSectionData == nil {
 		return "Invalid section in page"
 	}
-	if verr := s.pageSectionData.ValidateReturningUserReadableIssue(); verr != "" {
-		return verr
+	if verr := s.pageSectionData.Check(); verr != nil {
+		// TODO_P0 -- pass up
+		return verr.Error()
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(pageSectionTypeRegistry), s.PageSectionType) {
@@ -175,8 +176,8 @@ func (s *PageSection) ValidateReturningUserReadableIssue() string {
 
 type UnknownSection struct{}
 
-func (u UnknownSection) ValidateReturningUserReadableIssue() string {
-	return ""
+func (u UnknownSection) Check() UserPresentableErrorInterface {
+	return nil
 }
 
 // Title Section
@@ -231,15 +232,15 @@ func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 	return td, nil
 }
 
-func (t TitlePageSection) ValidateReturningUserReadableIssue() string {
+func (t TitlePageSection) Check() UserPresentableErrorInterface {
 	if t.Title == "" {
-		return "Page section of type title must have a title string."
+		return NewUserPresentableError("Page section of type title must have a title string.")
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type title must have a positive scaleFactor"
+		return NewUserPresentableError("Page section of type title must have a positive scaleFactor")
 	}
 
-	return ""
+	return nil
 }
 
 // Body Section
@@ -291,15 +292,15 @@ func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionType
 	return bd, nil
 }
 
-func (t BodyPageSection) ValidateReturningUserReadableIssue() string {
+func (t BodyPageSection) Check() UserPresentableErrorInterface {
 	if t.BodyText == "" {
-		return "Page section of type body must have a bodyText."
+		return NewUserPresentableError("Page section of type body must have a bodyText.")
 	}
 	if t.ScaleFactor <= 0 {
-		return "Page section of type body must have a positive scaleFactor"
+		return NewUserPresentableError("Page section of type body must have a positive scaleFactor")
 	}
 
-	return ""
+	return nil
 }
 
 // Image Section
