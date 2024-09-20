@@ -361,7 +361,7 @@ func (ac *Appcore) loadConfig(allowDebugLoad bool) error {
 				datamodel.StrictDatamodelParsing = *ac.forceParseModeForStrict
 			} else {
 				// Default to strict parsing when debugging a local unsigned file. This helps find issues and makes errors more descriptive.
-				datamodel.StrictDatamodelParsing = false
+				datamodel.StrictDatamodelParsing = true
 			}
 			pc = &datamodel.PrimaryConfig{}
 			err = json.Unmarshal(configFileData, &pc)
