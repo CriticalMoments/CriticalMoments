@@ -107,27 +107,27 @@ func (a *AlertAction) Check() UserPresentableErrorInterface {
 		return NewUserPresentableError("Alert must have an ok button and/or custom buttons.")
 	}
 	for i, customButtom := range a.CustomButtons {
-		if customButtonIssue := customButtom.ValidateReturningUserReadableIssue(); customButtonIssue != "" {
-			return NewUserPresentableError(fmt.Sprintf("For an alert, button at index %v had issue \"%v\"", i, customButtonIssue))
+		if customButtonIssue := customButtom.Check(); customButtonIssue != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("For an alert, button at index %v had issue.", i), customButtonIssue)
 		}
 	}
 
 	return nil
 }
 
-func (b *AlertActionCustomButton) Validate() bool {
-	return b.ValidateReturningUserReadableIssue() == ""
+func (b *AlertActionCustomButton) Valid() bool {
+	return b.Check() == nil
 }
 
-func (b *AlertActionCustomButton) ValidateReturningUserReadableIssue() string {
+func (b *AlertActionCustomButton) Check() UserPresentableErrorInterface {
 	if b.Label == "" {
-		return "Custom alert buttons must have a label"
+		return NewUserPresentableError("Custom alert buttons must have a label")
 	}
 	if !slices.Contains(alertActionStyles, b.Style) {
-		return fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style)
+		return NewUserPresentableError(fmt.Sprintf("Custom alert buttons must have a valid style: default, primary, or destructive. \"%v\" is not valid.", b.Style))
 	}
 
-	return ""
+	return nil
 }
 
 func (a *AlertAction) UnmarshalJSON(data []byte) error {

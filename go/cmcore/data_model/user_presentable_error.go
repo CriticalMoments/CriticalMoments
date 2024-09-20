@@ -20,7 +20,7 @@ func NewUserPresentableError(s string) *UserPresentableError {
 	}
 }
 
-func NewUserPresentableErrorWSource(s string, sourceErr error) *UserPresentableError {
+func NewUserPresentableErrorWSource(s string, sourceErr error) UserPresentableErrorInterface {
 	return &UserPresentableError{
 		userReadableErrorString: s,
 		SourceError:             sourceErr,

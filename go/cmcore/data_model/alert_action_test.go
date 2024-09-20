@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"golang.org/x/exp/slices"
@@ -58,6 +59,12 @@ func TestAlertActionValidators(t *testing.T) {
 	if a.Valid() {
 		t.Fatal("Should vaidate buttons as well")
 	}
+	if !strings.Contains(a.Check().Error(), "Custom alert buttons must have a label") {
+		t.Fatal("Incorrect error message")
+	}
+	if !strings.Contains(a.Check().Error(), "For an alert, button at index 0 had issue") {
+		t.Fatal("Incorrect error message")
+	}
 	a.CustomButtons = []*AlertActionCustomButton{}
 	if !a.Valid() {
 		t.Fatal()
@@ -73,28 +80,31 @@ func TestCustomButtonValidation(t *testing.T) {
 		Label: "Label",
 		Style: AlertActionButtonStyleEnumPrimary,
 	}
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button fails validation")
 	}
 	b.Style = ""
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Empty button style should not validate")
 	}
 	b.Style = "adsf"
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("INvalid style should not validate")
 	}
 	b.Style = AlertActionButtonStyleEnumDestructive
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button style fails validation")
 	}
 	b.Style = AlertActionButtonStyleEnumDefault
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button style fails validation")
 	}
 	b.Label = ""
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Buttons require a label")
+	}
+	if !strings.Contains(b.Check().Error(), "Custom alert buttons must have a label") {
+		t.Fatal("Incorrect error message")
 	}
 }
 
