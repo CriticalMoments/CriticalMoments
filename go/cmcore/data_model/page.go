@@ -47,35 +47,30 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if validationIssue := p.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return p.Check()
 }
 
-func (p *Page) ValidateReturningUserReadableIssue() string {
+func (p *Page) Check() UserPresentableErrorInterface {
 	if len(p.Sections) == 0 {
 		// back-compat: allow zero sections when not strict
 		if StrictDatamodelParsing {
-			return "page with 0 sections is not valid"
+			return NewUserPresentableError("page with 0 sections is not valid")
 		}
 	}
 
 	for _, section := range p.Sections {
-		if valErr := section.ValidateReturningUserReadableIssue(); valErr != "" {
+		if valErr := section.Check(); valErr != nil {
 			return valErr
 		}
 	}
 
 	for _, button := range p.Buttons {
 		if valErr := button.Check(); valErr != nil {
-			// TODO_P0 -- pass up
-			return valErr.Error()
+			return valErr
 		}
 	}
 
-	return ""
+	return nil
 }
 
 const (
@@ -146,31 +141,26 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 		s.pageSectionData = pageSectionData
 	}
 
-	if validationIssue := s.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return s.Check()
 }
 
-func (s *PageSection) ValidateReturningUserReadableIssue() string {
+func (s *PageSection) Check() UserPresentableErrorInterface {
 	if s.TopSpacingScale < 0 {
-		return "Top space scale for a page section must be >= 0"
+		return NewUserPresentableError("Top space scale for a page section must be >= 0")
 	}
 
 	if s.pageSectionData == nil {
-		return "Invalid section in page"
+		return NewUserPresentableError("Invalid section in page -- nil section data")
 	}
 	if verr := s.pageSectionData.Check(); verr != nil {
-		// TODO_P0 -- pass up
-		return verr.Error()
+		return verr
 	}
 
 	if StrictDatamodelParsing && !slices.Contains(maps.Keys(pageSectionTypeRegistry), s.PageSectionType) {
-		return fmt.Sprintf("Page section with unknown type: %v", s.PageSectionType)
+		return NewUserPresentableError(fmt.Sprintf("Page section with unknown type: %v", s.PageSectionType))
 	}
 
-	return ""
+	return nil
 }
 
 // Unknown section

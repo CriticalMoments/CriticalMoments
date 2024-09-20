@@ -34,11 +34,7 @@ func (m *ModalAction) Check() UserPresentableErrorInterface {
 	if m.Content == nil {
 		return NewUserPresentableError("Modals must have content")
 	}
-	if contentErr := m.Content.ValidateReturningUserReadableIssue(); contentErr != "" {
-		return NewUserPresentableError(contentErr)
-	}
-
-	return nil
+	return m.Content.Check()
 }
 
 func (m *ModalAction) UnmarshalJSON(data []byte) error {
