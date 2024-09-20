@@ -152,8 +152,8 @@ func testAllConditionsContainsCondition(t *testing.T, pc *PrimaryConfig, c *Cond
 func TestPrimaryConfigJson(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
-	if !pc.Validate() {
-		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	if !pc.Valid() {
+		t.Fatal(pc.Check())
 	}
 
 	// Check parsing of top level structure, but individual parsers (Themes, Actions) have
@@ -402,11 +402,11 @@ func TestInvalidConfigVersionTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
 	pc.ConfigVersion = "v2"
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("invalid config (v2) passed validation")
 	}
 	pc.ConfigVersion = ""
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("invalid config ('') passed validation")
 	}
 }
@@ -415,7 +415,7 @@ func TestNoDefaultTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
 	pc.defaultTheme = nil
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal("Not allowing nil default theme, which should be allowed")
 	}
 }
@@ -428,11 +428,11 @@ func TestNoNamedThemes(t *testing.T) {
 	}()
 
 	pc.namedThemes = nil
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Named themes map is nil, and validated")
 	}
 	pc.namedThemes = make(map[string]*Theme)
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Named themes map is empty, and an action uses a missing named theme, but it improperly validated")
 	}
 
@@ -440,7 +440,7 @@ func TestNoNamedThemes(t *testing.T) {
 	banner := pc.namedActions["bannerAction1"]
 	banner.BannerAction.CustomThemeName = ""
 	pc.namedActions["bannerAction1"] = banner
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal("empty named themes should be allowed if no one references them")
 	}
 }
@@ -449,11 +449,11 @@ func TestNoNamedTriggers(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
 	pc.namedTriggers = nil
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Named triggers map is nil, and validated")
 	}
 	pc.namedTriggers = make(map[string]*Trigger)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal("empty triggers map should be allowed")
 	}
 }
@@ -462,17 +462,17 @@ func TestNoNamedActions(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
 	pc.namedActions = nil
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Named actions map is nil, and validated")
 	}
 	pc.namedActions = map[string]*ActionContainer{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("empty map should fail since still triggers referencing them")
 	}
 
 	pc.namedTriggers = make(map[string]*Trigger)
 	pc.Notifications = make(map[string]*Notification)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal("empty actions should be allowed when no triggers or notifications reference them")
 	}
 }
@@ -481,75 +481,75 @@ func TestEmptyKey(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
 
 	pc.namedActions[""] = &ActionContainer{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Allowed empty key")
 	}
 	delete(pc.namedActions, "")
 
 	pc.namedThemes[""] = &Theme{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Allowed empty key")
 	}
 	delete(pc.namedThemes, "")
 
 	pc.namedTriggers[""] = &Trigger{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("Allowed empty key")
 	}
 	delete(pc.namedTriggers, "")
 
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal("Should be valid")
 	}
 }
 
 func TestBreakNestedValidationActions(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal()
 	}
 
 	pc.namedActions["invalidAction"] = &ActionContainer{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("actions not re-validated")
 	}
 }
 
 func TestBreakNestedValidationTriggers(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal()
 	}
 
 	pc.namedTriggers["invalidTrigger"] = &Trigger{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("trigger not re-validated")
 	}
 }
 
 func TestBreakNestedTheme(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal()
 	}
 
 	pc.defaultTheme = &Theme{} // invalid
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("default theme not re-validated")
 	}
 	pc.defaultTheme = nil // valid
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal()
 	}
 	pc.namedThemes["newInvalidTheme"] = &Theme{}
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("named themes not re-validated")
 	}
 }
 
 func TestPcAccessors(t *testing.T) {
 	pc := testHelperBuildMaxPrimaryConfig(t)
-	if !pc.Validate() {
+	if !pc.Valid() {
 		t.Fatal()
 	}
 
@@ -586,8 +586,8 @@ func TestPcAccessors(t *testing.T) {
 
 func TestMinValidConfig(t *testing.T) {
 	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
-	if !pc.Validate() {
-		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	if !pc.Valid() {
+		t.Fatal(pc.Check())
 	}
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version")
@@ -599,8 +599,8 @@ func TestMinValidConfig(t *testing.T) {
 
 func TestOddballValidConfig(t *testing.T) {
 	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/oddballvalid.json")
-	if !pc.Validate() {
-		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	if !pc.Valid() {
+		t.Fatal(pc.Check())
 	}
 	if len(pc.namedActions) != 0 || len(pc.namedThemes) != 0 || len(pc.namedTriggers) != 0 {
 		t.Fatal("Expected oddball with empty maps")
@@ -623,7 +623,7 @@ func TestMinWithUnknownFieldConfig(t *testing.T) {
 	decoder := json.NewDecoder(reader)
 	var pc PrimaryConfig
 	err = decoder.Decode(&pc)
-	if err != nil || !pc.Validate() {
+	if err != nil || !pc.Valid() {
 		t.Fatal("Non strict parsing failed")
 	}
 
@@ -772,33 +772,33 @@ func TestFutureBuiltInTheme(t *testing.T) {
 
 func TestMinAppAndClientVersionNumberValidation(t *testing.T) {
 	pc := testHelperBuilPrimaryConfigFromFile(t, "./test/testdata/primary_config/valid/minimalValid.json")
-	if !pc.Validate() {
-		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	if !pc.Valid() {
+		t.Fatal(pc.Check())
 	}
 	if pc.ConfigVersion != "v1" {
 		t.Fatal("Failed to parse config version")
 	}
 
 	pc.MinAppVersion = "invalid"
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("failed to validate MinAppVersion")
 	}
 	pc.MinAppVersion = ""
 	pc.MinCMVersion = "invalid"
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("failed to validate MinCMVersion")
 	}
 
 	pc.MinCMVersion = ""
 	pc.MinCMVersionInternal = "invalid"
-	if pc.Validate() {
+	if pc.Valid() {
 		t.Fatal("failed to validate MinCMVersionInternal")
 	}
 
 	pc.MinAppVersion = "1.2.3.4.5"
 	pc.MinCMVersion = "v34.234234.234.1123.32"
 	pc.MinCMVersionInternal = "v34.234234.234.1123.32"
-	if !pc.Validate() {
-		t.Fatal(pc.ValidateReturningUserReadableIssue())
+	if !pc.Valid() {
+		t.Fatal(pc.Check())
 	}
 }

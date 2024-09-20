@@ -146,9 +146,9 @@ func DecodePrimaryConfig(data []byte, signUtil *signing.SignUtil) (*PrimaryConfi
 	if err != nil {
 		return nil, err
 	}
-	configErr := pc.ValidateReturningUserReadableIssue()
-	if configErr != "" {
-		return nil, NewUserPresentableError(configErr)
+	configErr := pc.Check()
+	if configErr != nil {
+		return nil, configErr
 	}
 
 	return pc, nil
@@ -341,11 +341,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.Notifications = make(map[string]*Notification)
 	}
 
-	if validationIssue := pc.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return pc.Check()
 }
 
 func (pc *PrimaryConfig) NameForActionContainer(c *ActionContainer) string {
@@ -372,7 +368,7 @@ func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	}
 	// Limit depth of search, to avoid infinite loops
 	for i := 0; i < 50; i++ {
-		if t.ValidateDisallowFallthoughReturningUserReadableIssue() == "" {
+		if t.ValidateDisallowFallthoughReturningUserReadableIssue() == nil {
 			return t
 		}
 		if t.FallbackThemeName == "" {
@@ -388,87 +384,89 @@ func (pc *PrimaryConfig) themeIteratingFallbacks(t *Theme) *Theme {
 	return nil
 }
 
-func (pc *PrimaryConfig) Validate() bool {
-	return pc.ValidateReturningUserReadableIssue() == ""
+func (pc *PrimaryConfig) Valid() bool {
+	return pc.Check() == nil
 }
 
-func (pc *PrimaryConfig) ValidateReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) Check() UserPresentableErrorInterface {
 	// We bump version to 2+ when we want to break backwards compatibility.
 	// We try to parse all v1 versions (including new subversions)
 	if pc.ConfigVersion != "v1" && !strings.HasPrefix(pc.ConfigVersion, "v1.") {
-		return "Config must have a config version of v1"
+		return NewUserPresentableError("Config must have a config version of v1")
 	}
 
 	if pc.AppId == "" {
-		return "Config must have an appId"
+		return NewUserPresentableError("Config must have an appId")
 	}
 
 	if pc.MinAppVersion != "" {
 		if _, err := conditions.VersionFromVersionString(pc.MinAppVersion); err != nil {
-			return fmt.Sprintf("Config had invalid minAppVersion: %v", pc.MinAppVersion)
+			return NewUserPresentableError(fmt.Sprintf("Config had invalid minAppVersion: %v", pc.MinAppVersion))
 		}
 	}
 	if pc.MinCMVersion != "" {
 		if _, err := conditions.VersionFromVersionString(pc.MinCMVersion); err != nil {
-			return fmt.Sprintf("Config had invalid minCMVersion: %v", pc.MinCMVersion)
+			return NewUserPresentableError(fmt.Sprintf("Config had invalid minCMVersion: %v", pc.MinCMVersion))
 		}
 	}
 	if pc.MinCMVersionInternal != "" {
 		if _, err := conditions.VersionFromVersionString(pc.MinCMVersionInternal); err != nil {
-			return fmt.Sprintf("Config had invalid minCMVersionInternal: %v", pc.MinCMVersionInternal)
+			return NewUserPresentableError(fmt.Sprintf("Config had invalid minCMVersionInternal: %v", pc.MinCMVersionInternal))
 		}
 	}
 
-	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil {
-		return "Internal issue: code 7842371152"
+	// These should be initialized to empty maps
+	if pc.namedActions == nil || pc.namedThemes == nil || pc.namedTriggers == nil || pc.namedConditions == nil || pc.Notifications == nil {
+		return NewUserPresentableError("Internal issue. Nil maps. Code 7842371152")
 	}
 
 	if actionIssue := pc.validateEmbeddedActionsExistReturningUserReadable(); actionIssue != "" {
-		return actionIssue
+		return NewUserPresentableError(actionIssue)
 	}
 	if themeIssue := pc.validateThemeNamesExistReturningUserReadable(); themeIssue != "" {
-		return themeIssue
+		return NewUserPresentableError(themeIssue)
 	}
 	if emptyKeyIssue := pc.validateMapsDontContainEmptyStringReturningUserReadable(); emptyKeyIssue != "" {
-		return emptyKeyIssue
+		return NewUserPresentableError(emptyKeyIssue)
 	}
 	if fallbackNameIssue := pc.validateFallbackNames(); fallbackNameIssue != "" {
-		return fallbackNameIssue
+		return NewUserPresentableError(fallbackNameIssue)
 	}
 
 	// Run nested validations
-	return pc.validateNestedReturningUserReadableIssue()
+	return pc.checkNested()
 }
 
-func (pc *PrimaryConfig) validateNestedReturningUserReadableIssue() string {
+func (pc *PrimaryConfig) checkNested() UserPresentableErrorInterface {
 	if pc.defaultTheme != nil {
-		if defaultThemeIssue := pc.defaultTheme.ValidateReturningUserReadableIssue(); defaultThemeIssue != "" {
+		if defaultThemeIssue := pc.defaultTheme.Check(); defaultThemeIssue != nil {
 			return defaultThemeIssue
 		}
 	}
 	for themeName, theme := range pc.namedThemes {
-		if themeIssue := theme.ValidateReturningUserReadableIssue(); themeIssue != "" {
-			return fmt.Sprintf("Theme \"%v\" had issue: %v", themeName, themeIssue)
+		if themeIssue := theme.Check(); themeIssue != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Theme \"%v\" had issue. ", themeName), themeIssue)
 		}
 	}
 	for actionName, action := range pc.namedActions {
 		if actionValidationIssue := action.Check(); actionValidationIssue != nil {
-			// TODO_P0 log more in debug mode, including source
-			return fmt.Sprintf("Action \"%v\" had issue: %v", actionName, actionValidationIssue)
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Action \"%v\" had issue", actionName), actionValidationIssue)
 		}
 	}
 	for triggerName, trigger := range pc.namedTriggers {
 		if triggerIssue := trigger.ValidateReturningUserReadableIssue(); triggerIssue != "" {
-			return fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue)
+			// TODO_P0
+			return NewUserPresentableError(fmt.Sprintf("Trigger \"%v\" had issue: %v", triggerName, triggerIssue))
 		}
 	}
 	for notificationID, notification := range pc.Notifications {
 		if notifIssue := notification.ValidateReturningUserReadableIssue(); notifIssue != "" {
-			return fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notifIssue)
+			// TODO_P0
+			return NewUserPresentableError(fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notifIssue))
 		}
 	}
 
-	return ""
+	return nil
 }
 
 func (pc *PrimaryConfig) validateMapsDontContainEmptyStringReturningUserReadable() string {

@@ -278,7 +278,7 @@ func (t *Theme) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
+func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) UserPresentableErrorInterface {
 	// Default Values for nullable options
 	t.ScaleFontForUserPreference = true
 	if jt.ScaleFontForUserPreference != nil {
@@ -301,11 +301,13 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	t.DarkModeTheme = jt.DarkModeTheme
 	t.FallbackThemeName = jt.FallbackThemeName
 
-	if validationIssue := t.ValidateReturningUserReadableIssue(); validationIssue != "" {
+	if validationIssue := t.Check(); validationIssue != nil {
 		// parse time, we can ignore validation issues if fallback present.
 		// the primary config will validate the fallback theme exists and is valid
 		if StrictDatamodelParsing || t.FallbackThemeName == "" {
-			return NewUserPresentableError(validationIssue)
+			return validationIssue
+		} else {
+			fmt.Println("CriticalMoments: Invalid theme in config. Will use fallthrough theme. Issue: ", validationIssue)
 		}
 		t.IsFallthoughTheme = true
 	}
@@ -313,33 +315,33 @@ func parseThemeFromJsonTheme(t *Theme, jt *jsonTheme) *UserPresentableError {
 	return nil
 }
 
-func (t *Theme) Validate() bool {
-	return t.ValidateReturningUserReadableIssue() == ""
+func (t *Theme) Valid() bool {
+	return t.Check() == nil
 }
 
-func (t *Theme) ValidateReturningUserReadableIssue() string {
+func (t *Theme) Check() UserPresentableErrorInterface {
 	// Fallthough themes are valid as long as they have fallback name
 	if t.IsFallthoughTheme && t.FallbackThemeName != "" {
-		return ""
+		return nil
 	}
 
 	return t.ValidateDisallowFallthoughReturningUserReadableIssue()
 }
 
-func (t *Theme) ValidateDisallowFallthoughReturningUserReadableIssue() string {
+func (t *Theme) ValidateDisallowFallthoughReturningUserReadableIssue() UserPresentableErrorInterface {
 	// Check all colors are valid, but allow empty
 	colors := []string{t.BackgroundColor, t.BannerBackgroundColor, t.BannerForegroundColor, t.PrimaryColor, t.PrimaryTextColor, t.SecondaryTextColor}
 	for _, color := range colors {
 		if !stringColorIsValidAllowEmpty(color) {
-			return fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\"", color)
+			return NewUserPresentableError(fmt.Sprintf("Color isn't a valid color. Should be in format '#ffffff' (lower case only). Found \"%v\"", color))
 		}
 	}
 
 	if t.FontScale < 0.5 || t.FontScale > 2.0 {
-		return "Font scale must be in the range 0.5-2.0"
+		return NewUserPresentableError("Font scale must be in the range 0.5-2.0")
 	}
 
-	return ""
+	return nil
 }
 
 func stringColorIsValidAllowEmpty(c string) bool {
