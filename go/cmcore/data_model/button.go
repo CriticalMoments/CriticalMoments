@@ -64,7 +64,11 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	return b.Check()
+	if err := b.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (b *Button) Check() UserPresentableErrorInterface {

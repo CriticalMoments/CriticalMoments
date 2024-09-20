@@ -87,7 +87,11 @@ func (banner *BannerAction) UnmarshalJSON(data []byte) error {
 	banner.CustomThemeName = ja.CustomThemeName
 	banner.PreferredPosition = preferredPosition
 
-	return banner.Check()
+	if err := banner.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (b *BannerAction) AllEmbeddedThemeNames() ([]string, error) {

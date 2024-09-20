@@ -297,7 +297,11 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	}
 
 	// ignore ID which is set later from primary config
-	return n.CheckIgnoreID(true)
+	if err := n.CheckIgnoreID(true); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func parseMinutesFromHHMMString(i string) (int, error) {

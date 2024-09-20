@@ -68,7 +68,11 @@ func (l *LinkAction) UnmarshalJSON(data []byte) error {
 	l.UrlString = jl.UrlString
 	l.UseEmbeddedBrowser = useEmbeddedBrowser
 
-	return l.Check()
+	if err := l.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (l *LinkAction) AllEmbeddedThemeNames() ([]string, error) {

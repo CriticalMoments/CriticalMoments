@@ -178,7 +178,11 @@ func (a *AlertAction) UnmarshalJSON(data []byte) error {
 	}
 	a.CustomButtons = customButtons
 
-	return a.Check()
+	if err := a.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func customButtonFromJson(jb *jsonAlertCustomButton) (*AlertActionCustomButton, error) {

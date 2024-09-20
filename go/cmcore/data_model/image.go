@@ -79,7 +79,11 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 		i.imageData = imageData
 	}
 
-	return i.Check()
+	if err := i.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (i *Image) Check() UserPresentableErrorInterface {

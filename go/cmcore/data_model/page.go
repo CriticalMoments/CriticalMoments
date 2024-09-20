@@ -47,7 +47,11 @@ func (p *Page) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	return p.Check()
+	if err := p.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (p *Page) Check() UserPresentableErrorInterface {
@@ -141,7 +145,11 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 		s.pageSectionData = pageSectionData
 	}
 
-	return s.Check()
+	if err := s.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+
+	return nil
 }
 
 func (s *PageSection) Check() UserPresentableErrorInterface {

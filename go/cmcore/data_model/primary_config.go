@@ -341,6 +341,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 		pc.Notifications = make(map[string]*Notification)
 	}
 
+	// Don't output "data" because it's the whole config here. Doesn't help narrow down the issue.
 	return pc.Check()
 }
 
