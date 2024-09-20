@@ -58,15 +58,15 @@ func (p *Page) Check() UserPresentableErrorInterface {
 		}
 	}
 
-	for _, section := range p.Sections {
+	for i, section := range p.Sections {
 		if valErr := section.Check(); valErr != nil {
-			return valErr
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Page has an invalid section at index [%v]", i), valErr)
 		}
 	}
 
-	for _, button := range p.Buttons {
+	for i, button := range p.Buttons {
 		if valErr := button.Check(); valErr != nil {
-			return valErr
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Page has an invalid button at index [%v]", i), valErr)
 		}
 	}
 

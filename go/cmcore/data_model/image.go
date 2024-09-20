@@ -230,7 +230,7 @@ func (si *SymbolImage) Check() UserPresentableErrorInterface {
 	if si.Mode != "" && !slices.Contains(symbolModes, si.Mode) {
 		// Fallback to default if not strict
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(fmt.Sprintf("invalid SF Symbold 'mode' tag in imageData in config: '%v'", si.Mode))
+			return NewUserPresentableError(fmt.Sprintf("invalid SF Symbol 'mode' tag in imageData in config: '%v'", si.Mode))
 		}
 	}
 

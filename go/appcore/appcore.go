@@ -572,7 +572,7 @@ func (ac *Appcore) ThemeForName(themeName string) (resultTheme *datamodel.Theme)
 	return ac.config.ThemeWithName(themeName)
 }
 
-// TODO_P0: use this
+// set developer mode: log events for now, later we'll add condition evals, triggers, etc
 func (ac *Appcore) SetDeveloperMode(developerMode bool) {
 	ac.eventManager.logEvents = developerMode
 }

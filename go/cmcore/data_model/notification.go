@@ -157,7 +157,7 @@ func (n *Notification) CheckIgnoreID(ignoreID bool) UserPresentableErrorInterfac
 		n.BadgeCount < 0 {
 		return NewUserPresentableError("Notifications must have one or more of: title, body, or badgeCount.")
 	}
-	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {
+	if n.DeliveryWindowTODStartMinutes < 0 || n.DeliveryWindowTODStartMinutes > maxWindowLocalTimeEnd {
 		return NewUserPresentableError("Notifications must have a deliveryTimeOfDayStart between 0 and 23:59 mins.")
 	}
 	if n.DeliveryWindowTODEndMinutes < 0 || n.DeliveryWindowTODEndMinutes > maxWindowLocalTimeEnd {

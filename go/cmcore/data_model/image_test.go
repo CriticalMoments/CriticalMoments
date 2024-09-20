@@ -98,7 +98,7 @@ func TestJsonParsingImages(t *testing.T) {
 		t.Fatal("Symbol image failed to parse")
 	}
 	if i.SymbolImageData.Mode != "" || i.SymbolImageData.Weight != "" || i.SymbolImageData.PrimaryColor != "" || i.SymbolImageData.SecondaryColor != "" {
-		t.Fatal("Symbold defaults failed parse check")
+		t.Fatal("Symbol defaults failed parse check")
 	}
 
 	i = *i.Fallback
@@ -106,7 +106,7 @@ func TestJsonParsingImages(t *testing.T) {
 		t.Fatal("Symbol image failed to parse")
 	}
 	if i.SymbolImageData.Mode != "palette" || i.SymbolImageData.Weight != "light" || i.SymbolImageData.PrimaryColor != "#ff0000" || i.SymbolImageData.SecondaryColor != "#00ff00" {
-		t.Fatal("Symbold defaults failed parse check")
+		t.Fatal("Symbol defaults failed parse check")
 	}
 }
 

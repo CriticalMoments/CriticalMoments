@@ -35,7 +35,7 @@ func (c *ConditionalAction) Check() UserPresentableErrorInterface {
 		return NewUserPresentableError("Conditional actions must have a condition")
 	}
 	if err := c.Condition.Validate(); err != nil {
-		return err
+		return NewUserPresentableErrorWSource("Conditional action has an invalid condition", err)
 	}
 	if c.PassedActionName == "" {
 		return NewUserPresentableError("Conditional actions must include a passedActionName to run if condition passes (failedActionName is optional)")

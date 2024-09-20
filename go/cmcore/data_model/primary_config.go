@@ -273,7 +273,7 @@ func (pc *PrimaryConfig) UnmarshalJSON(data []byte) error {
 	var jpc jsonPrimaryConfig
 	err := json.Unmarshal(data, &jpc)
 	if err != nil {
-		return NewUserPresentableErrorWSource("Invalid Critical Moments config file: ", err)
+		return NewUserPresentableErrorWSource("Invalid Critical Moments config file", err)
 	}
 
 	pc.ConfigVersion = jpc.ConfigVersion
@@ -440,7 +440,7 @@ func (pc *PrimaryConfig) Check() UserPresentableErrorInterface {
 func (pc *PrimaryConfig) checkNested() UserPresentableErrorInterface {
 	if pc.defaultTheme != nil {
 		if defaultThemeIssue := pc.defaultTheme.Check(); defaultThemeIssue != nil {
-			return defaultThemeIssue
+			return NewUserPresentableErrorWSource("Default theme had issue", defaultThemeIssue)
 		}
 	}
 	for themeName, theme := range pc.namedThemes {
