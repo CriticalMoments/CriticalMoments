@@ -219,7 +219,7 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 		// Downstream during eval we return false and error
 		c.conditionString = ""
 		if StrictDatamodelParsing {
-			return err
+			return NewUserErrorForJsonIssue(data, err)
 		} else {
 			fmt.Printf("CriticalMoments: Ignoring invalid condition string. [%v]\nFrom error: %v\n", string(data), err)
 		}

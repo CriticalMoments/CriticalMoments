@@ -65,7 +65,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	if !ok {
 		errString := fmt.Sprintf("Unsupported 'imageType' tag in config: \"%v\" is not a valid image type.", i.ImageType)
 		if StrictDatamodelParsing {
-			return NewUserPresentableError(errString)
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError(errString))
 		} else {
 			// Forward compatibility: warn them the type is unrecognized in debug console, but could be newer config on older build so no hard error
 			fmt.Printf("CriticalMoments: %v This image will be ignored. If unexpected, check the CM config file.", errString)
@@ -74,7 +74,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 	} else {
 		imageData, err := unpacker(ji.RawSectionData, i)
 		if err != nil {
-			return NewUserPresentableErrorWSource("Unknown issue parsing image section of modal page.", err)
+			return NewUserErrorForJsonIssue(data, NewUserPresentableErrorWSource("Unknown issue parsing image section of modal page.", err))
 		}
 		i.imageData = imageData
 	}

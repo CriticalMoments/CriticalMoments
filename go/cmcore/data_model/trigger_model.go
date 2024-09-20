@@ -28,7 +28,10 @@ func (t *Trigger) UnmarshalJSON(data []byte) error {
 	t.EventName = jt.EventName
 	t.Condition = jt.Condition
 
-	return t.Check()
+	if err := t.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
+	}
+	return nil
 }
 
 func (t *Trigger) Valid() bool {

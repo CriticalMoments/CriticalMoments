@@ -252,7 +252,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	if jn.BadgeCount != nil {
 		n.BadgeCount = *jn.BadgeCount
 		if StrictDatamodelParsing && n.BadgeCount < 0 {
-			return NewUserPresentableError("Notification badgeCount must be greater than or equal to 0")
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError("Notification badgeCount must be greater than or equal to 0"))
 		}
 	} else {
 		n.BadgeCount = -1 // default to -1 for unset
@@ -267,12 +267,12 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	// Defaults could change over time, so either all custom, or all default or config could be invalid
 	if (jn.DeliveryWindowTODStart == "" && jn.DeliveryWindowTODEnd != "") ||
 		(jn.DeliveryWindowTODStart != "" && jn.DeliveryWindowTODEnd == "") {
-		return NewUserPresentableError("DeliveryTime must have both deliveryTimeOfDayStart and deliveryTimeOfDayEnd defined if either is defined.")
+		return NewUserErrorForJsonIssue(data, NewUserPresentableError("DeliveryTime must have both deliveryTimeOfDayStart and deliveryTimeOfDayEnd defined if either is defined."))
 	}
 	if jn.DeliveryWindowTODStart != "" {
 		deliveryStart, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODStart)
 		if err != nil && StrictDatamodelParsing {
-			return NewUserPresentableError("Invalid deliveryTimeOfDayStart. Expect HH:MM format. Was: " + jn.DeliveryWindowTODStart)
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError("Invalid deliveryTimeOfDayStart. Expect HH:MM format. Was: "+jn.DeliveryWindowTODStart))
 		} else if err != nil {
 			fmt.Printf("CriticalMoments: invalid deliveryTimeOfDayStart [%v]. Using default: %v\n", jn.DeliveryWindowTODStart, defaultDeliveryWindowLocalTimeStart)
 			n.DeliveryWindowTODStartMinutes = defaultDeliveryWindowLocalTimeStart
@@ -285,7 +285,7 @@ func (n *Notification) UnmarshalJSON(data []byte) error {
 	if jn.DeliveryWindowTODEnd != "" {
 		deliveryEnd, err := parseMinutesFromHHMMString(jn.DeliveryWindowTODEnd)
 		if err != nil && StrictDatamodelParsing {
-			return NewUserPresentableError("Invalid notification 'deliveryTimeOfDayEnd'. Expect HH:MM format. Was: " + jn.DeliveryWindowTODEnd)
+			return NewUserErrorForJsonIssue(data, NewUserPresentableError("Invalid notification 'deliveryTimeOfDayEnd'. Expect HH:MM format. Was: "+jn.DeliveryWindowTODEnd))
 		} else if err != nil {
 			fmt.Printf("CriticalMoments: invalid notification 'deliveryTimeOfDayEnd' [%v]. Using default: %v\n", jn.DeliveryWindowTODEnd, defaultDeliveryWindowLocalTimeEnd)
 			n.DeliveryWindowTODEndMinutes = defaultDeliveryWindowLocalTimeEnd

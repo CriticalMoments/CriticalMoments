@@ -10,23 +10,41 @@ type UserPresentableErrorInterface interface {
 	UserReadableErrorString() string
 }
 
-// Implements `error`
-type UserPresentableError struct {
+// Implements `error` and `UserPresentableErrorInterface`
+type userPresentableError struct {
 	userReadableErrorString string
 	SourceError             error
 }
 
-func NewUserPresentableError(s string) *UserPresentableError {
-	return &UserPresentableError{
+func NewUserPresentableError(s string) UserPresentableErrorInterface {
+	return &userPresentableError{
 		userReadableErrorString: s,
 	}
 }
 
 func NewUserPresentableErrorWSource(s string, sourceErr error) UserPresentableErrorInterface {
-	return &UserPresentableError{
+	return &userPresentableError{
 		userReadableErrorString: s,
 		SourceError:             sourceErr,
 	}
+}
+
+func (err *userPresentableError) Error() string {
+	if err.SourceError == nil {
+		return err.userReadableErrorString
+	}
+	// source and current inverted. The root is really the most important.
+	return fmt.Sprintf("%v\n    Source Error: %v", err.SourceError, err.userReadableErrorString)
+}
+
+func (err *userPresentableError) UserReadableErrorString() string {
+	return err.Error()
+}
+
+// Implements `error` and `userPresentableErrorInterface`
+type jsonUserPresentableError struct {
+	SourceError error
+	jsonSource  string
 }
 
 func NewUserErrorForJsonIssue(data []byte, sourceErr error) UserPresentableErrorInterface {
@@ -35,16 +53,22 @@ func NewUserErrorForJsonIssue(data []byte, sourceErr error) UserPresentableError
 	if len(jsonString) > 600 {
 		jsonString = jsonString[:600] + "... [truncated]"
 	}
-	return NewUserPresentableErrorWSource(fmt.Sprintf("Error parsing your config in the following section. See description of the source error below:\n%v", jsonString), sourceErr)
-}
-
-func (err *UserPresentableError) Error() string {
-	if err.SourceError == nil {
-		return err.userReadableErrorString
+	return &jsonUserPresentableError{
+		SourceError: sourceErr,
+		jsonSource:  jsonString,
 	}
-	return fmt.Sprintf("%v\n  Source Error: %v", err.userReadableErrorString, err.SourceError)
 }
 
-func (err *UserPresentableError) UserReadableErrorString() string {
-	return err.userReadableErrorString
+func (err *jsonUserPresentableError) Error() string {
+	if err.SourceError == nil {
+		return fmt.Sprintf("JSON Parsing Error in json: %v", err.jsonSource)
+	}
+	if err.jsonSource == "" {
+		return err.SourceError.Error()
+	}
+	return fmt.Sprintf("%v\n    JSON section this error occurred in: %v", err.SourceError.Error(), err.jsonSource)
+}
+
+func (err *jsonUserPresentableError) UserReadableErrorString() string {
+	return err.Error()
 }
