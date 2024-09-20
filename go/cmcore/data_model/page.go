@@ -140,7 +140,7 @@ func (s *PageSection) UnmarshalJSON(data []byte) error {
 	} else {
 		pageSectionData, err := unpacker(js.RawSectionData, s)
 		if err != nil {
-			return NewUserErrorForJsonIssue(data, err)
+			return err
 		}
 		s.pageSectionData = pageSectionData
 	}

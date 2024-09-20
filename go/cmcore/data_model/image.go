@@ -63,7 +63,7 @@ func (i *Image) UnmarshalJSON(data []byte) error {
 
 	unpacker, ok := imageTypeRegistry[i.ImageType]
 	if !ok {
-		errString := fmt.Sprintf("Unsupported 'imageType' tag in config: \"%v\" is not a valid image type.", i.ImageType)
+		errString := fmt.Sprintf("Unsupported or missing 'imageType' tag on image in config: \"%v\" is not a valid image type.", i.ImageType)
 		if StrictDatamodelParsing {
 			return NewUserErrorForJsonIssue(data, NewUserPresentableError(errString))
 		} else {
