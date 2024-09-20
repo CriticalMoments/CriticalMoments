@@ -460,9 +460,8 @@ func (pc *PrimaryConfig) checkNested() UserPresentableErrorInterface {
 		}
 	}
 	for notificationID, notification := range pc.Notifications {
-		if notifIssue := notification.ValidateReturningUserReadableIssue(); notifIssue != "" {
-			// TODO_P0
-			return NewUserPresentableError(fmt.Sprintf("Notification \"%v\" had issue: %v", notificationID, notifIssue))
+		if notifIssue := notification.Check(); notifIssue != nil {
+			return NewUserPresentableErrorWSource(fmt.Sprintf("Notification \"%v\" had issue.", notificationID), notifIssue)
 		}
 	}
 

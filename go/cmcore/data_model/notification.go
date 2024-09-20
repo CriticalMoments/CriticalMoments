@@ -139,12 +139,16 @@ type jsonNotification struct {
 	CancelationEvents       *[]string                `json:"cancelationEvents,omitempty"`
 }
 
-func (a *Notification) Validate() bool {
-	return a.ValidateReturningUserReadableIssue() == ""
+func (a *Notification) Valid() bool {
+	return a.Check() == nil
 }
 
-func (n *Notification) ValidateReturningUserReadableIssue() string {
-	return n.ValidateReturningUserReadableIssueIgnoreID(false)
+func (n *Notification) Check() UserPresentableErrorInterface {
+	issueString := n.ValidateReturningUserReadableIssueIgnoreID(false)
+	if issueString != "" {
+		return NewUserPresentableError(issueString)
+	}
+	return nil
 }
 
 func (n *Notification) ValidateReturningUserReadableIssueIgnoreID(ignoreID bool) string {

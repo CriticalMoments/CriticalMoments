@@ -22,68 +22,68 @@ func TestNotificationActionValidators(t *testing.T) {
 			TimestampEpoch: &timestamp,
 		},
 	}
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Body = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Didn't allow empty body")
 	}
 	a.ActionName = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Didn't allow empty action name")
 	}
 	a.Title = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty title and body")
 	}
 	a.BadgeCount = 1
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should be valid with badge count")
 	}
 	a.BadgeCount = -1
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Needs a title, body, or badge count")
 	}
 	a.Title = "title"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.Title = ""
 	a.Body = "body"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.ID = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty ID")
 	}
 	a.ID = "io.criticalmoments.test"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	rc := 0.5
 	a.RelevanceScore = &rc
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	rc = 1.1
 	a.RelevanceScore = &rc
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid relevance score")
 	}
 	rc = -0.0001
 	a.RelevanceScore = &rc
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid relevance score")
 	}
 	a.RelevanceScore = nil
 	a.InterruptionLevel = "passive"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.InterruptionLevel = "futureUnknown"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should not error since not strict")
 	}
 	StrictDatamodelParsing = true
@@ -91,26 +91,26 @@ func TestNotificationActionValidators(t *testing.T) {
 		StrictDatamodelParsing = false
 	}()
 	a.InterruptionLevel = "futureUnknown"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("should not be valid if strict")
 	}
 	StrictDatamodelParsing = false
 	a.InterruptionLevel = ""
 	a.DeliveryWindowTODEndMinutes = 24 * 60
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("delivery window out of bounds")
 	}
 	a.DeliveryWindowTODEndMinutes = 23*60 + 59
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("delivery window failed in bounds")
 	}
 	a.DeliveryWindowTODEndMinutes = 2
 	a.DeliveryWindowTODStartMinutes = 3
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed start after end")
 	}
 	a.DeliveryWindowTODEndMinutes = 60
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("delivery window failed in bounds")
 	}
 }
