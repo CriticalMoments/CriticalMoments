@@ -306,7 +306,7 @@ func TestParseDowString(t *testing.T) {
 func TestDeliveryTimeValidation(t *testing.T) {
 	// Case: Both TimestampEpoch and EventName are nil
 	dt := DeliveryTime{}
-	issue := dt.ValidateReturningUserReadableIssue()
+	issue := dt.Check().Error()
 	if issue != "DeliveryTime must have either a Timestamp or an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
@@ -315,7 +315,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	timestamp := int64(1000)
 	eventName := "event"
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventName: &eventName}
-	issue = dt.ValidateReturningUserReadableIssue()
+	issue = dt.Check().Error()
 	if issue != "DeliveryTime cannot have both a Timestamp and an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
@@ -323,29 +323,26 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	// Case: Both TimestampEpoch and EventOffset are defined
 	eventOffsetSeconds := 30
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffsetSeconds: &eventOffsetSeconds}
-	issue = dt.ValidateReturningUserReadableIssue()
+	issue = dt.Check().Error()
 	if issue != "DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid TimestampEpoch
 	dt = DeliveryTime{TimestampEpoch: &timestamp}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid EventName
 	dt = DeliveryTime{EventName: &eventName}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid EventOffset with EventName
 	dt = DeliveryTime{EventName: &eventName, EventOffsetSeconds: &eventOffsetSeconds}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
@@ -373,7 +370,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	if dt.EventInstance() != EventInstanceTypeFirst {
 		t.Fatal("failed to return First")
 	}
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on valid event instance string")
 	}
 	s = "invalid"
@@ -381,18 +378,18 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	if dt.EventInstance() != EventInstanceTypeUnknown {
 		t.Fatal("failed to return latest for unrecognized")
 	}
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on invalid event instance string in not strict mode")
 	}
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if dt.ValidateReturningUserReadableIssue() == "" {
+	if dt.Check() == nil {
 		t.Fatal("Did not error on invalid event instance string in not strict mode")
 	}
 	s = "latest"
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on valid event instance string in strict mode")
 	}
 }
