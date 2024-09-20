@@ -64,21 +64,17 @@ func (b *Button) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if validationIssue := b.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
-	}
-
-	return nil
+	return b.Check()
 }
 
-func (b *Button) ValidateReturningUserReadableIssue() string {
+func (b *Button) Check() UserPresentableErrorInterface {
 	if b.Title == "" {
-		return "Button title can not be empty."
+		return NewUserPresentableError("Button title can not be empty.")
 	}
 
 	if !slices.Contains(buttonStyles, b.Style) {
-		return fmt.Sprintf("Invalid button style: \"%v\"", b.Style)
+		return NewUserPresentableError(fmt.Sprintf("Invalid button style: \"%v\"", b.Style))
 	}
 
-	return ""
+	return nil
 }

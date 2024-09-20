@@ -69,8 +69,9 @@ func (p *Page) ValidateReturningUserReadableIssue() string {
 	}
 
 	for _, button := range p.Buttons {
-		if valErr := button.ValidateReturningUserReadableIssue(); valErr != "" {
-			return valErr
+		if valErr := button.Check(); valErr != nil {
+			// TODO_P0 -- pass up
+			return valErr.Error()
 		}
 	}
 
