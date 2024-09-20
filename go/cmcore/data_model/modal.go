@@ -30,7 +30,7 @@ func (m *ModalAction) Validate() bool {
 	return m.ValidateReturningUserReadableIssue() == nil
 }
 
-func (m *ModalAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (m *ModalAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if m.Content == nil {
 		return NewUserPresentableError("Modals must have content")
 	}

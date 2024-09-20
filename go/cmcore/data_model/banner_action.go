@@ -43,7 +43,7 @@ func (ba *BannerAction) Validate() bool {
 	return ba.ValidateReturningUserReadableIssue() == nil
 }
 
-func (b *BannerAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (b *BannerAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if b.Body == "" {
 		return NewUserPresentableError("Banners must have body text")
 	}

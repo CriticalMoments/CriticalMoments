@@ -93,7 +93,7 @@ func (a *AlertAction) Validate() bool {
 	return a.ValidateReturningUserReadableIssue() == nil
 }
 
-func (a *AlertAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (a *AlertAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if a.Title == "" && a.Message == "" {
 		return NewUserPresentableError("Alerts must have a title and/or a message. Both can not be blank.")
 	}

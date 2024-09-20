@@ -71,7 +71,7 @@ type ActionTypeInterface interface {
 	AllEmbeddedThemeNames() ([]string, error)
 	AllEmbeddedActionNames() ([]string, error)
 	AllEmbeddedConditions() ([]*Condition, error)
-	ValidateReturningUserReadableIssue() *UserPresentableError
+	ValidateReturningUserReadableIssue() UserPresentableErrorInterface
 	PerformAction(ab ActionBindings, actionName string) error
 }
 
@@ -122,7 +122,7 @@ func (ac *ActionContainer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (ac *ActionContainer) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (ac *ActionContainer) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if ac.ActionType == "" {
 		return NewUserPresentableError("Empty actionType not permitted")
 	}

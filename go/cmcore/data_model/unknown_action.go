@@ -6,7 +6,7 @@ type UnknownAction struct {
 	ActionType string
 }
 
-func (u *UnknownAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (u *UnknownAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	return nil
 }
 

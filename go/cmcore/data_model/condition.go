@@ -164,7 +164,7 @@ func (c *Condition) ExtractIdentifiers() (returnFields *ConditionFields, returnE
 	return &results, nil
 }
 
-func (c *Condition) Validate() error {
+func (c *Condition) Validate() UserPresentableErrorInterface {
 	if c.conditionString == "" {
 		return NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
 	}
@@ -219,7 +219,9 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 		// Downstream during eval we return false and error
 		c.conditionString = ""
 		if StrictDatamodelParsing {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
+			return err
+		} else {
+			fmt.Printf("CriticalMoments: Ignoring invalid condition string. [%v]\nFrom error: %v\n", string(data), err)
 		}
 	}
 

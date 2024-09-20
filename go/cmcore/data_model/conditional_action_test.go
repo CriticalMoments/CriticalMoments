@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -102,10 +103,27 @@ func TestJsonParsingInvalidConditionalActionCondition(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
 	var ac ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil || ac.ActionType == ActionTypeEnumConditional {
 		t.Fatal("Invalid conditionals should not parse")
+	}
+
+	upErr, ok := err.(*UserPresentableError)
+	if !ok {
+		t.Fatal("Invalid conditionals should return user presentable error")
+	}
+	errStr := upErr.Error()
+	if !strings.Contains(errStr, "Error parsing condition string: nil > 5") {
+		t.Fatal("user error should explain condition string. Was: ", errStr)
+	}
+	if !strings.Contains(errStr, "invalid operation: > (mismatched types") {
+		t.Fatal("user error should mention source error. Was: ", errStr)
 	}
 }
 

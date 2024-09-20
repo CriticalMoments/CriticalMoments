@@ -30,7 +30,7 @@ func (l *LinkAction) Validate() bool {
 	return l.ValidateReturningUserReadableIssue() == nil
 }
 
-func (l *LinkAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (l *LinkAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if l.UrlString == "" {
 		return NewUserPresentableError("Link actions must have a url")
 	}

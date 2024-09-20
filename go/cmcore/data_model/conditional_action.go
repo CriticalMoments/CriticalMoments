@@ -2,7 +2,6 @@ package datamodel
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type ConditionalAction struct {
@@ -31,12 +30,12 @@ func (c *ConditionalAction) Validate() bool {
 	return c.ValidateReturningUserReadableIssue() == nil
 }
 
-func (c *ConditionalAction) ValidateReturningUserReadableIssue() *UserPresentableError {
+func (c *ConditionalAction) ValidateReturningUserReadableIssue() UserPresentableErrorInterface {
 	if c.Condition == nil {
 		return NewUserPresentableError("Conditional actions must have a condition")
 	}
 	if err := c.Condition.Validate(); err != nil {
-		return NewUserPresentableErrorWSource(fmt.Sprintf("Condition in conditional action is not valid: [[%v]]", c.Condition.conditionString), err)
+		return err
 	}
 	if c.PassedActionName == "" {
 		return NewUserPresentableError("Conditional actions must include a passedActionName to run if condition passes (failedActionName is optional)")

@@ -2,6 +2,12 @@ package datamodel
 
 import "fmt"
 
+// error, but additional type we can check, and accessor to reason
+type UserPresentableErrorInterface interface {
+	Error() string
+	UserReadableErrorString() string
+}
+
 // Implements `error`
 type UserPresentableError struct {
 	userReadableErrorString string
@@ -26,4 +32,8 @@ func (err *UserPresentableError) Error() string {
 		return err.userReadableErrorString
 	}
 	return fmt.Sprintf("%v (Source Error: %v)", err.userReadableErrorString, err.SourceError)
+}
+
+func (err *UserPresentableError) UserReadableErrorString() string {
+	return err.userReadableErrorString
 }

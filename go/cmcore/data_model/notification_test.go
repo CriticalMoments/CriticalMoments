@@ -251,7 +251,7 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
 	cases := map[string]string{
-		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Invalid Condition",
+		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Error parsing condition string: true > 1",
 		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "blank cancelation event",                                    // add_test_case
 		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json":       "Notification badgeCount must be greater than or equal to 0", // add_test_case
 	}
