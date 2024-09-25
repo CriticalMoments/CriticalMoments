@@ -16,7 +16,7 @@
 		E03F9BAC2B6F30D1006EA449 /* MessagingDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BAB2B6F30D1006EA449 /* MessagingDemoScreen.m */; };
 		E03F9BAF2B7017F8006EA449 /* FeatureFlagsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E03F9BAE2B7017F8006EA449 /* FeatureFlagsDemoScreen.m */; };
 		E0409D3229FED2730027E0D2 /* ThemeDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */; };
-		E0446E642A0971750069E5BD /* config.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* config.json */; };
+		E0446E642A0971750069E5BD /* cmDevConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0446E632A0970A10069E5BD /* cmDevConfig.json */; };
 		E0446E672A0CBA540069E5BD /* AlertDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */; };
 		E0446E6A2A0D73F10069E5BD /* LinkDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E692A0D73F10069E5BD /* LinkDemoScreen.m */; };
 		E0446E752A0DC0170069E5BD /* SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E0446E742A0DC0170069E5BD /* SnapshotTests.m */; };
@@ -39,6 +39,7 @@
 		E0DA23EF29F4095900DB0AC7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0DA23EE29F4095900DB0AC7 /* CriticalMoments */; };
 		E0DA23F229F560A800DB0AC7 /* DemoViewContoller.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */; };
 		E0DD1D1A2A3A1B4B0059CC38 /* SheetDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */; };
+		E0E2EC192CA2488F000E74EF /* starterConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0E2EC182CA2488F000E74EF /* starterConfig.json */; };
 		E0EC791F2C395EF0004F60A6 /* NotificationsDemoScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = E0EC791E2C395EF0004F60A6 /* NotificationsDemoScreen.m */; };
 /* End PBXBuildFile section */
 
@@ -68,7 +69,7 @@
 		E0409D3029FED2730027E0D2 /* ThemeDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThemeDemoScreen.h; sourceTree = "<group>"; };
 		E0409D3129FED2730027E0D2 /* ThemeDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThemeDemoScreen.m; sourceTree = "<group>"; };
 		E0409D3329FF24490027E0D2 /* criticalmoments */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = criticalmoments; path = ../..; sourceTree = "<group>"; };
-		E0446E632A0970A10069E5BD /* config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = config.json; sourceTree = "<group>"; };
+		E0446E632A0970A10069E5BD /* cmDevConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cmDevConfig.json; sourceTree = "<group>"; };
 		E0446E652A0CBA540069E5BD /* AlertDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlertDemoScreen.h; sourceTree = "<group>"; };
 		E0446E662A0CBA540069E5BD /* AlertDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlertDemoScreen.m; sourceTree = "<group>"; };
 		E0446E682A0D73F10069E5BD /* LinkDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LinkDemoScreen.h; sourceTree = "<group>"; };
@@ -107,6 +108,7 @@
 		E0DA23F129F560A800DB0AC7 /* DemoViewContoller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoViewContoller.m; sourceTree = "<group>"; };
 		E0DD1D182A3A1B4B0059CC38 /* SheetDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SheetDemoScreen.h; sourceTree = "<group>"; };
 		E0DD1D192A3A1B4B0059CC38 /* SheetDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SheetDemoScreen.m; sourceTree = "<group>"; };
+		E0E2EC182CA2488F000E74EF /* starterConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = starterConfig.json; sourceTree = "<group>"; };
 		E0EC791D2C395EF0004F60A6 /* NotificationsDemoScreen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationsDemoScreen.h; sourceTree = "<group>"; };
 		E0EC791E2C395EF0004F60A6 /* NotificationsDemoScreen.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotificationsDemoScreen.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -206,7 +208,8 @@
 				E07B774A29F9B202001521F4 /* CMDemoScreen.m */,
 				E07B774F29FA0144001521F4 /* Utils.h */,
 				E07B775029FA0144001521F4 /* Utils.m */,
-				E0446E632A0970A10069E5BD /* config.json */,
+				E0446E632A0970A10069E5BD /* cmDevConfig.json */,
+				E0E2EC182CA2488F000E74EF /* starterConfig.json */,
 				E03F9BA72B6D8267006EA449 /* InfoHeader.h */,
 				E03F9BA82B6D8267006EA449 /* InfoHeader.m */,
 				E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */,
@@ -334,7 +337,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0446E642A0971750069E5BD /* config.json in Resources */,
+				E0446E642A0971750069E5BD /* cmDevConfig.json in Resources */,
+				E0E2EC192CA2488F000E74EF /* starterConfig.json in Resources */,
 				E0B545FC29F407C3002A25A8 /* LaunchScreen.storyboard in Resources */,
 				E0B545F929F407C3002A25A8 /* Assets.xcassets in Resources */,
 				E0B545F729F407C2002A25A8 /* Main.storyboard in Resources */,
