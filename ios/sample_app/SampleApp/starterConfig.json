@@ -191,7 +191,6 @@
                       "sections": [
                           {
                               "pageSectionType": "image",
-                              "topSpacingScale": 3,
                               "pageSectionData": {
                                   "imageType": "sf_symbol",
                                   "height": 80.0,
@@ -213,6 +212,8 @@
                               "topSpacingScale": 5,
                               "pageSectionData": {
                                   "title": "Feature One",
+                                  "width": 220.0,
+                                  "centerText": false,
                                   "scaleFactor": 0.6
                               }
                           },
@@ -221,14 +222,18 @@
                               "topSpacingScale": 0.7,
                               "pageSectionData": {
                                   "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 220.0,
+                                  "centerText": false,
                                   "scaleFactor": 1.1
                               }
                           },
                           {
                               "pageSectionType": "title",
-                              "topSpacingScale": 4,
+                              "topSpacingScale": 3,
                               "pageSectionData": {
                                   "title": "Feature Two",
+                                  "width": 220.0,
+                                  "centerText": false,
                                   "scaleFactor": 0.6
                               }
                           },
@@ -237,6 +242,28 @@
                               "topSpacingScale": 0.7,
                               "pageSectionData": {
                                   "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 220.0,
+                                  "centerText": false,
+                                  "scaleFactor": 1.1
+                              }
+                          },
+                          {
+                              "pageSectionType": "title",
+                              "topSpacingScale": 3,
+                              "pageSectionData": {
+                                  "title": "Feature Three",
+                                  "width": 220.0,
+                                  "centerText": false,
+                                  "scaleFactor": 0.6
+                              }
+                          },
+                          {
+                              "pageSectionType": "body",
+                              "topSpacingScale": 0.7,
+                              "pageSectionData": {
+                                  "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 220.0,
+                                  "centerText": false,
                                   "scaleFactor": 1.1
                               }
                           }

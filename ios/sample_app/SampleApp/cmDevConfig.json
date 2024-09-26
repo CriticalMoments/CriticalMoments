@@ -1052,6 +1052,23 @@
                                         "centerText": false,
                                         "usePrimaryFontColor": true
                                     }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "title": "Fixed Width Title Example",
+                                        "width": 200.0,
+                                        "scaleFactor": 0.7
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "bodyText": "Fixed width body text example which should wrap at 200 points.",
+                                        "width": 200.0
+                                    }
                                 }
                             ]
                         }

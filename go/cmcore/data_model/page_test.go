@@ -26,7 +26,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s1d := s1.TitleData
-	if s1d.Title != "title1" || s1d.ScaleFactor != 1.2 || s1d.Bold != false || s1d.CenterText || s1d.UsePrimaryTextColor {
+	if s1d.Title != "title1" || s1d.ScaleFactor != 1.2 || s1d.Bold != false || s1d.CenterText || s1d.UsePrimaryTextColor || s1d.Width != 100 {
 		t.Fatal("Parsing page failed")
 	}
 
@@ -35,7 +35,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s2d := s2.TitleData
-	if s2d.Title != "title2" || s2d.ScaleFactor != 1 || s2d.Bold != true || !s2d.CenterText || !s2d.UsePrimaryTextColor {
+	if s2d.Title != "title2" || s2d.ScaleFactor != 1 || s2d.Bold != true || !s2d.CenterText || !s2d.UsePrimaryTextColor || s2d.Width != 0 {
 		t.Fatal("Parsing page failed")
 	}
 
@@ -48,7 +48,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s4d := s4.BodyData
-	if s4d.BodyText != "body1" || s4d.ScaleFactor != 1 || s4d.Bold != false || s4d.CenterText != true || s4d.UsePrimaryTextColor != false {
+	if s4d.BodyText != "body1" || s4d.ScaleFactor != 1 || s4d.Bold != false || s4d.CenterText != true || s4d.UsePrimaryTextColor != false || s4d.Width != 0 {
 		t.Fatal("Parsing page failed")
 	}
 
@@ -57,7 +57,7 @@ func TestPageParsing(t *testing.T) {
 		t.Fatal("Parsing page failed")
 	}
 	s5d := s5.BodyData
-	if s5d.BodyText != "body2" || s5d.ScaleFactor != 1.1 || s5d.Bold != true || s5d.CenterText != false || s5d.UsePrimaryTextColor != true {
+	if s5d.BodyText != "body2" || s5d.ScaleFactor != 1.1 || s5d.Bold != true || s5d.CenterText != false || s5d.UsePrimaryTextColor != true || s5d.Width != 200 {
 		t.Fatal("Parsing page failed")
 	}
 

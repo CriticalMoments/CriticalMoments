@@ -114,13 +114,26 @@
             topSpaceMultiplier = [stack.spaceMultiplier objectAtIndex:i].floatValue;
         }
 
-        [constraints addObjectsFromArray:@[
-            [view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:topSpaceMultiplier],
-            [view.leadingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
-                                               constant:CM_PAGE_SIDE_PADDING],
-            [view.trailingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.trailingAnchor
-                                                constant:-CM_PAGE_SIDE_PADDING],
-        ]];
+        [constraints addObject:[view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop
+                                                                              multiplier:topSpaceMultiplier]];
+
+        if (view.frame.size.width == 0) {
+            // Center with margin if width not explicitly set
+            [constraints addObjectsFromArray:@[
+                [view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:topSpaceMultiplier],
+
+                [view.leadingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
+                                                   constant:CM_PAGE_SIDE_PADDING],
+                [view.trailingAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.trailingAnchor
+                                                    constant:-CM_PAGE_SIDE_PADDING],
+            ]];
+        } else {
+            // Center with exact width
+            [constraints addObjectsFromArray:@[
+                [view.widthAnchor constraintEqualToConstant:view.frame.size.width],
+                [view.centerXAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.centerXAnchor],
+            ]];
+        }
 
         lastTop = view.bottomAnchor;
     };
@@ -225,6 +238,11 @@
     } else {
         titleView.font = [self.theme fontOfSize:fontSize];
     }
+
+    if (titleData.width != 0) {
+        titleView.frame = CGRectMake(0, 0, titleData.width, 0);
+    }
+
     return titleView;
 }
 
@@ -248,6 +266,10 @@
         bodyLabel.font = [self.theme boldFontOfSize:fontSize];
     } else {
         bodyLabel.font = [self.theme fontOfSize:fontSize];
+    }
+
+    if (bodyData.width != 0) {
+        bodyLabel.frame = CGRectMake(0, 0, bodyData.width, 0);
     }
 
     return bodyLabel;

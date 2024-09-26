@@ -187,6 +187,7 @@ type TitlePageSection struct {
 	Bold                bool
 	UsePrimaryTextColor bool
 	CenterText          bool
+	Width               float64
 }
 
 func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
@@ -219,12 +220,16 @@ func unpackTitleSection(rawData json.RawMessage, s *PageSection) (pageSectionTyp
 		usePrimaryFontColor = true
 	}
 
+	// default to 0
+	widthFloat, _ := data["width"].(float64)
+
 	td := TitlePageSection{
 		Title:               title,
 		ScaleFactor:         scaleFactor,
 		Bold:                bold,
 		CenterText:          centerText,
 		UsePrimaryTextColor: usePrimaryFontColor,
+		Width:               widthFloat,
 	}
 	s.TitleData = &td
 
@@ -250,6 +255,7 @@ type BodyPageSection struct {
 	Bold                bool
 	UsePrimaryTextColor bool
 	CenterText          bool
+	Width               float64
 }
 
 func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionTypeInterface, error) {
@@ -279,12 +285,16 @@ func unpackBodySection(rawData json.RawMessage, s *PageSection) (pageSectionType
 		centerText = true
 	}
 
+	// default to 0
+	widthFloat, _ := data["width"].(float64)
+
 	bd := BodyPageSection{
 		BodyText:            bodyText,
 		ScaleFactor:         scaleFactor,
 		Bold:                bold,
 		UsePrimaryTextColor: usePrimaryFontColor,
 		CenterText:          centerText,
+		Width:               widthFloat,
 	}
 	s.BodyData = &bd
 
