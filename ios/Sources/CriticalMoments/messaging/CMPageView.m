@@ -116,9 +116,8 @@
 
         [constraints addObject:[view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop
                                                                               multiplier:topSpaceMultiplier]];
-
         if (view.frame.size.width == 0) {
-            // Center with margin if width not explicitly set
+            // No exact width, set padding
             [constraints addObjectsFromArray:@[
                 [view.topAnchor constraintEqualToSystemSpacingBelowAnchor:lastTop multiplier:topSpaceMultiplier],
 
@@ -128,10 +127,17 @@
                                                     constant:-CM_PAGE_SIDE_PADDING],
             ]];
         } else {
-            // Center with exact width
+            // Center with exact width, but also min paddings incase device is smaller.
+            NSLayoutConstraint *widthConstraint =
+                [view.widthAnchor constraintLessThanOrEqualToConstant:view.frame.size.width];
+            widthConstraint.priority = UILayoutPriorityDefaultHigh;
             [constraints addObjectsFromArray:@[
-                [view.widthAnchor constraintEqualToConstant:view.frame.size.width],
+                widthConstraint,
                 [view.centerXAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.centerXAnchor],
+                [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
+                                                                constant:CM_PAGE_SIDE_PADDING],
+                [view.trailingAnchor constraintLessThanOrEqualToAnchor:scrollView.layoutMarginsGuide.trailingAnchor
+                                                              constant:-CM_PAGE_SIDE_PADDING],
             ]];
         }
 
