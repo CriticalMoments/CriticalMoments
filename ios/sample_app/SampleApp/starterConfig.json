@@ -15,6 +15,11 @@
         "condition": "eventCount('KEY_FEATURE_2_USED') > 4",
         "actionName": "smartReviewAction"
       },
+      "usedKeyFeaturePaywallTrigger": {
+        "TODO": "This trigger shows the smart paywall after the user performs a key action in the app. See the smartPaywallReminderAction action to understand the conditions which make it 'smart' (checking battery level, checking frequency, etc). To implement: 1) fire events in-code after an in-app actions (one you want to show the review prompt after), 2) update the eventName below to the name of the event you created in #1",
+        "eventName": "KEY_FEATURE_USED",
+        "actionName": "smartPaywallReminderAction"
+      },
       "showPaywallDay7Trigger": {
         "TODO": "A trigger to show your paywall after 7 days. See the 'smartPaywallReminderAction' for what makes this smart (checking battery level, checking if distracted). To implement 1) implement a deeplink to your paywall in code, and update the link in 'smartPaywallReminderAction'. 2) implement the properties used in the smartPaywallReminderAction, such as 'has_paid_subscription' and 'completed_onboarding'.",
         "actionName": "smartPaywallReminderAction",
@@ -58,9 +63,16 @@
         "actionName": "whats_new_modal"
       },
       "outage_trigger": {
+        "TODO": "This trigger shows a warning to users that services are offline during an outage. To enable this, set the 'condition' to 'true' when the outage starts, and update your remote config. Be sure to set it back to false when the outage is resolved.",
         "actionName": "outage_warning",
         "eventName": "app_entered_foreground",
-        "condition": "true"
+        "condition": "false"
+      },
+      "banner_announcement_trigger": {
+        "TODO": "This trigger shows an announcement using banner UI and a web-link. To enable 1) set the banner text in 'announcement_banner', 2) set the web URL in 'announcement_info_action', 3) update the condition for when this should appear. The current example condition checks a date range, and will only show it once by checking eventCount.",
+        "actionName": "announcement_banner",
+        "eventName": "app_entered_foreground",
+        "condition": "now() > date('2022-01-01') && now() < date('2025-01-02') && eventCount('action:announcement_banner') == 0"
       }
     }
   },
@@ -344,6 +356,20 @@
         "actionType": "link",
         "actionData": {
           "url": "https://www.yourapp.com/pricing",
+          "useEmbeddedBrowser": true
+        }
+      },
+      "announcement_banner": {
+        "actionType": "banner",
+        "actionData": {
+          "body": "Our pricing is changing. Learn more →",
+          "tapActionName": "announcement_info_action"
+        }
+      },
+      "announcement_info_action": {
+        "actionType": "link",
+        "actionData": {
+          "url": "https://www.yourapp.com/pricing_update",
           "useEmbeddedBrowser": true
         }
       },
