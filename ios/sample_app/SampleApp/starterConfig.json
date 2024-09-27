@@ -28,34 +28,34 @@
         "eventName": "app_start"
       },
       "showPaywallMonthlyTrigger": {
-          "TODO": "A trigger to show your paywall once a month, after. See description of showPaywallDay7Trigger for details. Note: this condition assumes you kept showPaywallDay7Trigger and showPaywallDay21Trigger, and waits them to occur before starting the 21 day timer (see the condition).",
+        "TODO": "A trigger to show your paywall once a month, after. See description of showPaywallDay7Trigger for details. Note: this condition assumes you kept showPaywallDay7Trigger and showPaywallDay21Trigger, and waits them to occur before starting the 21 day timer (see the condition).",
         "actionName": "smartPaywallReminderAction",
         "condition": "eventCount('action:smartPaywallReminderAction') > 1 && latestEventTime('action:smartPaywallReminderAction') < now() - duration('720h')",
         "eventName": "app_start"
       },
       "showProBanner": {
-          "TODO": "This trigger can show a banner suggesting subscribing, when the app starts. Currently disabled as the condition is 'false'; set to 'true' to try the banner in development. For production, 1) Update the string in 'pro_banner' action, 2) set an appriopiate condition for when you want the banner to appear, such as '!has_paid_subscription && eventCount(app_start) % 3 == 0' to show it to unpaid users on every 3rd launch.",
-          "condition": "false",
-          "eventName": "app_start",
-          "actionName": "pro_banner"
+        "TODO": "This trigger can show a banner suggesting subscribing, when the app starts. Currently disabled as the condition is 'false'; set to 'true' to try the banner in development. For production, 1) Update the string in 'pro_banner' action, 2) set an appriopiate condition for when you want the banner to appear, such as '!has_paid_subscription && eventCount(app_start) % 3 == 0' to show it to unpaid users on every 3rd launch.",
+        "condition": "false",
+        "eventName": "app_start",
+        "actionName": "pro_banner"
       },
       "requestAppUpdate": {
-          "TODO": "Shows UI to users on old/buggy releases, requesting they upgrade their app. To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
-          "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
-          "eventName": "app_start",
-          "actionName": "suggest_app_upgrade"
+        "TODO": "Shows UI to users on old/buggy releases, requesting they upgrade their app. To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
+        "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
+        "eventName": "app_start",
+        "actionName": "suggest_app_upgrade"
       },
       "forceAppUpdate": {
-          "TODO": "Shows UI to users on old/buggy releases, forcing them to upgrade the app (no skip option). To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
-          "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
-          "eventName": "app_start",
-          "actionName": "force_app_upgrade"
+        "TODO": "Shows UI to users on old/buggy releases, forcing them to upgrade the app (no skip option). To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
+        "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
+        "eventName": "app_start",
+        "actionName": "force_app_upgrade"
       },
       "whatsNewTrigger": {
-          "TODO": "Shows a 'what's new' modal on startup. 1) replace content in 'whats_new_modal' with information about your app update, 2) update the condition version number check to the version number including these new features, 3) update the condition date check to when this version was released (so new user's don't see 'whats new'), 4) if this isn't your first 'whats new' modal, change the name of the 'whats_new_modal' action to something new, in both the condition here, and action section below. This ensures each announcement will appear exactly once (even if they saw the past modal).",
-          "eventName": "app_start",
-          "condition": "!versionLessThan(app_version, '2.0.0') && app_install_date < date('2025-01-01') && eventCount('action:whats_new_modal') == 0",
-          "actionName": "whats_new_modal"
+        "TODO": "Shows a 'what's new' modal on startup. 1) replace content in 'whats_new_modal' with information about your app update, 2) update the condition version number check to the version number including these new features, 3) update the condition date check to when this version was released (so new user's don't see 'whats new'), 4) if this isn't your first 'whats new' modal, change the name of the 'whats_new_modal' action to something new, in both the condition here, and action section below. This ensures each announcement will appear exactly once (even if they saw the past modal).",
+        "eventName": "app_start",
+        "condition": "!versionLessThan(app_version, '2.0.0') && app_install_date < date('2025-01-01') && eventCount('action:whats_new_modal') == 0",
+        "actionName": "whats_new_modal"
       }
     }
   },
@@ -68,212 +68,212 @@
         "condition": "(eventCount('system_app_review_requested') == 0 || latestEventTime('system_app_review_requested') < now() - duration('504h')) && versionGreaterThan(app_version, '1.0.0') && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2 && !versionLessThan(os_version, '17.0') && locale_language_code == 'en'"
       },
       "smartPaywallReminderAction": {
-          "actionType": "link",
-          "dev_comment": "user is logged in, don't show for 7 days (168h) after shown by this action (excludes user-driven taps), and some best practices for times to avoid (low battery, network)",
-          "condition": "!(has_paid_subscription ?? false) && eventCount('completed_onboarding') > 0 && (eventCount('action:smartPaywallReminderAction') == 0 || latestEventTime('action:smartPaywallReminderAction') < now() - duration('168h')) && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2",
-          "actionData": {
-            "url": "yourapp://show_paywall"
-          }
+        "actionType": "link",
+        "dev_comment": "user is logged in, don't show for 7 days (168h) after shown by this action (excludes user-driven taps), and some best practices for times to avoid (low battery, network)",
+        "condition": "!(has_paid_subscription ?? false) && eventCount('completed_onboarding') > 0 && (eventCount('action:smartPaywallReminderAction') == 0 || latestEventTime('action:smartPaywallReminderAction') < now() - duration('168h')) && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2",
+        "actionData": {
+          "url": "yourapp://show_paywall"
+        }
       },
       "suggest_app_upgrade": {
-          "actionType": "modal",
-          "actionData": {
-              "showCloseButton": true,
-              "content": {
-                  "pageType": "stack",
-                  "pageData": {
-                      "sections": [
-                          {
-                              "pageSectionType": "image",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "imageType": "sf_symbol",
-                                  "height": 80.0,
-                                  "imageData": {
-                                      "symbolName": "arrow.down.circle.fill",
-                                      "mode": "hierarchical"
-                                  }
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 2,
-                              "pageSectionData": {
-                                  "title": "App Update Recommended"
-                              }
-                          },
-                          {
-                              "pageSectionType": "body",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best experience.",
-                                  "scaleFactor": 1.3
-                              }
-                          }
-                      ],
-                      "buttons": [
-                          {
-                              "title": "Update Now",
-                              "style": "large",
-                              "actionName": "update_app_action"
-                          },
-                          {
-                              "title": "Not Now",
-                              "style": "info"
-                          }
-                      ]
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": true,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "arrow.down.circle.fill",
+                      "mode": "hierarchical"
+                    }
                   }
-              }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "App Update Recommended"
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best experience.",
+                    "scaleFactor": 1.3
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Update Now",
+                  "style": "large",
+                  "actionName": "update_app_action"
+                },
+                {
+                  "title": "Not Now",
+                  "style": "info"
+                }
+              ]
+            }
           }
+        }
       },
       "force_app_upgrade": {
-          "actionType": "modal",
-          "actionData": {
-              "showCloseButton": false,
-              "content": {
-                  "pageType": "stack",
-                  "pageData": {
-                      "sections": [
-                          {
-                              "pageSectionType": "image",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "imageType": "sf_symbol",
-                                  "height": 80.0,
-                                  "imageData": {
-                                      "symbolName": "arrow.down.circle.fill",
-                                      "mode": "hierarchical"
-                                  }
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 2,
-                              "pageSectionData": {
-                                  "title": "App Update Required"
-                              }
-                          },
-                          {
-                              "pageSectionType": "body",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "bodyText": "Your app is out of date. You must update in the app store.",
-                                  "scaleFactor": 1.3
-                              }
-                          }
-                      ],
-                      "buttons": [
-                          {
-                              "title": "Update Now",
-                              "style": "large",
-                              "preventDefault": true,
-                              "actionName": "update_app_action"
-                          }
-                      ]
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": false,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "arrow.down.circle.fill",
+                      "mode": "hierarchical"
+                    }
                   }
-              }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "App Update Required"
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "bodyText": "Your app is out of date. You must update in the app store.",
+                    "scaleFactor": 1.3
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Update Now",
+                  "style": "large",
+                  "preventDefault": true,
+                  "actionName": "update_app_action"
+                }
+              ]
+            }
           }
+        }
       },
       "update_app_action": {
-          "actionType": "link",
-          "actionData": {
-              "TODO": "Replace this with your app ID, and remove this comment",
-              "url": "itms-apps://itunes.apple.com/app/id324684580"
-          }
+        "actionType": "link",
+        "actionData": {
+          "TODO": "Replace this with your app ID, and remove this comment",
+          "url": "itms-apps://itunes.apple.com/app/id324684580"
+        }
       },
       "whats_new_modal": {
-          "actionType": "modal",
-          "actionData": {
-              "showCloseButton": false,
-              "content": {
-                  "pageType": "stack",
-                  "pageData": {
-                      "sections": [
-                          {
-                              "pageSectionType": "image",
-                              "pageSectionData": {
-                                  "imageType": "sf_symbol",
-                                  "height": 80.0,
-                                  "imageData": {
-                                      "symbolName": "star.square.fill",
-                                      "mode": "hierarchical"
-                                  }
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 2,
-                              "pageSectionData": {
-                                  "title": "What's New in YourApp"
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 6,
-                              "pageSectionData": {
-                                  "title": "Feature One",
-                                  "width": 240.0,
-                                  "scaleFactor": 0.5
-                              }
-                          },
-                          {
-                              "pageSectionType": "body",
-                              "topSpacingScale": 0.7,
-                              "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 240.0,
-                                  "centerText": false,
-                                  "scaleFactor": 1
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "title": "Feature Two",
-                                  "width": 240.0,
-                                  "scaleFactor": 0.5
-                              }
-                          },
-                          {
-                              "pageSectionType": "body",
-                              "topSpacingScale": 0.7,
-                              "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 240.0,
-                                  "centerText": false,
-                                  "scaleFactor": 1
-                              }
-                          },
-                          {
-                              "pageSectionType": "title",
-                              "topSpacingScale": 3,
-                              "pageSectionData": {
-                                  "title": "Feature Three",
-                                  "width": 240.0,
-                                  "scaleFactor": 0.5
-                              }
-                          },
-                          {
-                              "pageSectionType": "body",
-                              "topSpacingScale": 0.7,
-                              "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 240.0,
-                                  "centerText": false,
-                                  "scaleFactor": 1
-                              }
-                          }
-                      ],
-                      "buttons": [
-                          {
-                              "title": "Continue",
-                              "style": "large"
-                          }
-                      ]
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": false,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "star.square.fill",
+                      "mode": "hierarchical"
+                    }
                   }
-              }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "What's New in YourApp"
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 6,
+                  "pageSectionData": {
+                    "title": "Feature One",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "title": "Feature Two",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "title": "Feature Three",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Continue",
+                  "style": "large"
+                }
+              ]
+            }
           }
+        }
       },
       "pro_banner": {
         "actionType": "banner",
@@ -296,17 +296,17 @@
             "pageType": "stack",
             "pageData": {
               "sections": [
-                  {
-                      "pageSectionType": "image",
-                      "topSpacingScale": 3,
-                      "pageSectionData": {
-                          "imageType": "sf_symbol",
-                          "height": 80.0,
-                          "imageData": {
-                              "symbolName": "list.bullet.rectangle.portrait.fill",
-                              "mode": "hierarchical"
-                          }
-                      }
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "list.bullet.rectangle.portrait.fill",
+                      "mode": "hierarchical"
+                    }
+                  }
                 },
                 {
                   "pageSectionType": "title",
@@ -352,6 +352,7 @@
   },
   "notifications": {
     "onboardingReminder": {
+      "TODO": "For any notification, you must request the user's permission to show notifications: https://docs.criticalmoments.io/quick-start#request-notification-permissions",
       "title": "Complete APP_NAME Setup",
       "body": "It only takes 3 minutes to start APP_VALUE.",
       "cancelationEvents": ["completed_onboarding"],
@@ -364,8 +365,8 @@
       }
     },
     "secondOnboardingReminder": {
-        "title": "Complete APP_NAME Setup",
-        "body": "It only takes 3 minutes to start APP_VALUE.",
+      "title": "Complete APP_NAME Setup",
+      "body": "It only takes 3 minutes to start APP_VALUE.",
       "cancelationEvents": ["completed_onboarding"],
       "deliveryTimeOfDayStart": "10:00",
       "deliveryTimeOfDayEnd": "20:00",
