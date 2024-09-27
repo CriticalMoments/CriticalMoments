@@ -355,7 +355,9 @@
       "TODO": "For any notification, you must request the user's permission to show notifications: https://docs.criticalmoments.io/quick-start#request-notification-permissions",
       "title": "Complete APP_NAME Setup",
       "body": "It only takes 3 minutes to start APP_VALUE.",
-      "cancelationEvents": ["completed_onboarding"],
+      "cancelationEvents": [
+        "completed_onboarding"
+      ],
       "deliveryTimeOfDayStart": "10:00",
       "deliveryTimeOfDayEnd": "20:00",
       "deliveryTime": {
@@ -367,7 +369,9 @@
     "secondOnboardingReminder": {
       "title": "Complete APP_NAME Setup",
       "body": "It only takes 3 minutes to start APP_VALUE.",
-      "cancelationEvents": ["completed_onboarding"],
+      "cancelationEvents": [
+        "completed_onboarding"
+      ],
       "deliveryTimeOfDayStart": "10:00",
       "deliveryTimeOfDayEnd": "20:00",
       "dev_note": "259,200s is 3 days, and 345,600s is 4 days - so this will be delivered between day 3 and day 7 after last app launch. It's canceled if the user creates an account (user_sync event). The ideal delivery time is when the user is holding their device (not flat), and it's screen is on.",

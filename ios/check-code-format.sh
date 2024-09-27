@@ -12,6 +12,27 @@ find . -name '*.h' -or -name '*.m' | xargs clang-format --dry-run --Werror -styl
 
 FMTSTATUS=$?
 
-echo "formatting returned status $FMTSTATUS"
+if [ $FMTSTATUS -ne 0 ]; then
+    echo "clang formatting returned status $FMTSTATUS"
+    exit $FMTSTATUS
+fi
 
-exit $FMTSTATUS
+# json
+jq '.' sample_app/SampleApp/starterConfig.json > tmp_file
+cmp tmp_file sample_app/SampleApp/starterConfig.json
+FMTSTATUS=$?
+if [ $FMTSTATUS -ne 0 ]; then
+    echo "json formatting returned status $FMTSTATUS"
+    exit $FMTSTATUS
+fi
+jq '.' sample_app/SampleApp/cmDevConfig.json > tmp_file
+cmp tmp_file sample_app/SampleApp/cmDevConfig.json
+FMTSTATUS=$?
+if [ $FMTSTATUS -ne 0 ]; then
+    echo "json formatting returned status $FMTSTATUS"
+    exit $FMTSTATUS
+fi
+
+rm tmp_file
+
+exit 0
