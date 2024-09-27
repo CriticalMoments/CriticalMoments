@@ -209,22 +209,21 @@
                           },
                           {
                               "pageSectionType": "title",
-                              "topSpacingScale": 5,
+                              "topSpacingScale": 6,
                               "pageSectionData": {
                                   "title": "Feature One",
-                                  "width": 220.0,
-                                  "centerText": false,
-                                  "scaleFactor": 0.6
+                                  "width": 240.0,
+                                  "scaleFactor": 0.5
                               }
                           },
                           {
                               "pageSectionType": "body",
                               "topSpacingScale": 0.7,
                               "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 220.0,
+                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 240.0,
                                   "centerText": false,
-                                  "scaleFactor": 1.1
+                                  "scaleFactor": 1
                               }
                           },
                           {
@@ -232,19 +231,18 @@
                               "topSpacingScale": 3,
                               "pageSectionData": {
                                   "title": "Feature Two",
-                                  "width": 220.0,
-                                  "centerText": false,
-                                  "scaleFactor": 0.6
+                                  "width": 240.0,
+                                  "scaleFactor": 0.5
                               }
                           },
                           {
                               "pageSectionType": "body",
                               "topSpacingScale": 0.7,
                               "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 220.0,
+                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 240.0,
                                   "centerText": false,
-                                  "scaleFactor": 1.1
+                                  "scaleFactor": 1
                               }
                           },
                           {
@@ -252,19 +250,18 @@
                               "topSpacingScale": 3,
                               "pageSectionData": {
                                   "title": "Feature Three",
-                                  "width": 220.0,
-                                  "centerText": false,
-                                  "scaleFactor": 0.6
+                                  "width": 240.0,
+                                  "scaleFactor": 0.5
                               }
                           },
                           {
                               "pageSectionType": "body",
                               "topSpacingScale": 0.7,
                               "pageSectionData": {
-                                  "bodyText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
-                                  "width": 220.0,
+                                  "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                                  "width": 240.0,
                                   "centerText": false,
-                                  "scaleFactor": 1.1
+                                  "scaleFactor": 1
                               }
                           }
                       ],

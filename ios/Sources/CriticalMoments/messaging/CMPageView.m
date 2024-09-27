@@ -128,11 +128,15 @@
             ]];
         } else {
             // Center with exact width, but also min paddings incase device is smaller.
-            NSLayoutConstraint *widthConstraint =
+            NSLayoutConstraint *maxWidthConstraint =
                 [view.widthAnchor constraintLessThanOrEqualToConstant:view.frame.size.width];
-            widthConstraint.priority = UILayoutPriorityDefaultHigh;
+            maxWidthConstraint.priority = UILayoutPriorityDefaultHigh;
+            NSLayoutConstraint *exactWidthConstraint =
+                [view.widthAnchor constraintEqualToConstant:view.frame.size.width];
+            exactWidthConstraint.priority = UILayoutPriorityDefaultLow;
             [constraints addObjectsFromArray:@[
-                widthConstraint,
+                maxWidthConstraint,
+                exactWidthConstraint,
                 [view.centerXAnchor constraintEqualToAnchor:scrollView.layoutMarginsGuide.centerXAnchor],
                 [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.layoutMarginsGuide.leadingAnchor
                                                                 constant:CM_PAGE_SIDE_PADDING],
