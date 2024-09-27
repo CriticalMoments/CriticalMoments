@@ -39,8 +39,8 @@
         "eventName": "app_start"
       },
       "showProBanner": {
-        "TODO": "This trigger can show a banner suggesting subscribing, when the app starts. Currently disabled as the condition is 'false'; set to 'true' to try the banner in development. For production, 1) Update the string in 'pro_banner' action, 2) set an appriopiate condition for when you want the banner to appear, such as '!has_paid_subscription && eventCount(app_start) % 3 == 0' to show it to unpaid users on every 3rd launch.",
-        "condition": "false",
+        "TODO": "This trigger shows a banner suggesting the user subscribe. To enable, 1) Update the string in 'pro_banner' action, 2) set a deeplink to your paywall in 'paywallAction', 3) set an appriopiate condition for when you want the banner to appear. The example condition shows it to unpaid users on every 3rd launch (remove 'false &&' to enable this example).",
+        "condition": "false && !(has_paid_subscription ?? false) && eventCount('app_start') % 3 == 0",
         "eventName": "app_start",
         "actionName": "pro_banner"
       },
@@ -72,7 +72,13 @@
         "TODO": "This trigger shows an announcement using banner UI and a web-link. To enable 1) set the banner text in 'announcement_banner', 2) set the web URL in 'announcement_info_action', 3) update the condition for when this should appear. The current example condition checks a date range, and will only show it once by checking eventCount.",
         "actionName": "announcement_banner",
         "eventName": "app_entered_foreground",
-        "condition": "now() > date('2022-01-01') && now() < date('2025-01-02') && eventCount('action:announcement_banner') == 0"
+        "condition": "now() > date('2022-01-01') && now() < date('2022-02-01') && eventCount('action:announcement_banner') == 0"
+      },
+      "modal_announcement_trigger": {
+        "TODO": "This trigger shows an announcement using native modal UI. To enable 1) update the content of 'announcement_modal' with your announcement, 2) set the web URL in 'announcement_info_action' or remove the 'More info' button from 'announcement_modal', 3) update the condition for when this should appear. The current example condition checks a date range, and will only show it once by checking eventCount.",
+        "actionName": "announcement_modal",
+        "eventName": "app_entered_foreground",
+        "condition": "now() > date('2022-01-01') && now() < date('2022-02-01') && eventCount('action:announcement_modal') == 0"
       }
     }
   },
@@ -88,6 +94,13 @@
         "actionType": "link",
         "dev_comment": "user is logged in, don't show for 7 days (168h) after shown by this action (excludes user-driven taps), and some best practices for times to avoid (low battery, network)",
         "condition": "!(has_paid_subscription ?? false) && eventCount('completed_onboarding') > 0 && (eventCount('action:smartPaywallReminderAction') == 0 || latestEventTime('action:smartPaywallReminderAction') < now() - duration('168h')) && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2",
+        "actionData": {
+          "url": "yourapp://show_paywall"
+        }
+      },
+      "paywallAction": {
+        "DEV_NOTE": "Performs the same action as smartPaywallReminderAction, but without conditional checks. Use this if you want to show your paywall without smart checks, such as from a user-initiated button.",
+        "actionType": "link",
         "actionData": {
           "url": "yourapp://show_paywall"
         }
@@ -349,7 +362,7 @@
         "actionType": "banner",
         "actionData": {
           "body": "Explore Pro Features →",
-          "tapActionName": "pro_info_modal"
+          "tapActionName": "paywallAction"
         }
       },
       "pro_info_action": {
@@ -373,7 +386,7 @@
           "useEmbeddedBrowser": true
         }
       },
-      "pro_info_modal": {
+      "announcement_modal": {
         "actionType": "modal",
         "actionData": {
           "content": {
@@ -382,28 +395,27 @@
               "sections": [
                 {
                   "pageSectionType": "image",
-                  "topSpacingScale": 3,
                   "pageSectionData": {
                     "imageType": "sf_symbol",
-                    "height": 80.0,
+                    "height": 60.0,
                     "imageData": {
-                      "symbolName": "list.bullet.rectangle.portrait.fill",
+                      "symbolName": "coloncurrencysign.square.fill",
+                      "weight": "light",
                       "mode": "hierarchical"
                     }
                   }
                 },
                 {
                   "pageSectionType": "title",
-                  "topSpacingScale": 5.0,
                   "pageSectionData": {
-                    "title": "Try Pro for Free"
+                    "title": "Important Announcement"
                   }
                 },
                 {
                   "pageSectionType": "title",
                   "topSpacingScale": 1.5,
                   "pageSectionData": {
-                    "title": "Get even more from YOUR_APP",
+                    "title": "New pricing coming soon.",
                     "scaleFactor": 0.64
                   }
                 },
@@ -411,8 +423,7 @@
                   "pageSectionType": "body",
                   "topSpacingScale": 4,
                   "pageSectionData": {
-                    "bodyText": "Our pro plan is a great way to...",
-                    "scaleFactor": 1.15
+                    "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
                   }
                 }
               ],
@@ -422,10 +433,10 @@
                   "style": "large"
                 },
                 {
-                  "title": "Learn more about Pro",
+                  "title": "More info",
                   "preventDefault": true,
                   "style": "info",
-                  "actionName": "pro_info_action"
+                  "actionName": "announcement_info_action"
                 }
               ]
             }
