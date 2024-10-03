@@ -143,9 +143,11 @@
         if (![permittedIdentifiers containsObject:requiredTaskId]) {
             os_log_error(
                 OS_LOG_DEFAULT,
-                "CriticalMoments: Setup Issue\nYou must add CM background task IDs to your Info.plist. If you don't, "
+                "CriticalMoments: Setup Issue\nYou must add CM background task IDs to your Info.plist in the "
+                "BGTaskSchedulerPermittedIdentifiers section. If you don't, "
                 "some CM features will not function.\n\nSee our quick start guide for details on how to resolve this "
-                "issue: https://docs.criticalmoments.io\n\nThis warning log is only in debug builds.");
+                "issue (search for 'BGTaskSchedulerPermittedIdentifiers'): https://docs.criticalmoments.io\n\nThis "
+                "warning log is only in debug builds.");
             break;
         }
     }
