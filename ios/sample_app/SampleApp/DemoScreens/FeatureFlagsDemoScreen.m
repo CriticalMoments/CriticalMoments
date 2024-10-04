@@ -22,6 +22,11 @@
     return self;
 }
 
+- (NSString *)sectionSubtitleForResult:(bool)result withDescription:(NSString *)description {
+    return result ? [NSString stringWithFormat:@"✅ Feature Flag True\n\n%@", description]
+                  : [NSString stringWithFormat:@"❌ Feature Flag False\n\n%@", description];
+}
+
 - (void)buildSections {
     [CriticalMoments.sharedInstance
         checkNamedCondition:@"is_iphone_with_recent_os"
@@ -31,11 +36,13 @@
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"Device Targeting: Is Phone with Recent iOS"
-                                            : @"State: Is NOT Phone with Recent iOS";
+                      action.title = @"iPhone with iOS Version >= 17.0?";
                       action.subtitle =
-                          @"This feature flag will change state, depending on which device and OS it's run "
-                          @"on.\n\nCondition: device_model_class == 'iPhone' &&\n!versionLessThan(os_version, '17.0')";
+                          [self sectionSubtitleForResult:result
+                                         withDescription:
+                                             @"This feature flag checks device type (phone vs tablet), and OS version."
+                                             @"\n\nCondition: device_model_class == 'iPhone' "
+                                             @"&&\n!versionLessThan(os_version, '17.0')"];
                       [self addSection:@"Target Device Properties" withActions:@[ action ]];
                     }];
 
@@ -47,13 +54,18 @@
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"AB Test Group: User in A" : @"AB Test Group: User in B";
-                      action.subtitle =
-                          @"Split users into AB tests including: 1) random asignment, 2) filtering by user properties "
-                          @"(is_pro_user), 3) filtering by built-in properties (is_ipad, app_install_date), and much "
-                          @"more. These can be remotely updated to rollout or rollback.\n\nExample: "
-                          @"randForKey('experiment5', stableRand()) % 100 < 25 && "
-                          @"!(is_pro_user ?? false)";
+                      action.title = @"AB Test Group Assignment";
+                      NSString *subtitle = result ? @"🅰️ Assigned to Group A" : @"🅱️ Assigned to Group B";
+                      subtitle =
+                          [subtitle stringByAppendingString:
+                                        @"\n\nSplit users into AB tests including: 1) random asignment, 2) filtering "
+                                        @"by user properties "
+                                        @"(is_pro_user), 3) filtering by built-in properties (is_ipad, "
+                                        @"app_install_date), and much "
+                                        @"more. These can be remotely updated to rollout or rollback.\n\nExample: "
+                                        @"randForKey('experiment5', stableRand()) % 100 < 25 && "
+                                        @"!(is_pro_user ?? false)"];
+                      action.subtitle = subtitle;
                       [self addSection:@"AB Testing" withActions:@[ action ]];
                     }];
 
@@ -65,12 +77,13 @@
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"Offer: Explore European Vacation Deals"
-                                            : @"Offer: Explore Caribbean Vacation Deals";
-                      action.subtitle = @"Show different offers to "
-                                        @"different users based on local weather. Caribbean when cold, and Europe when "
-                                        @"warm.\n\nCondition: (weather_approx_location_temperature > 20)";
-                      [self addSection:@"Live Weather Example" withActions:@[ action ]];
+                      action.title = @"Weather: Temperature > 20";
+                      action.subtitle =
+                          [self sectionSubtitleForResult:result
+                                         withDescription:
+                                             @"This feature flag checks ourdoor weather, using GeoIP "
+                                             @"location.\n\nCondition: (weather_approx_location_temperature > 20)"];
+                      [self addSection:@"Weather Example" withActions:@[ action ]];
                     }];
 
     [CriticalMoments.sharedInstance
@@ -81,11 +94,12 @@
                           return;
                       }
                       CMDemoAction *action = [[CMDemoAction alloc] init];
-                      action.title = result ? @"Feature Flag: App Installed Over 10 Mins Ago"
-                                            : @"Feature Flag: App Installed in Last 10 Mins";
-                      action.subtitle =
-                          @"This flag looks at user engagement history to determine it's value. In this case, how long "
-                          @"ago the app was installed.\n\nCondition: app_install_date < now() - duration('10m')";
+                      action.title = @"App Installed Over 10 Mins Ago?";
+                      action.subtitle = [self sectionSubtitleForResult:result
+                                                       withDescription:@"This flag looks at user engagement history to "
+                                                                       @"determine it's value. In this case, how long "
+                                                                       @"ago the app was installed.\n\nCondition: "
+                                                                       @"app_install_date < now() - duration('10m')"];
                       [self addSection:@"User Engagement History" withActions:@[ action ]];
                     }];
 }

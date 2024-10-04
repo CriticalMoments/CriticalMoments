@@ -10,7 +10,8 @@
                     "centerText": false,
                     "scaleFactor": 1.2,
                     "usePrimaryFontColor": false,
-                    "bold": false
+                    "bold": false,
+                    "width": 100
                 }
             },
             {
@@ -38,7 +39,8 @@
                     "scaleFactor": 1.1,
                     "centerText": false,
                     "bold": true,
-                    "usePrimaryFontColor": true
+                    "usePrimaryFontColor": true,
+                    "width": 200
                 }
             }
         ],

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-JSON_CONFIG='./ios/sample_app/SampleApp/config.json'
+set -e
+
+JSON_CONFIG='./ios/sample_app/SampleApp/cmDevConfig.json'
 SIGNED_NAME='./docs/sample_app_config.cmconfig'
 
 echo "Signing config file..."

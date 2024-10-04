@@ -1,0 +1,516 @@
+{
+  "configVersion": "v1",
+  "TODO": "you must replace appID with your app ID (aka, bundle ID)",
+  "appId": "io.criticalmoments.demo-app",
+  "triggers": {
+    "namedTriggers": {
+      "usedKeyFeatureReviewTrigger": {
+        "TODO": "This trigger requests the user rate the app, after they perform a key action in the app. See the smartReview action to understand the conditions which make it 'smart' (checking battery level, checking frequency, etc). To implement: 1) fire events in-code after an in-app actions (one you want to show the review prompt after), 2) update the eventName below to the name of the event you created in #1",
+        "eventName": "KEY_FEATURE_USED",
+        "actionName": "smartReviewAction"
+      },
+      "keyFeatureTwoReviewTrigger": {
+        "TODO": "Similar to 'usedKeyFeatureReviewTrigger', but adds a condition. In this example, only asking every 4th time they complete the action. To implement: 1) fire events in-code after an in-app actions (one you want to show the review prompt after), 2) update the eventName below to the name of the event you created in #1, 3) Update 'condition' with the logic you want.",
+        "eventName": "KEY_FEATURE_2_USED",
+        "condition": "eventCount('KEY_FEATURE_2_USED') > 4",
+        "actionName": "smartReviewAction"
+      },
+      "usedKeyFeaturePaywallTrigger": {
+        "TODO": "This trigger shows the smart paywall after the user performs a key action in the app. See the smartPaywallReminderAction action to understand the conditions which make it 'smart' (checking battery level, checking frequency, etc). To implement: 1) fire events in-code after an in-app actions (one you want to show the review prompt after), 2) update the eventName below to the name of the event you created in #1",
+        "eventName": "KEY_FEATURE_USED",
+        "actionName": "smartPaywallReminderAction"
+      },
+      "showPaywallDay7Trigger": {
+        "TODO": "A trigger to show your paywall after 7 days. See the 'smartPaywallReminderAction' for what makes this smart (checking battery level, checking if distracted). To implement 1) implement a deeplink to your paywall in code, and update the link in 'smartPaywallReminderAction'. 2) implement the properties used in the smartPaywallReminderAction, such as 'has_paid_subscription' and 'completed_onboarding'.",
+        "actionName": "smartPaywallReminderAction",
+        "condition": "eventCount('action:smartPaywallReminderAction') == 0 && app_install_date < now() - duration('168h')",
+        "eventName": "app_start"
+      },
+      "showPaywallDay21Trigger": {
+        "TODO": "A trigger to show your paywall after 21 days. See description of showPaywallDay7Trigger for details. Note: this condition assumes you kept showPaywallDay7Trigger, and waits for it to occur once before starting the 21 day timer (see the condition).",
+        "actionName": "smartPaywallReminderAction",
+        "condition": "eventCount('action:smartPaywallReminderAction') == 1 && app_install_date < now() - duration('504h')",
+        "eventName": "app_start"
+      },
+      "showPaywallMonthlyTrigger": {
+        "TODO": "A trigger to show your paywall once a month, after. See description of showPaywallDay7Trigger for details. Note: this condition assumes you kept showPaywallDay7Trigger and showPaywallDay21Trigger, and waits them to occur before starting the 21 day timer (see the condition).",
+        "actionName": "smartPaywallReminderAction",
+        "condition": "eventCount('action:smartPaywallReminderAction') > 1 && latestEventTime('action:smartPaywallReminderAction') < now() - duration('720h')",
+        "eventName": "app_start"
+      },
+      "showProBanner": {
+        "TODO": "This trigger shows a banner suggesting the user subscribe. To enable, 1) Update the string in 'pro_banner' action, 2) set a deeplink to your paywall in 'paywallAction', 3) set an appriopiate condition for when you want the banner to appear. The example condition shows it to unpaid users on every 3rd launch (remove 'false &&' to enable this example).",
+        "condition": "false && !(has_paid_subscription ?? false) && eventCount('app_start') % 3 == 0",
+        "eventName": "app_start",
+        "actionName": "pro_banner"
+      },
+      "requestAppUpdate": {
+        "TODO": "Shows UI to users on old/buggy releases, requesting they upgrade their app. To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
+        "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
+        "eventName": "app_start",
+        "actionName": "suggest_app_upgrade"
+      },
+      "forceAppUpdate": {
+        "TODO": "Shows UI to users on old/buggy releases, forcing them to upgrade the app (no skip option). To implement: 1) Replace the '1.0.0' with the min acceptable app version, 2) optionally add specific buggy releases numbers to the array check to request those versions upgrade as well (even if they are newer than the min version).",
+        "condition": "versionLessThan(app_version, '1.0.0') || app_version in []",
+        "eventName": "app_start",
+        "actionName": "force_app_upgrade"
+      },
+      "whatsNewTrigger": {
+        "TODO": "Shows a 'what's new' modal on startup. 1) replace content in 'whats_new_modal' with information about your app update, 2) update the condition version number check to the version number including these new features, 3) update the condition date check to when this version was released (so new user's don't see 'whats new'), 4) if this isn't your first 'whats new' modal, change the name of the 'whats_new_modal' action to something new, in both the condition here, and action section below. This ensures each announcement will appear exactly once (even if they saw the past modal).",
+        "eventName": "app_start",
+        "condition": "!versionLessThan(app_version, '2.0.0') && app_install_date < date('2025-01-01') && eventCount('action:whats_new_modal') == 0",
+        "actionName": "whats_new_modal"
+      },
+      "outage_trigger": {
+        "TODO": "This trigger shows a warning to users that services are offline during an outage. To enable this, set the 'condition' to 'true' when the outage starts, and update your remote config. Be sure to set it back to false when the outage is resolved.",
+        "actionName": "outage_warning",
+        "eventName": "app_entered_foreground",
+        "condition": "false"
+      },
+      "banner_announcement_trigger": {
+        "TODO": "This trigger shows an announcement using banner UI and a web-link. To enable 1) set the banner text in 'announcement_banner', 2) set the web URL in 'announcement_info_action', 3) update the condition for when this should appear. The current example condition checks a date range, and will only show it once by checking eventCount.",
+        "actionName": "announcement_banner",
+        "eventName": "app_entered_foreground",
+        "condition": "now() > date('2022-01-01') && now() < date('2022-02-01') && eventCount('action:announcement_banner') == 0"
+      },
+      "modal_announcement_trigger": {
+        "TODO": "This trigger shows an announcement using native modal UI. To enable 1) update the content of 'announcement_modal' with your announcement, 2) set the web URL in 'announcement_info_action' or remove the 'More info' button from 'announcement_modal', 3) update the condition for when this should appear. The current example condition checks a date range, and will only show it once by checking eventCount.",
+        "actionName": "announcement_modal",
+        "eventName": "app_entered_foreground",
+        "condition": "now() > date('2022-01-01') && now() < date('2022-02-01') && eventCount('action:announcement_modal') == 0"
+      }
+    }
+  },
+  "actions": {
+    "namedActions": {
+      "smartReviewAction": {
+        "actionType": "review_prompt",
+        "actionData": {},
+        "dev_comment": "don't show for 21 days (504h) after shown, min app version check, and some best practices for times to avoid",
+        "condition": "(eventCount('system_app_review_requested') == 0 || latestEventTime('system_app_review_requested') < now() - duration('504h')) && versionGreaterThan(app_version, '1.0.0') && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2 && !versionLessThan(os_version, '17.0') && locale_language_code == 'en'"
+      },
+      "smartPaywallReminderAction": {
+        "actionType": "link",
+        "dev_comment": "user is logged in, don't show for 7 days (168h) after shown by this action (excludes user-driven taps), and some best practices for times to avoid (low battery, network)",
+        "condition": "!(has_paid_subscription ?? false) && eventCount('completed_onboarding') > 0 && (eventCount('action:smartPaywallReminderAction') == 0 || latestEventTime('action:smartPaywallReminderAction') < now() - duration('168h')) && !device_low_power_mode && has_active_network && !low_data_mode && device_battery_level > 0.2",
+        "actionData": {
+          "url": "yourapp://show_paywall"
+        }
+      },
+      "paywallAction": {
+        "DEV_NOTE": "Performs the same action as smartPaywallReminderAction, but without conditional checks. Use this if you want to show your paywall without smart checks, such as from a user-initiated button.",
+        "actionType": "link",
+        "actionData": {
+          "url": "yourapp://show_paywall"
+        }
+      },
+      "suggest_app_upgrade": {
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": true,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "arrow.down.circle.fill",
+                      "mode": "hierarchical"
+                    }
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "App Update Recommended"
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "bodyText": "Your app is out of date.\n\nWe suggest updating in the app store for the best experience.",
+                    "scaleFactor": 1.3
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Update Now",
+                  "style": "large",
+                  "actionName": "update_app_action"
+                },
+                {
+                  "title": "Not Now",
+                  "style": "info"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "force_app_upgrade": {
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": false,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "arrow.down.circle.fill",
+                      "mode": "hierarchical"
+                    }
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "App Update Required"
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "bodyText": "Your app is out of date. You must update in the app store.",
+                    "scaleFactor": 1.3
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Update Now",
+                  "style": "large",
+                  "preventDefault": true,
+                  "actionName": "update_app_action"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "outage_warning": {
+        "actionType": "modal",
+        "actionData": {
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "exclamationmark.icloud",
+                      "mode": "hierarchical"
+                    }
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "Temporary Service Interruption"
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "title": "We'll be back online soon",
+                    "scaleFactor": 0.7
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 5,
+                  "pageSectionData": {
+                    "bodyText": "We are currently experiencing issues with our service and some features may be unavailable.\n\nOur team working on a fix and we expect to be back online shortly.",
+                    "scaleFactor": 1.2
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Got It",
+                  "style": "large"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "update_app_action": {
+        "actionType": "link",
+        "actionData": {
+          "TODO": "Replace this with your app ID, and remove this comment",
+          "url": "itms-apps://itunes.apple.com/app/id324684580"
+        }
+      },
+      "whats_new_modal": {
+        "actionType": "modal",
+        "actionData": {
+          "showCloseButton": false,
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 80.0,
+                    "imageData": {
+                      "symbolName": "star.square.fill",
+                      "mode": "hierarchical"
+                    }
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 2,
+                  "pageSectionData": {
+                    "title": "What's New in YourApp"
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 6,
+                  "pageSectionData": {
+                    "title": "Feature One",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "title": "Feature Two",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 3,
+                  "pageSectionData": {
+                    "title": "Feature Three",
+                    "width": 240.0,
+                    "scaleFactor": 0.5
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 0.7,
+                  "pageSectionData": {
+                    "bodyText": "Lorem ipsum dolor sit amet, consect etur adipiscing elit, sed do eiusmod tempor incididunt",
+                    "width": 240.0,
+                    "centerText": false,
+                    "scaleFactor": 1
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Continue",
+                  "style": "large"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "pro_banner": {
+        "actionType": "banner",
+        "actionData": {
+          "body": "Explore Pro Features →",
+          "tapActionName": "paywallAction"
+        }
+      },
+      "pro_info_action": {
+        "actionType": "link",
+        "actionData": {
+          "url": "https://www.yourapp.com/pricing",
+          "useEmbeddedBrowser": true
+        }
+      },
+      "announcement_banner": {
+        "actionType": "banner",
+        "actionData": {
+          "body": "Our pricing is changing. Learn more →",
+          "tapActionName": "announcement_info_action"
+        }
+      },
+      "announcement_info_action": {
+        "actionType": "link",
+        "actionData": {
+          "url": "https://www.yourapp.com/pricing_update",
+          "useEmbeddedBrowser": true
+        }
+      },
+      "announcement_modal": {
+        "actionType": "modal",
+        "actionData": {
+          "content": {
+            "pageType": "stack",
+            "pageData": {
+              "sections": [
+                {
+                  "pageSectionType": "image",
+                  "pageSectionData": {
+                    "imageType": "sf_symbol",
+                    "height": 60.0,
+                    "imageData": {
+                      "symbolName": "coloncurrencysign.square.fill",
+                      "weight": "light",
+                      "mode": "hierarchical"
+                    }
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "pageSectionData": {
+                    "title": "Important Announcement"
+                  }
+                },
+                {
+                  "pageSectionType": "title",
+                  "topSpacingScale": 1.5,
+                  "pageSectionData": {
+                    "title": "New pricing coming soon.",
+                    "scaleFactor": 0.64
+                  }
+                },
+                {
+                  "pageSectionType": "body",
+                  "topSpacingScale": 4,
+                  "pageSectionData": {
+                    "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
+                  }
+                }
+              ],
+              "buttons": [
+                {
+                  "title": "Got it!",
+                  "style": "large"
+                },
+                {
+                  "title": "More info",
+                  "preventDefault": true,
+                  "style": "info",
+                  "actionName": "announcement_info_action"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "notifications": {
+    "onboardingReminder": {
+      "TODO": "For any notification, you must request the user's permission to show notifications: https://docs.criticalmoments.io/quick-start#request-notification-permissions",
+      "title": "Complete APP_NAME Setup",
+      "body": "It only takes 3 minutes to start APP_VALUE.",
+      "cancelationEvents": [
+        "completed_onboarding"
+      ],
+      "deliveryTimeOfDayStart": "10:00",
+      "deliveryTimeOfDayEnd": "20:00",
+      "deliveryTime": {
+        "eventName": "app_entered_background",
+        "eventInstance": "latest-once",
+        "eventOffsetSeconds": 900
+      }
+    },
+    "secondOnboardingReminder": {
+      "title": "Complete APP_NAME Setup",
+      "body": "It only takes 3 minutes to start APP_VALUE.",
+      "cancelationEvents": [
+        "completed_onboarding"
+      ],
+      "deliveryTimeOfDayStart": "10:00",
+      "deliveryTimeOfDayEnd": "20:00",
+      "dev_note": "259,200s is 3 days, and 345,600s is 4 days - so this will be delivered between day 3 and day 7 after last app launch. It's canceled if the user creates an account (user_sync event). The ideal delivery time is when the user is holding their device (not flat), and it's screen is on.",
+      "deliveryTime": {
+        "eventName": "app_entered_background",
+        "eventInstance": "latest-once",
+        "eventOffsetSeconds": 259200
+      },
+      "idealDeliveryConditions": {
+        "condition": "screen_brightness > 0.01 && device_orientation != 'face_up' && device_orientation != 'face_down'",
+        "maxWaitTimeSeconds": 345600
+      }
+    },
+    "churnNotification": {
+      "title": "APP_VALUE",
+      "body": "APP_VALUE_2",
+      "deliveryTimeOfDayStart": "10:00",
+      "deliveryTimeOfDayEnd": "20:00",
+      "dev_note": "2,592,000s is 30 days, and 345,600s is 4 days - so this will be delivered between day 30 and day 34 after last app launch. The ideal delivery time is when the user is holding their device (not flat), and it's screen is on.",
+      "deliveryTime": {
+        "eventName": "app_entered_foreground",
+        "eventInstance": "latest",
+        "eventOffsetSeconds": 2592000
+      },
+      "idealDeliveryConditions": {
+        "condition": "screen_brightness > 0.01 && device_orientation != 'face_up' && device_orientation != 'face_down'",
+        "maxWaitTimeSeconds": 345600
+      }
+    }
+  },
+  "themes": {
+    "TODO": "Themes allow you to control the colors and fonts used in Critical Moments UI. To implement a theme: 1) update the 'primary_theme' below with the colors and fonts of your brand 2) set 'defaultThemeName' to 'primary_theme' to make it your default theme. See theme spec for details: https://docs.criticalmoments.io/themes/theme-overview",
+    "defaultThemeName": "system",
+    "namedThemes": {
+      "primary_theme": {
+        "bannerBackgroundColor": "#a7fe01",
+        "bannerForegroundColor": "#ffffff",
+        "fontName": "AvenirNext-Regular",
+        "boldFontName": "AvenirNext-Bold",
+        "backgroundColor": "#000000",
+        "primaryTextColor": "#fafafa",
+        "primaryColor": "#3a758c",
+        "secondaryTextColor": "#a6a4a2"
+      }
+    }
+  }
+}

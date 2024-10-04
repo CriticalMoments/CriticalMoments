@@ -8,7 +8,7 @@ import (
 
 func TestModalValidation(t *testing.T) {
 	m := ModalAction{}
-	if m.Validate() {
+	if m.Valid() {
 		t.Fatal("Invalid content passed validation")
 	}
 
@@ -23,7 +23,7 @@ func TestModalValidation(t *testing.T) {
 	m.Content = &Page{
 		Sections: []*PageSection{&s},
 	}
-	if !m.Validate() {
+	if !m.Valid() {
 		t.Fatal("valid content failed validation")
 	}
 

@@ -26,19 +26,15 @@ func unpackModalFromJson(rawJson json.RawMessage, ac *ActionContainer) (ActionTy
 	return &modal, nil
 }
 
-func (m *ModalAction) Validate() bool {
-	return m.ValidateReturningUserReadableIssue() == ""
+func (m *ModalAction) Valid() bool {
+	return m.Check() == nil
 }
 
-func (m *ModalAction) ValidateReturningUserReadableIssue() string {
+func (m *ModalAction) Check() UserPresentableErrorInterface {
 	if m.Content == nil {
-		return "Modals must have content"
+		return NewUserPresentableError("Modals must have content")
 	}
-	if contentErr := m.Content.ValidateReturningUserReadableIssue(); contentErr != "" {
-		return contentErr
-	}
-
-	return ""
+	return m.Content.Check()
 }
 
 func (m *ModalAction) UnmarshalJSON(data []byte) error {
@@ -58,8 +54,8 @@ func (m *ModalAction) UnmarshalJSON(data []byte) error {
 	m.CustomThemeName = jm.CustomThemeName
 	m.ShowCloseButton = showCloseButton
 
-	if validationIssue := m.ValidateReturningUserReadableIssue(); validationIssue != "" {
-		return NewUserPresentableError(validationIssue)
+	if err := m.Check(); err != nil {
+		return NewUserErrorForJsonIssue(data, err)
 	}
 
 	return nil

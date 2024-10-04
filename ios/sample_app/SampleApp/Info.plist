@@ -22,6 +22,8 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to avoid showing messages when using peripherals.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Allow location to demo checking location in the SampleApp</string>
 	<key>NSRemindersFullAccessUsageDescription</key>

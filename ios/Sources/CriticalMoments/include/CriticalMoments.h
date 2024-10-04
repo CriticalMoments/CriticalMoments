@@ -111,11 +111,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendEvent:(NSString *)eventName;
 
 /**
- Set to true to log events to console, as they occur. Primarily uses in debugging, and should be disabled in release
- builds. Disabled by default.
+ Set to true to log events and conditions to console, as they occur. Primarily uses in debugging, and should be disabled
+ in release builds. Disabled by default.
 
- @param logEvents if true, events will be logged as they occur
+ @param devMode  if true, the CM SDK will log events and conditions as they occur
  */
+- (void)setDeveloperMode:(bool)devMode;
+
+/// :nodoc: Replaced by setDeveloperMode which logs events, and more.
 - (void)setLogEvents:(bool)logEvents;
 
 #pragma mark Feature Flags / Named Conditions

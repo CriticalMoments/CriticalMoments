@@ -8,72 +8,72 @@ import (
 
 func TestImageTypeValidation(t *testing.T) {
 	li := LocalImage{}
-	if li.ValidateReturningUserReadableIssue() == "" {
+	if li.Check() == nil {
 		t.Fatal("Local images require path")
 	}
 	li.Path = "image.jpg"
-	if li.ValidateReturningUserReadableIssue() != "" {
+	if li.Check() != nil {
 		t.Fatal("Local image failed validation")
 	}
 
 	si := SymbolImage{}
-	if si.ValidateReturningUserReadableIssue() == "" {
+	if si.Check() == nil {
 		t.Fatal("Symbol images require symbolName")
 	}
 	si.SymbolName = "upload"
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation")
 	}
 
 	si.Weight = "invalid"
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation when it should pass with strict=off")
 	}
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if si.ValidateReturningUserReadableIssue() == "" {
+	if si.Check() == nil {
 		t.Fatal("Symbol images require valid weight in strict mode")
 	}
 	si.Weight = SystemSymbolWeightEnumBold
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation")
 	}
 	StrictDatamodelParsing = false
 
 	si.Mode = "invalid"
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation when it should pass with strict=off")
 	}
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if si.ValidateReturningUserReadableIssue() == "" {
+	if si.Check() == nil {
 		t.Fatal("Symbol images require valid mode in strict mode")
 	}
 	si.Mode = SystemSymbolModeEnumHierarchical
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation")
 	}
 	StrictDatamodelParsing = false
 
 	si.PrimaryColor = "#x"
-	if si.ValidateReturningUserReadableIssue() == "" {
+	if si.Check() == nil {
 		t.Fatal("Invalid passed validation")
 	}
 	si.PrimaryColor = "#ffffff"
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation")
 	}
 
 	si.SecondaryColor = "#x"
-	if si.ValidateReturningUserReadableIssue() == "" {
+	if si.Check() == nil {
 		t.Fatal("Invalid passed validation")
 	}
 	si.SecondaryColor = "#ffffff"
-	if si.ValidateReturningUserReadableIssue() != "" {
+	if si.Check() != nil {
 		t.Fatal("Symbol image failed validation")
 	}
 }
@@ -98,7 +98,7 @@ func TestJsonParsingImages(t *testing.T) {
 		t.Fatal("Symbol image failed to parse")
 	}
 	if i.SymbolImageData.Mode != "" || i.SymbolImageData.Weight != "" || i.SymbolImageData.PrimaryColor != "" || i.SymbolImageData.SecondaryColor != "" {
-		t.Fatal("Symbold defaults failed parse check")
+		t.Fatal("Symbol defaults failed parse check")
 	}
 
 	i = *i.Fallback
@@ -106,7 +106,7 @@ func TestJsonParsingImages(t *testing.T) {
 		t.Fatal("Symbol image failed to parse")
 	}
 	if i.SymbolImageData.Mode != "palette" || i.SymbolImageData.Weight != "light" || i.SymbolImageData.PrimaryColor != "#ff0000" || i.SymbolImageData.SecondaryColor != "#00ff00" {
-		t.Fatal("Symbold defaults failed parse check")
+		t.Fatal("Symbol defaults failed parse check")
 	}
 }
 

@@ -164,7 +164,7 @@ func (c *Condition) ExtractIdentifiers() (returnFields *ConditionFields, returnE
 	return &results, nil
 }
 
-func (c *Condition) Validate() error {
+func (c *Condition) Validate() UserPresentableErrorInterface {
 	if c.conditionString == "" {
 		return NewUserPresentableError("Condition is empty string (not allowed). Use 'true' or 'false' for minimal condition.")
 	}
@@ -172,7 +172,7 @@ func (c *Condition) Validate() error {
 	// Run this even if not strict. It is checking the format of the condition as well
 	fields, err := c.ExtractIdentifiers()
 	if err != nil {
-		return err
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Error parsing condition string: %v", c.conditionString), err)
 	}
 
 	if StrictDatamodelParsing {
@@ -182,7 +182,7 @@ func (c *Condition) Validate() error {
 		for _, methodName := range fields.Methods {
 			if _, ok := AllBuiltInDynamicFunctions[methodName]; !ok {
 				if _, ok := StaticConditionHelperFunctions()[methodName]; !ok {
-					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized: %v", methodName))
+					return NewUserPresentableError(fmt.Sprintf("Method included in condition which isn't recognized. Method: '%v', in condition: [[ %v ]]", methodName, c.conditionString))
 				}
 			}
 		}
@@ -210,7 +210,7 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 	var conditionString *string
 	err := json.Unmarshal(data, &conditionString)
 	if err != nil {
-		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition String [[ %s ]]", string(data)), err)
+		return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid condition string [[ %s ]]", string(data)), err)
 	}
 	c.conditionString = *conditionString
 
@@ -219,7 +219,9 @@ func (c *Condition) UnmarshalJSON(data []byte) error {
 		// Downstream during eval we return false and error
 		c.conditionString = ""
 		if StrictDatamodelParsing {
-			return NewUserPresentableErrorWSource(fmt.Sprintf("Invalid Condition: [[ %v ]]", string(data)), err)
+			return NewUserErrorForJsonIssue(data, err)
+		} else {
+			fmt.Printf("CriticalMoments: Ignoring invalid condition string. [%v]\nFrom error: %v\n", string(data), err)
 		}
 	}
 

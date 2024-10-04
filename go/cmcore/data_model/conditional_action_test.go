@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -17,15 +18,15 @@ func testHelperNewCondition(s string, t *testing.T) *Condition {
 
 func TestConditionalActionValidators(t *testing.T) {
 	c := ConditionalAction{}
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional actions require a condition")
 	}
 	c.Condition = testHelperNewCondition("(network_connection_type == 'wifi')", t)
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional actions require a passed action")
 	}
 	c.PassedActionName = "pass_action"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid")
 	}
 	an, err := c.AllEmbeddedActionNames()
@@ -33,19 +34,19 @@ func TestConditionalActionValidators(t *testing.T) {
 		t.Fatal("Failed to return action name for pass action")
 	}
 	c.Condition.conditionString = "not_a_valid_var > 5"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should validate condition validity but non-strict okay")
 	}
 	c.Condition = nil
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional action require condition")
 	}
 	c.Condition = testHelperNewCondition("true", t)
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid")
 	}
 	c.FailedActionName = "fail_action"
-	if !c.Validate() {
+	if !c.Valid() {
 		t.Fatal("Conditional action should be valid with or without failed_action")
 	}
 	an, err = c.AllEmbeddedActionNames()
@@ -59,7 +60,7 @@ func TestConditionalActionValidators(t *testing.T) {
 	}()
 	// Check it calls nested validators. Can't construct a problematic condition without reflection
 	c.Condition.conditionString = "not_a_valid_func() > 5"
-	if c.Validate() {
+	if c.Valid() {
 		t.Fatal("Conditional action should validate condition validity")
 	}
 }
@@ -102,10 +103,27 @@ func TestJsonParsingInvalidConditionalActionCondition(t *testing.T) {
 	if err != nil {
 		t.Fatal()
 	}
+	StrictDatamodelParsing = true
+	defer func() {
+		StrictDatamodelParsing = false
+	}()
+
 	var ac ActionContainer
 	err = json.Unmarshal(testFileData, &ac)
 	if err == nil || ac.ActionType == ActionTypeEnumConditional {
 		t.Fatal("Invalid conditionals should not parse")
+	}
+
+	upErr, ok := err.(UserPresentableErrorInterface)
+	if !ok {
+		t.Fatal("Invalid conditionals should return user presentable error")
+	}
+	errStr := upErr.Error()
+	if !strings.Contains(errStr, "Error parsing condition string: nil > 5") {
+		t.Fatal("user error should explain condition string. Was: ", errStr)
+	}
+	if !strings.Contains(errStr, "invalid operation: > (mismatched types") {
+		t.Fatal("user error should mention source error. Was: ", errStr)
 	}
 }
 

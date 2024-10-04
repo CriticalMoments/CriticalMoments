@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"golang.org/x/exp/slices"
@@ -16,54 +17,60 @@ func TestAlertActionValidators(t *testing.T) {
 		ShowOkButton: true,
 		Style:        AlertActionStyleEnumDialog,
 	}
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Style = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty style")
 	}
 	a.Style = "asdf"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid style")
 	}
 	a.Style = AlertActionStyleEnumLarge
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Title = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow empty title if message still provided")
 	}
 	a.Message = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should not allow empty title and message")
 	}
 	a.Title = "New title"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow title and not message")
 	}
 	a.ShowOkButton = false
 	a.OkButtonActionName = "action"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should not allow an okay actio when ok button hidden")
 	}
 	a.ShowOkButton = true
 	a.OkButtonActionName = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should allow okay without an action")
 	}
 	cb := AlertActionCustomButton{}
 	a.CustomButtons = []*AlertActionCustomButton{&cb}
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Should vaidate buttons as well")
 	}
+	if !strings.Contains(a.Check().Error(), "Custom alert buttons must have a label") {
+		t.Fatal("Incorrect error message")
+	}
+	if !strings.Contains(a.Check().Error(), "For an alert, button at index 0 had issue") {
+		t.Fatal("Incorrect error message")
+	}
 	a.CustomButtons = []*AlertActionCustomButton{}
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal()
 	}
 	a.ShowOkButton = false
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Alert requires ok or custom buttons, but allowed neither")
 	}
 }
@@ -73,28 +80,31 @@ func TestCustomButtonValidation(t *testing.T) {
 		Label: "Label",
 		Style: AlertActionButtonStyleEnumPrimary,
 	}
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button fails validation")
 	}
 	b.Style = ""
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Empty button style should not validate")
 	}
 	b.Style = "adsf"
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("INvalid style should not validate")
 	}
 	b.Style = AlertActionButtonStyleEnumDestructive
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button style fails validation")
 	}
 	b.Style = AlertActionButtonStyleEnumDefault
-	if !b.Validate() {
+	if !b.Valid() {
 		t.Fatal("Valid button style fails validation")
 	}
 	b.Label = ""
-	if b.Validate() {
+	if b.Valid() {
 		t.Fatal("Buttons require a label")
+	}
+	if !strings.Contains(b.Check().Error(), "Custom alert buttons must have a label") {
+		t.Fatal("Incorrect error message")
 	}
 }
 
@@ -119,7 +129,7 @@ func TestJsonParsingMaximalFieldsAlert(t *testing.T) {
 		t.Fatal("failed to parse fallback action name")
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "For real?" {
@@ -189,7 +199,7 @@ func TestJsonParsingMinimalFieldsAlert(t *testing.T) {
 		t.Fatal()
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "For real?" {
@@ -227,7 +237,7 @@ func TestJsonParsingOkayDisabledAlert(t *testing.T) {
 		t.Fatal()
 	}
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.ShowOkButton {
@@ -276,7 +286,7 @@ func TestJsonParsingFuture(t *testing.T) {
 	}
 
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.Title != "hello from the future" {
@@ -309,7 +319,7 @@ func TestJsonParsingFutureButton(t *testing.T) {
 	}
 
 	a := ac.AlertAction
-	if a == nil || !a.Validate() {
+	if a == nil || !a.Valid() {
 		t.Fatal()
 	}
 	if a.CustomButtons[0].Style != AlertActionButtonStyleEnumDefault {

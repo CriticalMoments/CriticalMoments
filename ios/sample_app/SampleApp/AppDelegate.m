@@ -36,7 +36,9 @@
     [CriticalMoments.sharedInstance setLogEvents:true];
 #endif
 
-    [CriticalMoments.sharedInstance setDevelopmentConfigName:@"config.json"];
+    [CriticalMoments.sharedInstance setDevelopmentConfigName:@"cmDevConfig.json"];
+    //[CriticalMoments.sharedInstance setDevelopmentConfigName:@"starterConfig.json"];
+    //[CriticalMoments.sharedInstance setDevelopmentConfigName:@"demoConfig.json"];
     // Deployed via github pages. Manually build using sign_sample_app_config.sh, then merge that to the docs branch
     NSString *webBasedConfigUrl = @"https://criticalmoments.github.io/CriticalMoments/sample_app_config.cmconfig";
     [CriticalMoments.sharedInstance setReleaseConfigUrl:webBasedConfigUrl];

@@ -1,45 +1,74 @@
 package datamodel
 
-import "fmt"
+import (
+	"fmt"
+)
 
-// Interface we can check against, to see if error is okay to present to user
-// returns from this method should be plain english, and not refer to internals,
-// only the errors of inputs the user controls
-type UserPresentableErrorI interface {
-	UserErrorString() string
+// error, but additional type we can check, and accessor to reason
+type UserPresentableErrorInterface interface {
+	Error() string
+	UserReadableErrorString() string
 }
 
-// Implements UserPresentableErrorI and `error`
-type UserPresentableError struct {
+// Implements `error` and `UserPresentableErrorInterface`
+type userPresentableError struct {
 	userReadableErrorString string
 	SourceError             error
 }
 
-func NewUserPresentableError(s string) *UserPresentableError {
-	return &UserPresentableError{
+func NewUserPresentableError(s string) UserPresentableErrorInterface {
+	return &userPresentableError{
 		userReadableErrorString: s,
 	}
 }
 
-func NewUserPresentableErrorWSource(s string, sourceErr error) *UserPresentableError {
-	return &UserPresentableError{
+func NewUserPresentableErrorWSource(s string, sourceErr error) UserPresentableErrorInterface {
+	return &userPresentableError{
 		userReadableErrorString: s,
 		SourceError:             sourceErr,
 	}
 }
 
-func (err *UserPresentableError) UserErrorString() string {
-	sourcePresentableError, ok := interface{}(err.SourceError).(UserPresentableErrorI)
-	if ok {
-		return fmt.Sprintf("%v (from error: \"%v\")", err.userReadableErrorString, sourcePresentableError.UserErrorString())
-	} else {
-		return err.userReadableErrorString
-	}
-}
-
-func (err *UserPresentableError) Error() string {
+func (err *userPresentableError) Error() string {
 	if err.SourceError == nil {
 		return err.userReadableErrorString
 	}
-	return fmt.Sprintf("%v (Source Error: %v)", err.userReadableErrorString, err.SourceError)
+	// source and current inverted. The root is really the most important.
+	return fmt.Sprintf("%v\n    Source Error: %v", err.SourceError, err.userReadableErrorString)
+}
+
+func (err *userPresentableError) UserReadableErrorString() string {
+	return err.Error()
+}
+
+// Implements `error` and `userPresentableErrorInterface`
+type jsonUserPresentableError struct {
+	SourceError error
+	jsonSource  string
+}
+
+func NewUserErrorForJsonIssue(data []byte, sourceErr error) UserPresentableErrorInterface {
+	jsonString := string(data)
+	// truncated to max 600 characters, adding ... to the end
+	if len(jsonString) > 600 {
+		jsonString = jsonString[:600] + "... [truncated]"
+	}
+	return &jsonUserPresentableError{
+		SourceError: sourceErr,
+		jsonSource:  jsonString,
+	}
+}
+
+func (err *jsonUserPresentableError) Error() string {
+	if err.SourceError == nil {
+		return fmt.Sprintf("JSON Parsing Error in json: %v", err.jsonSource)
+	}
+	if err.jsonSource == "" {
+		return err.SourceError.Error()
+	}
+	return fmt.Sprintf("%v\n    JSON section this error occurred in: %v", err.SourceError.Error(), err.jsonSource)
+}
+
+func (err *jsonUserPresentableError) UserReadableErrorString() string {
+	return err.Error()
 }
