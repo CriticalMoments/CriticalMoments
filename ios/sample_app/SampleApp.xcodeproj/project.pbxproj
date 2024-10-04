@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E0265E042C90B73700D869BE /* SwiftUIViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */; };
+		E03190D32CB0380800E7173A /* demoConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E03190D22CB0380800E7173A /* demoConfig.json */; };
 		E0368DB02AE9B4AF00A513B7 /* CriticalMoments in Frameworks */ = {isa = PBXBuildFile; productRef = E0368DAF2AE9B4AF00A513B7 /* CriticalMoments */; };
 		E0368DB22AF7FE4600A513B7 /* testConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = E0368DB12AF7FE4600A513B7 /* testConfig.json */; };
 		E03977EA2ACBADCF00A879AD /* SwiftSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */; };
@@ -55,6 +56,7 @@
 
 /* Begin PBXFileReference section */
 		E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIViewTest.swift; sourceTree = "<group>"; };
+		E03190D22CB0380800E7173A /* demoConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = demoConfig.json; sourceTree = "<group>"; };
 		E0368DB12AF7FE4600A513B7 /* testConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = testConfig.json; path = ../../Tests/CriticalMomentsTests/TestResources/testConfig.json; sourceTree = "<group>"; };
 		E03977E92ACBADCF00A879AD /* SwiftSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSnapshotTests.swift; sourceTree = "<group>"; };
 		E03977ED2ACBB8EB00A879AD /* SampleAppTests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SampleAppTests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				E07B775029FA0144001521F4 /* Utils.m */,
 				E0446E632A0970A10069E5BD /* cmDevConfig.json */,
 				E0E2EC182CA2488F000E74EF /* starterConfig.json */,
+				E03190D22CB0380800E7173A /* demoConfig.json */,
 				E03F9BA72B6D8267006EA449 /* InfoHeader.h */,
 				E03F9BA82B6D8267006EA449 /* InfoHeader.m */,
 				E0265E032C90B73700D869BE /* SwiftUIViewTest.swift */,
@@ -341,6 +344,7 @@
 				E0E2EC192CA2488F000E74EF /* starterConfig.json in Resources */,
 				E0B545FC29F407C3002A25A8 /* LaunchScreen.storyboard in Resources */,
 				E0B545F929F407C3002A25A8 /* Assets.xcassets in Resources */,
+				E03190D32CB0380800E7173A /* demoConfig.json in Resources */,
 				E0B545F729F407C2002A25A8 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

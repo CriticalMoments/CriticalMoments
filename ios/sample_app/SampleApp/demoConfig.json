@@ -1,0 +1,401 @@
+{
+    "configVersion": "v1",
+    "appId": "io.criticalmoments.demo-app",
+    "triggers": {
+        "namedTriggers": {
+            "demoLaunchTrigger": {
+                "dev_comment": "this launched the demo alert, whenever the app enters the foreground. Swipe away and re-open the app to re-launch the demo.",
+                "eventName": "app_entered_foreground",
+                "actionName": "demoAlert"
+            }
+        }
+    },
+    "actions": {
+        "namedActions": {
+            "demoAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Critcial Moments Demos",
+                    "message": "Test Critical Moments features in your own app using this demo config. All features are driven by config, and can be remotely updated without app store updates.",
+                    "showOkButton": false,
+                    "showCancelButton": true,
+                    "style": "large",
+                    "customButtons": [
+                        {
+                            "label": "Conditional Check",
+                            "actionName": "conditionalAction"
+                        },
+                        {
+                            "label": "Modal",
+                            "actionName": "modalExample"
+                        },
+                        {
+                            "label": "Themed Modal",
+                            "actionName": "themedModalExample"
+                        },
+                        {
+                            "label": "Ask For Review",
+                            "actionName": "reviewAction"
+                        },
+                        {
+                            "label": "Notification",
+                            "actionName": "notificationAction"
+                        },
+                        {
+                            "label": "Banner",
+                            "actionName": "banner"
+                        },
+                        {
+                            "label": "Feature Flag: Battery Low",
+                            "actionName": "featureFlagDemoBatteryAction"
+                        },
+                        {
+                            "label": "Feature Flag: Weather > 20°C",
+                            "actionName": "featureFlagDemoWeatherAction"
+                        },
+                        {
+                            "label": "Feature Flag: AB Test Assignment",
+                            "actionName": "featureFlagDemoRandomAction"
+                        },
+                        {
+                            "label": "Top Banner",
+                            "actionName": "topBanner"
+                        },
+                        {
+                            "label": "Themed Banner",
+                            "actionName": "themedBanner"
+                        },
+                        {
+                            "label": "Open Web Link",
+                            "actionName": "webLinkAction"
+                        },
+                        {
+                            "label": "Embedded Browser",
+                            "actionName": "embeddedWebLinkAction"
+                        },
+                        {
+                            "label": "System Alert",
+                            "actionName": "basicAlert"
+                        }
+                    ]
+                }
+            },
+            "reviewAction": {
+                "actionType": "review_prompt",
+                "actionData": {}
+            },
+            "conditionalAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "interface_orientation == 'landscape'",
+                    "passedActionName": "landscapeAlert",
+                    "failedActionName": "portraitAlert"
+                }
+            },
+            "landscapeAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Landscape",
+                    "message": "The app's UI is landscape."
+                }
+            },
+            "portraitAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Portrait",
+                    "message": "The app's UI is portrait."
+                }
+            },
+            "basicAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Example Alert",
+                    "message": "Buttons, content, actions and targeting can be updated over the air. You can connect any action, such as modals, alerts, web-links and deep-links.",
+                    "showCancelButton": true,
+                    "okButtonActionName": "nested_alert"
+                }
+            },
+            "banner": {
+                "actionType": "banner",
+                "actionData": {
+                    "preferredPosition": "bottom",
+                    "tapActionName": "nested_alert",
+                    "body": "Insert banner message"
+                }
+            },
+            "topBanner": {
+                "actionType": "banner",
+                "actionData": {
+                    "preferredPosition": "top",
+                    "tapActionName": "nested_alert",
+                    "body": "Insert banner message"
+                }
+            },
+            "themedBanner": {
+                "actionType": "banner",
+                "actionData": {
+                    "themeName": "sea",
+                    "tapActionName": "nested_alert",
+                    "body": "Insert banner message"
+                }
+            },
+            "webLinkAction": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io"
+                }
+            },
+            "embeddedWebLinkAction": {
+                "actionType": "link",
+                "actionData": {
+                    "url": "https://criticalmoments.io",
+                    "useEmbeddedBrowser": true
+                }
+            },
+            "nested_alert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Nested Action",
+                    "message": "Your last action was connected to this alert action."
+                }
+            },
+            "modalExample": {
+                "actionType": "modal",
+                "actionData": {
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 60.0,
+                                        "imageData": {
+                                            "symbolName": "coloncurrencysign.square.fill",
+                                            "weight": "light",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "pageSectionData": {
+                                        "title": "Important Announcement"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 1.5,
+                                    "pageSectionData": {
+                                        "title": "New pricing coming soon.",
+                                        "scaleFactor": 0.64
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Got it!",
+                                    "style": "large"
+                                },
+                                {
+                                    "title": "More info",
+                                    "preventDefault": true,
+                                    "style": "info",
+                                    "actionName": "embeddedWebLinkAction"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "themedModalExample": {
+                "actionType": "modal",
+                "actionData": {
+                    "themeName": "sea_dark",
+                    "content": {
+                        "pageType": "stack",
+                        "pageData": {
+                            "sections": [
+                                {
+                                    "pageSectionType": "image",
+                                    "pageSectionData": {
+                                        "imageType": "sf_symbol",
+                                        "height": 60.0,
+                                        "imageData": {
+                                            "symbolName": "coloncurrencysign.square.fill",
+                                            "weight": "light",
+                                            "mode": "hierarchical"
+                                        }
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "pageSectionData": {
+                                        "title": "Important Announcement"
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "title",
+                                    "topSpacingScale": 1.5,
+                                    "pageSectionData": {
+                                        "title": "New pricing coming soon.",
+                                        "scaleFactor": 0.64
+                                    }
+                                },
+                                {
+                                    "pageSectionType": "body",
+                                    "topSpacingScale": 4,
+                                    "pageSectionData": {
+                                        "bodyText": "Your free plan won't be impacted! However, if you want to upgrade to 'Pro' now is your last chance to lock in our current pricing."
+                                    }
+                                }
+                            ],
+                            "buttons": [
+                                {
+                                    "title": "Got it!",
+                                    "style": "large"
+                                },
+                                {
+                                    "title": "More info",
+                                    "preventDefault": true,
+                                    "style": "info",
+                                    "actionName": "embeddedWebLinkAction"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "notificationAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "notifications_permission == 'authorized'",
+                    "passedActionName": "notificationQueuedAlert",
+                    "failedActionName": "permissionIssueAlert"
+                }
+            },
+            "permissionIssueAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Notification Permissions Blocked",
+                    "message": "Notifications will not work until your app request's permissions, and the user approves them."
+                }
+            },
+            "notificationQueuedAlert": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Swipe away app to see notifications",
+                    "message": "Notifications can only appear when the app is in the background.\n\nSwipe away this app in the next 30 seconds to see a notification."
+                }
+            },
+            "featureFlagDemoBatteryAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "device_battery_level < 0.2",
+                    "passedActionName": "featureFlagBatteryTrueAction",
+                    "failedActionName": "featureFlagBatteryFalseAction"
+                }
+            },
+            "featureFlagBatteryTrueAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Result: Battery Low",
+                    "message": "This device's battery is < 20%"
+                }
+            },
+            "featureFlagBatteryFalseAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Result: Battery Not Low",
+                    "message": "This device's battery is >= 20%"
+                }
+            },
+            "featureFlagDemoRandomAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "stableRand() % 2 == 0",
+                    "passedActionName": "featureFlagRandTrueAction",
+                    "failedActionName": "featureFlagRandFalseAction"
+                }
+            },
+            "featureFlagRandTrueAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "AB Test Group: A",
+                    "message": "This device was assigned to group A.\n\nYou'll continue to get the same result on this device over time, but 50% of users will be assigned to group B."
+                }
+            },
+            "featureFlagRandFalseAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "AB Test Group: B",
+                    "message": "This device was assigned to group B.\n\nYou'll continue to get the same result on this device over time, but 50% of users will be assigned to group A."
+                }
+            },
+            "featureFlagDemoWeatherAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "weather_approx_location_temperature > 20",
+                    "passedActionName": "featureFlagWeatherWarmAction",
+                    "failedActionName": "featureFlagDemoWeatherNullCheckAction"
+                }
+            },
+            "featureFlagDemoWeatherNullCheckAction": {
+                "actionType": "conditional_action",
+                "actionData": {
+                    "condition": "weather_approx_location_temperature != null",
+                    "passedActionName": "featureFlagWeatherCoolAction",
+                    "failedActionName": "featureFlagWeatherNullAction"
+                }
+            },
+            "featureFlagWeatherWarmAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Current Temp > 20°C",
+                    "message": "Using GeoIP location and a weather service, we found that the weather in your location is > 20°C."
+                }
+            },
+            "featureFlagWeatherCoolAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Current Temp <= 20°C",
+                    "message": "Using GeoIP location and a weather service, we found that the weather in your location is <= 20°C."
+                }
+            },
+            "featureFlagWeatherNullAction": {
+                "actionType": "alert",
+                "actionData": {
+                    "title": "Weather Unknown",
+                    "message": "We weren't able to find your location using GeoIP, or we then weather service was not able to provide current weather information."
+                }
+            }
+        }
+    },
+    "conditions": {
+      "namedConditions": {
+        "ab_test_assignment_feature_flag": "stableRand() % 2 == 0",
+        "weather_warm": "weather_approx_location_temperature > 20",
+        "battery_low": "device_battery_level < 0.2"
+      }
+    },
+    "notifications": {
+        "exampleNotification": {
+              "title": "Example Notification",
+              "body": "[Sample Content] It only takes 2 minutes to start healthy habbits with LifeTracker.",
+              "scheduleCondition": "(eventCount('action:notificationQueuedAlert') != 0 && latestEventTime('action:notificationQueuedAlert') > now() - duration('30s'))",
+              "deliveryTime": {
+                  "eventName": "app_entered_background",
+                  "eventInstance": "latest"
+              }
+        }
+    }
+}
+
