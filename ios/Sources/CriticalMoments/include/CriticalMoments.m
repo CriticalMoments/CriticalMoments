@@ -277,7 +277,13 @@ static CriticalMoments *sharedInstance = nil;
 - (void)setDevelopmentConfigName:(NSString *)configFileName {
     BOOL success = [self setDevelopmentConfigNameWithSuccess:configFileName fromBundle:nil];
     if (!success) {
-        os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: unable to find config file: %@", configFileName);
+        os_log_fault(OS_LOG_DEFAULT,
+                     "CriticalMoments: unable to find config file: %@\n\nTo resolve:\n - Check the filename is "
+                     "correct\n - Check you've added the file to your xCode project\n - Select the file in xCode and "
+                     "ensure your app is in the  'Target Membership' section, add it if not\n - In Xcode, open "
+                     "\"Project Settings\" > \"Build Phases\" > \"Copy Bundle Resources\", and verify the file you "
+                     "just added to the project is listed. If not, add it.",
+                     configFileName);
     }
 }
 
