@@ -11,4 +11,8 @@ cd $TARGET_DIRECTORY
 FILE_COUNT="$(find . -name '*.h' -or -name '*.m' | wc -l)"
 find . -name '*.h' -or -name '*.m' | xargs clang-format -style=file -i
 
+# format json
+jq '.' sample_app/SampleApp/starterConfig.json > tmp_file && mv tmp_file sample_app/SampleApp/starterConfig.json
+jq '.' sample_app/SampleApp/cmDevConfig.json > tmp_file && mv tmp_file sample_app/SampleApp/cmDevConfig.json
+
 echo "$FILE_COUNT files were formated with clang-format"

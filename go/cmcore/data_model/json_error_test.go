@@ -31,8 +31,8 @@ func TestJsonErrorFormatting(t *testing.T) {
 		if userFriendlyErr == nil {
 			t.Fatal("Failed to error on invalid json")
 		}
-		if _, ok := userFriendlyErr.(*UserPresentableError); !ok {
-			t.Fatalf("Failed to parse error message in file %s.\nExpected UserPresentableError\nGot '%s'\n", file, userFriendlyErr.Error())
+		if _, ok := userFriendlyErr.(UserPresentableErrorInterface); !ok {
+			t.Fatalf("Failed to parse error message in file %s.\nExpected UserPresentableErrorInterface\nGot '%s'\n", file, userFriendlyErr.Error())
 		}
 		if !strings.Contains(userFriendlyErr.Error(), expectedErr) {
 			t.Fatalf("Failed to parse error message in file %s.\nExpected '%s'\nGot '%s'\n", file, expectedErr, userFriendlyErr.Error())

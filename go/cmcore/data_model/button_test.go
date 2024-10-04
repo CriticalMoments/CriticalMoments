@@ -9,29 +9,29 @@ import (
 func TestButtonValidators(t *testing.T) {
 	b := Button{}
 	b.Style = ButtonStyleEnumLarge
-	if b.ValidateReturningUserReadableIssue() == "" {
+	if b.Check() == nil {
 		t.Fatal("Button requires a title")
 	}
 
 	b.Title = "Title"
 	b.Style = ""
-	if b.ValidateReturningUserReadableIssue() == "" {
+	if b.Check() == nil {
 		t.Fatal("Button with invalid style passed validation")
 	}
 
 	b.Style = ButtonStyleEnumLarge
-	if b.ValidateReturningUserReadableIssue() != "" {
+	if b.Check() != nil {
 		t.Fatal("Button with title failed validation")
 	}
 
 	b.Style = "invalidStyle"
-	if b.ValidateReturningUserReadableIssue() == "" {
+	if b.Check() == nil {
 		t.Fatal("Invalid button style passes validation")
 	}
 
 	for _, style := range buttonStyles {
 		b.Style = style
-		if b.ValidateReturningUserReadableIssue() != "" {
+		if b.Check() != nil {
 			t.Fatal("Valid Button failed validation")
 		}
 	}

@@ -10,7 +10,7 @@ jobs:
       with:
         go-version-file: 'go/go.mod'
         cache-dependency-path: go/go.sum
-    - uses: dominikh/staticcheck-action@v1.3.0
+    - uses: dominikh/staticcheck-action@v1.3.1
       with:
         working-directory: 'go'
         install-go: false
@@ -22,9 +22,9 @@ jobs:
       run: cd go && if [ "$(gofmt -d -l $(find . -type f -name '*.go'| grep -v "/vendor/\|/.git/") | wc -l)" -gt 0 ]; then exit 1; fi && cd ..
 
     - name: Run clang-format style 
-      uses: jidicula/clang-format-action@v4.10.1
+      uses: jidicula/clang-format-action@v4.13.0
       with:
-        clang-format-version: '13'
+        clang-format-version: '15'
         check-path: 'ios'
         fallback-style: 'WebKit'
         include-regex: '^.*\.((((c|C)(c|pp|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))|(ino|pde|proto|cu|m))$'

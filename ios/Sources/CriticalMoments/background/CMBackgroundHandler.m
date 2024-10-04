@@ -38,11 +38,12 @@
 
 - (void)registerBackgroundTasks {
     if (@available(iOS 13.0, *)) {
+        dispatch_queue_t cmActionQueue = [self.cm getActionQueue];
         for (NSString *taskId in allBackgroundIds) {
             CMBackgroundHandler *__weak weakSelf = self;
             BOOL registered =
                 [BGTaskScheduler.sharedScheduler registerForTaskWithIdentifier:taskId
-                                                                    usingQueue:nil
+                                                                    usingQueue:cmActionQueue
                                                                  launchHandler:^(__kindof BGTask *_Nonnull task) {
                                                                    [weakSelf runBackgroundWorker:task];
                                                                  }];
@@ -97,7 +98,12 @@
 
 - (void)runBackgroundWorker:(BGTask *)task API_AVAILABLE(ios(13.0)) {
     // Schedule next refresh. Currently only notifications need it, but can introduce others here as well.
-    AppcoreNotificationPlan *plan = [self.cm currentNotificationPlan:nil];
+    NSError *error;
+    AppcoreNotificationPlan *plan = [self.cm currentNotificationPlan:&error];
+    if (error) {
+        NSLog(@"CriticalMoments: error getting notification plan in runBackgroundWorker: %@",
+              error.localizedDescription);
+    }
     if (plan) {
         [self scheduleBackgroundTaskAtEpochTime:plan.earliestBgCheckTimeEpochSeconds];
     }
@@ -137,9 +143,11 @@
         if (![permittedIdentifiers containsObject:requiredTaskId]) {
             os_log_error(
                 OS_LOG_DEFAULT,
-                "CriticalMoments: Setup Issue\nYou must add CM background task IDs to your Info.plist. If you don't, "
+                "CriticalMoments: Setup Issue\nYou must add CM background task IDs to your Info.plist in the "
+                "BGTaskSchedulerPermittedIdentifiers section. If you don't, "
                 "some CM features will not function.\n\nSee our quick start guide for details on how to resolve this "
-                "issue: https://docs.criticalmoments.io\n\nThis warning log is only in debug builds.");
+                "issue (search for 'BGTaskSchedulerPermittedIdentifiers'): https://docs.criticalmoments.io\n\nThis "
+                "warning log is only in debug builds.");
             break;
         }
     }

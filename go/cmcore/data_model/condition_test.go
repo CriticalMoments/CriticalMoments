@@ -3,6 +3,7 @@ package datamodel
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -275,5 +276,30 @@ func TestExtractIdentifiers(t *testing.T) {
 	}
 	if !arraysEqualOrderInsensitive(fields.Variables, []string{"var1", "var2", "both"}) {
 		t.Fatal("Extract variables failed")
+	}
+}
+
+func TestUserPresentableErrorForCondition(t *testing.T) {
+	// Test our errors are user presentable, and friendly enough to debug
+	testCases := map[string]string{
+		"local_language_code IN ['en', 'fr']": "unexpected token Identifier(\"IN\")",
+		"!true && (false || 5)":               "mismatched types bool and int",
+		"user.name == 'John' && user.age > ":  "unexpected token EOF",
+	}
+
+	for conditionString, expectedErrorSubstring := range testCases {
+		c := Condition{
+			conditionString: conditionString,
+		}
+		err := c.Validate()
+		if err == nil {
+			t.Fatalf("Validate allowed invalid condition: %s", conditionString)
+		}
+		if !strings.Contains(err.UserReadableErrorString(), fmt.Sprintf("Error parsing condition string: %s", conditionString)) {
+			t.Fatalf("UserReadableErrorString not set correctly for condition: %s. Expected: %s, Got: %s", conditionString, fmt.Sprintf("Error parsing condition string: %s", conditionString), err.UserReadableErrorString())
+		}
+		if !strings.Contains(err.Error(), expectedErrorSubstring) {
+			t.Fatalf("UserErrorString failed to explain main issue for condition: %s. Expected: %s, Got: %s", conditionString, expectedErrorSubstring, err.Error())
+		}
 	}
 }

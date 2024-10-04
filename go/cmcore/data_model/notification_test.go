@@ -22,68 +22,68 @@ func TestNotificationActionValidators(t *testing.T) {
 			TimestampEpoch: &timestamp,
 		},
 	}
-	if !a.Validate() {
-		t.Fatal(a.ValidateReturningUserReadableIssue())
+	if !a.Valid() {
+		t.Fatal(a.Check())
 	}
 	a.Body = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Didn't allow empty body")
 	}
 	a.ActionName = ""
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Didn't allow empty action name")
 	}
 	a.Title = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty title and body")
 	}
 	a.BadgeCount = 1
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("Should be valid with badge count")
 	}
 	a.BadgeCount = -1
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Needs a title, body, or badge count")
 	}
 	a.Title = "title"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.Title = ""
 	a.Body = "body"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.ID = ""
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed empty ID")
 	}
 	a.ID = "io.criticalmoments.test"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	rc := 0.5
 	a.RelevanceScore = &rc
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	rc = 1.1
 	a.RelevanceScore = &rc
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid relevance score")
 	}
 	rc = -0.0001
 	a.RelevanceScore = &rc
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed invalid relevance score")
 	}
 	a.RelevanceScore = nil
 	a.InterruptionLevel = "passive"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should be valid")
 	}
 	a.InterruptionLevel = "futureUnknown"
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("should not error since not strict")
 	}
 	StrictDatamodelParsing = true
@@ -91,26 +91,26 @@ func TestNotificationActionValidators(t *testing.T) {
 		StrictDatamodelParsing = false
 	}()
 	a.InterruptionLevel = "futureUnknown"
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("should not be valid if strict")
 	}
 	StrictDatamodelParsing = false
 	a.InterruptionLevel = ""
 	a.DeliveryWindowTODEndMinutes = 24 * 60
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("delivery window out of bounds")
 	}
 	a.DeliveryWindowTODEndMinutes = 23*60 + 59
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("delivery window failed in bounds")
 	}
 	a.DeliveryWindowTODEndMinutes = 2
 	a.DeliveryWindowTODStartMinutes = 3
-	if a.Validate() {
+	if a.Valid() {
 		t.Fatal("Allowed start after end")
 	}
 	a.DeliveryWindowTODEndMinutes = 60
-	if !a.Validate() {
+	if !a.Valid() {
 		t.Fatal("delivery window failed in bounds")
 	}
 }
@@ -251,8 +251,8 @@ func TestJsonParsingMaxFieldsNotif(t *testing.T) {
 
 func TestJsonParsingInvalidNotif(t *testing.T) {
 	cases := map[string]string{
-		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Invalid Condition",
-		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "blank cancelation event",                                    // add_test_case
+		"./test/testdata/actions/notifications/invalid/invalidCondition.json":        "Error parsing condition string: true > 1",
+		"./test/testdata/actions/notifications/invalid/invalidCancelationEvent.json": "Notification has an empty string in cancelationEvents",      // add_test_case
 		"./test/testdata/actions/notifications/invalid/invalidBadgeCount.json":       "Notification badgeCount must be greater than or equal to 0", // add_test_case
 	}
 
@@ -272,9 +272,6 @@ func TestJsonParsingInvalidNotif(t *testing.T) {
 			t.Fatalf("Allowed invalid json: %v", testFile)
 		}
 		errorString := err.Error()
-		if upError, ok := err.(*UserPresentableError); ok {
-			errorString = upError.UserErrorString()
-		}
 		if !strings.Contains(errorString, expectedError) {
 			t.Fatalf("Allowed invalid: %v, expected error: %v, got error: %v", testFile, expectedError, errorString)
 		}
@@ -309,8 +306,8 @@ func TestParseDowString(t *testing.T) {
 func TestDeliveryTimeValidation(t *testing.T) {
 	// Case: Both TimestampEpoch and EventName are nil
 	dt := DeliveryTime{}
-	issue := dt.ValidateReturningUserReadableIssue()
-	if issue != "DeliveryTime must have either a Timestamp or an EventName defined." {
+	issue := dt.Check().Error()
+	if issue != "Notification DeliveryTime must have either a Timestamp or an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
@@ -318,37 +315,34 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	timestamp := int64(1000)
 	eventName := "event"
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventName: &eventName}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "DeliveryTime cannot have both a Timestamp and an EventName defined." {
+	issue = dt.Check().Error()
+	if issue != "Notification DeliveryTime cannot have both a Timestamp and an EventName defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Both TimestampEpoch and EventOffset are defined
 	eventOffsetSeconds := 30
 	dt = DeliveryTime{TimestampEpoch: &timestamp, EventOffsetSeconds: &eventOffsetSeconds}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
+	issue = dt.Check().Error()
+	if issue != "Notification DeliveryTime cannot have both a Timestamp and an EventOffset defined." {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid TimestampEpoch
 	dt = DeliveryTime{TimestampEpoch: &timestamp}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid EventName
 	dt = DeliveryTime{EventName: &eventName}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
 	// Case: Valid EventOffset with EventName
 	dt = DeliveryTime{EventName: &eventName, EventOffsetSeconds: &eventOffsetSeconds}
-	issue = dt.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	if dt.Check() != nil {
 		t.Fatalf("Unexpected validation issue: %v", issue)
 	}
 
@@ -376,7 +370,7 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	if dt.EventInstance() != EventInstanceTypeFirst {
 		t.Fatal("failed to return First")
 	}
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on valid event instance string")
 	}
 	s = "invalid"
@@ -384,18 +378,18 @@ func TestDeliveryTimeValidation(t *testing.T) {
 	if dt.EventInstance() != EventInstanceTypeUnknown {
 		t.Fatal("failed to return latest for unrecognized")
 	}
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on invalid event instance string in not strict mode")
 	}
 	StrictDatamodelParsing = true
 	defer func() {
 		StrictDatamodelParsing = false
 	}()
-	if dt.ValidateReturningUserReadableIssue() == "" {
+	if dt.Check() == nil {
 		t.Fatal("Did not error on invalid event instance string in not strict mode")
 	}
 	s = "latest"
-	if dt.ValidateReturningUserReadableIssue() != "" {
+	if dt.Check() != nil {
 		t.Fatal("Errored on valid event instance string in strict mode")
 	}
 }

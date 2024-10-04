@@ -13,10 +13,15 @@
 #import "../messaging/CMBannerManager.h"
 #import "../notifications/CMNotificationHandler.h"
 #import "../notifications/CMNotificationsDelegate.h"
+#import "../properties/CMPermissionsPropertyProvider.h"
 #import "../properties/CMPropertyRegisterer.h"
 #import "../themes/CMTheme_private.h"
 #import "../utils/CMNotificationObserver.h"
 #import "../utils/CMUtils.h"
+
+#if DEBUG
+@import Foundation;
+#endif
 
 #import <UserNotifications/UserNotifications.h>
 #import <os/log.h>
@@ -90,6 +95,10 @@ static CriticalMoments *sharedInstance = nil;
     return @"objcPong";
 }
 
+- (dispatch_queue_t)getActionQueue {
+    return self.actionQueue;
+}
+
 - (NSString *)goPing {
     return AppcoreGoPing();
 }
@@ -99,6 +108,13 @@ static CriticalMoments *sharedInstance = nil;
 }
 
 - (void)start {
+#if DEBUG
+    // No need to start in SwiftUI preview mode, and it will break previews.
+    if ([@"1" isEqualToString:NSProcessInfo.processInfo.environment[@"XCODE_RUNNING_FOR_PREVIEWS"]]) {
+        return;
+    }
+#endif
+
     // Start notification observer before main queues, so that the enter_forground and other events are at head of queue
     [self.notificationObserver start];
 
@@ -119,8 +135,11 @@ static CriticalMoments *sharedInstance = nil;
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = [self startReturningError];
         if (error) {
-            os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: Critical Moments was unable to start!\nCMError: %@",
-                         error.localizedDescription);
+            // os_log_fault formatting doesn't love obj-c strings. Format with Foundation first.
+            NSString *errorMsg = [NSString
+                stringWithFormat:@"CriticalMoments: Critical Moments was unable to start!\n    Start Error: %@",
+                                 error.localizedDescription];
+            os_log_fault(OS_LOG_DEFAULT, "%@", errorMsg);
 #if DEBUG
             os_log_fault(OS_LOG_DEFAULT,
                          "CriticalMoments: throwing a NSInternalInconsistencyException to help find the issue above. "
@@ -258,7 +277,13 @@ static CriticalMoments *sharedInstance = nil;
 - (void)setDevelopmentConfigName:(NSString *)configFileName {
     BOOL success = [self setDevelopmentConfigNameWithSuccess:configFileName fromBundle:nil];
     if (!success) {
-        os_log_fault(OS_LOG_DEFAULT, "CriticalMoments: unable to find config file: %@", configFileName);
+        os_log_fault(OS_LOG_DEFAULT,
+                     "CriticalMoments: unable to find config file: %@\n\nTo resolve:\n - Check the filename is "
+                     "correct\n - Check you've added the file to your xCode project\n - Select the file in xCode and "
+                     "ensure your app is in the  'Target Membership' section, add it if not\n - In Xcode, open "
+                     "\"Project Settings\" > \"Build Phases\" > \"Copy Bundle Resources\", and verify the file you "
+                     "just added to the project is listed. If not, add it.",
+                     configFileName);
     }
 }
 
@@ -309,8 +334,13 @@ static CriticalMoments *sharedInstance = nil;
     }
 }
 
+// replaced by setDeveloperMode
 - (void)setLogEvents:(bool)logEvents {
-    [self.appcore setLogEvents:logEvents];
+    [self setDeveloperMode:logEvents];
+}
+
+- (void)setDeveloperMode:(bool)devMode {
+    [self.appcore setDeveloperMode:devMode];
 }
 
 - (void)sendEvent:(NSString *)eventName {
@@ -539,7 +569,13 @@ static CriticalMoments *sharedInstance = nil;
                               }
                               if (granted) {
                                   // Schedule any CM notifications that need to be scheduled now
-                                  [_appcore forceUpdateNotificationPlan:nil];
+                                  NSError *error;
+                                  [_appcore forceUpdateNotificationPlan:&error];
+                                  if (error) {
+                                      NSLog(@"CriticalMoments: error in "
+                                            @"requestNotificationPermissionWithCompletionHandler: %@",
+                                            error.localizedDescription);
+                                  }
                               }
                             }];
     }];
@@ -593,6 +629,7 @@ static CriticalMoments *sharedInstance = nil;
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                      [CMBackgroundHandler devModeCheckBackgroundSetupCorrectly];
                      [CMNotificationsDelegate devModeCheckNotificationDelegateSetupCorrectly];
+                     [CMBluetoothPermissionsPropertyProvider devModeCheckBluetoothSetupCorrectly];
                    });
 }
 #endif

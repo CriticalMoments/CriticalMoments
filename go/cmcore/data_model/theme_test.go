@@ -21,14 +21,14 @@ func TestBuiltInThemesValid(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to get built in theme by name %v: %v", themeName, err)
 		}
-		issue := theme.ValidateReturningUserReadableIssue()
-		if issue != "" {
+		issue := theme.Check()
+		if issue != nil {
 			t.Errorf("Theme %v is invalid: %v", themeName, issue)
 		}
 	}
 
-	issue := testTheme.ValidateReturningUserReadableIssue()
-	if issue != "" {
+	issue := testTheme.Check()
+	if issue != nil {
 		t.Errorf("Test theme is invalid: %v", issue)
 	}
 

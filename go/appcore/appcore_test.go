@@ -48,6 +48,7 @@ func buildTestBuiltInProps(propTypes map[string]*datamodel.CMPropertyConfig) map
 	props := map[string]*datamodel.CMPropertyConfig{
 		"app_start_time":     {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 		"session_start_time": {Type: datamodel.CMTimeKind, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
+		"is_debug_build":     {Type: reflect.Bool, Source: datamodel.CMPropertySourceLib, Optional: false, SampleType: datamodel.CMPropertySampleTypeDoNotSample},
 	}
 
 	for k, v := range propTypes {
@@ -114,10 +115,23 @@ func (lb *testLibBindings) UpdateNotificationPlan(notifPlan *NotificationPlan) e
 }
 
 func testBuildValidTestAppCore(t *testing.T) (*Appcore, error) {
-	return buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+	ac, err := buildTestAppCoreWithPath("../cmcore/data_model/test/testdata/primary_config/valid/maximalValid.json", t)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// This file was designed to test non-strict parsing. It has "future" types which should fallback.
+	mode := false
+	ac.forceParseModeForStrict = &mode
+	return ac, nil
 }
 
 func buildTestAppCoreWithPath(path string, t *testing.T) (*Appcore, error) {
+	t.Cleanup(func() {
+		// Appcore may mutate global state, so let's reset it
+		datamodel.StrictDatamodelParsing = false
+	})
+
 	ac := NewAppcore()
 	configPath, err := filepath.Abs(path)
 	if err != nil {
@@ -699,6 +713,14 @@ func TestLoadingSignedConfig(t *testing.T) {
 	if ac.config == nil || ac.config.ConfigVersion != "v1" {
 		t.Fatal("Failed to load signed config")
 	}
+	// is_debug_build should be false
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("is_debug_build", t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result != false {
+		t.Fatal("is_debug_build should be false")
+	}
 }
 
 func TestLoadingEmptyUnsignedConfig(t *testing.T) {
@@ -727,6 +749,24 @@ func TestLoadingJsonOnlyAllowedInDebug(t *testing.T) {
 	err = ac.Start(true)
 	if err != nil || ac.config == nil || ac.config.AppId != "io.criticalmoments.demo" {
 		t.Fatal("Should not load json config unless in debug mode")
+	}
+}
+
+func TestDebugBuild(t *testing.T) {
+	ac, err := testBuildValidTestAppCore(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ac.Start(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := ac.propertyRegistry.evaluateCondition(testHelperNewCondition("is_debug_build", t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result != true {
+		t.Fatal("is_debug_build should be true")
 	}
 }
 
@@ -855,7 +895,7 @@ func TestSetLogEvents(t *testing.T) {
 	if ac.eventManager.logEvents {
 		t.Fatal("logEvents should be false by default")
 	}
-	ac.SetLogEvents(true)
+	ac.SetDeveloperMode(true)
 	if !ac.eventManager.logEvents {
 		t.Fatal("logEvents should be true after setting")
 	}
