@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setDeveloperMode:(bool)devMode;
 
 /// :nodoc: Replaced by setDeveloperMode which logs events, and more.
-- (void)setLogEvents:(bool)logEvents;
+- (void)setLogEvents:(bool)logEvents __attribute__((deprecated("Use setDeveloperMode: instead")));
 
 #pragma mark Feature Flags / Named Conditions
 

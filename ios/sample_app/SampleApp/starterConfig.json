@@ -512,5 +512,10 @@
         "secondaryTextColor": "#a6a4a2"
       }
     }
+  },
+  "conditions": {
+    "namedConditions": {
+      "exampleFeatureFlagBatteryAndNetwork": "device_battery_level > 0.2 && has_active_network"
+    }
   }
 }

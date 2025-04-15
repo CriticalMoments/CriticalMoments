@@ -123,15 +123,14 @@ We're here to help!
 
 Can't find an answer in our docs? Need help with integration, have a bug report, or a feature request? Feel free to reach out!
 
-- Email: [support@criticalmoments.io](mailto:support@criticalmoments.io) 
 - Bug tracker: [GitHub Issues](https://github.com/CriticalMoments/CriticalMoments/issues)
 
 ## License ⚖️
 
-Critical Moments requires you to purchase a license to use it in production apps. See our [pricing page](https://criticalmoments.io/pricing) for details. The code of the SDK is fully source-available, and in this repo.
+Critical Moments is MIT open source!
+
+A prior version of Critical Moments was source-available, but required a commercial license. If you've deployed that version, you can now use it for free. The signing tool for config files is [here](https://criticalmoments.io/sign_tool) and will sign any config, including those with pro-features, for free.
 
 ## Copyright ©️
-
-Copyright (c) 2023 Chesterfield Laboratories Inc.
 
 "Critical Moments" and our logos are trademarks. All rights reserved.

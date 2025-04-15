@@ -33,7 +33,7 @@
     [CriticalMoments.sharedInstance setApiKey:apiKey error:nil];
 
 #ifdef DEBUG
-    [CriticalMoments.sharedInstance setLogEvents:true];
+    [CriticalMoments.sharedInstance setDeveloperMode:true];
 #endif
 
     [CriticalMoments.sharedInstance setDevelopmentConfigName:@"cmDevConfig.json"];
