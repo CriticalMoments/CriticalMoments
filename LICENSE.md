@@ -1,11 +1,7 @@
-# How to get a License
+Copyright 2024
 
-See [https://criticalmoments.io/pricing](https://criticalmoments.io/pricing) to acquire a license with rights to use Critical Moments in your products. We have a variety of options available, including free plans for small businesses. You must create an account, agree to our terms, and select a plan to get a license and API key. See [terms](https://criticalmoments.io/legal/terms) for details. This paragraph is instructional, and does not consititue a grant of any rights. 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-# Source-Available License
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-Copyright (c) 2023 Chesterfield Laboratories Inc.
-
-All rights reserved. 
-
-This license does not grant you any right in any trademark or logo.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
